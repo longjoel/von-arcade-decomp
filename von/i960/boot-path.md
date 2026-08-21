@@ -70,6 +70,16 @@ This gives us an initial host-code order for the next annotations: I/O board
 startup, SHARC bootstrap, geometry bootstrap, then the main-data copy and
 decompression callers.
 
+The first non-bootstrap `main_data` consumer worth annotating is the routine at
+`0x3c40`. When its state flag permits, it walks a table at bus address
+`0x02ea2918`, consumes two 16-bit fields at a time, and passes each record
+through `0x1cac8`. That helper stores the three current fields in the host
+state block at `0x00504cdc`-`0x00504ce4` and returns through a saved pointer; it
+is state setup, not a coprocessor dispatch. This looks like a runtime
+table/command consumer rather than a bulk decompressor. The next host-code
+pass should identify the record format and the callers that consume that state
+block.
+
 ## Runtime Trace
 
 Run the headless execution trace with:
