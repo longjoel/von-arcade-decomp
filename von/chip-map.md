@@ -53,6 +53,10 @@ Status labels:
 | `00000000-001fffff` | i960 ROM | Main program image |
 | `00500000-005fffff` | Host RAM | Work RAM |
 | `00900000-0091ffff` | Shared buffer RAM | Geometry/coprocessor buffers |
+| `00800000-00803fff` | Geometry command window | 16-byte slots; `+4`/`+8` likely command/data lengths, semantics unconfirmed |
+| `00804000-00807fff` | Geometry program port | 9,340-word host upload boundary; target storage/format unknown |
+| `00884000-00887fff` | SHARC host FIFO | Upload transport and runtime command FIFO |
+| `008c0000-008c0fff` | SHARC external I/O | ADSP-21062 external I/O port |
 | `00840000-00840fff` | Geo/SHARC IOP window | Host-side coprocessor register setup; writes are logged, semantics unknown |
 | `01000000-010fffff` | Tilemap/character device | 2D tile and character data |
 | `01800000-0181bfff` | Palette/color translation | Video color state |

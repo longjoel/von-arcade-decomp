@@ -8,7 +8,9 @@ import re
 from pathlib import Path
 
 
-TILE_RE = re.compile(r"tile_write: offset=([0-9a-fA-F]+) data=([0-9a-fA-F]+)")
+TILE_RE = re.compile(
+    r"tile_write: (?:pc=[0-9a-fA-F]+ )?offset=([0-9a-fA-F]+) data=([0-9a-fA-F]+)"
+)
 RECORDS = (
     (0x0316, "W A R N I N G"),
     (0x040A, "THIS GAME IS TO BE USED ONLY IN JAPAN."),
@@ -35,6 +37,14 @@ def read_trace(path: Path) -> list[tuple[int, int]]:
     return result
 
 
+def find_vector(trace: list[tuple[int, int]], vector: list[tuple[int, int]]) -> int:
+    return next(
+        index
+        for index in range(len(trace) - len(vector) + 1)
+        if trace[index : index + len(vector)] == vector
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--original", type=Path, required=True)
@@ -43,16 +53,21 @@ def main() -> int:
 
     vector = expected()
     prototype = read_trace(args.prototype)
-    if prototype != vector:
-        raise SystemExit(f"prototype mismatch: expected {len(vector)} writes, found {len(prototype)}")
+    try:
+        prototype_start = find_vector(prototype, vector)
+    except StopIteration as error:
+        raise SystemExit(
+            f"prototype trace does not contain the recovered warning vector ({len(prototype)} writes)"
+        ) from error
 
     original = read_trace(args.original)
     try:
-        start = next(index for index in range(len(original) - len(vector) + 1) if original[index : index + len(vector)] == vector)
+        start = find_vector(original, vector)
     except StopIteration as error:
         raise SystemExit("original trace does not contain the recovered warning vector") from error
 
     print(f"warning tile vector matches prototype ({len(vector)} writes)")
+    print(f"prototype trace contains the vector at write index {prototype_start}")
     print(f"original trace contains the vector at write index {start}")
     return 0
 

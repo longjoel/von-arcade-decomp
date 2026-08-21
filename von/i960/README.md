@@ -26,5 +26,5 @@ runtime entry point only records a heartbeat in host RAM and loops.
 
 The prototype also parses the recovered text-record table from `main_data` at
 `0x02ea2918` and renders its records into the Model 2 tile RAM window at
-`0x01000000`. The inferred line-to-tile position formula and `0x8000 | ASCII`
-encoding are validated against the original `vonj` host trace.
+`0x01000000`. The recovered `(row << 6) + column` position formula and
+`0x8000 | ASCII` encoding are validated against the original `vonj` host trace.

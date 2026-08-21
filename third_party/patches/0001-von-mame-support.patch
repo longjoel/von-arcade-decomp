@@ -106,7 +106,41 @@ index f7dc5064..dbc3990e 100644
  void model2b_state::copro_sharc_map(address_map &map)
  {
  	map(0x0400000, 0x0bfffff).r(m_copro_fifo_in, FUNC(generic_fifo_u32_device::read));
-@@ -791,7 +798,7 @@ void model2_state::geo_prg_w(u32 data)
+@@ -677,21 +684,33 @@ void model2b_state::copro_fifo_w(u32 data)
+ void model2b_state::copro_fifo_w(u32 data)
+ {
+ 	if (m_coproctl & 0x80000000)
+ 	{
+ 		m_copro_adsp->external_dma_write(m_coprocnt, data & 0xffff);
+ 		m_coprocnt++;
+ 	}
+ 	else
+ 	{
++		static unsigned vonj_copro_fifo_trace_count;
++		if ((machine().system().name == std::string_view("vonj")) && (vonj_copro_fifo_trace_count < 256))
++		{
++			logerror("vonj_copro_fifo: pc=%08x data=%08x\n", m_maincpu->pc(), data);
++			vonj_copro_fifo_trace_count++;
++		}
+ 		m_copro_fifo_in->push(u32(data));
+ 	}
+ }
+ 
+ void model2b_state::copro_function_port_w(offs_t offset, u32 data)
+ {
++	static unsigned vonj_copro_function_trace_count;
+ 	u32 d = data & 0x800fffff;
+ 	u32 a = (offset >> 2) & 0xff;
+ 	d |= a << 23;
++	if ((machine().system().name == std::string_view("vonj")) && (vonj_copro_function_trace_count < 256))
++	{
++		logerror("vonj_copro_function: pc=%08x offset=%04x data=%08x normalized=%08x\n", m_maincpu->pc(), offset * 4, data, d);
++		vonj_copro_function_trace_count++;
++	}
+ 
+ 	m_copro_fifo_in->push(u32(d));
+ }
+@@ -791,7 +809,7 @@ void model2_state::geo_prg_w(u32 data)
  {
  	if (m_geoctl & 0x80000000)
  	{
@@ -115,6 +149,21 @@ index f7dc5064..dbc3990e 100644
  		m_geocnt++;
  	}
  	else
+@@ -822,8 +829,14 @@ u32 model2_state::geo_r(offs_t offset)
+ void model2_state::geo_w(offs_t offset, u32 data)
+ {
+ 	int address = offset * 4;
++	static unsigned vonj_geo_trace_count;
+ 
+ 	if (address < 0x1000)
+ 	{
++		if ((machine().system().name == std::string_view("vonj")) && (m_geocnt > 0) && ((data != 0) || (vonj_geo_trace_count < 32)) && (vonj_geo_trace_count < 512))
++		{
++			logerror("vonj_geo_cmd: pc=%08x address=%04x data=%08x ctl=%08x\n", m_maincpu->pc(), address, data, m_geoctl);
++			vonj_geo_trace_count++;
++		}
+ 
+ 		/*if (data & 0x80000000)
 @@ -1385,7 +1392,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
  
  	map(0x00804000, 0x00807fff).rw(FUNC(model2b_state::geo_prg_r), FUNC(model2b_state::geo_prg_w));
@@ -276,7 +325,7 @@ index f94f4b7a..80835bee 100644
 +	static unsigned vonj_trace_count;
 +	if (((machine().system().name == std::string_view("vonj")) || (machine().system().name == std::string_view("vonjdev"))) && data && (offset < 0x1000) && (vonj_trace_count < 4096))
 +	{
-+		logerror("vonj_tile_write: offset=%04x data=%04x mask=%04x\n", offset, data, mem_mask);
++		logerror("vonj_tile_write: pc=%08x offset=%04x data=%04x mask=%04x\n", machine().device<cpu_device>("maincpu")->pc(), offset, data, mem_mask);
 +		vonj_trace_count++;
 +	}
  	COMBINE_DATA(tile_ram.get() + offset);

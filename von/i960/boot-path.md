@@ -82,8 +82,25 @@ snapshots the fields into `0x00504ce8`-`0x00504cf0`, `0x1ccd0` walks a
 NUL-terminated string, and `0x1cc40` emits character data to
 `0x01000000`, the Model 2 tile RAM region. The table at `0x02ea2918`
 therefore appears to provide formatted messages or text records rather than
-bulk decompression data. The next host-code pass should identify the record
-fields and connect the text output to the visible attract/menu screens.
+bulk decompression data.
+
+The tile writer confirms the record fields: the first field initializes the
+column at `0x00504ce0`, the second initializes the row at `0x00504ce4`, and
+each printable character is written at `(row << 6) + column` with `0x8000`
+ORed into the character value. The column advances after each write. This
+explains the warning vector without a table-specific position exception; the
+remaining text-path work is to validate control characters and other tables.
+
+Formatted diagnostics use the same writer. The formatter entry at `0xf5100`
+dispatches through `0xf5190`, whose output loop calls `0x1cc40` byte by byte.
+The format string at `0x0c57a0` is `"Result : Node ID = %-2d\n"`, providing
+a concrete newline-bearing caller even though the warning table itself only
+contains printable ASCII.
+
+The five-second boot trace also exercises the loader's `"Done\n"` string at
+`0x00028170`. It writes `Done` at offsets `0x0323`-`0x0326`; the following
+`Bank1` text starts at `0x0359`, confirming a one-row (`0x40` tile) advance in
+the original runtime rather than only in static disassembly.
 
 The first table is the legal warning shown by the Japanese set:
 
@@ -153,6 +170,48 @@ space at `0x01c00002`. The ROM writes `0x4d`, reads the low byte back, and uses
 the result to select its I/O initialization path. The mirror makes that
 self-test complete without inventing a new device register; the physical
 address-line reason for the alias remains to be confirmed.
+
+The geometry bootstrap is bounded at the host boundary. The routine at
+`0x00028600` derives source bus address `0x02fc6290` from the `main_data` window,
+configures `0x00840000` with the ten observed writes listed in
+`disassembly-annotations.md`, and streams 9,340 masked 16-bit values to
+`0x00804000`. The source bytes match `main_data + 0x00fc6290` exactly. The
+target processor memory and side effects remain unknown and are intentionally
+not modeled.
+
+The uploaded stream is 9,340 16-bit units, leaving one unit modulo a 3-word
+group. It is therefore not treated as a contiguous 48-bit SHARC instruction
+image. The `0x00804000` program-port stream remains a separate geometry
+microprogram/data boundary from the SHARC bootstrap at `0x00980000`.
+
+The SHARC bootstrap is independently bounded: `0x000282e0` enables upload mode
+at `0x00980000`, transfers `0x2b1e` 16-bit words from main-ROM offset
+`0x0016b58c` through `0x00884000`, then clears the upload bit. MAME forwards
+these words to the ADSP-21062 external DMA interface and releases its halt
+line. This transport is modeled; SHARC execution and payload interpretation
+remain deferred.
+
+The first post-upload command activity is separate from the program port. The
+host clears 16-byte slots at `0x00800000`, then copies the inline table at
+`0x00028470` into that window. The first nonzero observed fields are at
+`0x00800014`, `0x00800024`, `0x00800028`, `0x00800034`, `0x00800044`, and
+`0x00800048`, with values `4`, `8`, `0x88`, `6`, `1`, and `1`. This establishes
+a slot-based geometry command boundary. MAME's existing handler labels slot
+offsets `+4` and `+8` as command-length and data-length fields, respectively;
+that interpretation is probable but remains unconfirmed until a nonzero
+command stream is decoded.
+
+The longer trace now provides that first nonzero command stream. Host writes at
+`0x00028c08`/`0x00028e88` use low-nibble-zero command addresses, and the MAME
+normalization produces `0x07800f0f`, `0x02000404`, `0x08001010`, and
+`0x0a001414` from the observed `0x0f0f`, `0x0404`, `0x1010`, and `0x1414`
+payloads. This validates the host-to-buffer encoding boundary, not the
+processor-side command meanings.
+
+The following routine at `0x00028de8` synchronizes submission to the video
+frame counter at `0x0098000c`, then updates the geometry write-start/read-start
+registers at `0x00801008`/`0x00803008`. These are buffer-pointer and phase
+controls; they are not evidence that the uploaded program has executed.
 
 `boot-trace.cmd` contains debugger breakpoints and watchpoints for interactive
 use with a MAME debugger frontend. The headless `none` backend does not process
