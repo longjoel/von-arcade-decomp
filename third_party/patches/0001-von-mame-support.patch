@@ -265,3 +265,20 @@ index fb59a458..e0ed411a 100644
  };
  
  /*****************************
+diff --git a/src/mame/sega/segaic24.cpp b/src/mame/sega/segaic24.cpp
+index f94f4b7a..80835bee 100644
+--- a/src/mame/sega/segaic24.cpp
++++ b/src/mame/sega/segaic24.cpp
+@@ -530,6 +530,12 @@ uint16_t segas24_tile_device::char_r(offs_t offset)
+ 
+ void segas24_tile_device::tile_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+ {
++	static unsigned vonj_trace_count;
++	if (((machine().system().name == std::string_view("vonj")) || (machine().system().name == std::string_view("vonjdev"))) && data && (offset < 0x1000) && (vonj_trace_count < 4096))
++	{
++		logerror("vonj_tile_write: offset=%04x data=%04x mask=%04x\n", offset, data, mem_mask);
++		vonj_trace_count++;
++	}
+ 	COMBINE_DATA(tile_ram.get() + offset);
+ 	if(offset < 0x4000)
+ 		tile_layer[offset >> 12]->mark_tile_dirty(offset & 0xfff);

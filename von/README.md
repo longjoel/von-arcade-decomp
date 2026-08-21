@@ -78,6 +78,7 @@ Run the project workflow from the repository root:
 ./scripts/trace-i960-boot.sh # trace reset and early host initialization in MAME
 python3 von/tools/analyze_geo_upload.py # locate the captured geometry stream in main_data
 python3 von/tools/analyze_i960_refs.py # list host-code references to Model 2 regions
+python3 von/tools/compare_tile_trace.py --original <trace> --prototype <trace> # compare warning tile writes
 ./scripts/run-i960.sh  # run the generated i960 host ROM with original support ROMs
 ./scripts/test.sh      # audit ROMs and validate the vonj driver
 ./scripts/run.sh       # launch vonj; pass extra MAME arguments

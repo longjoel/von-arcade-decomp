@@ -82,3 +82,28 @@ Model 2 tile RAM region at `0x01000000`. This establishes that the
 The exact tile coordinates and the meaning of the `line_or_layout` field remain
 open. The next annotation target is the code that consumes the saved text
 state and selects the tilemap destination.
+
+## Prototype Reproduction
+
+The i960 prototype now contains the nine recovered warning records and writes
+the captured tile vector directly to `0x01000000`. Its output matches the
+original trace exactly:
+
+```text
+tile encoding: 0x8000 | ASCII
+first tile:    offset 0x0316, value 0x8057 ('W')
+last tile:     offset 0x0831, value 0x8044 ('D')
+total writes:  299
+```
+
+Build and run the prototype with:
+
+```sh
+./scripts/i960-build.sh
+./scripts/run-i960.sh -video none -sound none -oslog -seconds_to_run 1 -skip_gameinfo
+```
+
+The output can be compared against a captured original trace with
+`von/tools/compare_tile_trace.py`. This is intentionally a fixed regression
+vector before the generic record parser and tile-position calculation are
+recovered.

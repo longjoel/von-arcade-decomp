@@ -23,7 +23,7 @@ LD_LIBRARY_PATH="$RUNTIME_PATH" \
         -video none \
         -sound none \
         -oslog \
-        -seconds_to_run 1 \
+        -seconds_to_run "${VON_TRACE_SECONDS:-1}" \
         -skip_gameinfo \
         > "$TRACE_LOG" 2>&1
 popd >/dev/null
