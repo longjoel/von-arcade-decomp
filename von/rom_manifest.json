@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "title": "Cyber Troopers: Virtual-On",
+  "platform": "arcade-model-2",
+  "set_status": "unverified",
+  "set_hypothesis": "The labels appear related to a Virtual-On twin configuration; confirm against the exact MAME driver set before reverse engineering.",
+  "artifacts": [
+    {"name":"epr-18643a.7","size":131072,"sha256":"de8636d3653997a1fa5f75cfbfb62a7fa7f104317e2a8bad70a199de608674cb","role":"epr","region":"unknown"},
+    {"name":"epr-18664b.15","size":524288,"sha256":"f0b83c4751baeace121f9cefc2c2074c8cbb63e1f980c0bf57c668b0c0620f72","role":"epr","region":"unknown"},
+    {"name":"epr-18665b.16","size":524288,"sha256":"e56b8e937f4fcdfca0dd64e201d3677c82b84b15a5b8046e76b6fdae6585bee9","role":"epr","region":"unknown"},
+    {"name":"epr-18666.13","size":524288,"sha256":"8272513e035abaa8270f28c7603a591a3da6c77a8504a456d514fffcf8a12d79","role":"epr","region":"unknown"},
+    {"name":"epr-18667.14","size":524288,"sha256":"b25b2e995adc2717882bd60842ff1c65204d9123183a9f9689206a879e1d5bac","role":"epr","region":"unknown"},
+    {"name":"epr-18670.31","size":524288,"sha256":"b890cfa7c573e9ebf9ee3fb8d6013507dfecc36b8b9c7f4b374dde9443e9b79a","role":"epr","region":"unknown"},
+    {"name":"mpr-18648.11","size":4194304,"sha256":"37cbb0aa1188cf825146b6a761cb81f1694c902602d2ec8eaf010f08c635369c","role":"mpr","region":"unknown"},
+    {"name":"mpr-18649.12","size":4194304,"sha256":"a07689dd930513dd82e1add289c040ce08bc45a170d563f82832c5c5145877ac","role":"mpr","region":"unknown"},
+    {"name":"mpr-18650.9","size":4194304,"sha256":"02ee6cacf8ad266133f063af42230971a74060e77855d6151aa6154a3c2c2630","role":"mpr","region":"unknown"},
+    {"name":"mpr-18651.10","size":4194304,"sha256":"1a6ed2a58f9194902fcff466c86ffc931a9c0d7b8ba824f2c86929a73b6ace36","role":"mpr","region":"unknown"},
+    {"name":"mpr-18652.32","size":4194304,"sha256":"4ed5680fa372d24508a49f82c18302517f278a5f15dbfb2b717c252305da3edf","role":"mpr","region":"unknown"},
+    {"name":"mpr-18653.34","size":4194304,"sha256":"9f6076bf6db36e2016500674abd45ef49954f10d20807ca823a60500740ee86a","role":"mpr","region":"unknown"},
+    {"name":"mpr-18654.17","size":4194304,"sha256":"8918629af3b6e99e671a9604c06e56615f369a654b2b664ace19ad7d69b6d658","role":"mpr","region":"unknown"},
+    {"name":"mpr-18655.21","size":4194304,"sha256":"2c645eb787ef144ca1b6891bd2826ea386298ebcf160d0e82b8cda8798773734","role":"mpr","region":"unknown"},
+    {"name":"mpr-18656.18","size":4194304,"sha256":"1b245e69d8c47efcb87062bf950e3d801195e18dad64de328bb8279d67f57c5b","role":"mpr","region":"unknown"},
+    {"name":"mpr-18657.22","size":4194304,"sha256":"75a0b9bedd1731c6ed64ababba7cf75391f8aa1e0f52ddd67bddbc40adce5001","role":"mpr","region":"unknown"},
+    {"name":"mpr-18658.25","size":2097152,"sha256":"51a78f2ac65263181f39726a6fc921d661bb099b63157e5197c7d6b809e067aa","role":"mpr","region":"unknown"},
+    {"name":"mpr-18659.26","size":2097152,"sha256":"f3db93571604124622b494c262e96002272bd21d9d6e8e496f069a4daedaa4ea","role":"mpr","region":"unknown"},
+    {"name":"mpr-18660.27","size":2097152,"sha256":"01083ce108512f33438876e857bf633642ff334c717f55edf2d9859e29901e4b","role":"mpr","region":"unknown"},
+    {"name":"mpr-18661.28","size":2097152,"sha256":"9f9a7e683dbd4b92224c72353aa674745a8919e131affd77cd486454d53bc9f7","role":"mpr","region":"unknown"},
+    {"name":"mpr-18662.29","size":2097152,"sha256":"2f1457dfc752e6ff7a5199810633850d675cf698d3568b3635eb0f5232fb6a0c","role":"mpr","region":"unknown"},
+    {"name":"mpr-18663.30","size":2097152,"sha256":"97c2131358890d3ff51f4d22af21f5a69a59c1cf211a8f04e23bf453419f5248","role":"mpr","region":"unknown"},
+    {"name":"vo-prog0.usa","size":524288,"sha256":"cecf0ac7740f0fccaf0962cd4ab2f6bda5455a1e88a34c3dcb420b12bdff6124","role":"program","region":"unknown"},
+    {"name":"vo-prog1.usa","size":524288,"sha256":"d46de6dcf05ad232745de96d07065a09bc1411dbd85e4c34e6f2467214f08097","role":"program","region":"unknown"}
+  ]
+}
