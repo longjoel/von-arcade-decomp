@@ -53,11 +53,13 @@ Status labels:
 | `00000000-001fffff` | i960 ROM | Main program image |
 | `00500000-005fffff` | Host RAM | Work RAM |
 | `00900000-0091ffff` | Shared buffer RAM | Geometry/coprocessor buffers |
+| `00840000-00840fff` | Geo/SHARC IOP window | Host-side coprocessor register setup; writes are logged, semantics unknown |
 | `01000000-010fffff` | Tilemap/character device | 2D tile and character data |
 | `01800000-0181bfff` | Palette/color translation | Video color state |
 | `01a00000-01a03fff` | Communication board shared RAM | Cabinet link mailbox/frame memory |
 | `01a04000` | Communication board CN register | Board enable/reset |
 | `01a04002` | Communication board FG register | Flip-gate/communication synchronization |
+| `01c00200` | 315-5649 I/O mirror candidate | Host self-test writes `0x4d` and reads it back; modeled with a `0x200` address mirror |
 | `01d00000-01d03fff` | Backup SRAM | Persistent state |
 | `02000000-03ffffff` | ROM board data window | Game data |
 | `06000000-06ffffff` | ROM board extra data window | Additional game data |

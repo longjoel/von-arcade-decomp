@@ -89,10 +89,51 @@ index e6a3dfe1..af9230a4 100644
  
  #ifdef M2COMM_SIMULATION
 diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
-index f7dc5064..d2a281d6 100644
+index f7dc5064..dbc3990e 100644
 --- a/src/mame/sega/model2.cpp
 +++ b/src/mame/sega/model2.cpp
-@@ -2436,6 +2436,9 @@ void model2_state::screen_vblank(int state)
+@@ -646,6 +646,13 @@ void model2b_state::copro_sharc_buffer_w(offs_t offset, u32 data)
+ 	m_bufferram[offset & 0x7fff] = data;
+ }
+ 
++void model2b_state::geo_sharc_iop_w(offs_t offset, u32 data)
++{
++	// The Virtual-On host initializes this Geo/SHARC IOP window, but the
++	// register meanings and side effects are not established yet.
++	logerror("geo_sharc_iop_w: PC:%08x address:%04x data:%08x\n", m_maincpu->pc(), offset * 4, data);
++}
++
+ void model2b_state::copro_sharc_map(address_map &map)
+ {
+ 	map(0x0400000, 0x0bfffff).r(m_copro_fifo_in, FUNC(generic_fifo_u32_device::read));
+@@ -791,7 +798,7 @@ void model2_state::geo_prg_w(u32 data)
+ {
+ 	if (m_geoctl & 0x80000000)
+ 	{
+-		//logerror("geo_prg_w: %08X:   %08X\n", m_geocnt, data);
++		logerror("geo_prg_data: %04x\n", data & 0xffff);
+ 		m_geocnt++;
+ 	}
+ 	else
+@@ -1385,7 +1392,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
+ 
+ 	map(0x00804000, 0x00807fff).rw(FUNC(model2b_state::geo_prg_r), FUNC(model2b_state::geo_prg_w));
+ 	//map(0x00804000, 0x00807fff).rw(FUNC(model2b_state::geo_sharc_fifo_r), FUNC(model2b_state::geo_sharc_fifo_w));
+-	//map(0x00840000, 0x00840fff).w(FUNC(model2b_state::geo_sharc_iop_w));
++	map(0x00840000, 0x00840fff).w(FUNC(model2b_state::geo_sharc_iop_w));
+ 
+ 	map(0x00880000, 0x00883fff).w(FUNC(model2b_state::copro_function_port_w));
+ 	map(0x00884000, 0x00887fff).rw(FUNC(model2b_state::copro_fifo_r), FUNC(model2b_state::copro_fifo_w));
+@@ -1404,7 +1411,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
+ 	map(0x11300000, 0x113fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
+ 	map(0x11400000, 0x1140ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).umask16(0x00ff).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
+ 
+-	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
++	map(0x01c00000, 0x01c0001f).mirror(0x00000200).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
+ 	map(0x01c00040, 0x01c00043).nopw();
+ }
+ 
+@@ -2436,6 +2443,9 @@ void model2_state::screen_vblank(int state)
  	}
  	if (m_m2comm)
  		m_m2comm->check_vint_irq();
@@ -102,7 +143,7 @@ index f7dc5064..d2a281d6 100644
  }
  
  void model2_state::sound_ready_w(int state)
-@@ -2722,7 +2725,7 @@ void model2a_state::model2a(machine_config &config)
+@@ -2722,7 +2732,7 @@ void model2a_state::model2a(machine_config &config)
  	io.in_pc_callback().set_ioport("IN1");
  	io.in_pd_callback().set_ioport("IN2");
  	io.in_pg_callback().set_ioport("SW");
@@ -111,7 +152,7 @@ index f7dc5064..d2a281d6 100644
  	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
  
  	model2_timers(config);
-@@ -2860,7 +2863,7 @@ void model2b_state::model2b(machine_config &config)
+@@ -2860,7 +2870,7 @@ void model2b_state::model2b(machine_config &config)
  	io.in_pc_callback().set_ioport("IN1");
  	io.in_pd_callback().set_ioport("IN2");
  	io.in_pg_callback().set_ioport("SW");
@@ -120,7 +161,7 @@ index f7dc5064..d2a281d6 100644
  	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
  
  	model2_timers(config);
-@@ -2874,6 +2877,14 @@ void model2b_state::model2b(machine_config &config)
+@@ -2874,6 +2884,14 @@ void model2b_state::model2b(machine_config &config)
  	config.set_default_layout(layout_segabill);
  }
  
@@ -135,7 +176,7 @@ index f7dc5064..d2a281d6 100644
  void model2b_state::model2b_5881(machine_config &config)
  {
  	model2b(config);
-@@ -6371,6 +6382,43 @@ ROM_START( vonj ) /* Virtual On Cyber Troopers Revision B (Japan), Model 2B, Seg
+@@ -6371,6 +6389,43 @@ ROM_START( vonj ) /* Virtual On Cyber Troopers Revision B (Japan), Model 2B, Seg
  	ROM_LOAD16_WORD_SWAP("mpr-18653.34", 0x400000, 0x400000, CRC(9ec3e7bf) SHA1(197bc8adc823e93128c1cebf69361a7c7297f808) )
  ROM_END
  
@@ -179,7 +220,7 @@ index f7dc5064..d2a281d6 100644
  ROM_START( vonr ) /* Virtual On Cyber Troopers Relay (Japan) */
  	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
  	ROM_LOAD32_WORD("epr-18671.15",  0x000000, 0x080000, CRC(fdc01c6b) SHA1(27f10bf02f31688009041b7c85a9527408adcb59) )
-@@ -7672,10 +7720,11 @@ GAME( 1995, gunblade,   0,        gunblade,     gunblade,  model2b_state, empty_
+@@ -7672,10 +7727,11 @@ GAME( 1995, gunblade,   0,        gunblade,     gunblade,  model2b_state, empty_
  GAMEL(1995, indy500,    0,        indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Twin (Revision A, Newer)", MACHINE_NOT_WORKING, layout_vr)
  GAMEL(1995, indy500d,   indy500,  indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Deluxe (Revision A)", MACHINE_NOT_WORKING, layout_vr)
  GAMEL(1995, indy500to,  indy500,  indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Twin (Revision A)", MACHINE_NOT_WORKING, layout_vr)
@@ -196,7 +237,7 @@ index f7dc5064..d2a281d6 100644
  GAME( 1996, sfight,     schamp,   model2b,      schamp,    model2b_state, empty_init,    ROT0, "Sega",   "Sonic the Fighters (Japan)", MACHINE_NOT_WORKING )
  GAME( 1996, lastbrnx,   0,        model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (Export, Revision A)", MACHINE_NOT_WORKING )
 diff --git a/src/mame/sega/model2.h b/src/mame/sega/model2.h
-index fb59a458..58c74bf6 100644
+index fb59a458..e0ed411a 100644
 --- a/src/mame/sega/model2.h
 +++ b/src/mame/sega/model2.h
 @@ -538,6 +538,7 @@ public:
@@ -207,7 +248,15 @@ index fb59a458..58c74bf6 100644
  	void model2b_0229(machine_config &config) ATTR_COLD;
  	void model2b_5881(machine_config &config) ATTR_COLD;
  	void indy500(machine_config &config) ATTR_COLD;
-@@ -572,7 +573,7 @@ protected:
+@@ -558,6 +559,7 @@ protected:
+ 	void copro_fifo_w(u32 data);
+ 	u32 copro_sharc_buffer_r(offs_t offset);
+ 	void copro_sharc_buffer_w(offs_t offset, u32 data);
++	void geo_sharc_iop_w(offs_t offset, u32 data);
+ 
+ 	void model2b_crx_mem(address_map &map) ATTR_COLD;
+ 	void model2b_5881_mem(address_map &map) ATTR_COLD;
+@@ -572,7 +574,7 @@ protected:
  	virtual void copro_boot() override;
  
  private:

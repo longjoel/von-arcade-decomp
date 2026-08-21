@@ -51,6 +51,10 @@ The initial hardware inventory is documented in [`chip-map.md`](chip-map.md).
 It distinguishes confirmed board/ROM mappings from inferred and unresolved
 physical chip identities.
 
+The first host-ROM analysis is documented in
+[`i960/boot-path.md`](i960/boot-path.md). Run `./scripts/disasm-i960.sh` to
+recreate its local disassembly output.
+
 ### Billboard workaround
 
 The shared Model 2B configuration normally includes the Sega Versus City
@@ -68,6 +72,10 @@ Run the project workflow from the repository root:
 ./scripts/prepare-mame.sh # clone/pin MAME and apply project patches
 ./scripts/build.sh     # build the reduced x64 MAME target
 ./scripts/i960-build.sh # build the Docker-backed i960 C prototype
+./scripts/disasm-i960.sh # reconstruct and disassemble the original vonj i960 ROM
+./scripts/trace-i960-boot.sh # trace reset and early host initialization in MAME
+python3 von/tools/analyze_geo_upload.py # locate the captured geometry stream in main_data
+python3 von/tools/analyze_i960_refs.py # list host-code references to Model 2 regions
 ./scripts/run-i960.sh  # run the generated i960 host ROM with original support ROMs
 ./scripts/test.sh      # audit ROMs and validate the vonj driver
 ./scripts/run.sh       # launch vonj; pass extra MAME arguments
