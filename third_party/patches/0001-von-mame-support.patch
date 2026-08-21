@@ -92,7 +92,7 @@ diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
 index f7dc5064..dbc3990e 100644
 --- a/src/mame/sega/model2.cpp
 +++ b/src/mame/sega/model2.cpp
-@@ -646,6 +646,13 @@ void model2b_state::copro_sharc_buffer_w(offs_t offset, u32 data)
+@@ -646,5 +646,12 @@ void model2b_state::copro_sharc_buffer_w(offs_t offset, u32 data)
  	m_bufferram[offset & 0x7fff] = data;
  }
  
@@ -105,7 +105,20 @@ index f7dc5064..dbc3990e 100644
 +
  void model2b_state::copro_sharc_map(address_map &map)
  {
- 	map(0x0400000, 0x0bfffff).r(m_copro_fifo_in, FUNC(generic_fifo_u32_device::read));
+@@ -673,5 +673,12 @@ u32 model2b_state::copro_fifo_r()
+ u32 model2b_state::copro_fifo_r()
+ {
+-	return m_copro_fifo_out->pop();
++	u32 data = m_copro_fifo_out->pop();
++	static unsigned vonj_copro_response_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) && (vonj_copro_response_trace_count < 256))
++	{
++		logerror("vonj_copro_response: pc=%08x data=%08x\n", m_maincpu->pc(), data);
++		vonj_copro_response_trace_count++;
++	}
++	return data;
+ }
+
 @@ -677,21 +684,33 @@ void model2b_state::copro_fifo_w(u32 data)
  void model2b_state::copro_fifo_w(u32 data)
  {
@@ -117,7 +130,7 @@ index f7dc5064..dbc3990e 100644
  	else
  	{
 +		static unsigned vonj_copro_fifo_trace_count;
-+		if ((machine().system().name == std::string_view("vonj")) && (vonj_copro_fifo_trace_count < 256))
++		if ((machine().system().name == std::string_view("vonj")) && ((vonj_copro_fifo_trace_count < 256) || (data != 8)))
 +		{
 +			logerror("vonj_copro_fifo: pc=%08x data=%08x\n", m_maincpu->pc(), data);
 +			vonj_copro_fifo_trace_count++;

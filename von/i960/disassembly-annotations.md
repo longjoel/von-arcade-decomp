@@ -349,6 +349,100 @@ branches, parallel memory operations, and hardware FIFO flags. MAME's SHARC
 core is currently the precise execution reference; the extracted listing is
 the basis for a later C routine port.
 
+### SHARC Service Dispatcher
+
+The corrected 6-byte-to-8-byte program packing exposes the startup dispatcher.
+Initialization at program slots `0x092-0x11d` builds a table at SHARC data
+memory `0x00030000`. The main loop then:
+
+1. Waits for FIFO input flag 0 to become non-empty.
+2. Reads an opcode and masks it to the low byte.
+3. Loads `DM(0x00030000 + opcode)` as an indirect program address.
+4. Calls that address in the `0x20000` program-memory bank.
+
+The first table entries identify small scalar services:
+
+```text
+opcode  target  observed body
+0x00    0x133   F0 = F0 + F1
+0x01    0x13b   F0 = F0 - F1
+0x02    0x143   F0 = F0 * F1
+0x03    0x14b   reciprocal-style polynomial/Newton operation
+0x04    0x15b   division-style operation using two inputs
+0x08    0x1bf   service-state initialization
+```
+
+Results are written through the SHARC output FIFO at `I1 = 0x00c00000`,
+matching MAME's `copro_fifo_out` mapping. This explains why the SHARC is not
+just a geometry command sink: it exposes a general math service interface.
+
+If a host FIFO value `0x44` is consumed as a dispatcher opcode, the table maps
+it to local slot `0xbab`. That handler consumes three input words,
+sign-extends two of them, converts them to floating point, calls helper
+regions at `0xdbe` and `0xdc4`, and emits at least two result words through the
+output FIFO. Those helpers use polynomial constants, `pi/2`-scale values, and
+reciprocal refinement, making a trigonometric or angle-related operation
+probable; execution-side correlation is still needed before assigning this
+handler to the observed host `0x44` writes.
+
+### Response-Side Confirmation
+
+The bounded response instrumentation logs reads from the SHARC output FIFO as
+`vonj_copro_response`. A 30-second original-ROM trace produced 256 bounded
+response reads, including values with plausible IEEE-754 encodings such as:
+
+```text
+0x41cdbfa3  0xbf34fdf4  0xbf6c7957  0x3f800000
+0x3e47baf0  0x3d5fffff  0x41f3014a  0x3f3504f6
+```
+
+The trace also shows repeated opcode `0x08` writes from later host routines,
+but no function-port writes. The response values are not yet paired to a
+specific opcode because the bounded FIFO trace reaches its cap and the host
+operand path is still only partially instrumented. They do confirm that the
+SHARC is actively returning computed numeric data rather than remaining a
+boot-only coprocessor.
+
+The same trace records repeated host FIFO writes of `0x08` from later routines
+at `0x000187d8` and `0x00003c5c`, plus recurring `0x44` values from several
+host routines. One representative FIFO sequence is:
+
+```text
+0x00000044, 0x00000014, 0x00000b73, 0x0000003a, 0x000009d8
+```
+
+No function-port writes appear. Because the SHARC dispatcher and handlers
+consume variable numbers of FIFO words, this sequence cannot yet be split into
+opcode and operands from host writes alone. The numeric response stream
+confirms active SHARC computation, but is not yet a complete test vector for a
+named service.
+
+### SHARC Documentation To Obtain
+
+The most relevant external reference is the Analog Devices **ADSP-2106x SHARC
+Processor User's Manual, Revision 2.1**, part number `82-000795-03`:
+
+```text
+https://www.analog.com/media/en/dsp-documentation/processor-manuals/50836807228561ADSP2106xSHARCProcessorUsersManual_Revision2_1.pdf
+```
+
+The useful sections are the instruction-set appendix, PM/DM memory model, host
+interface, DMA controller, interrupt/flag inputs, boot modes, and floating-point
+compute instructions. The companion ADSP-21060/21061/21062 datasheet is useful
+for package-level bus and host-port details, but the processor manual is the
+higher-value source for this ROM.
+
+The local MAME sources remain essential executable documentation:
+
+- `third_party/mame-master/src/devices/cpu/sharc/sharc_dasm.cpp`: instruction encoding and disassembly syntax.
+- `third_party/mame-master/src/devices/cpu/sharc/sharc.cpp`: DMA packing, host boot, I/O, and core state.
+- `third_party/mame-master/src/devices/cpu/sharc/sharcdrc.cpp`: execution behavior used by the recompiler.
+- `third_party/mame-master/src/mame/sega/model2.cpp`: Model 2B FIFO, shared RAM, and host mappings.
+
+The practical workflow is now: use the manual to decode an instruction and its
+flags, use MAME to verify packing behavior, then use the extracted listing and
+bounded host packet trace to identify routine inputs and outputs.
+
 ## Prototype Reproduction
 
 The i960 prototype now contains the nine recovered warning records and applies
