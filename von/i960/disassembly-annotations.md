@@ -104,6 +104,6 @@ Build and run the prototype with:
 ```
 
 The output can be compared against a captured original trace with
-`von/tools/compare_tile_trace.py`. This is intentionally a fixed regression
-vector before the generic record parser and tile-position calculation are
-recovered.
+`von/tools/compare_tile_trace.py`. The parser currently supports the recovered
+warning table shape and line range; other text tables will require additional
+position and encoding rules as they are encountered.

@@ -5,43 +5,47 @@ typedef unsigned short u16;
  * depending on the original game's I/O or coprocessor initialization. */
 #define WORKRAM ((volatile u32 *)0x00500000)
 #define TILERAM ((volatile u16 *)0x01000000)
+#define WARNING_TABLE ((volatile unsigned char *)0x02EA2918)
 
-struct warning_record
+static u32 tile_offset_for_line(u16 line)
 {
-    u16 id;
-    u16 line;
-    const char *text;
-    u32 tile_offset;
-};
+    if (line == 0x000c)
+        return 0x0316;
+    if (line < 0x0010 || line > 0x0020 || (line & 1) != 0)
+        return 0xffffffffUL;
+    return 0x040a + ((u32)(line - 0x0010) / 2) * 0x80;
+}
 
-static const struct warning_record warning_records[] = {
-    {0x0016, 0x000c, "W A R N I N G", 0x0316},
-    {0x000a, 0x0010, "THIS GAME IS TO BE USED ONLY IN JAPAN.", 0x040a},
-    {0x000a, 0x0012, "EXPORT, SALES, DISTRIBUTION AND/OR", 0x048a},
-    {0x000a, 0x0014, "OPERATION OUTSIDE THIS AREA MAY", 0x050a},
-    {0x000a, 0x0016, "CONSTITUTE A VIOLATION OF INTERNATIONAL", 0x058a},
-    {0x000a, 0x0018, "LAWS ON COPYRIGHTS AND/OR INDUSTRIAL", 0x060a},
-    {0x000a, 0x001a, "PROPERTY RIGHTS AND SUBJECT THE", 0x068a},
-    {0x000a, 0x001c, "VIOLATING PARTY TO LEGAL PROCEEDINGS.", 0x070a},
-    {0x000a, 0x0020, "                   SEGA ENTERPRISES,LTD.", 0x080a},
-};
-
-static void render_warning(void)
+static u32 render_text_table(void)
 {
-    u32 record;
+    volatile const unsigned char *cursor = WARNING_TABLE;
+    u32 records = 0;
 
-    for (record = 0; record < sizeof(warning_records) / sizeof(warning_records[0]); record++)
+    for (;;)
     {
-        const struct warning_record *entry = &warning_records[record];
-        const char *text = entry->text;
+        u16 id = (u16)cursor[0] | ((u16)cursor[1] << 8);
+        u16 line = (u16)cursor[2] | ((u16)cursor[3] << 8);
+        u32 tile_offset;
         u32 index = 0;
 
-        while (text[index] != '\0')
+        cursor += 4;
+        if (id == 0xffff && line == 0xffff)
+            break;
+
+        tile_offset = tile_offset_for_line(line);
+        if (tile_offset == 0xffffffffUL)
+            break;
+
+        while (cursor[index] != '\0')
         {
-            TILERAM[entry->tile_offset + index] = (u16)(0x8000U | (unsigned char)text[index]);
+            TILERAM[tile_offset + index] = (u16)(0x8000U | cursor[index]);
             index++;
         }
+        cursor += index + 1;
+        records++;
     }
+
+    return records;
 }
 
 void i960_prototype_main(void)
@@ -51,7 +55,7 @@ void i960_prototype_main(void)
     *marker = 0x49393630UL;
     marker[1] = 0x50524F54UL;
     marker[2] = marker[2] + 1;
-    render_warning();
+    marker[5] = render_text_table();
     marker[4] = 0x54455854UL;
 
     for (;;)

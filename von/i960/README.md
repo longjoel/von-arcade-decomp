@@ -24,7 +24,7 @@ The linker layout is a first approximation of the Model 2 address map. The
 startup table at address zero follows the i960 Kx reset structure, while the
 runtime entry point only records a heartbeat in host RAM and loops.
 
-The prototype also renders the recovered Japanese warning records into the
-Model 2 tile RAM window at `0x01000000`. The tile offsets and `0x8000 | ASCII`
-encoding are taken from the original `vonj` host trace; this is a first
-behavioral test vector, not yet a general text renderer.
+The prototype also parses the recovered text-record table from `main_data` at
+`0x02ea2918` and renders its records into the Model 2 tile RAM window at
+`0x01000000`. The inferred line-to-tile position formula and `0x8000 | ASCII`
+encoding are validated against the original `vonj` host trace.
