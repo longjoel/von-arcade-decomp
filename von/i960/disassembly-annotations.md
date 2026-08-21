@@ -75,8 +75,8 @@ are not yet fully labeled.
 ### Character Output: `0x0001cc40` and `0x0001ccd0`
 
 `0x1ccd0` iterates a NUL-terminated string and calls `0x1cc40` for each byte.
-`0x1cc40` normalizes the character and writes a 16-bit tile/character value
-into the Model 2 tilemap region at `0x01000000`. This establishes that the
+`0x1cc40` normalizes the character and writes a 16-bit tile value into the
+Model 2 tile RAM region at `0x01000000`. This establishes that the
 `0x3c40` table is UI/message data, not geometry or decompression data.
 
 The exact tile coordinates and the meaning of the `line_or_layout` field remain

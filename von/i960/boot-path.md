@@ -80,7 +80,7 @@ is state setup, not a coprocessor dispatch.
 The surrounding consumers make this a likely text/UI subsystem. `0x1cb00`
 snapshots the fields into `0x00504ce8`-`0x00504cf0`, `0x1ccd0` walks a
 NUL-terminated string, and `0x1cc40` emits character data to
-`0x01000000`, the Model 2 tile/character region. The table at `0x02ea2918`
+`0x01000000`, the Model 2 tile RAM region. The table at `0x02ea2918`
 therefore appears to provide formatted messages or text records rather than
 bulk decompression data. The next host-code pass should identify the record
 fields and connect the text output to the visible attract/menu screens.
