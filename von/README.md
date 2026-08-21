@@ -54,6 +54,8 @@ physical chip identities.
 The first host-ROM analysis is documented in
 [`i960/boot-path.md`](i960/boot-path.md). Run `./scripts/disasm-i960.sh` to
 recreate its local disassembly output.
+Address-level interpretations are maintained in
+[`i960/disassembly-annotations.md`](i960/disassembly-annotations.md).
 
 ### Billboard workaround
 
