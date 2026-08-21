@@ -85,6 +85,24 @@ therefore appears to provide formatted messages or text records rather than
 bulk decompression data. The next host-code pass should identify the record
 fields and connect the text output to the visible attract/menu screens.
 
+The first table is the legal warning shown by the Japanese set:
+
+```text
+W A R N I N G
+THIS GAME IS TO BE USED ONLY IN JAPAN.
+EXPORT, SALES, DISTRIBUTION AND/OR
+OPERATION OUTSIDE THIS AREA MAY
+CONSTITUTE A VIOLATION OF INTERNATIONAL
+LAWS ON COPYRIGHTS AND/OR INDUSTRIAL
+PROPERTY RIGHTS AND SUBJECT THE
+VIOLATING PARTY TO LEGAL PROCEEDINGS.
+                   SEGA ENTERPRISES,LTD.
+```
+
+The first record is `(id=0x0016, line=0x000c)`; subsequent warning lines use
+`id=0x000a` and line/layout values `0x0010` through `0x0020`. The table ends
+with `(0xffff, 0xffff)`.
+
 ## Runtime Trace
 
 Run the headless execution trace with:
