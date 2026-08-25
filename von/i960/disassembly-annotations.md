@@ -400,6 +400,14 @@ copy from ROM address `0x02fb1d10` into `0x11401000`.
 `0x001687a4`; otherwise it submits `0x60` words from `0x001686e4`. The command
 word is zero in both paths.
 
+The startup gate at `0x28840` is more complex than its call site suggests. It
+reads backup SRAM byte `0x01d00027`, subtracts one, and dispatches through the
+nine-entry table at `0x2885c` (with the default path at `0x28974`). The selected
+path initializes profile-dependent floating-point constants and stores values
+at `0x00512bd4`, `0x00512bd8`, and `0x00512bdc` before continuing into a larger
+calculation. It is recorded as `geometry_profile_dispatch`, not reconstructed
+as a boolean status function.
+
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
 phase operations are directly confirmed.
