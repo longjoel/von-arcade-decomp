@@ -373,6 +373,13 @@ words exactly. `recovered_geometry_buffer_prepare()` in
 `von/i960/recovered_geometry.c` implements the same raw IEEE-754 exponent
 logic without relying on host floating-point behavior.
 
+`recovered_geometry_buffer_and_batch_chain()` now connects that generator to
+the recovered four-batch submitter using the original host address
+`0x00509ba0`. `von/tools/verify_geometry_chain.py` verifies the complete
+buffer shape and reports the four `0x800`-word source/command strides. The
+chain is linked into the prototype but remains opt-in rather than being called
+by the smoke-test entry point.
+
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
 phase operations are directly confirmed.
