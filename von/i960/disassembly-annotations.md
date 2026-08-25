@@ -419,6 +419,14 @@ stores the resulting profile state in `0x005039f4` and `0x00503a00`. Its first
 source pointer is `0x02c00008`; the later bank uses `0x02c77438`. The loader's
 return contract and decompression behavior remain intentionally unassigned.
 
+The loader target `0x27e50` is now labeled `texture_decompressor`. Static
+analysis shows it initializes `0xfed` bytes at `0x00511bb0`, clears status at
+`0x00515080`, reads a four-byte big-endian header from its source pointer, and
+returns zero on the normal completion path or the status word at
+`0x00515080` on the alternate path. It writes decoded halfwords through the
+two destination pointers supplied by `0x28120`. The bitstream algorithm is
+left for a separate slice.
+
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
 phase operations are directly confirmed.
