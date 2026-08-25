@@ -301,6 +301,46 @@ parameter advances by `0x2000`, the command offset advances by `0x800`, and the
 batch counter exits at four. It also confirms the initial frame handoff and two
 final `0xf0f` pulses.
 
+### Geometry Pipeline Startup: `0x00028d80`
+
+The caller-side startup routine accepts a mode/status value in its first
+argument. Ghidra and the listing agree on this order:
+
+1. Call the device/status helper at `0x28840`.
+2. When the argument is zero, upload the SHARC bootstrap at `0x282e0` and the
+   geometry program at `0x28620`.
+3. Run initialization helpers at `0x28d08`, `0x28548`, `0x284b8`, and `0x28418`.
+4. In the zero-mode path, run texture/setup helpers at `0x28120` and `0x28d30`.
+5. Prepare the host buffer at `0x00509ba0` through `0x28b80`.
+6. Submit that buffer through the four-batch loop at `0x28c80`.
+7. Store `0xffff` at `0x0181c000` before returning.
+
+This connects the recovered upload and command routines to their first
+caller-side buffer producer. The meaning of the buffer transformation in
+`0x28b80` remains the next unresolved static slice; it uses the i960 floating
+point conversion helper at `0x28b40` and should not yet be rewritten as guessed
+C arithmetic.
+
+### Geometry Buffer Preparation: `0x00028b80`
+
+The Ghidra report establishes the shape of the unresolved producer without
+assigning field names:
+
+- Input parameter is the byte address `0x00509ba0` in the startup caller.
+- The loop counter starts at `0x1fff` and decrements, producing `0x2000`
+  iterations.
+- The output pointer advances by four bytes per iteration.
+- The routine calls `0x28b40` multiple times per record.
+- `0x28b40` uses i960 floating-point `logbnr`, `addr`, and `cvtzri` operations,
+  then clamps the result to zero or `0x80` in its boundary cases.
+- The record packing combines converted values with shifts of `8`, `16`, and
+  `24` bits and reads a table at `0x00017d00`.
+
+The generated C contains synthetic register-stack objects for this routine,
+so no recovered source file is added yet. The next evidence needed is a
+runtime memory vector around `0x00509ba0` and its output buffer, followed by a
+small scalar test of the `0x28b40` conversion helper.
+
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
 phase operations are directly confirmed.
