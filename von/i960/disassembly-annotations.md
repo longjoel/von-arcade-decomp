@@ -380,6 +380,12 @@ buffer shape and reports the four `0x800`-word source/command strides. The
 chain is linked into the prototype but remains opt-in rather than being called
 by the smoke-test entry point.
 
+`recovered_geometry_pipeline_buffer_phase()` captures the confirmed suffix of
+`0x28d80`: it runs the buffer/batch chain and writes `0xffff` to
+`0x0181c000`. The preceding device, SHARC, texture, and board helper calls are
+intentionally not folded into this function until their signatures and side
+effects are recovered.
+
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
 phase operations are directly confirmed.

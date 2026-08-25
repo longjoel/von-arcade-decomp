@@ -12,6 +12,7 @@ typedef unsigned short u16;
 #define GEO_READ_START     ((volatile u32 *)0x00803008)
 #define GEO_PHASE          ((volatile u32 *)0x00511ba0)
 #define GEOMETRY_BUFFER    ((volatile u32 *)0x00509ba0)
+#define GEOMETRY_STATE     ((volatile u16 *)0x0181c000)
 
 void recovered_geometry_frame_submission(void);
 
@@ -111,6 +112,13 @@ void recovered_geometry_buffer_and_batch_chain(void)
 {
     recovered_geometry_buffer_prepare(GEOMETRY_BUFFER);
     recovered_geometry_command_batch_loop((volatile const u8 *)GEOMETRY_BUFFER);
+}
+
+/* Confirmed suffix of 0x28d80 after its device/setup helper calls. */
+void recovered_geometry_pipeline_buffer_phase(void)
+{
+    recovered_geometry_buffer_and_batch_chain();
+    *GEOMETRY_STATE = 0xffffU;
 }
 
 /* Recovered from the frame/phase handoff at 0x28de8. */
