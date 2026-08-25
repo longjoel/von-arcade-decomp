@@ -391,7 +391,9 @@ Two small startup helpers are now recovered in
 preserves the `0x28418` control/phase reset sequence, and
 `recovered_geometry_register_clear()` preserves the `0x28d08` write of
 `0x4004` to `0x10000000`. The larger texture initializer at `0x28548` remains
-separate.
+separate. `recovered_texture_initializer()` now covers that routine: two
+127-entry `floor(index / 2)` ramps at `0x11400000`, followed by an `0x2080`-byte
+copy from ROM address `0x02fb1d10` into `0x11401000`.
 
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
