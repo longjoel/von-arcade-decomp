@@ -408,6 +408,11 @@ at `0x00512bd4`, `0x00512bd8`, and `0x00512bdc` before continuing into a larger
 calculation. It is recorded as `geometry_profile_dispatch`, not reconstructed
 as a boolean status function.
 
+The direct profile constants are preserved in `recovered_geometry_profile.c`
+as raw IEEE-754 bit patterns. Backup values mapping to indices `0..8` are
+represented explicitly; zero and out-of-range values use the observed default
+triple. The subsequent table/math calculation in `0x28840` remains separate.
+
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
 phase operations are directly confirmed.
