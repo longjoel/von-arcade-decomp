@@ -467,3 +467,73 @@ The output can be compared against a captured original trace with
 `von/tools/compare_tile_trace.py`. The parser currently supports the recovered
 warning table shape and line range; other text tables will require additional
 position and encoding rules as they are encountered.
+
+## Toolbox Baseline Trace
+
+The reproducible Toolbox capture command is:
+
+```sh
+VON_TRACE_SECONDS=5 ./scripts/trace-von-toolbox.sh
+```
+
+The 5-second capture is `von/build/disasm/vonj-toolbox-5s.trace`. It contains
+9,588 lines and confirms:
+
+- Geo program upload begins during boot and reports `9340` dwords.
+- Early Geo commands execute from host PCs `0x000284d4` and `0x0002851c`.
+- Tile text writes continue through host PC `0x0001ccb0`.
+- The first bounded non-initialization FIFO word observed is `0x44` at host PC
+  `0x000bd690`.
+
+The value `0x44` is retained as an observed packet word, not yet assigned a
+SHARC service meaning.
+
+The normalizer `von/tools/normalize_mame_trace.py` reports the same capture as:
+
+```text
+geo_prg_data: 9340
+geo_sharc_iop_w: 10
+vonj_copro_fifo: 2
+vonj_geo_cmd: 75
+vonj_tile_write: 147
+FIFO: pc=0002840c data=00000008
+      pc=000bd690 data=00000044
+```
+
+No FIFO response or function-port event occurred in this five-second idle
+session. This makes `0x44` the first useful candidate for a controlled input
+
+### Controlled IN1 Input Sweep
+
+The Lua stimulus in `von/tools/synthetic_input.lua` drives each `IN1` player-one
+field for 30 frames, releases it for 30 frames, and then advances to the next
+field:
+
+```text
+Button 1, Button 2, Button 3, Button 4,
+Joystick Down, Joystick Up, Joystick Right, Joystick Left
+```
+
+The direct port write initially tested was ineffective because it writes the
+port output latch rather than the input state. Driving the `Button 1` field with
+`set_value(1)` produced this 6-second vector:
+
+```text
+geo_prg_data: 9340        geo_sharc_iop_w: 10
+vonj_copro_fifo: 14       vonj_geo_cmd: 284
+vonj_tile_write: 538
+```
+
+The eight-field sweep completed with the same upload counts and produced:
+
+```text
+vonj_copro_fifo: 256      vonj_geo_cmd: 512
+vonj_tile_write: 538
+```
+
+The FIFO sequence added after boot consists primarily of repeated `0x08`
+writes from PC `0x00003c5c`, with an additional `0x08` from `0x000187d8`.
+This confirms that player-one controls reach the host path and cause repeated
+coprocessor work, but the aggregate sweep does not yet isolate each field's
+packet shape. The trace is `von/build/disasm/vonj-toolbox-input-sweep-12s.trace`.
+experiment, while the `0x08` write remains initialization traffic.

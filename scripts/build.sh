@@ -25,7 +25,7 @@ printf 'Building reduced Virtual-On MAME target...\n'
     LDFLAGS="$BREW_LDFLAGS" \
     make REGENIE=1 TARGET=mame SUBTARGET=von \
         SOURCES=src/mame/sega/model2.cpp \
-        USE_QTDEBUG=0 NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 NO_USE_PIPEWIRE=1 \
+        USE_QTDEBUG=0 NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 NO_USE_PIPEWIRE=1 NO_USE_PULSEAUDIO=1 \
         -j"${JOBS:-$(nproc)}"
 )
 printf 'Built %s\n' "$MAME_BIN"

@@ -1,0 +1,69 @@
+diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
+--- a/src/mame/sega/model2.cpp
++++ b/src/mame/sega/model2.cpp
+@@ -646,7 +646,8 @@ void model2b_state::copro_sharc_buffer_w(offs_t offset, u32 data)
+ 	m_bufferram[offset & 0x7fff] = data;
+ }
+ 
+ void model2b_state::geo_sharc_iop_w(offs_t offset, u32 data)
+ {
++	logerror("geo_sharc_iop_w: PC:%08x address:%04x data:%08x\n", m_maincpu->pc(), offset * 4, data);
+ }
+ 
+@@ -673,5 +673,12 @@ u32 model2b_state::copro_fifo_r()
+ u32 model2b_state::copro_fifo_r()
+ {
+-	return m_copro_fifo_out->pop();
++	u32 data = m_copro_fifo_out->pop();
++	static unsigned vonj_copro_response_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) && (vonj_copro_response_trace_count < 256))
++	{
++		logerror("vonj_copro_response: pc=%08x data=%08x\n", m_maincpu->pc(), data);
++		vonj_copro_response_trace_count++;
++	}
++	return data;
+ }
+ 
+@@ -677,21 +684,33 @@ void model2b_state::copro_fifo_w(u32 data)
+ void model2b_state::copro_fifo_w(u32 data)
+ {
+ 	if (m_coproctl & 0x80000000)
+ 	{
+ 		m_copro_adsp->external_dma_write(m_coprocnt, data & 0xffff);
+ 		m_coprocnt++;
+ 	}
+ 	else
+ 	{
++		static unsigned vonj_copro_fifo_trace_count;
++		if ((machine().system().name == std::string_view("vonj")) && ((vonj_copro_fifo_trace_count < 256) || (data != 8)))
++		{
++			logerror("vonj_copro_fifo: pc=%08x data=%08x\n", m_maincpu->pc(), data);
++			vonj_copro_fifo_trace_count++;
++		}
+ 		m_copro_fifo_in->push(u32(data));
+ 	}
+ }
+ 
+ void model2b_state::copro_function_port_w(offs_t offset, u32 data)
+ {
++	static unsigned vonj_copro_function_trace_count;
+ 	u32 d = data & 0x800fffff;
+ 	u32 a = (offset >> 2) & 0xff;
+ 	d |= a << 23;
++	if ((machine().system().name == std::string_view("vonj")) && (vonj_copro_function_trace_count < 256))
++	{
++		logerror("vonj_copro_function: pc=%08x offset=%04x data=%08x normalized=%08x\n", m_maincpu->pc(), offset * 4, data, d);
++		vonj_copro_function_trace_count++;
++	}
+ 
+ 	m_copro_fifo_in->push(u32(d));
+ }
+@@ -791,7 +809,7 @@ void model2_state::geo_prg_w(u32 data)
+ {
+ 	if (m_geoctl & 0x80000000)
+ 	{
+-		//logerror("geo_prg_w: %08X:   %08X\n", m_geocnt, data);
++		logerror("geo_prg_data: %04x\n", data & 0xffff);
+ 		m_geocnt++;
+ 	}
+ 	else
