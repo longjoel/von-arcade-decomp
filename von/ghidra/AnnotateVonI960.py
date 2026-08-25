@@ -75,11 +75,13 @@ label(0x000284e8, "geometry_command_window_init")
 label(0x00028470, "geometry_command_init_table")
 label(0x00028de8, "geometry_frame_submission")
 label(0x00028e88, "geometry_function_command_submit")
+label(0x00028c00, "geometry_command_batch_submit")
 ensure_function(0x00003c40, "ui_warning_table_walker")
 ensure_function(0x00028620, "geometry_program_upload", 0x00028758)
 ensure_function(0x000284b0, "geometry_command_window_init", 0x00028538)
 ensure_function(0x00028de8, "geometry_frame_submission", 0x00028e7c)
 ensure_function(0x00028e88, "geometry_function_command_submit", 0x00028efc)
+ensure_function(0x00028c00, "geometry_command_batch_submit", 0x00028cf4)
 
 # Static hardware/data references used by the annotated notes.
 label(0x00028170, "texture_load_done_message")

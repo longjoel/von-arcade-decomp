@@ -286,6 +286,10 @@ The same source file also contains two further host-side slices:
   selection at `0x28de8`: initialize `0x00803008` from the prior phase, poll
   bit 2 of `0x0098000c`, toggle `0x00511ba0`, and write the new phase to
   `0x00801008`.
+- `recovered_geometry_batch_command_submit()` preserves the separate
+  `0x28c00` path: function word `0x1414`, a count word, and a 32-bit source
+  stream before the `0x1010` completion word. This is not interchangeable with
+  the 16-bit masked stream at `0x28e88`.
 
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
