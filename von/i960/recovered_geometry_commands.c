@@ -7,12 +7,14 @@ typedef unsigned short u16;
 #define GEO_COMMAND_WINDOW ((volatile u32 *)0x00800000)
 #define GEO_COMMAND_TABLE  ((volatile const u8 *)0x00028470)
 #define GEO_PROGRAM_PORT   ((volatile u32 *)0x00804000)
+#define GEO_CONTROL        ((volatile u32 *)0x00980008)
 #define GEO_FRAME_STATUS   ((volatile u32 *)0x0098000c)
 #define GEO_WRITE_START    ((volatile u32 *)0x00801008)
 #define GEO_READ_START     ((volatile u32 *)0x00803008)
 #define GEO_PHASE          ((volatile u32 *)0x00511ba0)
 #define GEOMETRY_BUFFER    ((volatile u32 *)0x00509ba0)
 #define GEOMETRY_STATE     ((volatile u16 *)0x0181c000)
+#define GEO_FIXED_REGISTER ((volatile u32 *)0x10000000)
 
 void recovered_geometry_frame_submission(void);
 
@@ -119,6 +121,24 @@ void recovered_geometry_pipeline_buffer_phase(void)
 {
     recovered_geometry_buffer_and_batch_chain();
     *GEOMETRY_STATE = 0xffffU;
+}
+
+/* Recovered from the startup handshake at 0x28418. */
+void recovered_geometry_initial_handshake(void)
+{
+    *GEO_CONTROL = 0;
+    *GEO_WRITE_START = 0;
+    GEO_COMMAND_WINDOW[0x0f0 / 4] = 0x00000f0fU;
+    *GEO_WRITE_START = 0x00010000U;
+    GEO_COMMAND_WINDOW[0x0f0 / 4] = 0x00000f0fU;
+    *GEO_READ_START = 0x00010000U;
+    *GEO_PHASE = 0;
+}
+
+/* Recovered from the small helper at 0x28d08. */
+void recovered_geometry_register_clear(void)
+{
+    *GEO_FIXED_REGISTER = 0x00004004U;
 }
 
 /* Recovered from the frame/phase handoff at 0x28de8. */

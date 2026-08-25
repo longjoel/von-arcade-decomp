@@ -386,6 +386,13 @@ by the smoke-test entry point.
 intentionally not folded into this function until their signatures and side
 effects are recovered.
 
+Two small startup helpers are now recovered in
+`recovered_geometry_commands.c`: `recovered_geometry_initial_handshake()`
+preserves the `0x28418` control/phase reset sequence, and
+`recovered_geometry_register_clear()` preserves the `0x28d08` write of
+`0x4004` to `0x10000000`. The larger texture initializer at `0x28548` remains
+separate.
+
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
 phase operations are directly confirmed.
