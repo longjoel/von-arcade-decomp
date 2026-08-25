@@ -43,6 +43,8 @@ i960-elf-gcc "$CPU_FLAG" -O1 -ffreestanding -fno-builtin -fno-common \
     -c recovered_texture.c -o /src/von/build/i960/recovered_texture.o
 i960-elf-gcc "$CPU_FLAG" -O1 -ffreestanding -fno-builtin -fno-common \
     -c recovered_geometry_profile.c -o /src/von/build/i960/recovered_geometry_profile.o
+i960-elf-gcc "$CPU_FLAG" -O1 -ffreestanding -fno-builtin -fno-common \
+    -c recovered_texture_decompress.c -o /src/von/build/i960/recovered_texture_decompress.o
 i960-elf-as -ahls=/src/von/build/i960/start.lst start.s \
     -o /src/von/build/i960/start.o
 i960-elf-gcc "$CPU_FLAG" -nostdlib -nostartfiles \
@@ -51,6 +53,7 @@ i960-elf-gcc "$CPU_FLAG" -nostdlib -nostartfiles \
     /src/von/build/i960/recovered_geometry_commands.o \
     /src/von/build/i960/recovered_texture.o \
     /src/von/build/i960/recovered_geometry_profile.o \
+    /src/von/build/i960/recovered_texture_decompress.o \
     -T link.ld -Wl,-Map,/src/von/build/i960/prototype.map \
     -o /src/von/build/i960/prototype.elf
 i960-elf-objcopy -O binary /src/von/build/i960/prototype.elf \

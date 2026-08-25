@@ -425,7 +425,18 @@ analysis shows it initializes `0xfed` bytes at `0x00511bb0`, clears status at
 returns zero on the normal completion path or the status word at
 `0x00515080` on the alternate path. It writes decoded halfwords through the
 two destination pointers supplied by `0x28120`. The bitstream algorithm is
-left for a separate slice.
+left for a separate slice. `von/i960/recovered_texture_decompress.c` now
+contains a static candidate for the decoder: 12-bit ring-buffer references,
+flag-byte token selection, literal/back-reference lengths, and the
+palette-based secondary-bank test.
+
+The source header bytes observed through MAME match the reconstructed ROM
+interleave exactly, but the current texture-RAM dump does not yet match the
+candidate's first output word. This is the current validation wall: the MAME
+checkout has an already-applied patch set that is not cleanly reversible by
+`prepare-mame.sh`, so adding a temporary CPU write tap would disturb unrelated
+local changes. Do not treat the decompressor C as behaviorally confirmed until
+that write boundary is instrumented in a clean MAME build.
 
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
