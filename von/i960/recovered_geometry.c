@@ -21,6 +21,64 @@ typedef unsigned short u16;
 #define GEO_STAGING_WORDS 0x8000U
 #define GEO_PROGRAM_WORDS 0x247cU
 
+#define GEOMETRY_TABLE_WORDS 0x2000U
+#define GEOMETRY_TABLE_STEP  0x7f00U
+
+static int geometry_raw_logb(u32 bits)
+{
+    u32 exponent;
+    u32 fraction;
+    int highest;
+
+    bits &= 0x7fffffffU;
+    exponent = (bits >> 23) & 0xffU;
+    fraction = bits & 0x7fffffU;
+    if (exponent != 0)
+        return (int)exponent - 127;
+    if (fraction == 0)
+        return -10000;
+
+    highest = -1;
+    while (fraction != 0)
+    {
+        fraction >>= 1;
+        ++highest;
+    }
+    return highest - 149;
+}
+
+/* 0x28b40: logbnr(raw bits) + 128, cvtzri, then clamp to [0, 0x80]. */
+static u32 recovered_geometry_float_conversion(u32 raw_bits)
+{
+    int result = geometry_raw_logb(raw_bits) + 128;
+
+    if (result <= 0)
+        return 0;
+    if (result > 0x80)
+        return 0x80;
+    return (u32)result;
+}
+
+/* 0x28b80: generate the 0x2000-word byte-packed geometry table. */
+void recovered_geometry_buffer_prepare(volatile u32 *output)
+{
+    u32 index;
+    u32 value = 0;
+
+    for (index = 0; index < GEOMETRY_TABLE_WORDS; ++index)
+    {
+        u32 word = recovered_geometry_float_conversion(value);
+        value += GEOMETRY_TABLE_STEP;
+        word |= recovered_geometry_float_conversion(value) << 8;
+        value += GEOMETRY_TABLE_STEP;
+        word |= recovered_geometry_float_conversion(value) << 16;
+        value += GEOMETRY_TABLE_STEP;
+        word |= recovered_geometry_float_conversion(value) << 24;
+        value += GEOMETRY_TABLE_STEP;
+        output[index] = word;
+    }
+}
+
 void recovered_geometry_program_upload(void)
 {
     volatile u32 *staging = GEO_STAGING;
