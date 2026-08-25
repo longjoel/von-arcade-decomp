@@ -172,7 +172,7 @@ self-test complete without inventing a new device register; the physical
 address-line reason for the alias remains to be confirmed.
 
 The geometry bootstrap is bounded at the host boundary. The routine at
-`0x00028600` derives source bus address `0x02fc6290` from the `main_data` window,
+`0x00028620` derives source bus address `0x02fc6290` from the `main_data` window,
 configures `0x00840000` with the ten observed writes listed in
 `disassembly-annotations.md`, and streams 9,340 masked 16-bit values to
 `0x00804000`. The source bytes match `main_data + 0x00fc6290` exactly. The
@@ -212,6 +212,37 @@ The following routine at `0x00028de8` synchronizes submission to the video
 frame counter at `0x0098000c`, then updates the geometry write-start/read-start
 registers at `0x00801008`/`0x00803008`. These are buffer-pointer and phase
 controls; they are not evidence that the uploaded program has executed.
+
+## Scripted Gameplay Progression
+
+`von/tools/gameplay_progress.lua` drives the game from boot into live battles
+using direct ioport field writes (immune to host keyboard mapping issues) and
+logs tilemap checksums, ASCII text overlays, and per-second PNG snapshots.
+
+```sh
+VON_PROGRESS_SECONDS=150 ./scripts/trace-von-progress.sh
+```
+
+Outputs (ignored): `von/build/disasm/vonj-progress-<s>.trace`,
+`...s.lua.log`, and `vonj-progress-snaps/vonj/NNNN.png`.
+
+Confirmed attract-to-battle flow at 60 fps frame timing:
+
+| Frame | Input | Observed result |
+| ---: | --- | --- |
+| ~900 | Coin 1 pulse | `MACHINE SELECT / PRESS BUTTON` opens with the 1P cursor on Temjin |
+| ~1500 | 1 Player Start pulse | Machine confirmed; launch animation, then battle starts |
+| 1800-7000 | stick/shot combat phase | Live battle: damage numbers, enemy health depletion, round victory |
+| ~7300+ | (none) | Round 2 loads on a new stage; on eventual loss, `CONTINUE?` countdown with `INSERT COIN(S)` |
+
+The warning screen auto-dismisses; menus after it use graphics tiles, not
+ASCII text tiles, so progression is verified through snapshots and tilemap
+checksums rather than text decoding. The battle session raises coprocessor
+FIFO traffic from ~14.1M events (idle attract) to ~15.3M events over 150
+seconds and exercises host code far beyond the boot PCs. This scripted
+scenario supersedes the earlier random-input fuzzing as the coverage driver:
+traces from these sessions are the source of new host PCs and SHARC opcodes
+to annotate.
 
 `boot-trace.cmd` contains debugger breakpoints and watchpoints for interactive
 use with a MAME debugger frontend. The headless `none` backend does not process

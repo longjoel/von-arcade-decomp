@@ -140,7 +140,8 @@ the tile row while restoring the current record's origin column.
 
 ## Geometry Upload Setup
 
-The geometry bootstrap routine at `0x00028600` displays `"Downloading GEO prog"`
+The geometry bootstrap routine at `0x00028620` displays `"Downloading GEO prog"`
+from the inline string at `0x00028600`
 at column 8, row 9, then prepares the geometry boundary. At `0x2862c` it
 derives these pointers:
 
@@ -170,6 +171,55 @@ unsigned 16-bit payloads, and writes them through the geometry program port at
 `0x00804000`. The original trace captures 9,340 writes. The uploaded bytes are
 an exact little-endian match for `main_data` offset `0x00fc6290`; no geometry
 processor execution or register side effect is inferred yet.
+
+### Ghidra Static Confirmation
+
+The Ghidra report now decompiles the complete host routine from `0x00028620`
+through `0x00028754`. The inline string at `0x00028600` is separate from the
+executable entry. Static values recovered from the routine are:
+
+```text
+r4 = 0x00900000
+r5 = 0x00840000       // r4 - 0x000c0000
+r6 = 0x02fc6290       // r4 + 0x026c6290
+staging fill value = 0x07800f0f
+staging count = 0x8000 (32768)
+program count = 0x247c (9340)
+program mask = 0xffff
+program port = 0x00804000
+```
+
+The decompiler recovers both loops and the ten IOP setup writes, including the
+`0x00840100`, `0x00840104`, and `0x00840108` fields. This independently
+confirms the runtime boundary trace; the remaining unknown is processor-side
+interpretation, not host-side reconstruction.
+
+The upstream i960 Ghidra module originally modeled `bal` as a terminal branch.
+The ROM uses it as branch-and-link at `0x00028628`, storing return address
+`0x0002862c` in `g14` before calling `0x0001cac8`. The local processor patch
+models this as a call, allowing the decompiler to reach the upload body. The
+same pattern appears in the UI helper path and must be retained when reviewing
+future decompilations.
+
+The reset entry at `0x00000930` also now decompiles through `ret` at `0x000009e4`
+and matches the GNU listing's instruction boundaries. Ghidra's generated C
+still renders i960 register-stack and condition-code details as synthetic
+`ac`, `fp`, and stack variables; those are presentation artifacts until the
+calling convention is refined.
+
+### First Recovered Source Slice
+
+`von/i960/recovered_geometry.c` is the first checked-in C reconstruction from
+the Ghidra output. `recovered_geometry_program_upload()` preserves the
+confirmed staging fill, control pulses, IOP setup fields, masked 16-bit source
+stream, and final read/write of `0x00803008`. It is linked into the i960
+prototype by `scripts/i960-build.sh`, but is not called by the smoke-test entry
+point yet. This keeps the current runnable prototype stable while proving that
+the recovered routine compiles with the pinned i960 toolchain.
+
+The source deliberately does not implement the geometry processor's response
+to those writes. That boundary remains a hardware stub until independently
+decoded.
 
 ### Fresh Boot Boundary Trace
 
@@ -376,6 +426,37 @@ Results are written through the SHARC output FIFO at `I1 = 0x00c00000`,
 matching MAME's `copro_fifo_out` mapping. This explains why the SHARC is not
 just a geometry command sink: it exposes a general math service interface.
 
+The runtime table gives more reliable assignments for the first nontrivial
+command stream. The entries are indexed by the low byte of the FIFO word:
+
+```text
+opcode  target       confirmed body
+0x08    0x000201bf   reset service-state index at DM(0x30100)
+0x40    0x00020af2   consume one word; store a shifted/biased value at DM(0x30148)
+0x41    0x00020af9   consume one word; table-based conversion; emit one result
+0x44    0x00020ba1   initialize constants at DM(0x3015c..0x3015e)
+0x35    0x000208f2   consume six words; reciprocal/math result
+```
+
+The first complete normal-stream fragment in the 30-second trace is:
+
+```text
+host FIFO <- 0x00000040
+host FIFO <- 0x00000005
+host FIFO <- 0x00000041
+host FIFO <- 0x0001b100
+SHARC output -> 0x00000000, 0x00000019
+```
+
+The `0x40` and `0x41` handlers therefore establish a one-word operand
+convention. The later `0x35` packet and its operand block are still being
+decoded. The earlier hypothesis that `0x44` dispatched a three-operand
+trigonometric handler was incorrect; `0x44` is a no-payload constant
+initialization command. The trigonometric-looking handlers remain present in
+the service table, but must be assigned to their actual opcodes before being
+used as protocol definitions.
+
+<!-- superseded protocol hypothesis:
 If a host FIFO value `0x44` is consumed as a dispatcher opcode, the table maps
 it to local slot `0xbab`. That handler consumes three input words,
 sign-extends two of them, converts them to floating point, calls helper
@@ -384,6 +465,7 @@ output FIFO. Those helpers use polynomial constants, `pi/2`-scale values, and
 reciprocal refinement, making a trigonometric or angle-related operation
 probable; execution-side correlation is still needed before assigning this
 handler to the observed host `0x44` writes.
+-->
 
 ### Response-Side Confirmation
 
@@ -397,11 +479,102 @@ response reads, including values with plausible IEEE-754 encodings such as:
 ```
 
 The trace also shows repeated opcode `0x08` writes from later host routines,
-but no function-port writes. The response values are not yet paired to a
+but no function-port writes. Most response values are not yet paired to a
 specific opcode because the bounded FIFO trace reaches its cap and the host
-operand path is still only partially instrumented. They do confirm that the
-SHARC is actively returning computed numeric data rather than remaining a
-boot-only coprocessor.
+operand path is still only partially instrumented. The packet examples below
+provide the first paired response vectors. They confirm that the SHARC is
+actively returning computed numeric data rather than remaining a boot-only
+coprocessor.
+
+### Initial FIFO Packet Grammar
+
+The 30-second trace provides the first operand-count vectors. These are
+observed stream boundaries matched against the SHARC handlers, not guessed
+message names:
+
+```text
+0x08                          reset service state; no payload
+0x44                          initialize constants; no payload
+0x40 <word>                   one operand; state conversion/update
+0x41 <word>                   one operand; conversion and result
+0x35 <word> x 6               six operands; vector/math result
+0x1e <word> x 2               two operands; result observed
+0x1b <word>                   one operand; result observed
+0x1c <word>                   one operand; result observed
+0x1d <word> x 2               two operands; result observed
+```
+
+A representative observed sequence is:
+
+```text
+0x40 00000005
+0x41 0001b100        -> reads 00000000, 00000019
+0x35 00000000 00000000 00000000 c2a00000 00000000 bf800000
+                     -> reads 00000000, 80000000
+0x1e 00000600 41d00000
+                     -> reads 00000000, 41cdbfa3
+```
+
+The initial `0x08` at `0x0002840c` is therefore a service reset after
+bootstrap, while the repeated `0x08` at `0x00003c5c` is a recurring reset or
+phase command from the host UI path. The later `0x44` at `0x000bd690` is a
+constant-table initialization command. The next implementation boundary is
+to model these packet lengths and state transitions before attempting to port
+the math bodies.
+
+### Seeded Input Fuzzing
+
+`von/tools/fuzz_input.lua` applies a reproducible LCG-generated state to all
+twelve player-one controls, including both sticks, both shot/dash pairs, coin,
+and one-player start. Each random control state is held for four emulation
+frames, and the run exits after 600 callback frames. The seed is supplied with
+`VON_FUZZ_SEED` inside the Toolbox container:
+
+```sh
+toolbox run --container von-mame bash -lc \
+  'VON_FUZZ_SEED=1 exec /var/home/longjoel/Projects/von-arcade-decomp/third_party/mame-master/von vonj \
+   -rompath /var/home/longjoel/Projects/von-arcade-decomp/von/build/disasm/rompath \
+   -autoboot_script /var/home/longjoel/Projects/von-arcade-decomp/von/tools/fuzz_input.lua \
+   -video none -sound none -oslog -seconds_to_run 12 -skip_gameinfo -nothrottle'
+```
+
+Seeds `1`, `2`, and `3` resolved all controls and produced identical filtered
+`vonj_*` boundary events: `9340` Geo upload words, `256` bounded FIFO events,
+`512` Geo commands, and `538` tile writes. This is a meaningful negative
+result: the controls are reaching MAME's input fields, but this boot/attract
+session does not yet expose input-dependent FIFO traffic. The traces are
+`von/build/disasm/vonj-fuzz-start-seed{1,2,3}.trace`.
+
+### Opcode `0x35` State Boundary
+
+The host producer at `0x0006f600` is a useful protocol wrapper. It converts two
+host fixed-point values, sends opcode `0x41`, consumes the returned value as an
+index/divisor, and then sends opcode `0x35`. The six `0x35` operands are emitted
+in this order:
+
+```text
+g6, g1, g7, g2, g4, bitwise_not(g5)
+```
+
+The values are derived from quotient operations and a lookup table at
+`0x0051bb24`; they are not the original joystick coordinates. This means the
+`0x41 -> 0x35` pair is one stateful host protocol operation.
+
+The SHARC target for `0x35` is `0x000208f2`. Its entry reads six FIFO words as:
+
+```text
+R4, R0, R6, R2, R13, R12
+```
+
+It then combines those integer registers with floating-point registers and
+service-table values, performs reciprocal refinement, and writes `R0` to the
+output FIFO at instruction `0x908`. The handler uses floating-point state
+prepared by the preceding service rather than loading all of its operands into
+`F0..F12`; therefore it is a continuation of a stateful vector/matrix pipeline,
+not a self-contained six-argument scalar routine. The first observed packet's
+second operand is zero, matching its first observed output word of zero, but
+the complete response pairing remains subject to the FIFO read/write timing
+ambiguity in the current MAME trace.
 
 The same trace records repeated host FIFO writes of `0x08` from later routines
 at `0x000187d8` and `0x00003c5c`, plus recurring `0x44` values from several
@@ -499,6 +672,18 @@ vonj_tile_write: 147
 FIFO: pc=0002840c data=00000008
       pc=000bd690 data=00000044
 ```
+
+The text tile map can be rendered from the trace with:
+
+```sh
+python3 von/tools/dump_tile_trace.py \
+  von/build/disasm/vonj-toolbox-5s.trace \
+  --output von/build/disasm/vonj-toolbox-5s.tiles.txt
+```
+
+This reconstructs the latest 64-column tile state and decodes the observed
+`0x8000 | ASCII` text tiles. Non-text tile codes are shown as spaces; decoding
+those into pixel art will require the corresponding tile graphics data.
 
 No FIFO response or function-port event occurred in this five-second idle
 session. This makes `0x44` the first useful candidate for a controlled input
