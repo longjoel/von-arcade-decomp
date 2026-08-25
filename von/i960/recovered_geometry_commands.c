@@ -12,6 +12,8 @@ typedef unsigned short u16;
 #define GEO_READ_START     ((volatile u32 *)0x00803008)
 #define GEO_PHASE          ((volatile u32 *)0x00511ba0)
 
+void recovered_geometry_frame_submission(void);
+
 /* The first loop clears the +4 and +8 fields of 64 sixteen-byte slots. */
 void recovered_geometry_command_window_clear(void)
 {
@@ -70,6 +72,37 @@ void recovered_geometry_batch_command_submit(volatile const u32 *source,
 
     GEO_COMMAND_WINDOW[0x100 / 4] = 0x00001010U;
     *GEO_PROGRAM_PORT = 0;
+}
+
+/* Recovered from 0x28c80. The source argument is a byte-addressed host
+ * pointer, matching the i960 register arithmetic and 32-bit loads. */
+void recovered_geometry_command_batch_loop(volatile const u8 *source)
+{
+    volatile u32 *function_word = &GEO_COMMAND_WINDOW[0x0f0 / 4];
+    u32 command_offset;
+    u32 batch;
+
+    command_offset = 0;
+    batch = 0;
+    recovered_geometry_frame_submission();
+    do
+    {
+        recovered_geometry_batch_command_submit(
+            (volatile const u32 *)source, command_offset << 2, 0x800U);
+        *function_word = 0x00000f0fU;
+        recovered_geometry_frame_submission();
+        recovered_geometry_frame_submission();
+        recovered_geometry_frame_submission();
+
+        ++batch;
+        source += 0x2000;
+        command_offset += 0x800;
+    } while (batch < 4);
+
+    *function_word = 0x00000f0fU;
+    recovered_geometry_frame_submission();
+    *function_word = 0x00000f0fU;
+    recovered_geometry_frame_submission();
 }
 
 /* Recovered from the frame/phase handoff at 0x28de8. */

@@ -290,6 +290,16 @@ The same source file also contains two further host-side slices:
   `0x28c00` path: function word `0x1414`, a count word, and a 32-bit source
   stream before the `0x1010` completion word. This is not interchangeable with
   the 16-bit masked stream at `0x28e88`.
+- `recovered_geometry_command_batch_loop()` reconstructs `0x28c80`: four
+  batches of `0x800` 32-bit words, source increments of `0x2000` bytes,
+  command-offset increments of `0x800` before the i960 `<< 2` conversion, and
+  the three frame handoffs between batches. The trailing `0xf0f` function-word
+  pulses are retained exactly.
+
+The Ghidra decompilation confirms these loop values directly: the source
+parameter advances by `0x2000`, the command offset advances by `0x800`, and the
+batch counter exits at four. It also confirms the initial frame handoff and two
+final `0xf0f` pulses.
 
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
