@@ -395,6 +395,11 @@ separate. `recovered_texture_initializer()` now covers that routine: two
 127-entry `floor(index / 2)` ramps at `0x11400000`, followed by an `0x2080`-byte
 copy from ROM address `0x02fb1d10` into `0x11401000`.
 
+`recovered_geometry_auxiliary_submit_select()` covers `0x28d30`: when
+`0x005039f4 == 4` and `0x00503a00 == 32`, it submits `0x4e4` 16-bit words from
+`0x001687a4`; otherwise it submits `0x60` words from `0x001686e4`. The command
+word is zero in both paths.
+
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
 phase operations are directly confirmed.

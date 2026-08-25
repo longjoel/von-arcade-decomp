@@ -15,6 +15,8 @@ typedef unsigned short u16;
 #define GEOMETRY_BUFFER    ((volatile u32 *)0x00509ba0)
 #define GEOMETRY_STATE     ((volatile u16 *)0x0181c000)
 #define GEO_FIXED_REGISTER ((volatile u32 *)0x10000000)
+#define GEOMETRY_STATE_A   ((volatile u32 *)0x005039f4)
+#define GEOMETRY_STATE_B   ((volatile u32 *)0x00503a00)
 
 void recovered_geometry_frame_submission(void);
 
@@ -139,6 +141,21 @@ void recovered_geometry_initial_handshake(void)
 void recovered_geometry_register_clear(void)
 {
     *GEO_FIXED_REGISTER = 0x00004004U;
+}
+
+/* Recovered from 0x28d30. */
+void recovered_geometry_auxiliary_submit_select(void)
+{
+    if (*GEOMETRY_STATE_A == 4U && *GEOMETRY_STATE_B == 32U)
+    {
+        recovered_geometry_function_command_submit(
+            (volatile const u16 *)0x001687a4, 0, 0x4e4U);
+    }
+    else
+    {
+        recovered_geometry_function_command_submit(
+            (volatile const u16 *)0x001686e4, 0, 0x60U);
+    }
 }
 
 /* Recovered from the frame/phase handoff at 0x28de8. */
