@@ -7,6 +7,7 @@ MAME_URL="https://github.com/mamedev/mame.git"
 MAME_REF="569c5e9d4534cb244ff67ebbdb5f9fe69a465318"
 PATCH_FILE="$ROOT_DIR/third_party/patches/0001-von-mame-support.patch"
 TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0002-von-sharc-tracing.patch"
+TEXTURE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0003-von-texture-write-tracing.patch"
 VON_SUBTARGET="$ROOT_DIR/scripts/mame-von.lua"
 
 command -v git >/dev/null 2>&1 || {
@@ -23,7 +24,7 @@ if [[ "$(git -C "$MAME_DIR" rev-parse HEAD)" != "$MAME_REF" ]]; then
     git -C "$MAME_DIR" checkout "$MAME_REF"
 fi
 
-for patch in "$PATCH_FILE" "$TRACE_PATCH_FILE"; do
+for patch in "$PATCH_FILE" "$TRACE_PATCH_FILE" "$TEXTURE_TRACE_PATCH_FILE"; do
     if git -C "$MAME_DIR" apply --reverse --check "$patch" >/dev/null 2>&1; then
         printf 'MAME patch already applied: %s\n' "$(basename "$patch")"
     elif git -C "$MAME_DIR" apply --check "$patch" >/dev/null 2>&1; then

@@ -1,0 +1,24 @@
+diff --git a/src/devices/cpu/i960/i960.cpp b/src/devices/cpu/i960/i960.cpp
+--- a/src/devices/cpu/i960/i960.cpp
++++ b/src/devices/cpu/i960/i960.cpp
+@@ -112,11 +112,20 @@ void i960_cpu_device::i960_write_word_unaligned(uint32_t address, uint16_t data)
+ {
++	static unsigned vonj_texture_write_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) &&
++		(address >= 0x11000000) && (address < 0x11400000) &&
++		(m_PIP >= 0x27e50) && (m_PIP < 0x280a8) &&
++		(vonj_texture_write_trace_count < 64))
++	{
++		logerror("vonj_texture_write: pc=%08x address=%08x data=%04x\n", m_PIP, address, data);
++		vonj_texture_write_trace_count++;
++	}
+ 	if (!WORD_ALIGNED(address))
+ 	{
+ 		m_program.write_byte(address, data & 0xff);
+ 		m_program.write_byte(address+1, (data>>8)&0xff);
+ 	}
+ 	else
+ 	{
+ 		m_program.write_word(address, data);
+ 	}
+ }
