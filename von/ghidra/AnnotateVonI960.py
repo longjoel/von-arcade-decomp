@@ -23,8 +23,15 @@ def label(address, name, comment=None):
 def ensure_function(address, name, end=None):
     """Seed code entry points the raw-binary analyzer cannot discover."""
     start = toAddr(address)
+    function_manager = currentProgram.getFunctionManager()
     if end is not None:
-        currentProgram.getListing().clearCodeUnits(start, toAddr(end - 1), False)
+        finish = toAddr(end - 1)
+        overlapping = function_manager.getFunctionsOverlapping(AddressSet(start, finish))
+        while overlapping.hasNext():
+            other = overlapping.next()
+            if other.getEntryPoint() != start:
+                function_manager.removeFunction(other.getEntryPoint())
+        currentProgram.getListing().clearCodeUnits(start, finish, False)
         current = start
         while current.getOffset() < end:
             instruction = currentProgram.getListing().getInstructionAt(current)
@@ -37,7 +44,6 @@ def ensure_function(address, name, end=None):
     else:
         currentProgram.getListing().clearCodeUnits(start, toAddr(address + 0x20), False)
         disassemble(start)
-    function_manager = currentProgram.getFunctionManager()
     function = function_manager.getFunctionAt(start)
     if function is None:
         function = createFunction(start, name)
@@ -66,9 +72,14 @@ label(0x000282e0, "sharc_bootstrap_upload")
 label(0x00028600, "geometry_upload_message")
 label(0x000284b0, "geometry_command_window_clear")
 label(0x000284e8, "geometry_command_window_init")
+label(0x00028470, "geometry_command_init_table")
 label(0x00028de8, "geometry_frame_submission")
+label(0x00028e88, "geometry_function_command_submit")
 ensure_function(0x00003c40, "ui_warning_table_walker")
 ensure_function(0x00028620, "geometry_program_upload", 0x00028758)
+ensure_function(0x000284b0, "geometry_command_window_init", 0x00028538)
+ensure_function(0x00028de8, "geometry_frame_submission", 0x00028e7c)
+ensure_function(0x00028e88, "geometry_function_command_submit", 0x00028efc)
 
 # Static hardware/data references used by the annotated notes.
 label(0x00028170, "texture_load_done_message")

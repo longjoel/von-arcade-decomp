@@ -253,9 +253,10 @@ consumption and the command-word meanings remain unresolved.
 ### First Command-Window Vector
 
 After the program upload, routine `0x000284b0` clears 16-byte slots in a
-separate command window at `0x00800000`. Routine `0x000284e8` then copies 32
-bytes from the inline table at `0x00028470` into the first two words of those
-slots. The first nonzero writes observed after the upload are:
+separate command window at `0x00800000`. The fall-through/table-copy entry at
+`0x000284e8` then consumes 64 bytes from the inline table at `0x00028470`,
+copying two bytes into the `+4` and `+8` words of each of 32 slots. The first
+nonzero writes observed after the upload are:
 
 ```text
 0x00800014 <- 0x00000004
@@ -269,6 +270,26 @@ slots. The first nonzero writes observed after the upload are:
 The 16-byte stride and table copy are confirmed. The fields' command-length,
 data, and processor-control meanings remain unknown; the trace is intentionally
 kept at the bus-write level.
+
+`von/i960/recovered_geometry_commands.c` now reconstructs the two confirmed
+operations separately: clearing the `+4`/`+8` fields of 64 slots and copying
+the 64-byte inline initialization table into 32 slots. The functions are
+linked into the prototype but are not called by the smoke-test entry point.
+
+The same source file also contains two further host-side slices:
+
+- `recovered_geometry_function_command_submit()` reproduces the probable
+  `(source, command, count)` register mapping at `0x28e88`, including the
+  `0x00800040 <- 0x404`, normalized program word, count word, masked 16-bit
+  stream, `0x00800100 <- 0x1010`, and terminating zero write.
+- `recovered_geometry_frame_submission()` reproduces the confirmed phase
+  selection at `0x28de8`: initialize `0x00803008` from the prior phase, poll
+  bit 2 of `0x0098000c`, toggle `0x00511ba0`, and write the new phase to
+  `0x00801008`.
+
+The command parameter names remain probable because the ROM exposes register
+roles rather than source-level types. The bus addresses, masks, counts, and
+phase operations are directly confirmed.
 
 The existing `geo_w` implementation provides a useful, but not yet independently
 confirmed, field interpretation: offsets ending in `0x0` carry the command or
