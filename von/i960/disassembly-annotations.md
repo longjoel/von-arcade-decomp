@@ -413,6 +413,12 @@ as raw IEEE-754 bit patterns. Backup values mapping to indices `0..8` are
 represented explicitly; zero and out-of-range values use the observed default
 triple. The subsequent table/math calculation in `0x28840` remains separate.
 
+The texture/profile setup at `0x28120` displays the loading messages, calls
+the unresolved loader `0x27e50` for two ROM-board/texture-bank ranges, and
+stores the resulting profile state in `0x005039f4` and `0x00503a00`. Its first
+source pointer is `0x02c00008`; the later bank uses `0x02c77438`. The loader's
+return contract and decompression behavior remain intentionally unassigned.
+
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
 phase operations are directly confirmed.
