@@ -10,6 +10,9 @@ TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0002-von-sharc-tracing.patch"
 TEXTURE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0003-von-texture-write-tracing.patch"
 TEXTURE_SOURCE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0004-von-texture-source-tracing.patch"
 PALETTE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0005-von-palette-tracing.patch"
+TEXTURE_COMMAND_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0006-von-texture-command-tracing.patch"
+GEOMETRY_OBJECT_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0007-von-geometry-object-tracing.patch"
+GEOMETRY_MATRIX_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0008-von-geometry-matrix-tracing.patch"
 VON_SUBTARGET="$ROOT_DIR/scripts/mame-von.lua"
 
 command -v git >/dev/null 2>&1 || {
@@ -26,7 +29,7 @@ if [[ "$(git -C "$MAME_DIR" rev-parse HEAD)" != "$MAME_REF" ]]; then
     git -C "$MAME_DIR" checkout "$MAME_REF"
 fi
 
-for patch in "$PATCH_FILE" "$TRACE_PATCH_FILE" "$TEXTURE_TRACE_PATCH_FILE" "$TEXTURE_SOURCE_TRACE_PATCH_FILE" "$PALETTE_TRACE_PATCH_FILE"; do
+for patch in "$PATCH_FILE" "$TRACE_PATCH_FILE" "$TEXTURE_TRACE_PATCH_FILE" "$TEXTURE_SOURCE_TRACE_PATCH_FILE" "$PALETTE_TRACE_PATCH_FILE" "$TEXTURE_COMMAND_TRACE_PATCH_FILE" "$GEOMETRY_OBJECT_TRACE_PATCH_FILE" "$GEOMETRY_MATRIX_TRACE_PATCH_FILE"; do
     if git -C "$MAME_DIR" apply --reverse --check "$patch" >/dev/null 2>&1; then
         printf 'MAME patch already applied: %s\n' "$(basename "$patch")"
     elif git -C "$MAME_DIR" apply --check "$patch" >/dev/null 2>&1; then

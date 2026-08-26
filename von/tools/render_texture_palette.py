@@ -37,7 +37,21 @@ def main() -> int:
     args = parser.parse_args()
 
     palette, colorxlat, luma = parse_trace(args.trace)
-    pixels = args.bank.read_bytes()
+    packed = args.bank.read_bytes()
+    pixels = bytearray()
+    for y in range(1024):
+        for x in range(2048):
+            x2 = x
+            y2 = y
+            offset = (y2 // 2) * 512 + (x2 // 2)
+            word = int.from_bytes(packed[(offset >> 1) * 4:(offset >> 1) * 4 + 4], "little")
+            if offset & 1:
+                word >>= 16
+            if (y & 1) == 0:
+                word >>= 8
+            if (x & 1) == 0:
+                word >>= 4
+            pixels.append((word & 0x0f) << 4)
     gamma = [max((value - 64) * 255 // 191, 0) for value in range(256)]
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -56,7 +70,7 @@ def main() -> int:
                 gamma[colorxlat.get(0x4000 + (blue << 8) + level, 0) & 0xff],
             ))
         path = args.output_dir / f"bank0-colorbase-{base:03d}.ppm"
-        path.write_bytes(b"P6\n1024 1024\n255\n" + output)
+        path.write_bytes(b"P6\n2048 1024\n255\n" + output)
         print(path)
     return 0
 

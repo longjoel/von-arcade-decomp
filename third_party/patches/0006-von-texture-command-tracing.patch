@@ -1,0 +1,19 @@
+diff --git a/src/mame/sega/model2_v.cpp b/src/mame/sega/model2_v.cpp
+--- a/src/mame/sega/model2_v.cpp
++++ b/src/mame/sega/model2_v.cpp
+@@ -411,4 +411,15 @@
+ 	object.texheader[0] = *th++;
+ 	object.texheader[1] = *th++;
+ 	object.texheader[2] = *th++;
+ 	object.texheader[3] = *th++;
++	static unsigned vonj_texture_command_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) && (vonj_texture_command_trace_count < 512))
++	{
++		logerror("vonj_texture_command: uv=%08x header=%08x tex=%04x,%04x,%04x,%04x attr=%08x colorbase=%03x sheet=%d size=%ux%u origin=%u,%u\n",
++			raster->command_buffer[0], raster->command_buffer[1], object.texheader[0], object.texheader[1],
++			object.texheader[2], object.texheader[3], attr, (object.texheader[3] >> 6) & 0x3ff,
++			(object.texheader[2] & 0x1000) ? 1 : 0, 32 << (object.texheader[0] & 7),
++			32 << ((object.texheader[0] >> 3) & 7), 32 * (object.texheader[2] & 0x3f),
++			32 * ((object.texheader[2] >> 6) & 0x1f));
++		vonj_texture_command_trace_count++;
++	}
