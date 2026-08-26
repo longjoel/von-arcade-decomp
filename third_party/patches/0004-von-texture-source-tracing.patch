@@ -1,0 +1,20 @@
+diff --git a/src/devices/cpu/i960/i960.cpp b/src/devices/cpu/i960/i960.cpp
+--- a/src/devices/cpu/i960/i960.cpp
++++ b/src/devices/cpu/i960/i960.cpp
+@@ -2002,4 +2002,15 @@
+ 		case 0x80: { // ldob
+ 			m_icount -= 4;
+-			u8 v = m_program.read_byte(get_ea(opcode));
++			uint32_t address = get_ea(opcode);
++			u8 v = m_program.read_byte(address);
++			static unsigned vonj_texture_source_trace_count;
++			if ((machine().system().name == std::string_view("vonj")) &&
++				(address >= 0x2c00000) && (address < 0x2c80000) &&
++				(m_PIP >= 0x27e50) && (m_PIP < 0x280a8) &&
++				(vonj_texture_source_trace_count < 64))
++			{
++				logerror("vonj_texture_source: pc=%08x address=%08x data=%02x r4=%08x r5=%08x r6=%08x r7=%08x r8=%08x\n",
++					m_PIP, address, v, m_r[4], m_r[5], m_r[6], m_r[7], m_r[8]);
++				vonj_texture_source_trace_count++;
++			}
+ 			if(!m_stalled)

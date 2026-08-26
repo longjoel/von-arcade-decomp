@@ -431,12 +431,28 @@ flag-byte token selection, literal/back-reference lengths, and the
 palette-based secondary-bank test.
 
 The source header bytes observed through MAME match the reconstructed ROM
-interleave exactly, but the current texture-RAM dump does not yet match the
-candidate's first output word. This is the current validation wall: the MAME
-checkout has an already-applied patch set that is not cleanly reversible by
-`prepare-mame.sh`, so adding a temporary CPU write tap would disturb unrelated
-local changes. Do not treat the decompressor C as behaviorally confirmed until
-that write boundary is instrumented in a clean MAME build.
+interleave exactly, but Lua `read_u8` does not expose the same byte order as
+the i960 `ldob` path for this `ROM_LOAD32_WORD` region. A clean MAME write tap
+at `0x2808c`, paired with CPU source and ring-read traces, resolves the loader:
+flag bits are consumed per output byte, `1` selects a literal, `0` selects a
+back-reference, the ring is cleared for `0xfed` bytes, and the copy length is
+the low nibble plus three. The recovered model matches all 512 traced primary
+halfword writes, including the ring transition at output `0x110`; Lua texture
+RAM snapshots are not suitable for final validation because they can be
+mid-decompression and use a different access representation. The clean source
+tracing patch is `third_party/patches/0004-von-texture-source-tracing.patch`.
+
+The complete texture path is now bounded. The compressed sources at
+`0x02c00008` and `0x02c77438` come from the `main_data` ROM region
+(`mpr-18648/49/50/51`), not the four dedicated texture sockets. The loader
+expands them into the two 2 MiB host texture-RAM windows at `0x11000000` and
+`0x11200000`; each stream currently produces `0x80000` halfwords, with the
+format-table test selecting the primary or secondary sheet. The dedicated
+texture sockets (`mpr-18660/58/61/59`) form a separate 16 MiB texture-ROM
+region. Model 2 raster commands read UV records and texture headers from that
+region unless bit `0x800000` selects texture RAM, then sample the selected
+32-byte tile sheet from texture RAM. `von/tools/extract_texture_pipeline.py`
+reproduces these three ROM/RAM artifacts under `von/build/disasm`.
 
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and

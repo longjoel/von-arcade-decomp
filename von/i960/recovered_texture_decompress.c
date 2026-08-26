@@ -67,7 +67,7 @@ int recovered_texture_decompress(volatile const u8 *source,
             if (copy_remaining == 0)
             {
                 flags >>= 1;
-                if (flags & 0x100U)
+                if ((flags & 0x100U) == 0)
                     flags = (u32)*source++ | 0xff00U;
 
                 if ((flags & 1U) == 0)
@@ -81,6 +81,8 @@ int recovered_texture_decompress(volatile const u8 *source,
                     u32 low = *source++;
                     u32 high = *source++;
                     copy_offset = ((high & 0xf0U) << 4) | low;
+                    /* The first copied byte is emitted immediately; the loop
+                     * counter therefore encodes the nibble plus two. */
                     copy_remaining = (high & 0x0fU) + 2U;
                     copy_index = 1;
                     value = ring[copy_offset];

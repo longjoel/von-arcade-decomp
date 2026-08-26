@@ -1,0 +1,40 @@
+diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
+--- a/src/mame/sega/model2.cpp
++++ b/src/mame/sega/model2.cpp
+@@ -363,4 +363,11 @@
+ void model2_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
+ {
+ 	COMBINE_DATA(&m_palram[offset]);
++	static unsigned vonj_palette_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) && (vonj_palette_trace_count < 10000))
++	{
++		logerror("vonj_palette_write: offset=%04x data=%04x mask=%04x value=%04x\n",
++			offset, data, mem_mask, m_palram[offset]);
++		vonj_palette_trace_count++;
++	}
+ 	u16 palcolor = m_palram[offset];
+@@ -381,5 +381,13 @@
+ void model2_state::colorxlat_w(offs_t offset, u16 data, u16 mem_mask)
+ {
+ 	COMBINE_DATA(&m_colorxlat[offset]);
++	static unsigned vonj_colorxlat_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) &&
++		(m_colorxlat[offset] != 0) && (vonj_colorxlat_trace_count < 30000))
++	{
++		logerror("vonj_colorxlat_write: offset=%04x data=%04x mask=%04x value=%04x\n",
++			offset, data, mem_mask, m_colorxlat[offset]);
++		vonj_colorxlat_trace_count++;
++	}
+ 
+ 	// if writing to the scroll color table, mark the palette as dirty
+@@ -1047,4 +1047,10 @@
+ void model2_state::lumaram_w(offs_t offset, u8 data)
+ {
++	static unsigned vonj_luma_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) && (vonj_luma_trace_count < 0x10000))
++	{
++		logerror("vonj_luma_write: offset=%04x data=%02x\n", offset, data);
++		vonj_luma_trace_count++;
++	}
+ 	m_lumaram[offset] = data;
+ }

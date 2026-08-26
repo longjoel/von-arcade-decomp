@@ -29,9 +29,6 @@ def decompress(source: bytes, format_table: bytes) -> tuple[list[int], list[int]
     ring = bytearray(0x1000)
     write_index = 0xfee
     flags = 0
-    copy_offset = 0
-    copy_index = 0
-    copy_remaining = 0
     primary: list[int] = []
     secondary: list[int] = []
 
@@ -50,37 +47,30 @@ def decompress(source: bytes, format_table: bytes) -> tuple[list[int], list[int]
             or (low == 9 and high >= 10)
         )
 
-    for output_index in range(words):
-        output_word = 0
-        for pair in range(2):
-            if copy_remaining == 0:
-                flags >>= 1
-                if flags & 0x100:
-                    flags = source[source_index] | 0xff00
-                    source_index += 1
-                if flags & 1:
-                    low = source[source_index]
-                    high = source[source_index + 1]
-                    source_index += 2
-                    copy_offset = ((high & 0xf0) << 4) | low
-                    copy_remaining = (high & 0x0f) + 2
-                    copy_index = 1
-                    value = ring[copy_offset]
-                else:
-                    value = source[source_index]
-                    source_index += 1
-            else:
-                value = ring[(copy_offset + copy_index) & 0xfff]
-                copy_index += 1
-                if copy_remaining < copy_index:
-                    copy_remaining = 0
+    decoded = bytearray()
+    while len(decoded) < words * 2:
+        flags >>= 1
+        if not flags & 0x100:
+            flags = source[source_index] | 0xff00
+            source_index += 1
+        if flags & 1:
+            values = (source[source_index],)
+            source_index += 1
+        else:
+            low = source[source_index]
+            high = source[source_index + 1]
+            source_index += 2
+            copy_offset = ((high & 0xf0) << 4) | low
+            values = (ring[(copy_offset + copy_index) & 0xfff]
+                      for copy_index in range((high & 0x0f) + 3))
+        for value in values:
+            if len(decoded) == words * 2:
+                break
+            decoded.append(value)
             ring[write_index] = value
             write_index = (write_index + 1) & 0xfff
-            if pair == 0:
-                output_word = value
-            else:
-                output_word |= value << 8
-
+    for output_index in range(words):
+        output_word = decoded[output_index * 2] | (decoded[output_index * 2 + 1] << 8)
         if output_index < 0x60000 or not helper_bank(output_index):
             primary.append(output_word)
             secondary.append(0)
