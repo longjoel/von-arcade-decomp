@@ -276,6 +276,21 @@
           "notes": "Behavioral C reconstruction is linked and trace-confirmed; byte match not established."
         },
         {
+          "name": "geometry_service_submit",
+          "start": "0x0002a990",
+          "end": "0x0002aa74",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_geometry.c",
+          "symbol": "recovered_geometry_service_submit",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_geometry_service.py"
+          ],
+          "notes": "Reconstructs the fixed SHARC service packet, three response reads, forwarding of the first two responses plus the caller command to the geometry port, and the final completion word."
+        },
+        {
           "name": "geometry_initial_handshake",
           "start": "0x00028418",
           "end": "0x00028464",

@@ -289,6 +289,25 @@ invokes the SCSP initializer after geometry startup, so the bounded audio
 startup sequence is part of the generated runtime rather than a disconnected
 translation.
 
+### Reused Geometry Service Boundary: `0x0002a990`
+
+The attract worklist's next high-frequency host target is a fixed SHARC
+service wrapper. It writes this request to the coprocessor FIFO at
+`0x00884000`:
+
+```text
+5, 16, 20, (first & 0xffff), 21, (second & 0xffff), 26,
+0xbf34fdf4, 0xbf34fdf4, 0x3f34fdf4
+```
+
+The wrapper then reads three response words, marks geometry command-window
+offset `0xa0` with `0x0a0a`, forwards the first two responses followed by its
+third argument to the geometry program port at `0x00804000`, and writes FIFO
+completion word `6`. `recovered_geometry_service_packet()` isolates the
+deterministic request framing for exhaustive testing; the MMIO wrapper retains
+the response and forwarding order without assigning a meaning to the SHARC
+service itself.
+
 ### First Recovered Source Slice
 
 `von/i960/recovered_geometry.c` is the first checked-in C reconstruction from

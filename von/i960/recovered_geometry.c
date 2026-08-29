@@ -7,7 +7,7 @@
  * intentionally represented only by their observed bus accesses.
  */
 
-typedef unsigned long u32;
+typedef unsigned int u32;
 typedef unsigned short u16;
 
 #define GEO_STAGING       ((volatile u32 *)0x00900000)
@@ -20,6 +20,10 @@ typedef unsigned short u16;
 #define SHARC_CONTROL     ((volatile u32 *)0x00980000)
 #define SHARC_FIFO        ((volatile u16 *)0x00884000)
 #define SHARC_SOURCE      ((volatile const u16 *)0x0016b58c)
+#define COPROCESSOR_FIFO  (*(volatile u32 *)0x00884000)
+#define GEO_COMMAND_WINDOW ((volatile u32 *)0x00800000)
+
+#define GEOMETRY_SERVICE_PACKET_WORDS 11U
 
 #define GEO_STAGING_WORDS 0x8000U
 #define GEO_PROGRAM_WORDS 0x247cU
@@ -126,4 +130,46 @@ void recovered_geometry_program_upload(void)
 
     *GEO_CONTROL = 0;
     *GEO_READ_START = *GEO_READ_START;
+}
+
+/* Encode the fixed request emitted by the heavily reused 0x2a990 helper. */
+u32 recovered_geometry_service_packet(u32 first, u32 second, u32 *output)
+{
+    output[0] = 5U;
+    output[1] = 16U;
+    output[2] = 20U;
+    output[3] = first & 0xffffU;
+    output[4] = 21U;
+    output[5] = second & 0xffffU;
+    output[6] = 26U;
+    output[7] = 0xbf34fdf4U;
+    output[8] = 0xbf34fdf4U;
+    output[9] = 0x3f34fdf4U;
+    output[10] = 6U;
+    return GEOMETRY_SERVICE_PACKET_WORDS;
+}
+
+/* Recovered from 0x2a990: submit a SHARC service and forward its response. */
+void recovered_geometry_service_submit(u32 first, u32 second, u32 command)
+{
+    u32 packet[GEOMETRY_SERVICE_PACKET_WORDS];
+    u32 response0;
+    u32 response1;
+    u32 response2;
+    u32 index;
+
+    recovered_geometry_service_packet(first, second, packet);
+    for (index = 0; index < 10U; ++index)
+        COPROCESSOR_FIFO = packet[index];
+
+    response0 = COPROCESSOR_FIFO;
+    response1 = COPROCESSOR_FIFO;
+    response2 = COPROCESSOR_FIFO;
+    (void)response2;
+
+    GEO_COMMAND_WINDOW[0xa0U / 4U] = 0x00000a0aU;
+    *GEO_PROGRAM_PORT = response0;
+    *GEO_PROGRAM_PORT = response1;
+    *GEO_PROGRAM_PORT = command;
+    COPROCESSOR_FIFO = packet[10];
 }

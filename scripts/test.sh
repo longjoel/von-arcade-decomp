@@ -11,6 +11,7 @@ python3 von/tools/test_recovered_audio_queue.py
 python3 von/tools/test_recovered_audio_helpers.py
 python3 von/tools/test_recovered_audio_queue_consumer.py
 python3 von/tools/test_recovered_host_control.py
+python3 von/tools/test_recovered_geometry_service.py
 python3 von/tools/rom_audit.py
 ROM_PATH="$(prepare_rom_path)"
 trap 'cleanup_rom_path "$ROM_PATH"' EXIT
