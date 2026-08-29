@@ -107,6 +107,13 @@ Printable characters advance the column only while its prior value is at most
 61. These bounds are direct consequences of the `cmpible`/`cmpibg` branches;
 their presentation-level purpose remains unconfirmed.
 
+The adjacent helper at `0x0001ccf8` is a narrow tile/control bus wrapper. It
+writes its 32-bit argument unchanged to `0x01800000` and returns through the
+i960 link register. `recovered_text_write_tile_control()` preserves that write
+without assigning a higher-level register name; its pure bus description is
+checked across all 65,536 low-word input values by
+`von/tools/test_recovered_text_control.py`.
+
 ### Formatted String Boundary
 
 The control path is also reachable through the formatter, not only the direct

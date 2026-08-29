@@ -6,7 +6,7 @@
  * Callers here provide only static strings without format directives.
  */
 
-typedef unsigned long u32;
+typedef unsigned int u32;
 typedef unsigned short u16;
 typedef unsigned char u8;
 
@@ -14,6 +14,7 @@ typedef unsigned char u8;
 #define TEXT_STATE_COLUMN ((volatile u32 *)0x00504ce0)
 #define TEXT_STATE_ROW    ((volatile u32 *)0x00504ce4)
 #define TILE_RAM          ((volatile u16 *)0x01000000)
+#define TILE_CONTROL      (*(volatile u32 *)0x01800000)
 
 void recovered_text_set_position(u32 column, u32 row)
 {
@@ -56,4 +57,17 @@ void recovered_text_write_string(volatile const u8 *text)
 
     while ((character = *text++) != 0)
         recovered_text_emit_char(character);
+}
+
+/* Pure description of the single bus write in the 0x1ccf8 helper. */
+u32 recovered_text_tile_control_bus(u32 value, u32 *address)
+{
+    *address = 0x01800000U;
+    return value;
+}
+
+/* Recovered text/tile control write at i960 0x0001ccf8. */
+void recovered_text_write_tile_control(u32 value)
+{
+    TILE_CONTROL = value;
 }

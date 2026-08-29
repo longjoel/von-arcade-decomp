@@ -335,6 +335,21 @@
           "notes": "Observed during input-free startup and integrated for static loader messages. Production C preserves the NUL-terminated byte walk and per-character dispatch."
         },
         {
+          "name": "text_tile_control_write",
+          "start": "0x0001ccf8",
+          "end": "0x0001cd10",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_write_tile_control",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_text_control.py"
+          ],
+          "notes": "Preserves the helper's single 32-bit write of its input to tile/control MMIO address 0x01800000."
+        },
+        {
           "name": "texture_initializer",
           "start": "0x00028548",
           "end": "0x000285f4",
