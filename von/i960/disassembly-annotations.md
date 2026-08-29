@@ -114,6 +114,23 @@ without assigning a higher-level register name; its pure bus description is
 checked across all 65,536 low-word input values by
 `von/tools/test_recovered_text_control.py`.
 
+The related initializer at `0x0001c618` resets six halfword fields at
+`0x00504d24..0x00504d2e`, stores the tile-clear count `0x4000` at
+`0x00504d32`, clears the words at `0x00504d34` and `0x00504d38`, and then
+zeros four video-memory ranges:
+
+```text
+0x01000000: 0x4000 halfwords
+0x0100c000: 0x1000 halfwords
+0x01008000: 0x0800 halfwords
+0x0100a000: 8 halfwords
+```
+
+`recovered_text_video_initialize()` preserves this bounded clear plan. Its
+state and region descriptors are checked by
+`von/tools/test_recovered_text_video.py`; the hardware-clearing wrapper remains
+available for the future caller integration pass.
+
 ### Formatted String Boundary
 
 The control path is also reachable through the formatter, not only the direct

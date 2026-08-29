@@ -350,6 +350,21 @@
           "notes": "Preserves the helper's single 32-bit write of its input to tile/control MMIO address 0x01800000."
         },
         {
+          "name": "text_video_initialize",
+          "start": "0x0001c618",
+          "end": "0x0001c6f8",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_video_initialize",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_text_video.py"
+          ],
+          "notes": "Resets the nine observed text/video state fields and clears the four exact halfword regions at 0x01000000, 0x0100c000, 0x01008000, and 0x0100a000."
+        },
+        {
           "name": "texture_initializer",
           "start": "0x00028548",
           "end": "0x000285f4",

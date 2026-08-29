@@ -15,6 +15,12 @@ typedef unsigned char u8;
 #define TEXT_STATE_ROW    ((volatile u32 *)0x00504ce4)
 #define TILE_RAM          ((volatile u16 *)0x01000000)
 #define TILE_CONTROL      (*(volatile u32 *)0x01800000)
+#define VIDEO_STATE       ((volatile u16 *)0x00504d24)
+
+static const u32 VIDEO_CLEAR_ADDRESSES[4] = {
+    0x01000000U, 0x0100c000U, 0x01008000U, 0x0100a000U
+};
+static const u32 VIDEO_CLEAR_HALWORDS[4] = {0x4000U, 0x1000U, 0x0800U, 8U};
 
 void recovered_text_set_position(u32 column, u32 row)
 {
@@ -70,4 +76,69 @@ u32 recovered_text_tile_control_bus(u32 value, u32 *address)
 void recovered_text_write_tile_control(u32 value)
 {
     TILE_CONTROL = value;
+}
+
+/* Describe the four halfword ranges cleared by the 0x1c618 initializer. */
+u32 recovered_text_video_clear_plan(u32 index, u32 *address, u32 *halfwords)
+{
+    if (index >= 4U)
+        return 0U;
+    *address = VIDEO_CLEAR_ADDRESSES[index];
+    *halfwords = VIDEO_CLEAR_HALWORDS[index];
+    return 1U;
+}
+
+/* Describe the five initial state writes before the video clears. */
+u32 recovered_text_video_state_plan(u32 index, u32 *address, u32 *value)
+{
+    if (index < 6U) {
+        *address = 0x00504d24U + index * 2U;
+        *value = 0U;
+        return 1U;
+    }
+    if (index == 6U) {
+        *address = 0x00504d32U;
+        *value = 0x4000U;
+        return 1U;
+    }
+    if (index == 7U) {
+        *address = 0x00504d34U;
+        *value = 0U;
+        return 1U;
+    }
+    if (index == 8U) {
+        *address = 0x00504d38U;
+        *value = 0U;
+        return 1U;
+    }
+    return 0U;
+}
+
+static void recovered_text_clear_video_region(u32 address, u32 halfwords)
+{
+    volatile u16 *destination = (volatile u16 *)(unsigned long)address;
+
+    while (halfwords-- != 0U)
+        *destination++ = 0U;
+}
+
+/* Recovered text/tile/video initialization at i960 0x0001c618. */
+void recovered_text_video_initialize(void)
+{
+    u32 index;
+    u32 address;
+    u32 halfwords;
+    u32 value;
+
+    for (index = 0; index < 7U; ++index) {
+        recovered_text_video_state_plan(index, &address, &value);
+        *(volatile u16 *)(unsigned long)address = (u16)value;
+    }
+    *(volatile u32 *)0x00504d34 = 0U;
+    *(volatile u32 *)0x00504d38 = 0U;
+
+    for (index = 0; index < 4U; ++index) {
+        recovered_text_video_clear_plan(index, &address, &halfwords);
+        recovered_text_clear_video_region(address, halfwords);
+    }
 }
