@@ -70,6 +70,76 @@
           "notes": "Observed on the board-I/O failure path. Production C fills the 16-byte queue with 0xff, clears both indices, and writes both 0x00ff sentinels. It is conditionally integrated after the reconstructed I/O self-test."
         },
         {
+          "name": "signed_runtime_band_classifier",
+          "start": "0x00073508",
+          "end": "0x000735c8",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_runtime_math.c",
+          "symbol": "recovered_signed_band",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md"
+          ],
+          "notes": "High-frequency attract leaf. Production C sign-extends the low 16 bits and reproduces all ten threshold bands. Callers use the result as an index into gameplay and presentation lookup tables."
+        },
+        {
+          "name": "audio_queue_capacity_check",
+          "start": "0x0002a458",
+          "end": "0x0002a494",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_audio_queue.c",
+          "symbol": "recovered_audio_queue_has_space",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md"
+          ],
+          "notes": "Computes free space in the 64-byte host-to-SCSP ring while preserving one empty slot to distinguish full from empty."
+        },
+        {
+          "name": "audio_queue_byte_push",
+          "start": "0x0002a4a8",
+          "end": "0x0002a4d8",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_audio_queue.c",
+          "symbol": "recovered_audio_queue_push",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md"
+          ],
+          "notes": "Writes one byte at the current producer index and advances it modulo 64. The interrupt path drains this ring to sound MMIO 0x009c0000."
+        },
+        {
+          "name": "audio_command_u16_send",
+          "start": "0x0002a4e0",
+          "end": "0x0002a574",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_audio_queue.c",
+          "symbol": "recovered_audio_send_u16",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md"
+          ],
+          "notes": "Queues special command 0xff as one byte or a normal 16-bit command as 0xae/high/low after reserving space, honors the observed mode/status suppression gate, and raises host control bit 10 to service the queue."
+        },
+        {
+          "name": "runtime_random_step",
+          "start": "0x000f5058",
+          "end": "0x000f5094",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_runtime_math.c",
+          "symbol": "recovered_random_next",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md"
+          ],
+          "notes": "High-frequency attract leaf. The pure step multiplies the 31-bit state by 0x5d588b65, folds the 64-bit product into 31 bits exactly as the emul/chkbit/addc sequence does, and the hardware wrapper updates 0x005785d0."
+        },
+        {
           "name": "geometry_program_upload",
           "start": "0x00028620",
           "end": "0x00028758",

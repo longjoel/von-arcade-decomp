@@ -37,6 +37,9 @@ fails if any observed PC lies beyond the generated-code extent.
 The current eight-second baseline visits 564 distinct PCs, all within the
 generated `0x00000000-0x00002520` range.
 
+Run the host-side exhaustive checks for recovered deterministic runtime leaves
+with `python3 von/tools/test_recovered_runtime_math.py`.
+
 The first standalone C slice is the reset routine. Its candidate artifacts are
 `von/build/i960/reconstructed_reset.elf`, `reconstructed_reset.bin`, and
 `reconstructed_reset.lst`; compare it with:

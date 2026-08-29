@@ -219,6 +219,32 @@ read/write indices at `0x00504c70/74`, and stores `0x00ff` sentinels at
 `0x00504c78` and `0x00503312`. `recovered_host_queue.c` preserves those
 effects and is conditionally called when the reconstructed I/O test fails.
 
+### High-Frequency Attract Leaves
+
+The 60-second input-free trace identifies `0x000f5058` as a heavily reused
+31-bit pseudorandom step. It multiplies the state at `0x005785d0` by
+`0x5d588b65`, then uses `chkbit 31` plus `addc high,high` to fold the 64-bit
+product across bit 31. Clearing bit 31 leaves the new state in the range
+`0..0x7fffffff`. `recovered_random_step()` expresses the arithmetic separately
+from the MMIO-addressed state wrapper so deterministic vectors can be tested.
+
+The leaf at `0x00073508` sign-extends its low 16-bit argument and returns one
+of ten bands. Nonnegative boundaries are `0x038d`, `0x1554`, `0x3fff`, and
+`0x5fff`; negative boundaries are `-0x6000`, `-0x4000`, `-0x1555`, and
+`-0x038e`. Observed callers immediately use the result in halfword or word
+lookup tables, supporting the classifier interpretation without assigning a
+more specific gameplay name yet.
+
+The cluster at `0x0002a458-0x0002a574` is the producer side of a 64-byte
+host-to-SCSP command ring. Read and write indices live at `0x0051aa70/74`,
+with bytes at `0x0051aa80`. The interrupt path at `0x000016dc` checks sound
+status `0x009c0004`, removes one queued byte, and writes it to `0x009c0000`.
+Normal 16-bit commands are framed as `0xae`, high byte, low byte; `0xff` is a
+one-byte special case. After enqueue, `0x00001348` raises bit 10 in the host
+control mirror and MMIO register to request service. The recovered source
+keeps the capacity, enqueue, framing, suppression gate, and kick operations
+separate enough for focused validation.
+
 ### First Recovered Source Slice
 
 `von/i960/recovered_geometry.c` is the first checked-in C reconstruction from
