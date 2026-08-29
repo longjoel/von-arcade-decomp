@@ -13,11 +13,12 @@ from pathlib import Path
 
 
 OBJECT = re.compile(
-    r"vonj_geometry_object: seq=(\d+) time=([0-9.]+) tpa=([0-9a-f]+) "
-    r"tha=([0-9a-f]+) oba=([0-9a-f]+) count=([0-9a-f]+) mode=(\d+) source=([^ ]+)"
+    r"vonj_geometry_object: (?:seq=(\d+) )?time=([0-9.e+-]+) "
+    r"tpa=([0-9a-f]+) tha=([0-9a-f]+) oba=([0-9a-f]+) "
+    r"count=([0-9a-f]+) mode=(\d+) source=([^ ]+)"
 )
 MATRIX = re.compile(
-    r"vonj_geometry_matrix: seq=(\d+) time=([0-9.]+) "
+    r"vonj_geometry_matrix: (?:seq=(\d+) )?time=([0-9.e+-]+) "
     r"m=([^ ]+) t=([^ ]+)"
 )
 
@@ -108,22 +109,22 @@ def main() -> int:
     args = parser.parse_args()
 
     events = []
-    for line in args.trace.read_text().splitlines():
+    for ordinal, line in enumerate(args.trace.read_text().splitlines()):
         match = OBJECT.search(line)
         if match:
-            events.append((int(match[1]), "object", float(match[2]), int(match[5], 16)))
+            events.append((float(match[2]), ordinal, "object", int(match[5], 16)))
             continue
         match = MATRIX.search(line)
         if match:
             matrix = tuple(float(value) for value in match[3].split(","))
             translation = tuple(float(value) for value in match[4].split(","))
-            events.append((int(match[1]), "matrix", float(match[2]), matrix + translation))
+            events.append((float(match[2]), ordinal, "matrix", matrix + translation))
     events.sort()
 
     frames: dict[float, list[tuple[int, tuple[float, ...]]]] = {}
     current = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0,
                0.0, 0.0, 0.0)
-    for _, kind, time, value in events:
+    for time, _, kind, value in events:
         if kind == "matrix":
             current = value
         else:

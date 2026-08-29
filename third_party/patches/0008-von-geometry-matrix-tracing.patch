@@ -1,7 +1,7 @@
 diff --git a/src/mame/sega/model2_v.cpp b/src/mame/sega/model2_v.cpp
 --- a/src/mame/sega/model2_v.cpp
 +++ b/src/mame/sega/model2_v.cpp
-@@ -2032,3 +2032,12 @@
+@@ -2013,6 +2013,15 @@ u32 *model2_state::geo_matrix_write(geo_state *geo, u32 opcode, u32 *input)
  	/* read in the transformation matrix */
  	for (i = 0; i < 12; i++)
  		geo->matrix[i] = u2f(*input++);
@@ -14,3 +14,5 @@ diff --git a/src/mame/sega/model2_v.cpp b/src/mame/sega/model2_v.cpp
 +			geo->matrix[9], geo->matrix[10], geo->matrix[11]);
 +		vonj_geometry_matrix_trace_count++;
 +	}
+ 
+ 	return input;

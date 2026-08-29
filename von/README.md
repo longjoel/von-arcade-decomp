@@ -124,6 +124,50 @@ MAME preparation defaults to the `core` patch set, applying Virtual-On support
 and communication diagnostics. Set `VON_MAME_PATCH_SET=debug` to include the
 existing graphics tracing patches as well.
 
+### Geometry capture and model extraction
+
+The debug patch set instruments the Model 2 polygon renderer at three useful
+boundaries: object submissions, transformation-matrix writes, and accepted
+polygons after vertex transformation. The polygon ROMs can be assembled into
+the CPU-visible geometry address space, so a capture can be turned into raw
+meshes without redistributing ROM data:
+
+```sh
+VON_MAME_PATCH_SET=debug ./scripts/remote-build.sh
+./scripts/trace-geometry-select.sh
+python3 von/tools/extract_geometry_rom.py
+python3 von/tools/dump_geometry_objects.py \
+  --trace von/build/disasm/vonj-geometry-select-40s.trace
+./scripts/export-player-select-models.sh \
+  von/build/disasm/vonj-geometry-select-40s.trace
+```
+
+That batch command emits one OBJ and one self-contained glTF asset per unique
+polygon-ROM object. Individual objects can also be exported directly:
+
+```sh
+python3 von/tools/export_geometry_obj.py \
+  --oba 0x0084553f \
+  --output von/build/disasm/geometry-objects/oba-0084553f.obj
+python3 von/tools/export_geometry_gltf.py \
+  von/build/disasm/geometry-objects/oba-0084553f.obj \
+  von/build/disasm/geometry-objects/oba-0084553f.gltf
+```
+
+When a capture contains complete 40-object select-screen frames, the matrix
+trace can be exported as one animated glTF model:
+
+```sh
+python3 von/tools/export_geometry_animation_gltf.py \
+  --trace von/build/disasm/vonj-geometry-select-40s.trace
+```
+
+The capture script uses `bin/von` directly and defaults to SDL's dummy video
+backend, so it also works on headless build hosts. If the run remains on the
+Model 2 boot screen, the event counts printed by the script make that runtime
+limitation explicit; the exporter should only be run once object and matrix
+events are present.
+
 The generated i960 host ROM can be run directly with:
 
 ```sh

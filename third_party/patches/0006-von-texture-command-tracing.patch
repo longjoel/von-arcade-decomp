@@ -1,10 +1,7 @@
 diff --git a/src/mame/sega/model2_v.cpp b/src/mame/sega/model2_v.cpp
 --- a/src/mame/sega/model2_v.cpp
 +++ b/src/mame/sega/model2_v.cpp
-@@ -408,6 +408,17 @@
- 		th = &raster->texture_rom[raster->command_buffer[1] & raster->texture_rom_mask];
- 
- 	object.texheader[0] = *th++;
+@@ -411,6 +411,17 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
  	object.texheader[1] = *th++;
  	object.texheader[2] = *th++;
  	object.texheader[3] = *th++;
@@ -19,3 +16,6 @@ diff --git a/src/mame/sega/model2_v.cpp b/src/mame/sega/model2_v.cpp
 +			32 * ((object.texheader[2] >> 6) & 0x1f));
 +		vonj_texture_command_trace_count++;
 +	}
+ 
+ 	/* extract the texture header offset */
+ 	tho = (attr >> 12) & 0x1f;

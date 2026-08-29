@@ -9,7 +9,8 @@ from pathlib import Path
 
 
 OBJECT = re.compile(
-    r"vonj_geometry_object: tpa=([0-9a-f]+) tha=([0-9a-f]+) "
+    r"vonj_geometry_object: (?:seq=\d+ )?(?:time=[0-9.e+-]+ )?"
+    r"tpa=([0-9a-f]+) tha=([0-9a-f]+) "
     r"oba=([0-9a-f]+) count=([0-9a-f]+) mode=(\d+) source=([a-z-]+)"
 )
 
