@@ -245,6 +245,50 @@ control mirror and MMIO register to request service. The recovered source
 keeps the capacity, enqueue, framing, suppression gate, and kick operations
 separate enough for focused validation.
 
+The `0x00001348-0x00001370` thunk is now represented as
+`recovered_host_service_request()`, rather than being folded into the producer.
+The command framing and all 64-by-64 ring-capacity combinations are covered by
+`von/tools/test_recovered_audio_queue.py`; this validates the pure producer
+semantics without dereferencing the target's MMIO addresses.
+
+The corresponding consumer branch at `0x000016dc` is represented by
+`recovered_audio_queue_consume()`. It requires a nonempty FIFO and SCSP status
+bit 0, then reads one byte, advances the read index modulo 64, and writes the
+value to `0x009c0000`. The reconstructed heartbeat polls bit 10 of the generated
+control mirror and invokes the MMIO wrapper, while the state-only behavior is
+covered across every read/write-index pair and representative status value by
+`von/tools/test_recovered_audio_queue_consumer.py`.
+
+The host interrupt-mask helper at `0x000017c8-0x000018a8` is now represented
+by `recovered_host_interrupt_mask_update()`. It clears the requested bit in
+`0x00501cd0` and `0xe80004`, reloads the timer selected by masks `4`, `8`,
+`16`, or `32`, re-arms the bit, and writes the inverse mask to `0xe80000`.
+The timer selection and reload table is checked for every 16-bit mask by
+`von/tools/test_recovered_host_control.py`.
+
+### Additional Audio Producer Helpers
+
+Five adjacent host-side audio units are now represented in
+`von/i960/recovered_audio_queue.c`:
+
+- `0x0002a430` is a four-iteration volatile countdown used to let SCSP
+  register writes settle. The initializer calls it between its control writes.
+- `0x0002a5f0` duplicates the u16 producer framing but suppresses normal
+  commands when mode is 1 and the low board-status byte is 0. The `0xff`
+  special case remains unconditional, matching the sibling at `0x2a4e0`.
+- `0x0002a690` clamps a signed level to `1..127` and sends `0xa0, 1, level`.
+- `0x0002a870` sends `0xa0, 0, low_byte(value)` without the clamp.
+- `0x0002a8a0` initializes both FIFO indices, fills all 64 queue bytes with
+  `0x99`, writes the SCSP control sequence `0, 0, 0, 0x40, 0x4e, 0x37`
+  with five intervening short delays, and queues the `0xff` startup command.
+
+The pure framing, clamp, delay-count, and initialization-constant helpers are
+covered by `von/tools/test_recovered_audio_queue.py` and
+`von/tools/test_recovered_audio_helpers.py`. The reconstructed main path now
+invokes the SCSP initializer after geometry startup, so the bounded audio
+startup sequence is part of the generated runtime rather than a disconnected
+translation.
+
 ### First Recovered Source Slice
 
 `von/i960/recovered_geometry.c` is the first checked-in C reconstruction from

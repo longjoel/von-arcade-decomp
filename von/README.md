@@ -207,4 +207,30 @@ toolchain, byte-compare it, run the relevant regression, and then update the
 ledger. Behavioral reconstructions that do not yet byte-match remain
 provisional and do not increase the headline percentage.
 
+### Current reconstruction milestone
+
+The latest unattended pass recovered five additional host-side audio units
+from the i960 attract trace and integrated the SCSP startup sequence into the
+reconstructed main path:
+
+- `0x2a430`: four-iteration SCSP register-settle delay
+- `0x2a5f0`: alternate status-gated 16-bit audio command sender
+- `0x2a690`: signed level clamp to `1..127` and `0xa0, 1, level` framing
+- `0x2a870`: raw `0xa0, 0, low_byte(value)` command sender
+- `0x2a8a0`: 64-byte FIFO initialization, SCSP control sequence, and startup
+  `0xff` command
+
+The producer and consumer paths are covered by exhaustive host-side tests,
+including 983,040 parameterized framing vectors, 262,144 frame vectors,
+266,240 FIFO-capacity vectors, 20,480 consumer vectors, and 65,536 interrupt
+mask vectors. The full test script, ROM audit, and MAME validation pass. The
+drone0 i960 build produces the reconstructed image, and the clean runtime
+audit confirms that all 320 visited instructions execute from generated code.
+
+The ledger currently records `4,132/4,132` classified executable bytes as
+C-represented behavioral reconstructions. The strict byte-match headline is
+still `0/4,132`, because these slices remain provisional pending compiler/ABI
+calibration and byte-for-byte comparison. The refreshed 60-second attract
+worklist contains 30 represented units and 232 remaining untriaged units.
+
 Saturn and PC versions are deferred until the arcade path is understood.

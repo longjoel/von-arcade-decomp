@@ -14,7 +14,7 @@ fi
 printf 'Using i960 CPU mode: %s\n' "$CPU_FLAG"
 mkdir -p /src/von/build/i960
 
-for source in main recovered_io recovered_host_queue recovered_runtime_math recovered_audio_queue recovered_geometry recovered_geometry_commands recovered_text recovered_texture recovered_geometry_profile recovered_texture_decompress reconstructed_main; do
+for source in main recovered_io recovered_host_queue recovered_host_control recovered_runtime_math recovered_audio_queue recovered_geometry recovered_geometry_commands recovered_text recovered_texture recovered_geometry_profile recovered_texture_decompress reconstructed_main; do
     i960-elf-gcc "$CPU_FLAG" -O1 -ffreestanding -fno-builtin -fno-common \
         -c "/src/von/i960/$source.c" -o "/src/von/build/i960/$source.o"
 done
@@ -31,6 +31,7 @@ i960-elf-as -ahls=/src/von/build/i960/start_reconstructed.lst /src/von/i960/star
 COMMON_OBJECTS=(
     /src/von/build/i960/recovered_io.o
     /src/von/build/i960/recovered_host_queue.o
+    /src/von/build/i960/recovered_host_control.o
     /src/von/build/i960/recovered_runtime_math.o
     /src/von/build/i960/recovered_audio_queue.o
     /src/von/build/i960/recovered_geometry.o

@@ -15,6 +15,8 @@ typedef unsigned short u16;
 u32 recovered_io_self_test(void);
 void recovered_host_queue_initialize(void);
 void recovered_geometry_pipeline_startup(u32 mode);
+void recovered_audio_initialize_scsp(void);
+void recovered_audio_service_pending(void);
 
 void i960_reconstructed_main(void)
 {
@@ -28,10 +30,13 @@ void i960_reconstructed_main(void)
         recovered_host_queue_initialize();
 
     recovered_geometry_pipeline_startup(0);
+    recovered_audio_initialize_scsp();
     state[3] = 0x47454f30UL; /* GEO0 */
     state[6] = 0;
     state[4] = 0x494e4954UL; /* INIT */
 
-    for (;;)
+    for (;;) {
+        recovered_audio_service_pending();
         state[5] = state[5] + 1;
+    }
 }

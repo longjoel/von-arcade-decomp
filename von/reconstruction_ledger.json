@@ -93,7 +93,8 @@
           "symbol": "recovered_audio_queue_has_space",
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_audio_queue.py"
           ],
           "notes": "Computes free space in the 64-byte host-to-SCSP ring while preserving one empty slot to distinguish full from empty."
         },
@@ -107,7 +108,8 @@
           "symbol": "recovered_audio_queue_push",
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_audio_queue.py"
           ],
           "notes": "Writes one byte at the current producer index and advances it modulo 64. The interrupt path drains this ring to sound MMIO 0x009c0000."
         },
@@ -121,9 +123,130 @@
           "symbol": "recovered_audio_send_u16",
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_audio_queue.py"
           ],
           "notes": "Queues special command 0xff as one byte or a normal 16-bit command as 0xae/high/low after reserving space, honors the observed mode/status suppression gate, and raises host control bit 10 to service the queue."
+        },
+        {
+          "name": "audio_short_delay",
+          "start": "0x0002a430",
+          "end": "0x0002a450",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_audio_queue.c",
+          "symbol": "recovered_audio_short_delay",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_audio_helpers.py"
+          ],
+          "notes": "The observed leaf seeds a volatile countdown with four and loops until zero. It is used as a short SCSP register-settle delay during audio initialization."
+        },
+        {
+          "name": "audio_command_u16_send_when_idle",
+          "start": "0x0002a5f0",
+          "end": "0x0002a690",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_audio_queue.c",
+          "symbol": "recovered_audio_send_u16_when_idle",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_audio_queue.py"
+          ],
+          "notes": "Sibling producer framing helper. It preserves the 0xff one-byte case and suppresses normal 0xae/high/low commands only when mode is 1 and the low board-status byte is zero."
+        },
+        {
+          "name": "audio_clamped_level_send",
+          "start": "0x0002a690",
+          "end": "0x0002a6dc",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_audio_queue.c",
+          "symbol": "recovered_audio_send_clamped_level",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_audio_helpers.py"
+          ],
+          "notes": "Clamps the signed input to the observed inclusive range 1..127, frames it as 0xa0, selector 1, level, and sends the three-byte audio command when FIFO capacity permits."
+        },
+        {
+          "name": "audio_selector_zero_send",
+          "start": "0x0002a870",
+          "end": "0x0002a8a0",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_audio_queue.c",
+          "symbol": "recovered_audio_send_value_selector_zero",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_audio_helpers.py"
+          ],
+          "notes": "Frames the low byte of the input as 0xa0, selector 0, value and submits the three-byte command through the shared ring-capacity and service-request path."
+        },
+        {
+          "name": "audio_scsp_queue_initialize",
+          "start": "0x0002a8a0",
+          "end": "0x0002a930",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_audio_queue.c",
+          "symbol": "recovered_audio_initialize_scsp",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_audio_helpers.py"
+          ],
+          "notes": "Initializes both 64-byte FIFO indices, fills the FIFO with 0x99, performs the six observed SCSP control writes with the five short delays, then sends the 0xff startup command."
+        },
+        {
+          "name": "host_service_request",
+          "start": "0x00001348",
+          "end": "0x00001370",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_audio_queue.c",
+          "symbol": "recovered_host_service_request",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_audio_queue.py"
+          ],
+          "notes": "Shared service-request thunk called by the audio producer. It sets bit 10 in the host control mirror and writes the same value to the interrupt-control MMIO register."
+        },
+        {
+          "name": "audio_queue_consumer",
+          "start": "0x000016dc",
+          "end": "0x00001738",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_audio_queue.c",
+          "symbol": "recovered_audio_queue_consume",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_audio_queue_consumer.py"
+          ],
+          "notes": "Recovers the bit-10 interrupt branch: when the 64-byte FIFO is nonempty and SCSP status bit 0 is ready, consume one byte, advance 0x0051aa70 modulo 64, and write the value to SCSP command MMIO 0x009c0000. The reconstructed heartbeat polls the generated control mirror to integrate this bounded service path."
+        },
+        {
+          "name": "host_interrupt_mask_update",
+          "start": "0x000017c8",
+          "end": "0x000018a8",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_host_control.c",
+          "symbol": "recovered_host_interrupt_mask_update",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_host_control.py"
+          ],
+          "notes": "Clears and re-arms a host interrupt mask, reloads timer MMIO for masks 4/8/16/32 with the observed values, and acknowledges the source through 0xe80000. The audio bit-10 service uses the same control transition."
         },
         {
           "name": "runtime_random_step",
