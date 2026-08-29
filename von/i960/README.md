@@ -19,6 +19,24 @@ separate C reconstruction image. Run the latter with:
 
 Capture its early startup trace with `./scripts/trace-i960-reconstructed.sh`.
 
+For the code-isolation test, build and run the clean image:
+
+```sh
+./scripts/i960-build.sh
+./scripts/run-i960-clean.sh -video none -sound none -oslog -seconds_to_run 8 -skip_gameinfo
+```
+
+`reconstructed-clean-maincpu.bin` contains only generated C/assembly startup
+code and the hash-verified asset ranges declared in
+`approved_data_ranges.json`; all remaining ROM space is filled with `0xff`.
+Its generated manifest records every copied range and output hash. This image
+currently completes recovered hardware initialization and then stays in the
+heartbeat loop; the attract scheduler is the next integration boundary.
+Audit an instrumented run with `./scripts/audit-i960-clean-runtime.sh`; it
+fails if any observed PC lies beyond the generated-code extent.
+The current eight-second baseline visits 564 distinct PCs, all within the
+generated `0x00000000-0x00002520` range.
+
 The first standalone C slice is the reset routine. Its candidate artifacts are
 `von/build/i960/reconstructed_reset.elf`, `reconstructed_reset.bin`, and
 `reconstructed_reset.lst`; compare it with:
@@ -79,10 +97,10 @@ reconstructed symbol names, while the original ROM listing is raw-address
 disassembly and still needs function-boundary annotations.
 
 The reconstructed image currently covers the trace-confirmed I/O self-test,
-SHARC upload, geometry upload/setup, command-window initialization, and
-texture initialization path. It is intentionally separate from the smoke
-prototype and does not yet enter the unresolved frame-synchronized command
-loop.
+SHARC upload, geometry upload/setup, command-window initialization, texture
+initialization, and frame-synchronized startup pipeline. It remains separate
+from the smoke prototype and returns to a heartbeat after completing that
+bounded pipeline; the attract scheduler is not yet reconstructed.
 
 The build uses `ghcr.io/nkito/i960_sbc:latest`, which provides an
 `i960-elf` GCC/binutils toolchain. The image is pinned by the Docker registry

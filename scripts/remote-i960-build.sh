@@ -19,6 +19,8 @@ python3 "$ROOT_DIR/von/tools/extract_maincpu.py" \
     --output "$ROOT_DIR/von/build/i960/vonj-original-maincpu.bin"
 rsync -a --delete "$ROOT_DIR/von/i960/" "$REMOTE_HOST:$REMOTE_CHECKOUT/von/i960/"
 rsync -a "$ROOT_DIR/scripts/i960-build-inner.sh" "$REMOTE_HOST:$REMOTE_CHECKOUT/scripts/i960-build-inner.sh"
+rsync -a "$ROOT_DIR/von/tools/build_clean_i960_image.py" \
+    "$REMOTE_HOST:$REMOTE_CHECKOUT/von/tools/build_clean_i960_image.py"
 rsync -a "$ROOT_DIR/von/build/i960/vonj-original-maincpu.bin" \
     "$REMOTE_HOST:$REMOTE_CHECKOUT/von/build/i960/vonj-original-maincpu.bin"
 
@@ -38,4 +40,5 @@ scp "$REMOTE_HOST:$REMOTE_CHECKOUT/von/build/i960/"'reconstructed_reset.elf' "$R
 scp "$REMOTE_HOST:$REMOTE_CHECKOUT/von/build/i960/"'reconstructed_reset.bin' "$ROOT_DIR/von/build/i960/reconstructed_reset.bin"
 scp "$REMOTE_HOST:$REMOTE_CHECKOUT/von/build/i960/"'reconstructed_reset.lst' "$ROOT_DIR/von/build/i960/reconstructed_reset.lst"
 rsync -a --delete "$REMOTE_HOST:$REMOTE_CHECKOUT/von/build/rompath/reconstructed/" "$ROOT_DIR/von/build/rompath/reconstructed/"
+"$ROOT_DIR/scripts/package-i960-clean.sh"
 printf 'Synchronized reconstructed i960 image\n'

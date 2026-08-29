@@ -207,6 +207,18 @@ still renders i960 register-stack and condition-code details as synthetic
 `ac`, `fp`, and stack variables; those are presentation artifacts until the
 calling convention is refined.
 
+The input-free coverage trace also enters the helper at `0x00000a30`. Its
+entire `0x28`-byte body is i960 ABI setup (`flushreg`, PFP marking, and first
+spill-frame bounds), not game behavior. `start_reconstructed.s` supplies the
+equivalent register-stack foundation before its first nested C call, so this
+unit is classified separately from the reset copy/MMIO routine.
+
+The same trace reaches `0x00018488` from the board-I/O failure dispatch. This
+routine initializes a 16-byte host queue at `0x00504c60` to `0xff`, clears its
+read/write indices at `0x00504c70/74`, and stores `0x00ff` sentinels at
+`0x00504c78` and `0x00503312`. `recovered_host_queue.c` preserves those
+effects and is conditionally called when the reconstructed I/O test fails.
+
 ### First Recovered Source Slice
 
 `von/i960/recovered_geometry.c` is the first checked-in C reconstruction from
@@ -389,11 +401,12 @@ the register/texture/command-window/handshake setup, then conditionally loads
 textures and submits the auxiliary stream. Both paths prepare and submit the
 host buffer before storing `0xffff` to `0x0181c000`. The individual helpers
 remain separately named and verified; this caller preserves their ROM order.
-Direct invocation from the reconstructed MAME harness currently reaches the
-first texture text tile write and then raises MAME's i960 `Unhandled 00`
-exception. The production C caller remains provisionally recorded from static
-audit; the flatter, already runtime-validated boot harness remains the
-regression entry while the nested-call issue is isolated.
+Direct invocation from the reconstructed MAME harness now completes. The
+earlier i960 `Unhandled 00` at PC zero was a register-stack spill failure: the
+fifth nested C call exceeded the cached local-register frames before the
+replacement startup had initialized `fp`, `pfp`, and `sp`. Initializing those
+registers around `0x00500400`, matching the original startup convention,
+allows the full zero-mode pipeline to reach INIT with a live heartbeat.
 
 Two small startup helpers are now recovered in
 `recovered_geometry_commands.c`: `recovered_geometry_initial_handshake()`

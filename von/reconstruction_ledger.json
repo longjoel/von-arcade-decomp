@@ -28,6 +28,48 @@
           "notes": "Standalone C translation builds at the original address. Comparison result: 35/184 bytes equal; compiler shape and synmovq still prevent byte validation."
         },
         {
+          "name": "reset_register_stack_setup",
+          "start": "0x00000a30",
+          "end": "0x00000a58",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/start_reconstructed.s",
+          "symbol": "_start_ip",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-1s.pcs",
+            "von/i960/disassembly-annotations.md"
+          ],
+          "notes": "Observed reset helper performs i960 register-cache setup: flush registers, mark PFP, and establish the first spill frame. This is processor ABI scaffolding rather than game logic; the replacement startup implements its required effect before entering C."
+        },
+        {
+          "name": "io_self_test_core",
+          "start": "0x00002730",
+          "end": "0x00002768",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_io.c",
+          "symbol": "recovered_io_self_test",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-1s.pcs",
+            "von/i960/boot-path.md"
+          ],
+          "notes": "Observed during the input-free boot trace. Production C preserves the 0x4d write/read, low-byte comparison, and failure-state store. The success/failure dispatch beginning at 0x2768 remains a separate work unit."
+        },
+        {
+          "name": "host_byte_queue_initialize",
+          "start": "0x00018488",
+          "end": "0x000184d4",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_host_queue.c",
+          "symbol": "recovered_host_queue_initialize",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-1s.pcs",
+            "von/i960/disassembly-annotations.md"
+          ],
+          "notes": "Observed on the board-I/O failure path. Production C fills the 16-byte queue with 0xff, clears both indices, and writes both 0x00ff sentinels. It is conditionally integrated after the reconstructed I/O self-test."
+        },
+        {
           "name": "geometry_program_upload",
           "start": "0x00028620",
           "end": "0x00028758",
@@ -50,6 +92,39 @@
           "symbol": "recovered_geometry_initial_handshake",
           "evidence": ["von/i960/disassembly-annotations.md"],
           "notes": "Production C reconstruction is linked into the reconstructed image and preserves the seven observed MMIO writes. A standalone candidate previously matched 18/76 bytes; byte validation is blocked on compiler/ABI calibration."
+        },
+        {
+          "name": "text_position_state",
+          "start": "0x0001cac8",
+          "end": "0x0001caec",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_set_position",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Observed during input-free startup and integrated into the reconstructed texture loader. Production C preserves origin, column, and row stores."
+        },
+        {
+          "name": "text_character_output",
+          "start": "0x0001cc40",
+          "end": "0x0001ccc4",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_emit_char",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Observed during input-free startup. Printable tile writes and TAB/LF state transitions are represented; reconstructed loader tile offsets match the original trace."
+        },
+        {
+          "name": "text_string_output",
+          "start": "0x0001ccd0",
+          "end": "0x0001ccf0",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_write_string",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Observed during input-free startup and integrated for static loader messages. Production C preserves the NUL-terminated byte walk and per-character dispatch."
         },
         {
           "name": "texture_initializer",
@@ -160,9 +235,9 @@
           "classification": "code",
           "status": "provisional",
           "source": "von/i960/recovered_geometry_commands.c",
-          "symbol": "recovered_geometry_pipeline_buffer_phase",
+          "symbol": "recovered_geometry_pipeline_startup",
           "evidence": ["von/i960/disassembly-annotations.md"],
-          "notes": "Production C preserves the 0x28d80 mode gate and exact helper order: profile setup; conditional SHARC and geometry uploads; command/window, texture, and initial-handshake setup; conditional texture/auxiliary submission; geometry buffer preparation/submission; then the 0xffff state store. Direct invocation in the reconstructed runtime currently reaches the first texture text write then triggers MAME's i960 'Unhandled 00'; the existing flattened boot harness remains the runtime regression while this nested-call integration issue is investigated. Byte validation is blocked on compiler/ABI calibration."
+          "notes": "Production C preserves the 0x28d80 mode gate and exact helper order: profile setup; conditional SHARC and geometry uploads; command/window, texture, and initial-handshake setup; conditional texture/auxiliary submission; geometry buffer preparation/submission; then the 0xffff state store. Direct zero-mode invocation now reaches INIT with a live heartbeat after the reconstructed startup initializes the i960 register-stack spill area. Byte validation is blocked on compiler/ABI calibration."
         },
         {
           "name": "geometry_frame_submission",

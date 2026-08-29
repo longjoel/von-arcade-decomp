@@ -19,3 +19,5 @@ docker run --rm \
     --entrypoint /bin/bash \
     "$IMAGE" \
     /src/scripts/i960-build-inner.sh
+
+"$ROOT_DIR/scripts/package-i960-clean.sh"

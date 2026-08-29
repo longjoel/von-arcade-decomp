@@ -1,0 +1,23 @@
+diff --git a/src/frontend/mame/luaengine_debug.cpp b/src/frontend/mame/luaengine_debug.cpp
+index c07d10cdd7..f9d2592821 100644
+--- a/src/frontend/mame/luaengine_debug.cpp
++++ b/src/frontend/mame/luaengine_debug.cpp
+@@ -412,6 +412,18 @@ void lua_engine::initialize_debug(sol::table &emu)
+ 				dev.single_step(steps);
+ 			});
+ 	device_debug_type.set_function("go", &device_debug::go);
++	device_debug_type.set_function("track_pc",
++			[] (device_debug &dev, bool enable, sol::object clear)
++			{
++				if (clear.is<bool>() && clear.as<bool>())
++					dev.track_pc_data_clear();
++				dev.set_track_pc(enable);
++			});
++	device_debug_type.set_function("track_pc_visited",
++			[] (device_debug &dev, offs_t address)
++			{
++				return dev.track_pc_visited(address);
++			});
+ 	device_debug_type.set_function("bpset",
+ 			[] (device_debug &dev, offs_t address, char const *cond, char const *act)
+ 			{

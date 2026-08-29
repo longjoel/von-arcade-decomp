@@ -85,6 +85,8 @@ python3 von/tools/analyze_geo_upload.py # locate the captured geometry stream in
 python3 von/tools/analyze_i960_refs.py # list host-code references to Model 2 regions
 python3 von/tools/compare_tile_trace.py --original <trace> --prototype <trace> # compare warning tile writes
 ./scripts/run-i960.sh  # run the generated i960 host ROM with original support ROMs
+./scripts/run-i960-clean.sh # run generated code with only approved original data ranges
+./scripts/audit-i960-clean-runtime.sh # prove a clean run executes generated code only
 ./scripts/test.sh      # audit ROMs and validate the local bin/von
 ./scripts/run.sh       # launch vonj locally; pass extra MAME arguments
 ./scripts/run-twin.sh  # launch two linked local cabinet instances
@@ -127,6 +129,7 @@ The generated i960 host ROM can be run directly with:
 ```sh
 ./scripts/run-i960.sh
 ./scripts/run-i960-reconstructed.sh
+./scripts/run-i960-clean.sh
 ```
 
 `run-twin.sh` starts two Model 2 cabinet processes with reversed communication

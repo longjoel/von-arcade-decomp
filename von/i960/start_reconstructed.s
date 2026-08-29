@@ -54,6 +54,10 @@ _user_stack:
 	.align 4
 	.globl _start_ip
 _start_ip:
+	lda 0x00500400,fp
+	lda -0x40(fp),pfp
+	lda 0x40(fp),sp
+	mov 0,g14
 	call _i960_reconstructed_main
 	b _start_ip
 

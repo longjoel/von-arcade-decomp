@@ -1,13 +1,14 @@
 # Virtual-On ROM-to-C Reconstruction Roadmap
 
 This is the long-term work list for translating the executable Virtual-On
-firmware into readable, buildable C. Planned work does not count as progress;
-the percentage is updated only by the reconstruction ledger after a slice has
-passed byte comparison.
+firmware into readable, buildable C. The active delivery milestone is the
+input-free, C-only i960 attract path defined in
+[`attract-mode-roadmap.md`](attract-mode-roadmap.md). Byte reproduction remains
+an optional research metric rather than the delivery gate.
 
 ## Progress rule
 
-The headline metric is:
+The historical strict metric is:
 
 ```text
 byte-validated C code bytes / confirmed executable firmware bytes
@@ -40,8 +41,9 @@ C (`provisional` or `byte-validated`) without claiming a byte match:
 python3 von/tools/reconstruction_progress.py --semantic-report
 ```
 
-This measure guides work sequencing only; it never replaces the headline
-byte-validated percentage.
+This measure describes the fourteen currently selected slices only; it is not
+overall project progress. Active completion uses ROM classification, weighted
+attract-closure recovery, and runtime-checkpoint percentages.
 
 ## Phase 0: inventory and classification
 

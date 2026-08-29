@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "image_size": 2097152,
+  "fill_byte": 255,
+  "ranges": [
+    {
+      "name": "texture_format_table",
+      "start": "0x00027c50",
+      "end": "0x00027e50",
+      "sha256": "d100c73f1a733a2c578b985dea6ce68008e5fe1b4f9fb7e1014d2db26aad4d4d"
+    },
+    {
+      "name": "texture_loader_text",
+      "start": "0x000280e0",
+      "end": "0x00028120",
+      "sha256": "9c1da7dfe2cfc19e7bef9177c1121348554818f38315a76d032b95ad64cbc251"
+    },
+    {
+      "name": "geometry_command_table",
+      "start": "0x00028470",
+      "end": "0x000284b0",
+      "sha256": "ccc7668a7be9e1ffdd5960d3f32f6c046d256da73d29d7383f5a82acc185ee78"
+    },
+    {
+      "name": "geometry_auxiliary_streams",
+      "start": "0x001686e4",
+      "end": "0x0016916c",
+      "sha256": "d7061270ed1973f30573511d65038bd7c50da57f27a799afd988783c2f074b1f"
+    },
+    {
+      "name": "sharc_bootstrap_stream",
+      "start": "0x0016b58c",
+      "end": "0x00170bc8",
+      "sha256": "b79f37baa8205e9ef90c7640d596dbaae700d6fd67eb149c125a9fb4042a38da"
+    }
+  ]
+}
