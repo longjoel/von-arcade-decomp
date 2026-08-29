@@ -4,6 +4,7 @@ local LOG_PATH = os.getenv("VON_TEXTURE_LOG") or "texture-buffers.log"
 local DUMP_DIR = os.getenv("VON_TEXTURE_DUMP_DIR") or "."
 local frame = 0
 local dumps = 0
+local max_frames = tonumber(os.getenv("VON_TEXTURE_FRAMES")) or 600
 local last_marker = nil
 local cpu = manager.machine.devices[":maincpu"]
 local space = cpu.spaces["program"]
@@ -70,7 +71,12 @@ emu.register_periodic(function()
             dumps = dumps + 1
         end
     end
-    if frame >= 600 then
+    if frame >= max_frames then
+        log("final_dump_frame=" .. frame)
+        dump_bank(DUMP_DIR .. "/texture-11000000.final.hex",
+            0x11000000, words0)
+        dump_bank(DUMP_DIR .. "/texture-11200000.final.hex",
+            0x11200000, words0)
         log_file:close()
         manager.machine:exit()
     end

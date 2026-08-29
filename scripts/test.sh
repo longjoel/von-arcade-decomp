@@ -7,17 +7,18 @@ require_mame
 
 cd "$ROOT_DIR"
 python3 von/tools/rom_audit.py
+ROM_PATH="$(prepare_rom_path)"
+trap 'cleanup_rom_path "$ROM_PATH"' EXIT
 
-SYSTEM_LIST="$(LD_LIBRARY_PATH="$(brew_runtime_path)${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
-    "$MAME_BIN" -listfull)"
-[[ "$SYSTEM_LIST" =~ (^|$'\n')vonj[[:space:]] ]] || die "vonj driver is not present in the built target"
+SYSTEM_LIST="$(env $(runtime_env) "$MAME_BIN" -listfull)"
+for set_name in vonj vonu vonjdev; do
+    [[ "$SYSTEM_LIST" =~ (^|$'\n')$set_name[[:space:]] ]] || die "$set_name driver is not present in the built target"
+done
 
-LD_LIBRARY_PATH="$(brew_runtime_path)${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
-    "$MAME_BIN" vonj -rompath "$ROM_DIR" -validate
+env $(runtime_env) "$MAME_BIN" vonj -rompath "$ROM_PATH" -validate
 
 if [[ -f "$ROOT_DIR/von/build/i960/prototype-maincpu.bin" ]]; then
-    LD_LIBRARY_PATH="$(brew_runtime_path)${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
-        "$MAME_BIN" vonjdev -rompath "$ROOT_DIR/von/build/rompath" -validate
+    env $(runtime_env) "$MAME_BIN" vonjdev -rompath "$ROM_PATH" -validate
 fi
 
 printf 'Tests passed.\n'

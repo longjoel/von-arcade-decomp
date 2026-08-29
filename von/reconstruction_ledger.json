@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "metric": {
+    "name": "byte_validated_c_translation",
+    "numerator": "code bytes with a byte-for-byte C build match",
+    "denominator": "confirmed executable firmware bytes",
+    "unclassified_bytes_excluded": true
+  },
+  "images": [
+    {
+      "name": "maincpu",
+      "firmware": "i960KB",
+      "size": 2097152,
+      "role": "host executable firmware",
+      "slices": [
+        {
+          "name": "reset_startup",
+          "start": "0x00000930",
+          "end": "0x000009e8",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/reconstructed_reset.c",
+          "symbol": "reconstructed_reset_entry",
+          "evidence": [
+            "von/i960/boot-path.md",
+            "von/i960/disassembly-annotations.md"
+          ],
+          "notes": "Standalone C translation builds at the original address. Comparison result: 35/184 bytes equal; compiler shape and synmovq still prevent byte validation."
+        },
+        {
+          "name": "geometry_program_upload",
+          "start": "0x00028620",
+          "end": "0x00028758",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_geometry.c",
+          "symbol": "recovered_geometry_program_upload",
+          "evidence": [
+            "von/i960/disassembly-annotations.md"
+          ],
+          "notes": "Behavioral C reconstruction is linked and trace-confirmed; byte match not established."
+        },
+        {
+          "name": "geometry_initial_handshake",
+          "start": "0x00028418",
+          "end": "0x00028464",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_geometry_commands.c",
+          "symbol": "recovered_geometry_initial_handshake",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Production C reconstruction is linked into the reconstructed image and preserves the seven observed MMIO writes. A standalone candidate previously matched 18/76 bytes; byte validation is blocked on compiler/ABI calibration."
+        },
+        {
+          "name": "texture_initializer",
+          "start": "0x00028548",
+          "end": "0x000285f4",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_texture.c",
+          "symbol": "recovered_texture_initializer",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Production C reconstruction is linked into the reconstructed image and preserves the two ramps plus the 0x2080-byte table copy. A standalone candidate previously matched 17/172 bytes; byte validation is blocked on compiler/ABI calibration."
+        },
+        {
+          "name": "geometry_register_clear",
+          "start": "0x00028d08",
+          "end": "0x00028d24",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_geometry_commands.c",
+          "symbol": "recovered_geometry_register_clear",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Production C reconstruction is linked into the reconstructed image and preserves the 0x4004 write. A standalone candidate previously matched 3/28 bytes; byte validation is blocked on compiler/ABI calibration."
+        },
+        {
+          "name": "texture_decompressor",
+          "start": "0x00027e50",
+          "end": "0x000280bc",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_texture_decompress.c",
+          "symbol": "recovered_texture_decompress",
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/tools/verify_texture_decompress.py"
+          ],
+          "notes": "Recovered production C matches all 64 original MAME debug write-trace records (address and halfword value) from the first texture stream. Post-load RAM snapshots are intentionally excluded because later loader calls overwrite the same windows. Byte validation is blocked on compiler/ABI calibration."
+        },
+        {
+          "name": "texture_loader_profile_setup",
+          "start": "0x00028120",
+          "end": "0x000281dc",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_texture.c",
+          "symbol": "recovered_texture_loader_profile_setup",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Production C now preserves the static loader messages and their text positioning, both decoder calls, swapped destination windows, saved second-source pointer, and error-state contract. The plain-string text helper recovers 0x1cac8/0x1cc40/0x1ccd0 only; general printf-style formatting remains outside this slice. The reconstructed runtime reaches INIT with texture_status=0 after this path executes. Byte validation is blocked on compiler/ABI calibration."
+        },
+        {
+          "name": "geometry_float_conversion_helper",
+          "start": "0x00028b40",
+          "end": "0x00028b7c",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_geometry.c",
+          "symbol": "recovered_geometry_float_conversion",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Recovered helper is used by the checked-in geometry table generator. A standalone candidate previously matched 3/60 bytes; byte validation is blocked on compiler support for the original logbnr/cvtzri sequence."
+        },
+        {
+          "name": "geometry_buffer_prepare",
+          "start": "0x00028b80",
+          "end": "0x00028c00",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_geometry.c",
+          "symbol": "recovered_geometry_buffer_prepare",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Recovered C generation of all 0x2000 output words is verified by von/tools/verify_geometry_buffer.py. A standalone candidate previously matched 5/128 bytes; byte validation is blocked on compiler/ABI calibration."
+        },
+        {
+          "name": "geometry_batch_submit",
+          "start": "0x00028c00",
+          "end": "0x00028c78",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_geometry_commands.c",
+          "symbol": "recovered_geometry_batch_command_submit",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Recovered production C preserves the 32-bit command stream and FIFO writes. A standalone candidate previously matched 24/120 bytes; byte validation is blocked on compiler/ABI calibration."
+        },
+        {
+          "name": "geometry_command_batch_loop",
+          "start": "0x00028c80",
+          "end": "0x00028cf4",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_geometry_commands.c",
+          "symbol": "recovered_geometry_command_batch_loop",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Static audit against 0x28c80-0x28cf4 confirms the initial handoff, four 0x800-word batches at 0x2000-byte strides, three handoffs per batch, and two final handoffs. Byte validation is blocked on compiler/ABI calibration."
+        },
+        {
+          "name": "geometry_auxiliary_submit_select",
+          "start": "0x00028d30",
+          "end": "0x00028d7c",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_geometry_commands.c",
+          "symbol": "recovered_geometry_auxiliary_submit_select",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Recovered production C preserves both state checks and source/count selections. A standalone candidate previously matched 17/76 bytes; byte validation is blocked on compiler/ABI calibration."
+        },
+        {
+          "name": "geometry_pipeline_startup",
+          "start": "0x00028d80",
+          "end": "0x00028ddc",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_geometry_commands.c",
+          "symbol": "recovered_geometry_pipeline_buffer_phase",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Production C preserves the 0x28d80 mode gate and exact helper order: profile setup; conditional SHARC and geometry uploads; command/window, texture, and initial-handshake setup; conditional texture/auxiliary submission; geometry buffer preparation/submission; then the 0xffff state store. Direct invocation in the reconstructed runtime currently reaches the first texture text write then triggers MAME's i960 'Unhandled 00'; the existing flattened boot harness remains the runtime regression while this nested-call integration issue is investigated. Byte validation is blocked on compiler/ABI calibration."
+        },
+        {
+          "name": "geometry_frame_submission",
+          "start": "0x00028de8",
+          "end": "0x00028e7c",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_geometry_commands.c",
+          "symbol": "recovered_geometry_frame_submission",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Static audit against 0x28de8-0x28e7c confirms prior-phase read selection, polling until status bit 2 changes, phase toggle, and new-phase write selection. The polling condition was corrected from the prior inverse C condition. Byte validation is blocked on compiler/ABI calibration."
+        },
+        {
+          "name": "geometry_function_command_submit",
+          "start": "0x00028e88",
+          "end": "0x00028efc",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_geometry_commands.c",
+          "symbol": "recovered_geometry_function_command_submit",
+          "evidence": ["von/i960/disassembly-annotations.md"],
+          "notes": "Static audit against 0x28e88-0x28efc confirms the 0x404 function word, bit-23 command normalization, count, masked 16-bit stream, 0x1010 completion word, and final zero write. Byte validation is blocked on compiler/ABI calibration."
+        }
+      ]
+    },
+    {
+      "name": "cpu3",
+      "firmware": "Z80",
+      "size": 131072,
+      "role": "communication-board firmware",
+      "slices": []
+    },
+    {
+      "name": "audiocpu",
+      "firmware": "68000",
+      "size": 524288,
+      "role": "audio firmware",
+      "slices": []
+    },
+    {
+      "name": "sharc",
+      "firmware": "ADSP-21062",
+      "size": null,
+      "role": "coprocessor executable regions",
+      "slices": [],
+      "notes": "Executable boundaries are not yet separated from copro_data."
+    }
+  ]
+}

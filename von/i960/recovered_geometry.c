@@ -17,9 +17,13 @@ typedef unsigned short u16;
 #define GEO_PHASE         ((volatile u32 *)0x00980020)
 #define GEO_READ_START    ((volatile u32 *)0x00803008)
 #define MAIN_DATA_SOURCE  ((volatile u16 *)0x02fc6290)
+#define SHARC_CONTROL     ((volatile u32 *)0x00980000)
+#define SHARC_FIFO        ((volatile u16 *)0x00884000)
+#define SHARC_SOURCE      ((volatile const u16 *)0x0016b58c)
 
 #define GEO_STAGING_WORDS 0x8000U
 #define GEO_PROGRAM_WORDS 0x247cU
+#define SHARC_BOOT_WORDS  0x2b1eU
 
 #define GEOMETRY_TABLE_WORDS 0x2000U
 #define GEOMETRY_TABLE_STEP  0x7f00U
@@ -77,6 +81,17 @@ void recovered_geometry_buffer_prepare(volatile u32 *output)
         value += GEOMETRY_TABLE_STEP;
         output[index] = word;
     }
+}
+
+/* Core transfer from the 0x282e0 SHARC bootstrap routine. */
+void recovered_sharc_bootstrap_upload(void)
+{
+    u32 index;
+
+    *SHARC_CONTROL = 0x80000000U;
+    for (index = 0; index < SHARC_BOOT_WORDS; ++index)
+        *SHARC_FIFO = SHARC_SOURCE[index];
+    *SHARC_CONTROL = 0;
 }
 
 void recovered_geometry_program_upload(void)

@@ -1,0 +1,163 @@
+diff --git a/src/emu/emuopts.cpp b/src/emu/emuopts.cpp
+--- a/src/emu/emuopts.cpp
++++ b/src/emu/emuopts.cpp
+@@ -194,6 +194,7 @@
+ 	{ OPTION_COMM_REMOTE_PORT,                           "15112",     core_options::option_type::STRING,     "remote port to connect to" },
+ 	{ OPTION_COMM_FRAME_SYNC,                            "0",         core_options::option_type::BOOLEAN,    "sync frames" },
+ 	{ OPTION_COMM_MASTER,                                "0",         core_options::option_type::BOOLEAN,    "make the Model 2 communication board the link master" },
++	{ OPTION_COMM_DIAGNOSTICS,                           "0",         core_options::option_type::BOOLEAN,    "log Model 2 communication state and packets" },
+ 
+ 	// misc options
+ 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE MISC OPTIONS" },
+diff --git a/src/emu/emuopts.h b/src/emu/emuopts.h
+--- a/src/emu/emuopts.h
++++ b/src/emu/emuopts.h
+@@ -184,6 +184,7 @@
+ #define OPTION_COMM_REMOTE_PORT     "comm_remoteport"
+ #define OPTION_COMM_FRAME_SYNC      "comm_framesync"
+ #define OPTION_COMM_MASTER           "comm_master"
++#define OPTION_COMM_DIAGNOSTICS      "comm_diagnostics"
+ 
+ #define OPTION_CONFIRM_QUIT         "confirm_quit"
+ #define OPTION_UI_MOUSE             "ui_mouse"
+@@ -468,6 +469,7 @@
+ 	const char *comm_remoteport() const { return value(OPTION_COMM_REMOTE_PORT); }
+ 	bool comm_framesync() const { return bool_value(OPTION_COMM_FRAME_SYNC); }
+ 	bool comm_master() const { return bool_value(OPTION_COMM_MASTER); }
++	bool comm_diagnostics() const { return bool_value(OPTION_COMM_DIAGNOSTICS); }
+ 
+ 	bool confirm_quit() const { return bool_value(OPTION_CONFIRM_QUIT); }
+ 	bool ui_mouse() const { return bool_value(OPTION_UI_MOUSE); }
+diff --git a/src/mame/sega/m2comm.h b/src/mame/sega/m2comm.h
+--- a/src/mame/sega/m2comm.h
++++ b/src/mame/sega/m2comm.h
+@@ -64,6 +64,10 @@
+ 	uint8_t m_buffer1[0x1000]{};
+ 	uint8_t m_framesync;
+ 	bool m_master = false;
++	bool m_diagnostics = false;
++	uint8_t m_diag_shared[4]{ 0xff, 0xff, 0xff, 0xff };
++	uint8_t m_diag_linkalive = 0xff;
++	uint8_t m_diag_role = 0xff;
+ 	uint16_t m_frameoffset;
+ 
+ #ifdef M2COMM_SIMULATION
+@@ -79,6 +83,8 @@
+ 	int read_frame(int dataSize);
+ 	void send_data(uint8_t frameType, int frameStart, int frameSize, int dataSize);
+ 	void send_frame(int dataSize);
++	void diagnostic_state();
++	void diagnostic_packet(const char *direction, const uint8_t *data, int size);
+ #endif
+ };
+ 
+diff --git a/src/mame/sega/m2comm.cpp b/src/mame/sega/m2comm.cpp
+--- a/src/mame/sega/m2comm.cpp
++++ b/src/mame/sega/m2comm.cpp
+@@ -213,6 +213,7 @@
+ 
+ 	m_framesync = mconfig.options().comm_framesync() ? 0x01 : 0x00;
+ 	m_master = mconfig.options().comm_master();
++	m_diagnostics = mconfig.options().comm_diagnostics();
+ 
+ 	m_frameoffset = 0x1c0; // default
+ }
+@@ -234,6 +235,9 @@
+ 	m_zfg = 0;
+ 	m_cn = 0;
+ 	m_fg = 0;
++	m_diag_shared[0] = m_diag_shared[1] = m_diag_shared[2] = m_diag_shared[3] = 0xff;
++	m_diag_linkalive = 0xff;
++	m_diag_role = 0xff;
+ }
+ 
+ uint8_t m2comm_device::zfg_r(offs_t offset)
+@@ -343,6 +347,7 @@
+ {
+ 	if (m_linkenable == 0x01)
+ 	{
++		diagnostic_state();
+ 		int frameStart = 0x2000;
+ 		int frameSize = m_shared[0x13] << 8 | m_shared[0x12];
+ 		int frameOffset = frameStart | m_shared[0x15] << 8 | m_shared[0x14];
+@@ -636,6 +641,7 @@
+ 	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
+ 	if (recv > 0)
+ 	{
++		diagnostic_packet("rx", m_buffer0, recv);
+ 		// check if message complete
+ 		if (recv != dataSize)
+ 		{
+@@ -659,6 +665,8 @@
+ 					togo = 0;
+ 				}
+ 			}
++			if (togo > 0 && m_diagnostics)
++				osd_printf_verbose("M2COMM: diag rx short-read expected=%d received=%u\n", dataSize, recv);
+ 		}
+ 	}
+ 	else if (!filerr && recv == 0)
+@@ -671,6 +679,8 @@
+ 			m_line_rx.reset();
+ 		}
+ 	}
++	else if (filerr && m_diagnostics)
++		osd_printf_verbose("M2COMM: diag rx failure error=%s\n", filerr.message());
+ 	return recv;
+ }
+ 
+@@ -692,8 +702,13 @@
+ 	std::uint32_t written;
+ 
+ 	filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
++	diagnostic_packet("tx", m_buffer0, written);
++	if (m_diagnostics && written != std::uint32_t(dataSize) && !filerr)
++		osd_printf_verbose("M2COMM: diag tx short-write expected=%d written=%u\n", dataSize, written);
+ 	if (filerr)
+ 	{
++		if (m_diagnostics)
++			osd_printf_verbose("M2COMM: diag tx failure error=%s\n", filerr.message());
+ 		if (m_linkalive == 0x01)
+ 		{
+ 			osd_printf_verbose("M2COMM: tx connection lost\n");
+@@ -703,4 +718,40 @@
+ 		}
+ 	}
+ }
++
++void m2comm_device::diagnostic_state()
++{
++	if (!m_diagnostics)
++		return;
++
++	uint8_t role = m_shared[0x01];
++	if (role != m_diag_role)
++	{
++		osd_printf_verbose("M2COMM: diag role shared[01]=%02x (%s)\n", role,
++			role == 0x01 ? "master" : role == 0x02 ? "slave" : "unknown");
++		m_diag_role = role;
++	}
++	if (m_linkalive != m_diag_linkalive)
++	{
++		osd_printf_verbose("M2COMM: diag link-state=%s (%u)\n",
++			m_linkalive == 0 ? "searching" : m_linkalive == 1 ? "established" : "failed", m_linkalive);
++		m_diag_linkalive = m_linkalive;
++	}
++	if (memcmp(m_diag_shared, m_shared, 4) != 0)
++	{
++		osd_printf_verbose("M2COMM: diag shared[00..03]=%02x,%02x,%02x,%02x\n",
++			m_shared[0], m_shared[1], m_shared[2], m_shared[3]);
++		memcpy(m_diag_shared, m_shared, 4);
++	}
++}
++
++void m2comm_device::diagnostic_packet(const char *direction, const uint8_t *data, int size)
++{
++	if (!m_diagnostics || size < 1)
++		return;
++
++	const uint8_t id = data[0];
++	if (id == 0xff || id == 0xfe || id == 0xfc || id <= m_linkcount)
++		osd_printf_verbose("M2COMM: diag %s packet id=%02x size=%d\n", direction, id, size);
++}
+ #endif

@@ -4,7 +4,6 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 require_command tar
 
-"$ROOT_DIR/scripts/build.sh"
 "$ROOT_DIR/scripts/test.sh"
 
 VERSION="${VON_VERSION:-$(date -u +%Y%m%dT%H%M%SZ)}"

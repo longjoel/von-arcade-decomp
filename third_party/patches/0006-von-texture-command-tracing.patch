@@ -1,7 +1,9 @@
 diff --git a/src/mame/sega/model2_v.cpp b/src/mame/sega/model2_v.cpp
 --- a/src/mame/sega/model2_v.cpp
 +++ b/src/mame/sega/model2_v.cpp
-@@ -411,4 +411,15 @@
+@@ -408,6 +408,17 @@
+ 		th = &raster->texture_rom[raster->command_buffer[1] & raster->texture_rom_mask];
+ 
  	object.texheader[0] = *th++;
  	object.texheader[1] = *th++;
  	object.texheader[2] = *th++;

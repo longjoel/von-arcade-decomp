@@ -6,6 +6,9 @@ The original `vonj` host image can be reconstructed and disassembled with:
 ./scripts/disasm-i960.sh
 ```
 
+When local Docker access is unavailable, generate the same listing through the
+configured remote builder with `./scripts/remote-disasm-i960.sh`.
+
 This reads the four `maincpu` ROMs from `von/artifacts/`, applies the MAME
 `ROM_LOAD32_WORD` layout, and writes ignored analysis output to
 `von/build/disasm/`.

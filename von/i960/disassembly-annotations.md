@@ -282,9 +282,11 @@ The same source file also contains two further host-side slices:
   `(source, command, count)` register mapping at `0x28e88`, including the
   `0x00800040 <- 0x404`, normalized program word, count word, masked 16-bit
   stream, `0x00800100 <- 0x1010`, and terminating zero write.
+  Static audit against `0x28e88-0x28efc` confirms those operations and their
+  order; it is represented in production C, though not byte-validated.
 - `recovered_geometry_frame_submission()` reproduces the confirmed phase
   selection at `0x28de8`: initialize `0x00803008` from the prior phase, poll
-  bit 2 of `0x0098000c`, toggle `0x00511ba0`, and write the new phase to
+  bit 2 of `0x0098000c` until it changes, toggle `0x00511ba0`, and write the new phase to
   `0x00801008`.
 - `recovered_geometry_batch_command_submit()` preserves the separate
   `0x28c00` path: function word `0x1414`, a count word, and a 32-bit source
@@ -380,11 +382,18 @@ buffer shape and reports the four `0x800`-word source/command strides. The
 chain is linked into the prototype but remains opt-in rather than being called
 by the smoke-test entry point.
 
-`recovered_geometry_pipeline_buffer_phase()` captures the confirmed suffix of
-`0x28d80`: it runs the buffer/batch chain and writes `0xffff` to
-`0x0181c000`. The preceding device, SHARC, texture, and board helper calls are
-intentionally not folded into this function until their signatures and side
-effects are recovered.
+`recovered_geometry_pipeline_startup()` now captures the full `0x28d80`
+orchestration sequence. It first applies the profile constants, conditionally
+uploads the SHARC bootstrap and geometry program when mode is zero, performs
+the register/texture/command-window/handshake setup, then conditionally loads
+textures and submits the auxiliary stream. Both paths prepare and submit the
+host buffer before storing `0xffff` to `0x0181c000`. The individual helpers
+remain separately named and verified; this caller preserves their ROM order.
+Direct invocation from the reconstructed MAME harness currently reaches the
+first texture text tile write and then raises MAME's i960 `Unhandled 00`
+exception. The production C caller remains provisionally recorded from static
+audit; the flatter, already runtime-validated boot harness remains the
+regression entry while the nested-call issue is isolated.
 
 Two small startup helpers are now recovered in
 `recovered_geometry_commands.c`: `recovered_geometry_initial_handshake()`
@@ -394,6 +403,19 @@ preserves the `0x28418` control/phase reset sequence, and
 separate. `recovered_texture_initializer()` now covers that routine: two
 127-entry `floor(index / 2)` ramps at `0x11400000`, followed by an `0x2080`-byte
 copy from ROM address `0x02fb1d10` into `0x11401000`.
+
+The `0x28418-0x28464` handshake is also built as an isolated C candidate in
+`reconstructed_geometry_handshake.c`. The remote i960 build produces a
+76-byte comparison image: 18 bytes match the original. The writes and values
+are preserved, but ordinary C does not reproduce the original register
+allocation or its `g0/g14` branch-link prologue and `bx (g0)` return. It remains
+provisional until a C build can be byte-validated.
+
+The texture initializer is likewise built as an isolated candidate in
+`reconstructed_texture_initializer.c`. Its 172-byte comparison image matches
+17 bytes of the original. The two 127-entry ramps and the `0x2080`-byte ROM
+copy are behaviorally represented, but compiler loop and register choices keep
+the slice provisional.
 
 `recovered_geometry_auxiliary_submit_select()` covers `0x28d30`: when
 `0x005039f4 == 4` and `0x00503a00 == 32`, it submits `0x4e4` 16-bit words from
@@ -419,6 +441,15 @@ stores the resulting profile state in `0x005039f4` and `0x00503a00`. Its first
 source pointer is `0x02c00008`; the later bank uses `0x02c77438`. The loader's
 return contract and decompression behavior remain intentionally unassigned.
 
+`recovered_texture_loader_profile_setup()` now preserves the complete local
+loader sequence: it places the static loading/Bank0/Done/Bank1 messages using
+the recovered plain-text helpers, calls the decoder with `0x11000000/0x11200000`,
+saves the second source at `0x00512bd0`, then calls the decoder with those
+destinations swapped. A nonzero decoder result writes `0` and `5` to
+`0x00503a00` and `0x005039f4` respectively. The broad printf-style formatter
+remains separate, but this loader uses no format arguments and is now
+semantically C-covered.
+
 The loader target `0x27e50` is now labeled `texture_decompressor`. Static
 analysis shows it initializes `0xfed` bytes at `0x00511bb0`, clears status at
 `0x00515080`, reads a four-byte big-endian header from its source pointer, and
@@ -429,6 +460,12 @@ left for a separate slice. `von/i960/recovered_texture_decompress.c` now
 contains a static candidate for the decoder: 12-bit ring-buffer references,
 flag-byte token selection, literal/back-reference lengths, and the
 palette-based secondary-bank test.
+
+The recovered decoder is behaviorally validated against MAME's focused debug
+write trace: all first 64 `vonj_texture_write` records match the C model's
+destination address and halfword value. This is the valid evidence boundary;
+the later full-RAM snapshots are not used because subsequent loader calls
+reuse and overwrite both texture-RAM windows.
 
 The source header bytes observed through MAME match the reconstructed ROM
 interleave exactly, but Lua `read_u8` does not expose the same byte order as

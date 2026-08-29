@@ -14,7 +14,7 @@ from pathlib import Path
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mame", required=True, type=Path, help="MAME executable")
-    parser.add_argument("--set", default="vonu", help="MAME set name; choose explicitly after ROM identification")
+    parser.add_argument("--set", default="vonj", help="MAME set name; choose explicitly after ROM identification")
     parser.add_argument("--rom-dir", type=Path, default=Path(__file__).parents[1] / "artifacts")
     parser.add_argument("--capture-dir", type=Path, default=Path(__file__).parents[1] / "captures")
     parser.add_argument("--record-input", type=Path, help="MAME input recording file")

@@ -19,6 +19,15 @@ typedef unsigned short u16;
 #define GEOMETRY_STATE_B   ((volatile u32 *)0x00503a00)
 
 void recovered_geometry_frame_submission(void);
+void recovered_geometry_buffer_prepare(volatile u32 *output);
+void recovered_geometry_profile_setup(void);
+void recovered_sharc_bootstrap_upload(void);
+void recovered_geometry_program_upload(void);
+void recovered_texture_initializer(void);
+int recovered_texture_loader_profile_setup(void);
+void recovered_geometry_initial_handshake(void);
+void recovered_geometry_register_clear(void);
+void recovered_geometry_auxiliary_submit_select(void);
 
 /* The first loop clears the +4 and +8 fields of 64 sixteen-byte slots. */
 void recovered_geometry_command_window_clear(void)
@@ -111,16 +120,35 @@ void recovered_geometry_command_batch_loop(volatile const u8 *source)
     recovered_geometry_frame_submission();
 }
 
-/* Confirmed host-side chain from 0x28d80 after hardware setup completes. */
+/* Confirmed host-side buffer generation and submission chain. */
 void recovered_geometry_buffer_and_batch_chain(void)
 {
     recovered_geometry_buffer_prepare(GEOMETRY_BUFFER);
     recovered_geometry_command_batch_loop((volatile const u8 *)GEOMETRY_BUFFER);
 }
 
-/* Confirmed suffix of 0x28d80 after its device/setup helper calls. */
-void recovered_geometry_pipeline_buffer_phase(void)
+/* Recovered caller sequence at 0x28d80. The mode value is saved in r4 by the
+ * ROM and gates the two conditional setup groups. */
+void recovered_geometry_pipeline_startup(u32 mode)
 {
+    recovered_geometry_profile_setup();
+
+    if (mode == 0) {
+        recovered_sharc_bootstrap_upload();
+        recovered_geometry_program_upload();
+    }
+
+    recovered_geometry_register_clear();
+    recovered_texture_initializer();
+    recovered_geometry_command_window_clear();
+    recovered_geometry_command_table_copy();
+    recovered_geometry_initial_handshake();
+
+    if (mode == 0) {
+        (void)recovered_texture_loader_profile_setup();
+        recovered_geometry_auxiliary_submit_select();
+    }
+
     recovered_geometry_buffer_and_batch_chain();
     *GEOMETRY_STATE = 0xffffU;
 }
@@ -169,7 +197,8 @@ void recovered_geometry_frame_submission(void)
 
     expected = *GEO_FRAME_STATUS & 4U;
 
-    while ((*GEO_FRAME_STATUS & 4U) != expected)
+    /* 0x28e34/0x28e3c branches back while bit 2 is unchanged. */
+    while ((*GEO_FRAME_STATUS & 4U) == expected)
         ;
 
     phase = (phase + 1U) & 1U;

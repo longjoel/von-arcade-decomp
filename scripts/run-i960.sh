@@ -21,7 +21,7 @@ if [[ ${#MAME_ARGS[@]} -eq 0 ]]; then
     MAME_ARGS=(-window -skip_gameinfo)
 fi
 
-LD_LIBRARY_PATH="$(brew_runtime_path)${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+env $(runtime_env) \
     "$MAME_BIN" vonjdev \
         -rompath "$I960_ROMPATH" \
         "${MAME_ARGS[@]}"

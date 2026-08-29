@@ -3,6 +3,11 @@
 typedef unsigned long u32;
 typedef unsigned char u8;
 
+#define BACKUP_PROFILE ((volatile const u8 *)0x01d00027)
+#define PROFILE_FIRST  ((volatile u32 *)0x00512bd4)
+#define PROFILE_SECOND ((volatile u32 *)0x00512bd8)
+#define PROFILE_THIRD  ((volatile u32 *)0x00512bdc)
+
 struct geometry_profile_constants
 {
     u32 first;
@@ -23,7 +28,7 @@ static const struct geometry_profile_constants profiles[9] = {
     { 0x3f400000U, 0x3f59999aU, 0x3dcccccdU },
 };
 
-/* Returns zero for the default path, which is not one of the direct entries. */
+/* Returns nonzero only for a direct table entry. */
 int recovered_geometry_profile_constants(u8 backup_value,
                                           volatile u32 *first,
                                           volatile u32 *second,
@@ -32,10 +37,11 @@ int recovered_geometry_profile_constants(u8 backup_value,
     u32 index;
 
     if (backup_value == 0)
-        return 0;
+        goto default_profile;
     index = (u32)backup_value - 1U;
     if (index >= 9)
     {
+default_profile:
         *first = 0x3f0ccccdU;
         *second = 0x3f59999aU;
         *third = 0x3e19999aU;
@@ -45,4 +51,13 @@ int recovered_geometry_profile_constants(u8 backup_value,
     *second = profiles[index].second;
     *third = profiles[index].third;
     return 1;
+}
+
+/* First, directly observable part of the 0x28840 profile dispatch. */
+void recovered_geometry_profile_setup(void)
+{
+    (void)recovered_geometry_profile_constants(*BACKUP_PROFILE,
+                                                PROFILE_FIRST,
+                                                PROFILE_SECOND,
+                                                PROFILE_THIRD);
 }
