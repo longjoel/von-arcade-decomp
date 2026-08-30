@@ -416,13 +416,13 @@
           "classification": "code",
           "status": "provisional",
           "source": "von/i960/recovered_text.c",
-          "symbol": "recovered_text_string_font_mode",
+          "symbol": "recovered_text_write_glyph_string",
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
             "von/i960/disassembly-annotations.md",
             "von/tools/test_recovered_text_control.py"
           ],
-          "notes": "Recovers the 0x1da90 branch contract: select glyph mode 1 unless a lowercase ASCII byte occurs after the first string byte. Per-character glyph writes through 0x1d310 remain a separate dependency."
+          "notes": "Recovers the 0x1da90 string loop: select glyph mode 1 unless a lowercase ASCII byte occurs after the first string byte, then emit each byte through the mapped-ROM glyph writer with zero attribute bits."
         },
         {
           "name": "text_video_initialize",

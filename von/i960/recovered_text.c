@@ -25,6 +25,8 @@ static const u32 GLYPH_TABLES[4] = {
     0x02ea11d0U, 0x02ea14d0U, 0x02ea17d0U, 0x02ea1ad0U
 };
 
+void recovered_text_emit_glyph(u32 character, u32 font_mode, u32 attributes);
+
 void recovered_text_set_position(u32 column, u32 row)
 {
     *TEXT_STATE_ORIGIN = column;
@@ -87,6 +89,16 @@ u32 recovered_text_string_font_mode(const u8 *text)
         ++cursor;
     }
     return mode;
+}
+
+/* Recovered glyph-string writer at i960 0x0001da90. */
+void recovered_text_write_glyph_string(volatile const u8 *text)
+{
+    u32 font_mode = recovered_text_string_font_mode((const u8 *)text);
+    u8 character;
+
+    while ((character = *text++) != 0U)
+        recovered_text_emit_glyph(character, font_mode, 0U);
 }
 
 /* Describe one 0x1bc90 row transfer without entering the hardware blitter. */

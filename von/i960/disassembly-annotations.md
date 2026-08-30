@@ -311,8 +311,9 @@ The timer selection and reload table is checked for every 16-bit mask by
 The warning-string helper at `0x0001da90-0x0001db34` scans bytes after the
 first string byte. It selects glyph mode `1` when no lowercase ASCII byte is
 present and mode `0` otherwise; `recovered_text_string_font_mode()` checks
-that decision for all 65,536 two-byte prefixes. The downstream glyph-table
-writer at `0x0001d310` remains untriaged.
+that decision for all 65,536 two-byte prefixes. The reconstructed
+`recovered_text_write_glyph_string()` then sends every non-NUL byte through
+the mapped-ROM glyph writer at `0x0001d310` with zero attribute bits.
 
 The common dispatcher begins at `0x00001380`. Its recovered gate clears the
 requested source mask from `0x00501cd0` and `0xe80004`, then selects a
