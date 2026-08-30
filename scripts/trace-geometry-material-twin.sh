@@ -64,6 +64,11 @@ for cabinet in p1 p2; do
         --trace "$trace" --rom "$ROM" \
         --output "$OUTPUT_DIR/$cabinet/first-match-frame.gltf" \
         --max-time 32.8 --min-objects 100
+    python3 "$ROOT_DIR/von/tools/export_geometry_frame_textured_gltf.py" \
+        --trace "$trace" --rom "$ROM" --texture-rom "$TEXTURE_ROM" \
+        --bank-primary "$TEXTURE_BANK" --bank-secondary "$TEXTURE_BANK_SECONDARY" \
+        --palette-trace "$trace" --output "$OUTPUT_DIR/$cabinet/first-match-frame-textured.gltf" \
+        --max-time 32.8 --min-objects 100
     python3 "$ROOT_DIR/von/tools/extract_texture_tiles.py" \
         --trace "$trace" --bank "$TEXTURE_BANK" \
         --output-dir "$OUTPUT_DIR/$cabinet/texture-tiles" --limit 2048

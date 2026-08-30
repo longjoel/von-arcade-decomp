@@ -223,11 +223,15 @@ transition and extracts referenced indexed texture tiles as PGM previews with
 an `index.tsv` manifest beside the scene exports. Each object also receives a
 `textured-objects/oba-*.gltf` export with UV accessors, glTF material groups,
 and embedded PNG tiles rendered through the captured palette, color-translation,
-and luma state. For example:
+and luma state. The same capture also emits a complete
+`first-match-frame-textured.gltf` scene with the traced object slots and
+transforms. For example:
 
 ```sh
 ./scripts/view-geometry.sh \
   von/build/disasm/first-match-material-twin/<capture>/p1/textured-objects/oba-00a670ca.gltf
+./scripts/view-geometry.sh \
+  von/build/disasm/first-match-material-twin/<capture>/p1/first-match-frame-textured.gltf
 ```
 
 The standalone exporter remains able to emit grayscale tiles when
