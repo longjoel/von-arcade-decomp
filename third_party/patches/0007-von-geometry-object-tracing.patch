@@ -6,7 +6,7 @@ diff --git a/src/mame/sega/model2_v.cpp b/src/mame/sega/model2_v.cpp
  
  	u32 *obp;                /* Object Pointer */
 +	static unsigned vonj_geometry_object_trace_count;
-+	if ((machine().system().name == std::string_view("vonj")) && (vonj_geometry_object_trace_count < 2048))
++	if ((machine().system().name == std::string_view("vonj")) && (vonj_geometry_object_trace_count < 16384))
 +	{
 +		logerror("vonj_geometry_object: time=%f tpa=%08x tha=%08x oba=%08x count=%08x mode=%u source=%s\n",
 +			machine().time().as_double(), tpa, tha, oba, obc, geo->mode & 3,

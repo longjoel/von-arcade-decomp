@@ -112,7 +112,15 @@ def main() -> int:
     for ordinal, line in enumerate(args.trace.read_text().splitlines()):
         match = OBJECT.search(line)
         if match:
-            events.append((float(match[2]), ordinal, "object", int(match[5], 16)))
+            events.append((float(match[2]), ordinal, "object", (
+                int(match[5], 16), {
+                    "tpa": int(match[3], 16),
+                    "tha": int(match[4], 16),
+                    "count": int(match[6], 16),
+                    "mode": int(match[7]),
+                    "source": match[8],
+                }
+            )))
             continue
         match = MATRIX.search(line)
         if match:
@@ -121,20 +129,21 @@ def main() -> int:
             events.append((float(match[2]), ordinal, "matrix", matrix + translation))
     events.sort()
 
-    frames: dict[float, list[tuple[int, tuple[float, ...]]]] = {}
+    frames: dict[float, list[tuple[int, tuple[float, ...], dict[str, int | str]]]] = {}
     current = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0,
                0.0, 0.0, 0.0)
     for time, _, kind, value in events:
         if kind == "matrix":
             current = value
         else:
-            frames.setdefault(time, []).append((value, current))
+            oba, metadata = value
+            frames.setdefault(time, []).append((oba, current, metadata))
     frames = {time: objects for time, objects in frames.items() if len(objects) == 40}
     times = sorted(frames)
     if not times:
         raise SystemExit("no complete 40-object frames found")
-    slots = [oba for oba, _ in frames[times[0]]]
-    if any([oba for oba, _ in frames[time]] != slots for time in times):
+    slots = [oba for oba, _, _ in frames[times[0]]]
+    if any([oba for oba, _, _ in frames[time]] != slots for time in times):
         raise SystemExit("object order changed between frames")
 
     blob = bytearray()
@@ -175,8 +184,12 @@ def main() -> int:
             }]})
 
     node_count = len(slots)
-    nodes = [{"mesh": mesh_by_oba[oba], "name": f"slot_{slot:02d}_oba_{oba:08x}"}
-             for slot, oba in enumerate(slots)]
+    first_metadata = {oba: metadata for oba, _, metadata in frames[times[0]]}
+    nodes = [{
+        "mesh": mesh_by_oba[oba],
+        "name": f"slot_{slot:02d}_oba_{oba:08x}",
+        "extras": {"geometry_object": first_metadata[oba]},
+    } for slot, oba in enumerate(slots)]
     input_view = add_blob(b"".join(struct.pack("<f", time - times[0]) for time in times))
     input_accessor = len(accessors)
     accessors.append({"bufferView": input_view, "componentType": 5126, "count": len(times),
