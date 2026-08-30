@@ -57,7 +57,7 @@ for cabinet in p1 p2; do
         python3 "$ROOT_DIR/von/tools/export_geometry_textured_gltf.py" \
             --rom "$ROM" --texture-rom "$TEXTURE_ROM" \
             --bank-primary "$TEXTURE_BANK" --bank-secondary "$TEXTURE_BANK_SECONDARY" \
-            --oba "$oba" --tpa "$tpa" --tha "$tha" \
+            --palette-trace "$trace" --oba "$oba" --tpa "$tpa" --tha "$tha" \
             --output "$textured_objects/oba-${oba#0x}.gltf"
     done < "$objects/index.tsv"
     python3 "$ROOT_DIR/von/tools/export_geometry_frame_gltf.py" \

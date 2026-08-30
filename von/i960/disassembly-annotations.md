@@ -698,8 +698,10 @@ stream at 16,384 records per cabinet. The linked passive capture reached
 keys; 530 indexed PGM tiles were extracted from the primary decompressed
 texture bank for each cabinet. The wrapper and profile are
 `scripts/trace-geometry-material-twin.sh` and
-`VON_MAME_PATCH_SET=geometry-material`; this material manifest is the next
-input needed to associate UV records with the exported polygon meshes.
+`VON_MAME_PATCH_SET=geometry-material`; the wrapper now combines those records
+with the palette/color-translation/luma trace and writes palette-rendered PNG
+tiles into the UV-associated glTF material groups. The grayscale fallback keeps
+the indexed texel values available when a palette trace is not present.
 
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and

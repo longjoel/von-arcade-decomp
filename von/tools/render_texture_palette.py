@@ -25,6 +25,25 @@ def parse_trace(path: Path) -> tuple[dict[int, int], dict[int, int], dict[int, i
     return palette, colorxlat, luma
 
 
+def gamma(value: int) -> int:
+    return max((value - 64) * 255 // 191, 0)
+
+
+def palette_rgb(index: int, colorbase: int, palette: dict[int, int],
+                colorxlat: dict[int, int], luma: dict[int, int]) -> tuple[int, int, int]:
+    """Map one 4bpp texel through the captured palette pipeline."""
+    color = palette.get(0x1000 + colorbase, 0) & 0x7fff
+    red = (color >> 0) & 0x1f
+    green = (color >> 5) & 0x1f
+    blue = (color >> 10) & 0x1f
+    level = luma.get(index * 8, 0)
+    return (
+        gamma(colorxlat.get((red << 8) + level, 0) & 0xff),
+        gamma(colorxlat.get(0x2000 + (green << 8) + level, 0) & 0xff),
+        gamma(colorxlat.get(0x4000 + (blue << 8) + level, 0) & 0xff),
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bank", type=Path,
@@ -52,23 +71,13 @@ def main() -> int:
             if (x & 1) == 0:
                 word >>= 4
             pixels.append((word & 0x0f) << 4)
-    gamma = [max((value - 64) * 255 // 191, 0) for value in range(256)]
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     for base_text in args.bases.split(","):
         base = int(base_text, 0)
-        color = palette.get(0x1000 + base, 0) & 0x7fff
-        red = (color >> 0) & 0x1f
-        green = (color >> 5) & 0x1f
-        blue = (color >> 10) & 0x1f
         output = bytearray()
         for index in pixels:
-            level = luma.get(index >> 1, 0)
-            output.extend((
-                gamma[colorxlat.get((red << 8) + level, 0) & 0xff],
-                gamma[colorxlat.get(0x2000 + (green << 8) + level, 0) & 0xff],
-                gamma[colorxlat.get(0x4000 + (blue << 8) + level, 0) & 0xff],
-            ))
+            output.extend(palette_rgb(index >> 4, base, palette, colorxlat, luma))
         path = args.output_dir / f"bank0-colorbase-{base:03d}.ppm"
         path.write_bytes(b"P6\n2048 1024\n255\n" + output)
         print(path)

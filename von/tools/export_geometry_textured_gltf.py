@@ -11,6 +11,7 @@ import zlib
 from pathlib import Path
 
 from export_geometry_obj import point, words
+from render_texture_palette import palette_rgb, parse_trace
 
 
 def u16(data: bytes, address: int) -> int:
@@ -46,6 +47,19 @@ def png_gray(width: int, height: int, pixels: bytes) -> bytes:
             chunk(b"IDAT", zlib.compress(rows, 9)) + chunk(b"IEND", b""))
 
 
+def png_rgb(width: int, height: int, pixels: bytes) -> bytes:
+    def chunk(name: bytes, payload: bytes) -> bytes:
+        return (struct.pack(">I", len(payload)) + name + payload +
+                struct.pack(">I", zlib.crc32(name + payload) & 0xffffffff))
+
+    row_size = width * 3
+    rows = b"".join(b"\x00" + pixels[row * row_size:(row + 1) * row_size]
+                   for row in range(height))
+    return (b"\x89PNG\r\n\x1a\n" +
+            chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)) +
+            chunk(b"IDAT", zlib.compress(rows, 9)) + chunk(b"IEND", b""))
+
+
 def texel(bank: bytes, x: int, y: int) -> int:
     x &= 2047
     y &= 1023
@@ -60,13 +74,19 @@ def texel(bank: bytes, x: int, y: int) -> int:
     return (word & 0x0f) * 17
 
 
-def tile_png(bank: bytes, header: tuple[int, int, int, int]) -> bytes | None:
-    width, height, origin_x, origin_y, _ = texture_size(header)
+def tile_png(bank: bytes, header: tuple[int, int, int, int], palette_state=None) -> bytes | None:
+    width, height, origin_x, origin_y, colorbase = texture_size(header)
     if width > 2048 or height > 1024:
         return None
-    pixels = bytes(texel(bank, origin_x + x, origin_y + y)
-                   for y in range(height) for x in range(width))
-    return png_gray(width, height, pixels)
+    indices = bytes(texel(bank, origin_x + x, origin_y + y) // 17
+                    for y in range(height) for x in range(width))
+    if palette_state is None:
+        return png_gray(width, height, bytes(index * 17 for index in indices))
+    palette, colorxlat, luma = palette_state
+    pixels = bytes(channel
+                   for index in indices
+                   for channel in palette_rgb(index, colorbase, palette, colorxlat, luma))
+    return png_rgb(width, height, pixels)
 
 
 def parse_faces(geometry: bytes, texture_data: bytes, oba: int, tpa: int, tha: int):
@@ -123,6 +143,8 @@ def main() -> int:
                         default=Path("von/build/disasm/texture-pipeline/bank0-primary.bin"))
     parser.add_argument("--bank-secondary", type=Path,
                         default=Path("von/build/disasm/texture-pipeline/bank0-secondary.bin"))
+    parser.add_argument("--palette-trace", type=Path,
+                        help="optional MAME trace containing palette/colorxlat/luma writes")
     parser.add_argument("--oba", type=lambda value: int(value, 0), required=True)
     parser.add_argument("--tpa", type=lambda value: int(value, 0), required=True)
     parser.add_argument("--tha", type=lambda value: int(value, 0), required=True)
@@ -133,6 +155,7 @@ def main() -> int:
     geometry = args.rom.read_bytes()
     primary = args.bank_primary.read_bytes()
     secondary = args.bank_secondary.read_bytes()
+    palette_state = parse_trace(args.palette_trace) if args.palette_trace else None
     faces = parse_faces(geometry, texture_data, args.oba, args.tpa, args.tha)
 
     blob = bytearray()
@@ -188,7 +211,7 @@ def main() -> int:
         width, height, origin_x, origin_y, colorbase = texture_size(header)
         textured = ((header[0] >> 13) & 3) & 2
         bank = secondary if header[2] & 0x1000 else primary
-        image_data = tile_png(bank, header) if textured else None
+        image_data = tile_png(bank, header, palette_state) if textured else None
         texture_index = None
         if image_data is not None:
             image_index = len(images)
@@ -229,7 +252,8 @@ def main() -> int:
                      base64.b64encode(blob).decode("ascii")}],
         "bufferViews": views, "accessors": accessors,
         "extras": {"oba": args.oba, "tpa": args.tpa, "tha": args.tha,
-                   "faces": len(faces), "textured_materials": sum(bool(x) for x in textures)},
+                   "faces": len(faces), "textured_materials": sum(bool(x) for x in textures),
+                   "palette_rendered": palette_state is not None},
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(document, indent=2) + "\n")
