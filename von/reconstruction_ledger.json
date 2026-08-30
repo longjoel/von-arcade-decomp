@@ -264,6 +264,21 @@
           "notes": "Recovers the bit-10 interrupt branch: when the 64-byte FIFO is nonempty and SCSP status bit 0 is ready, consume one byte, advance 0x0051aa70 modulo 64, and write the value to SCSP command MMIO 0x009c0000. The reconstructed heartbeat polls the generated control mirror to integrate this bounded service path."
         },
         {
+          "name": "text_voltage_warning_message_sequence",
+          "start": "0x00001674",
+          "end": "0x000016d8",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_voltage_warning_message_sequence",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_text_video.py"
+          ],
+          "notes": "Recovers the post-upload portion of the bit-9 interrupt path: initialize text/video state and emit four voltage-warning records at (4,16), (4,19), (4,25), and (20,28). The preceding 0x20180 video upload remains separately blocked on the 0xf5d40 hardware blitter."
+        },
+        {
           "name": "host_interrupt_mask_update",
           "start": "0x000017c8",
           "end": "0x000018a8",

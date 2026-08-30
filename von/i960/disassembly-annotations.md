@@ -324,6 +324,13 @@ service. `recovered_host_interrupt_route()` records this route contract and
 is exhaustively checked for all 65,536 16-bit masks; the side-effecting
 downstream handlers remain separate work units.
 
+The bit-9 branch's post-upload sequence at `0x00001674-0x000016d8` now maps
+directly to `recovered_text_voltage_warning_message_sequence()`: it resets the
+text/video state and writes four voltage-warning records at `(4,16)`,
+`(4,19)`, `(4,25)`, and `(20,28)`. The immediately preceding `0x20180` call
+still depends on the `0x000f5d40` video blitter and is intentionally outside
+this bounded sequence.
+
 The adjacent bootstrap at `0x0001bb8-0x0001c10` is represented by
 `recovered_host_interrupt_initialize()`. It acknowledges with zero, loads
 `0x61a80` into timer registers `0xf00004`, `0xf00000`, `0xf0000c`, and

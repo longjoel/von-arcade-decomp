@@ -53,6 +53,13 @@ def main() -> int:
             ctypes.POINTER(ctypes.c_uint32),
         ]
         recovered.recovered_text_video_row_transfer_plan.restype = ctypes.c_uint32
+        recovered.recovered_text_voltage_warning_plan.argtypes = [
+            ctypes.c_uint32,
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+        ]
+        recovered.recovered_text_voltage_warning_plan.restype = ctypes.c_uint32
 
         clear_expected = (
             (0x01000000, 0x4000),
@@ -113,6 +120,32 @@ def main() -> int:
             if valid != 0:
                 raise SystemExit(f"invalid {function_name} index accepted")
 
+        warning_expected = (
+            (4, 16, 0x000012E0),
+            (4, 19, 0x000012F0),
+            (4, 25, 0x00001310),
+            (20, 28, 0x00001320),
+        )
+        for index, expected in enumerate(warning_expected):
+            column = ctypes.c_uint32()
+            row = ctypes.c_uint32()
+            text = ctypes.c_uint32()
+            valid = recovered.recovered_text_voltage_warning_plan(
+                index, ctypes.byref(column), ctypes.byref(row), ctypes.byref(text)
+            )
+            actual = (column.value, row.value, text.value)
+            if valid != 1 or actual != expected:
+                raise SystemExit(
+                    f"warning plan mismatch index={index}: {actual!r} != {expected!r}"
+                )
+        column = ctypes.c_uint32(0xDEADBEEF)
+        row = ctypes.c_uint32(0xDEADBEEF)
+        text = ctypes.c_uint32(0xDEADBEEF)
+        if recovered.recovered_text_voltage_warning_plan(
+            4, ctypes.byref(column), ctypes.byref(row), ctypes.byref(text)
+        ) != 0:
+            raise SystemExit("accepted invalid warning record")
+
         plan_vectors = 0
         for rows in (0, 1, 2, 64, 255):
             for row in range(rows + 1):
@@ -151,7 +184,7 @@ def main() -> int:
                 plan_vectors += 1
 
     print(
-        "PASS: 4 video clear, 9 video state, and "
+        "PASS: 4 video clear, 9 video state, 4 warning records, and "
         f"{plan_vectors:,} row-transfer plan entries"
     )
     return 0

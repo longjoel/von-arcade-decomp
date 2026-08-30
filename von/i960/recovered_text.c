@@ -24,6 +24,11 @@ static const u32 VIDEO_CLEAR_HALWORDS[4] = {0x4000U, 0x1000U, 0x0800U, 8U};
 static const u32 GLYPH_TABLES[4] = {
     0x02ea11d0U, 0x02ea14d0U, 0x02ea17d0U, 0x02ea1ad0U
 };
+static const u32 VOLTAGE_WARNING_COLUMNS[4] = {4U, 4U, 4U, 20U};
+static const u32 VOLTAGE_WARNING_ROWS[4] = {16U, 19U, 25U, 28U};
+static const u32 VOLTAGE_WARNING_TEXTS[4] = {
+    0x000012e0U, 0x000012f0U, 0x00001310U, 0x00001320U
+};
 
 void recovered_text_emit_glyph(u32 character, u32 font_mode, u32 attributes);
 
@@ -180,6 +185,20 @@ u32 recovered_text_glyph_next_column(u32 normalized_character,
     return column;
 }
 
+/* Describe one fixed warning record from the 0x1674 interrupt sequence. */
+u32 recovered_text_voltage_warning_plan(u32 index,
+                                        u32 *column,
+                                        u32 *row,
+                                        u32 *text)
+{
+    if (index >= 4U)
+        return 0U;
+    *column = VOLTAGE_WARNING_COLUMNS[index];
+    *row = VOLTAGE_WARNING_ROWS[index];
+    *text = VOLTAGE_WARNING_TEXTS[index];
+    return 1U;
+}
+
 /* Recovered glyph-table writer at i960 0x0001d310. */
 void recovered_text_emit_glyph(u32 character, u32 font_mode, u32 attributes)
 {
@@ -289,5 +308,22 @@ void recovered_text_video_initialize(void)
     for (index = 0; index < 4U; ++index) {
         recovered_text_video_clear_plan(index, &address, &halfwords);
         recovered_text_clear_video_region(address, halfwords);
+    }
+}
+
+/* Recovered warning-message sequence at i960 0x00001674-0x000016d8. */
+void recovered_text_voltage_warning_message_sequence(void)
+{
+    u32 index;
+    u32 column;
+    u32 row;
+    u32 text;
+
+    recovered_text_video_initialize();
+    for (index = 0U; index < 4U; ++index) {
+        recovered_text_voltage_warning_plan(index, &column, &row, &text);
+        recovered_text_set_position(column, row);
+        recovered_text_write_glyph_string(
+            (volatile const u8 *)(unsigned long)text);
     }
 }
