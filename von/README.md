@@ -208,6 +208,21 @@ python3 von/tools/export_geometry_frame_gltf.py \
   --max-time 32.8 --min-objects 100
 ```
 
+For a lightweight isolated preview, Chromium is enough; no Blender or external
+JavaScript packages are required. The viewer supports drag orbit and wheel zoom:
+
+```sh
+./scripts/view-geometry.sh \
+  von/build/disasm/first-match-scenes/p1-first-match.gltf
+./scripts/view-geometry.sh \
+  von/build/disasm/first-match-geometry-objects/oba-0091e76c.gltf
+```
+
+The first command shows the extracted scene. The second shows one object in
+isolation; replace the filename with any exported `.gltf`. The script serves
+the files only on localhost and opens the bundled dependency-free WebGL viewer
+in Chromium.
+
 `geometry-trace` is a smaller build profile containing only the object/matrix
 geometry instrumentation and renderer-boundary diagnostics. It avoids the
 high-volume polygon and texture logs in the full `debug` profile, which makes
