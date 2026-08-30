@@ -161,6 +161,47 @@ u32 recovered_text_video_upload_plan(u32 *source,
     return 1U;
 }
 
+/* Expand one source halfword as the 0x1bb90 converter does. */
+u32 recovered_word_expand(u32 value)
+{
+    value &= 0xffffU;
+    return ((value & 0x000fU) << 1)
+        | ((value & 0x1000U) >> 12)
+        | ((value & 0x00f0U) << 2)
+        | ((value & 0x2000U) >> 8)
+        | ((value & 0x0f00U) << 3)
+        | ((value & 0x4000U) >> 4);
+}
+
+/* Recovered 16-word-block converter at i960 0x0001bb90. */
+void recovered_word_expand_blocks(volatile u16 *destination,
+                                  volatile const u16 *source,
+                                  u32 blocks)
+{
+    u32 index;
+    u32 words = blocks << 4;
+
+    for (index = 0U; index < words; ++index)
+        destination[index] = (u16)recovered_word_expand(source[index]);
+}
+
+u32 recovered_halfword_byte_swap(u32 value)
+{
+    value &= 0xffffU;
+    return ((value & 0x00ffU) << 8) | ((value & 0xff00U) >> 8);
+}
+
+/* Recovered halfword byte-swap loop at i960 0x0001bc20. */
+void recovered_halfword_byte_swap_copy(volatile u16 *destination,
+                                       volatile const u16 *source,
+                                       u32 halfwords)
+{
+    u32 index;
+
+    for (index = 0U; index < halfwords; ++index)
+        destination[index] = (u16)recovered_halfword_byte_swap(source[index]);
+}
+
 /* Recovered fixed video upload at i960 0x00020180. */
 void recovered_text_video_upload(void)
 {

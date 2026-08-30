@@ -470,6 +470,36 @@
           "notes": "Recovers the glyph writer's 7-bit normalization, printable index range, two-bit font-bank selection, four glyph-table bases, eight-byte descriptor stride, two-row tile writes, attribute bits, and column advance. Every descriptor's mapped data pointer and width is validated against main_data; active caller integration remains separate."
         },
         {
+          "name": "word_expand_blocks",
+          "start": "0x0001bb90",
+          "end": "0x0001bc20",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_word_expand_blocks",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_text_video.py"
+          ],
+          "notes": "Recovers the 16-word-block halfword converter, including its exact nibble/bit expansion and ignored source bit 15. The transform is exhaustively checked for every 16-bit input value."
+        },
+        {
+          "name": "halfword_byte_swap_copy",
+          "start": "0x0001bc20",
+          "end": "0x0001bc90",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_halfword_byte_swap_copy",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_text_video.py"
+          ],
+          "notes": "Recovers the adjacent halfword byte-swap copy loop and exhaustively checks the transform across all 16-bit source values."
+        },
+        {
           "name": "text_video_row_transfer_plan",
           "start": "0x0001bc90",
           "end": "0x0001bcd0",

@@ -136,6 +136,17 @@ for each requested row. Each call advances its source pointer by `0x80` bytes
 and its destination pointer by `halfwords * 2` bytes while copying that byte
 count. `recovered_text_video_copy_rows()` preserves this schedule.
 
+The preceding `0x0001bb90-0x0001bc20` converter consumes `blocks * 16`
+halfwords. It expands source bits `0..3`, `4..7`, `8..11`, and bits `12..14`
+into a packed output halfword while dropping bit 15. The exact transform is
+implemented by `recovered_word_expand_blocks()` and exhaustively checked over
+all 65,536 source values.
+
+The adjacent `0x0001bc20-0x0001bc90` loop copies a caller-selected number of
+halfwords with each source halfword's bytes reversed. The concrete
+`recovered_halfword_byte_swap_copy()` implementation and all 65,536 possible
+halfword swaps are host-tested.
+
 The `0x00020180` caller supplies a fixed upload request: source `0x01004000`,
 destination pointer slot `0x02fd61d0`, `0x40` halfwords per row, and `0x40`
 rows. `recovered_text_video_upload()` now executes that exact handoff through

@@ -71,6 +71,22 @@ def main() -> int:
             ctypes.c_uint32,
         ]
         recovered.recovered_text_video_copy_rows.restype = None
+        recovered.recovered_word_expand.argtypes = [ctypes.c_uint32]
+        recovered.recovered_word_expand.restype = ctypes.c_uint32
+        recovered.recovered_word_expand_blocks.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_void_p,
+            ctypes.c_uint32,
+        ]
+        recovered.recovered_word_expand_blocks.restype = None
+        recovered.recovered_halfword_byte_swap.argtypes = [ctypes.c_uint32]
+        recovered.recovered_halfword_byte_swap.restype = ctypes.c_uint32
+        recovered.recovered_halfword_byte_swap_copy.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_void_p,
+            ctypes.c_uint32,
+        ]
+        recovered.recovered_halfword_byte_swap_copy.restype = None
         recovered.recovered_text_voltage_warning_plan.argtypes = [
             ctypes.c_uint32,
             ctypes.POINTER(ctypes.c_uint32),
@@ -180,6 +196,78 @@ def main() -> int:
                     )
                 copy_vectors += 1
 
+        word_vectors = 0
+        for value in range(0x10000):
+            expected = (
+                ((value & 0x000F) << 1)
+                | ((value & 0x1000) >> 12)
+                | ((value & 0x00F0) << 2)
+                | ((value & 0x2000) >> 8)
+                | ((value & 0x0F00) << 3)
+                | ((value & 0x4000) >> 4)
+            )
+            actual = recovered.recovered_word_expand(value)
+            if actual != expected:
+                raise SystemExit(
+                    f"word expand mismatch value=0x{value:04x}: "
+                    f"0x{actual:04x} != 0x{expected:04x}"
+                )
+            word_vectors += 1
+
+        block_vectors = 0
+        for blocks in (0, 1, 2, 8):
+            source = (ctypes.c_uint16 * max(1, blocks * 16))()
+            destination = (ctypes.c_uint16 * max(1, blocks * 16))()
+            for index in range(blocks * 16):
+                source[index] = (index * 0x1357 + 0x2468) & 0xFFFF
+                destination[index] = 0xA5A5
+            recovered.recovered_word_expand_blocks(destination, source, blocks)
+            for index in range(blocks * 16):
+                value = source[index]
+                expected = (
+                    ((value & 0x000F) << 1)
+                    | ((value & 0x1000) >> 12)
+                    | ((value & 0x00F0) << 2)
+                    | ((value & 0x2000) >> 8)
+                    | ((value & 0x0F00) << 3)
+                    | ((value & 0x4000) >> 4)
+                )
+                if destination[index] != expected:
+                    raise SystemExit(
+                        f"block expand mismatch blocks={blocks} index={index}"
+                    )
+                block_vectors += 1
+
+        swap_vectors = 0
+        for value in range(0x10000):
+            expected = ((value & 0x00FF) << 8) | ((value & 0xFF00) >> 8)
+            actual = recovered.recovered_halfword_byte_swap(value)
+            if actual != expected:
+                raise SystemExit(
+                    f"halfword swap mismatch value=0x{value:04x}: "
+                    f"0x{actual:04x} != 0x{expected:04x}"
+                )
+            swap_vectors += 1
+
+        swap_block_vectors = 0
+        for halfwords in (0, 1, 2, 31, 128):
+            source = (ctypes.c_uint16 * max(1, halfwords))()
+            destination = (ctypes.c_uint16 * max(1, halfwords))()
+            for index in range(halfwords):
+                source[index] = (index * 0x5317 + 0x2468) & 0xFFFF
+                destination[index] = 0xA5A5
+            recovered.recovered_halfword_byte_swap_copy(
+                destination, source, halfwords
+            )
+            for index in range(halfwords):
+                value = source[index]
+                expected = ((value & 0x00FF) << 8) | ((value & 0xFF00) >> 8)
+                if destination[index] != expected:
+                    raise SystemExit(
+                        f"halfword swap copy mismatch count={halfwords} index={index}"
+                    )
+                swap_block_vectors += 1
+
         warning_expected = (
             (4, 16, 0x000012E0),
             (4, 19, 0x000012F0),
@@ -245,7 +333,9 @@ def main() -> int:
 
     print(
         "PASS: 4 video clear, 9 video state, 1 upload, 4 warning records, "
-        f"{copy_vectors} row copies, and {plan_vectors:,} row-transfer plan entries"
+        f"{copy_vectors} row copies, {word_vectors:,} word expansions, "
+        f"{block_vectors} block expansions, {swap_vectors:,} halfword swaps, "
+        f"{swap_block_vectors} swap copies, and {plan_vectors:,} row-transfer plan entries"
     )
     return 0
 
