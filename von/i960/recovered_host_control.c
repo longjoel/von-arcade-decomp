@@ -1,4 +1,4 @@
-/* Recovered host interrupt-mask/timer helper at i960 0x17c8-0x18a8. */
+/* Recovered host interrupt-mask, timer, and dispatcher helpers. */
 
 typedef unsigned int u32;
 
@@ -10,6 +10,31 @@ typedef unsigned int u32;
 #define TIMER_2            (*(volatile u32 *)0x00f00008)
 #define TIMER_3            (*(volatile u32 *)0x00f0000c)
 #define HOST_TIMER_STATE   (*(volatile u32 *)0x0051aac0)
+
+enum recovered_host_interrupt_route {
+    HOST_INTERRUPT_ROUTE_ACK = 0U,
+    HOST_INTERRUPT_ROUTE_SYSTEM = 1U,
+    HOST_INTERRUPT_ROUTE_FATAL = 2U,
+    HOST_INTERRUPT_ROUTE_TEXT = 3U,
+    HOST_INTERRUPT_ROUTE_AUDIO = 4U,
+    HOST_INTERRUPT_ROUTE_UNHANDLED = 5U
+};
+
+/* Route values selected by the common 0x1380 dispatcher. */
+u32 recovered_host_interrupt_route(u32 mask)
+{
+    if (mask == 1U)
+        return HOST_INTERRUPT_ROUTE_SYSTEM;
+    if (mask == 2U || mask == 0x800U)
+        return HOST_INTERRUPT_ROUTE_FATAL;
+    if (mask == 0x200U)
+        return HOST_INTERRUPT_ROUTE_TEXT;
+    if (mask == 0x400U)
+        return HOST_INTERRUPT_ROUTE_AUDIO;
+    if (mask > 0x80U)
+        return HOST_INTERRUPT_ROUTE_UNHANDLED;
+    return HOST_INTERRUPT_ROUTE_ACK;
+}
 
 u32 recovered_host_timer_initial_value(void)
 {

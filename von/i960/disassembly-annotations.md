@@ -290,6 +290,15 @@ by `recovered_host_interrupt_mask_update()`. It clears the requested bit in
 The timer selection and reload table is checked for every 16-bit mask by
 `von/tools/test_recovered_host_control.py`.
 
+The common dispatcher begins at `0x00001380`. Its recovered gate clears the
+requested source mask from `0x00501cd0` and `0xe80004`, then selects a
+downstream route: mask `1` enters the system path, masks `2` and `0x800` enter
+the fatal/unhandled path, `0x200` enters text/video service, and `0x400` enters
+the audio FIFO consumer. Other values are acknowledged without a downstream
+service. `recovered_host_interrupt_route()` records this route contract and
+is exhaustively checked for all 65,536 16-bit masks; the side-effecting
+downstream handlers remain separate work units.
+
 The adjacent bootstrap at `0x0001bb8-0x0001c10` is represented by
 `recovered_host_interrupt_initialize()`. It acknowledges with zero, loads
 `0x61a80` into timer registers `0xf00004`, `0xf00000`, `0xf0000c`, and
