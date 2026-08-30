@@ -90,6 +90,7 @@ python3 von/tools/compare_tile_trace.py --original <trace> --prototype <trace> #
 ./scripts/test.sh      # audit ROMs and validate the local bin/von
 ./scripts/run.sh       # launch vonj locally; pass extra MAME arguments
 ./scripts/run-twin.sh  # launch two linked local cabinet instances
+./scripts/trace-geometry-twin.sh # capture and export linked player-select geometry
 ./scripts/test-twin.sh # configure roles, then run deterministic link/start diagnostic
 ./scripts/e2e.sh       # test and run one headless second
 ./scripts/deploy.sh    # test and create a ROM-free tarball
@@ -121,8 +122,9 @@ the optional tracing patches, use `VON_MAME_PATCH_SET=debug
 ./scripts/remote-build.sh`; the debug patch set is otherwise unchanged.
 
 MAME preparation defaults to the `core` patch set, applying Virtual-On support
-and communication diagnostics. Set `VON_MAME_PATCH_SET=debug` to include the
-existing graphics tracing patches as well.
+and communication diagnostics. Set `VON_MAME_PATCH_SET=geometry-trace` for the
+focused geometry extraction instrumentation, or `VON_MAME_PATCH_SET=debug` to
+include all existing graphics tracing patches.
 
 ### Geometry capture and model extraction
 
@@ -162,11 +164,30 @@ python3 von/tools/export_geometry_animation_gltf.py \
   --trace von/build/disasm/vonj-geometry-select-40s.trace
 ```
 
-The capture script uses `bin/von` directly and defaults to SDL's dummy video
-backend, so it also works on headless build hosts. If the run remains on the
-Model 2 boot screen, the event counts printed by the script make that runtime
-limitation explicit; the exporter should only be run once object and matrix
-events are present.
+The single-cabinet capture script uses `bin/von` directly and defaults to SDL's
+dummy video backend, so it also works on headless build hosts. A single cabinet
+can remain at the Model 2 boot screen while waiting for the twin communication
+link; that is expected for this game and is why player-select extraction uses
+the linked harness below.
+
+For a reproducible linked capture that drives both cabinets through coin/start
+and exports the first 40-object player-select frames, run:
+
+```sh
+VON_MAME_PATCH_SET=geometry-trace ./scripts/remote-build.sh
+VON_GEOMETRY_TWIN_SECONDS=20 ./scripts/trace-geometry-twin.sh
+```
+
+The command writes the raw per-cabinet traces below `von/captures/`, then emits
+40 individual OBJ/glTF object assets and a self-contained animated glTF for
+each cabinet below `von/build/disasm/player-select-twin-*/`. The linked run must
+be allowed to bind localhost sockets; sandboxed environments may need their
+network namespace disabled for this diagnostic.
+
+`geometry-trace` is a smaller build profile containing only the object/matrix
+geometry instrumentation and renderer-boundary diagnostics. It avoids the
+high-volume polygon and texture logs in the full `debug` profile, which makes
+linked extraction practical on slower build hosts.
 
 The generated i960 host ROM can be run directly with:
 

@@ -22,6 +22,9 @@ mkdir -p "$TWIN_DIR/p1/cfg" "$TWIN_DIR/p1/nvram" "$TWIN_DIR/p1/inp" "$TWIN_DIR/p
     "$TWIN_DIR/p2/cfg" "$TWIN_DIR/p2/nvram" "$TWIN_DIR/p2/inp" "$TWIN_DIR/p2/snap"
 
 MAME_ARGS=(-window -skip_gameinfo -verbose "$@")
+if [[ "${VON_TWIN_SECONDS:-0}" != 0 ]]; then
+    MAME_ARGS+=(-seconds_to_run "$VON_TWIN_SECONDS")
+fi
 COMM_DIAGNOSTIC_ARGS=()
 [[ "${VON_COMM_DIAGNOSTICS:-0}" == 1 ]] && COMM_DIAGNOSTIC_ARGS=(-comm_diagnostics)
 P1_LOG="$TWIN_DIR/p1/mame.log"
@@ -58,6 +61,7 @@ printf 'Starting cabinet P2 on comm port %s\n' "$P2_PORT"
 printf 'Twin capture directory: %s\n' "$TWIN_DIR"
 
 env $(runtime_env) \
+    VON_PROGRESS_LOG="$TWIN_DIR/p1/progress.lua.log" \
     stdbuf -oL -eL "$MAME_BIN" "$SET_NAME" \
         -rompath "$ROM_PATH" \
         -cfg_directory "$TWIN_DIR/p1/cfg" \
@@ -70,6 +74,7 @@ env $(runtime_env) \
 P1_PID=$!
 
 env $(runtime_env) \
+    VON_PROGRESS_LOG="$TWIN_DIR/p2/progress.lua.log" \
     stdbuf -oL -eL "$MAME_BIN" "$SET_NAME" \
         -rompath "$ROM_PATH" \
         -cfg_directory "$TWIN_DIR/p2/cfg" \
