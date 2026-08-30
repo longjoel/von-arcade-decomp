@@ -89,7 +89,8 @@ def main() -> int:
     texture_rom = args.texture_rom.read_bytes()
     primary = args.bank_primary.read_bytes()
     secondary = args.bank_secondary.read_bytes()
-    palette_state = parse_trace(args.palette_trace) if args.palette_trace else None
+    palette_state = (parse_trace(args.palette_trace, selected_time)
+                     if args.palette_trace else None)
 
     blob = bytearray()
     views: list[dict[str, int]] = []

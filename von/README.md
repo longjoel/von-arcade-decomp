@@ -225,7 +225,8 @@ an `index.tsv` manifest beside the scene exports. Each object also receives a
 and embedded PNG tiles rendered through the captured palette, color-translation,
 and luma state. The same capture also emits a complete
 `first-match-frame-textured.gltf` scene with the traced object slots and
-transforms. For example:
+transforms; its palette state is selected at the frame's geometry timestamp.
+For example:
 
 ```sh
 ./scripts/view-geometry.sh \

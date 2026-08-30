@@ -145,6 +145,8 @@ def main() -> int:
                         default=Path("von/build/disasm/texture-pipeline/bank0-secondary.bin"))
     parser.add_argument("--palette-trace", type=Path,
                         help="optional MAME trace containing palette/colorxlat/luma writes")
+    parser.add_argument("--palette-time", type=float,
+                        help="use palette state at or before this emulated timestamp")
     parser.add_argument("--oba", type=lambda value: int(value, 0), required=True)
     parser.add_argument("--tpa", type=lambda value: int(value, 0), required=True)
     parser.add_argument("--tha", type=lambda value: int(value, 0), required=True)
@@ -155,7 +157,8 @@ def main() -> int:
     geometry = args.rom.read_bytes()
     primary = args.bank_primary.read_bytes()
     secondary = args.bank_secondary.read_bytes()
-    palette_state = parse_trace(args.palette_trace) if args.palette_trace else None
+    palette_state = (parse_trace(args.palette_trace, args.palette_time)
+                     if args.palette_trace else None)
     faces = parse_faces(geometry, texture_data, args.oba, args.tpa, args.tha)
 
     blob = bytearray()

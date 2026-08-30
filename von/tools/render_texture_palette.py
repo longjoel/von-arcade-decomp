@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Render decoded texture bytes through a captured Model 2 palette state."""
+"""Render decoded texture bytes through a captured Model 2 palette state.
+
+Timestamped traces can be filtered with ``--time`` so a later palette rewrite
+does not affect an earlier scene.
+"""
 
 from __future__ import annotations
 
@@ -8,18 +12,24 @@ import re
 from pathlib import Path
 
 
-def parse_trace(path: Path) -> tuple[dict[int, int], dict[int, int], dict[int, int]]:
+EVENT_TIME = re.compile(r"(?:^| )time=([0-9.e+-]+)(?: |$)")
+
+
+def parse_trace(path: Path, at_time: float | None = None) -> tuple[dict[int, int], dict[int, int], dict[int, int]]:
     palette: dict[int, int] = {}
     colorxlat: dict[int, int] = {}
     luma: dict[int, int] = {}
     for line in path.read_text().splitlines():
-        match = re.search(r"vonj_palette_write: offset=([0-9a-f]+).*value=([0-9a-f]+)", line)
+        event_time = EVENT_TIME.search(line)
+        if at_time is not None and event_time and float(event_time[1]) > at_time:
+            continue
+        match = re.search(r"vonj_palette_write: (?:time=[0-9.e+-]+ )?offset=([0-9a-f]+).*value=([0-9a-f]+)", line)
         if match:
             palette[int(match[1], 16)] = int(match[2], 16)
-        match = re.search(r"vonj_colorxlat_write: offset=([0-9a-f]+).*value=([0-9a-f]+)", line)
+        match = re.search(r"vonj_colorxlat_write: (?:time=[0-9.e+-]+ )?offset=([0-9a-f]+).*value=([0-9a-f]+)", line)
         if match:
             colorxlat[int(match[1], 16)] = int(match[2], 16)
-        match = re.search(r"vonj_luma_write: offset=([0-9a-f]+) data=([0-9a-f]+)", line)
+        match = re.search(r"vonj_luma_write: (?:time=[0-9.e+-]+ )?offset=([0-9a-f]+) data=([0-9a-f]+)", line)
         if match:
             luma[int(match[1], 16)] = int(match[2], 16)
     return palette, colorxlat, luma
@@ -53,9 +63,11 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path,
                         default=Path("von/build/disasm/texture-pipeline/color"))
     parser.add_argument("--bases", default="0,1,2,4,7,16,22,25")
+    parser.add_argument("--time", type=float,
+                        help="use palette state at or before this emulated timestamp")
     args = parser.parse_args()
 
-    palette, colorxlat, luma = parse_trace(args.trace)
+    palette, colorxlat, luma = parse_trace(args.trace, args.time)
     packed = args.bank.read_bytes()
     pixels = bytearray()
     for y in range(1024):

@@ -8,8 +8,8 @@ diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
 +	static unsigned vonj_palette_trace_count;
 +	if ((machine().system().name == std::string_view("vonj")) && (vonj_palette_trace_count < 10000))
 +	{
-+		logerror("vonj_palette_write: offset=%04x data=%04x mask=%04x value=%04x\n",
-+			offset, data, mem_mask, m_palram[offset]);
++		logerror("vonj_palette_write: time=%.6f offset=%04x data=%04x mask=%04x value=%04x\n",
++			machine().time().as_double(), offset, data, mem_mask, m_palram[offset]);
 +		vonj_palette_trace_count++;
 +	}
  	u16 palcolor = m_palram[offset];
@@ -21,8 +21,8 @@ diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
 +	if ((machine().system().name == std::string_view("vonj")) &&
 +		(m_colorxlat[offset] != 0) && (vonj_colorxlat_trace_count < 30000))
 +	{
-+		logerror("vonj_colorxlat_write: offset=%04x data=%04x mask=%04x value=%04x\n",
-+			offset, data, mem_mask, m_colorxlat[offset]);
++		logerror("vonj_colorxlat_write: time=%.6f offset=%04x data=%04x mask=%04x value=%04x\n",
++			machine().time().as_double(), offset, data, mem_mask, m_colorxlat[offset]);
 +		vonj_colorxlat_trace_count++;
 +	}
  
@@ -33,7 +33,8 @@ diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
 +	static unsigned vonj_luma_trace_count;
 +	if ((machine().system().name == std::string_view("vonj")) && (vonj_luma_trace_count < 0x10000))
 +	{
-+		logerror("vonj_luma_write: offset=%04x data=%02x\n", offset, data);
++		logerror("vonj_luma_write: time=%.6f offset=%04x data=%02x\n",
++			machine().time().as_double(), offset, data);
 +		vonj_luma_trace_count++;
 +	}
  	m_lumaram[offset] = data;
