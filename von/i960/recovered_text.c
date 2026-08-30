@@ -31,6 +31,9 @@ static const u32 VOLTAGE_WARNING_TEXTS[4] = {
 };
 
 void recovered_text_emit_glyph(u32 character, u32 font_mode, u32 attributes);
+void recovered_memory_copy_forward(volatile u8 *destination,
+                                   volatile const u8 *source,
+                                   u32 bytes);
 
 void recovered_text_set_position(u32 column, u32 row)
 {
@@ -106,7 +109,7 @@ void recovered_text_write_glyph_string(volatile const u8 *text)
         recovered_text_emit_glyph(character, font_mode, 0U);
 }
 
-/* Describe one 0x1bc90 row transfer without entering the hardware blitter. */
+/* Describe one 0x1bc90 row transfer. */
 u32 recovered_text_video_row_transfer_plan(
     u32 row,
     u32 source,
@@ -128,6 +131,22 @@ u32 recovered_text_video_row_transfer_plan(
     return 1U;
 }
 
+/* Recovered 0x1bc90 row loop. */
+void recovered_text_video_copy_rows(volatile u8 *source,
+                                    volatile u8 *destination,
+                                    u32 halfwords,
+                                    u32 rows)
+{
+    u32 row;
+    u32 row_bytes = halfwords << 1;
+
+    for (row = 0U; row < rows; ++row) {
+        recovered_memory_copy_forward(destination, source, row_bytes);
+        source += 0x80U;
+        destination += row_bytes;
+    }
+}
+
 /* Describe the 0x20180 upload request before it enters the row blitter. */
 u32 recovered_text_video_upload_plan(u32 *source,
                                     u32 *destination_pointer,
@@ -139,6 +158,23 @@ u32 recovered_text_video_upload_plan(u32 *source,
     *halfwords = 0x40U;
     *rows = 0x40U;
     return 1U;
+}
+
+/* Recovered fixed video upload at i960 0x00020180. */
+void recovered_text_video_upload(void)
+{
+    u32 source;
+    u32 destination_pointer;
+    u32 halfwords;
+    u32 rows;
+    u32 destination;
+
+    recovered_text_video_upload_plan(&source, &destination_pointer,
+                                     &halfwords, &rows);
+    destination = *(volatile const u32 *)(unsigned long)destination_pointer;
+    recovered_text_video_copy_rows((volatile u8 *)(unsigned long)source,
+                                   (volatile u8 *)(unsigned long)destination,
+                                   halfwords, rows);
 }
 
 /* Describe the 0x1d310 glyph-table and tile-address selection. */
@@ -339,4 +375,11 @@ void recovered_text_voltage_warning_message_sequence(void)
         recovered_text_write_glyph_string(
             (volatile const u8 *)(unsigned long)text);
     }
+}
+
+/* Recovered bit-9 interrupt branch before the separate fatal tail. */
+void recovered_text_voltage_warning_interrupt_path(void)
+{
+    recovered_text_video_upload();
+    recovered_text_voltage_warning_message_sequence();
 }

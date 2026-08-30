@@ -131,17 +131,21 @@ state and region descriptors are checked by
 `von/tools/test_recovered_text_video.py`; the hardware-clearing wrapper remains
 available for the future caller integration pass.
 
-The shared video helper at `0x0001bc90-0x0001bcd0` invokes the hardware
-blitter once for each requested row. Each call advances its source pointer by
-`0x80` bytes and its destination pointer by `halfwords * 2` bytes while
-passing that byte count to the blitter. `recovered_text_video_row_transfer_plan()`
-captures this schedule without dereferencing video memory; the `0x000f5d40`
-blitter itself remains untriaged.
+The shared video helper at `0x0001bc90-0x0001bcd0` performs one forward copy
+for each requested row. Each call advances its source pointer by `0x80` bytes
+and its destination pointer by `halfwords * 2` bytes while copying that byte
+count. `recovered_text_video_copy_rows()` preserves this schedule.
 
 The `0x00020180` caller supplies a fixed upload request: source `0x01004000`,
 destination pointer slot `0x02fd61d0`, `0x40` halfwords per row, and `0x40`
-rows. `recovered_text_video_upload_plan()` records that exact handoff to the
-shared row scheduler without invoking the lower-level blitter.
+rows. `recovered_text_video_upload()` now executes that exact handoff through
+the shared row-copy loop.
+
+The lower-level call target at `0x000f5d40-0x000f5e80` is a general forward
+non-overlap copy primitive, not a video-specific blitter. It selects aligned
+16-, 8-, 4-, 2-, and 1-byte loops but has the standard byte-for-byte forward
+copy contract captured by `recovered_memory_copy_forward()`. Its overlap-aware
+sibling begins at `0x000f5e80` and remains separate.
 
 The glyph writer at `0x0001d310-0x0001d410` masks characters to seven bits,
 maps printable bytes `0x20-0x7f` to indices `0-95` and other inputs to index
@@ -329,12 +333,11 @@ service. `recovered_host_interrupt_route()` records this route contract and
 is exhaustively checked for all 65,536 16-bit masks; the side-effecting
 downstream handlers remain separate work units.
 
-The bit-9 branch's post-upload sequence at `0x00001674-0x000016d8` now maps
-directly to `recovered_text_voltage_warning_message_sequence()`: it resets the
-text/video state and writes four voltage-warning records at `(4,16)`,
-`(4,19)`, `(4,25)`, and `(20,28)`. The immediately preceding `0x20180` call
-still depends on the `0x000f5d40` video blitter and is intentionally outside
-this bounded sequence.
+The bit-9 branch at `0x00001670` now maps to
+`recovered_text_voltage_warning_interrupt_path()`: it performs the fixed
+upload, resets text/video state, and writes four voltage-warning records at
+`(4,16)`, `(4,19)`, `(4,25)`, and `(20,28)`. The branch at `0x16d8` into the
+fatal tail remains a distinct dependency.
 
 The adjacent bootstrap at `0x0001bb8-0x0001c10` is represented by
 `recovered_host_interrupt_initialize()`. It acknowledges with zero, loads

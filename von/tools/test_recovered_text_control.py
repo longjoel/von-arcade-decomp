@@ -14,6 +14,7 @@ from verify_texture_decompress import assemble_main_data
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "von/i960/recovered_text.c"
+MEMORY_SOURCE = ROOT / "von/i960/recovered_memory.c"
 
 
 def main() -> int:
@@ -26,6 +27,7 @@ def main() -> int:
                 "-fPIC",
                 "-O2",
                 SOURCE,
+                MEMORY_SOURCE,
                 "-o",
                 library,
             ],

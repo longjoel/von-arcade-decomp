@@ -264,19 +264,19 @@
           "notes": "Recovers the bit-10 interrupt branch: when the 64-byte FIFO is nonempty and SCSP status bit 0 is ready, consume one byte, advance 0x0051aa70 modulo 64, and write the value to SCSP command MMIO 0x009c0000. The reconstructed heartbeat polls the generated control mirror to integrate this bounded service path."
         },
         {
-          "name": "text_voltage_warning_message_sequence",
-          "start": "0x00001674",
+          "name": "text_voltage_warning_interrupt_path",
+          "start": "0x00001670",
           "end": "0x000016d8",
           "classification": "code",
           "status": "provisional",
           "source": "von/i960/recovered_text.c",
-          "symbol": "recovered_text_voltage_warning_message_sequence",
+          "symbol": "recovered_text_voltage_warning_interrupt_path",
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
             "von/i960/disassembly-annotations.md",
             "von/tools/test_recovered_text_video.py"
           ],
-          "notes": "Recovers the post-upload portion of the bit-9 interrupt path: initialize text/video state and emit four voltage-warning records at (4,16), (4,19), (4,25), and (20,28). The preceding 0x20180 video upload remains separately blocked on the 0xf5d40 hardware blitter."
+          "notes": "Recovers the bit-9 interrupt path through the separate fatal tail: perform the fixed video upload, initialize text/video state, and emit four voltage-warning records at (4,16), (4,19), (4,25), and (20,28). The branch at 0x16d8 into the fatal tail remains outside this slice."
         },
         {
           "name": "host_interrupt_mask_update",
@@ -395,19 +395,34 @@
           "notes": "Preserves the helper's single 32-bit write of its input to tile/control MMIO address 0x01800000."
         },
         {
+          "name": "memory_copy_forward",
+          "start": "0x000f5d40",
+          "end": "0x000f5e80",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_memory.c",
+          "symbol": "recovered_memory_copy_forward",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_memory.py"
+          ],
+          "notes": "Recovers the forward non-overlap copy primitive's byte-for-byte contract. The original dispatches among aligned 16-, 8-, 4-, 2-, and 1-byte loops; the C implementation preserves their common forward-copy behavior."
+        },
+        {
           "name": "text_video_upload_plan",
           "start": "0x00020180",
           "end": "0x000201a0",
           "classification": "code",
           "status": "provisional",
           "source": "von/i960/recovered_text.c",
-          "symbol": "recovered_text_video_upload_plan",
+          "symbol": "recovered_text_video_upload",
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
             "von/i960/disassembly-annotations.md",
             "von/tools/test_recovered_text_video.py"
           ],
-          "notes": "Recovers the 0x20180 request shape: source 0x01004000, destination pointer slot 0x02fd61d0, 0x40 halfwords per row, and 0x40 rows. The call into the separately untriaged 0xf5d40 hardware blitter remains outside the plan."
+          "notes": "Recovers the 0x20180 fixed upload: source 0x01004000, destination pointer slot 0x02fd61d0, 0x40 halfwords per row, and 0x40 rows, dispatched through the recovered row-copy loop."
         },
         {
           "name": "text_glyph_address_plan",
@@ -431,13 +446,13 @@
           "classification": "code",
           "status": "provisional",
           "source": "von/i960/recovered_text.c",
-          "symbol": "recovered_text_video_row_transfer_plan",
+          "symbol": "recovered_text_video_copy_rows",
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
             "von/i960/disassembly-annotations.md",
             "von/tools/test_recovered_text_video.py"
           ],
-          "notes": "Recovers the shared video helper's row schedule: call the hardware blitter once per row, advance source by 0x80 bytes, advance destination by halfwords*2 bytes, and pass that byte count. The 0xf5d40 blitter remains a separate dependency."
+          "notes": "Recovers the shared video helper's row loop: forward-copy halfwords*2 bytes once per row, advance source by 0x80 bytes, and advance destination by halfwords*2 bytes."
         },
         {
           "name": "text_string_font_mode",

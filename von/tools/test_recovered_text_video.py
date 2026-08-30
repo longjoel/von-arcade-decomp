@@ -12,6 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "von/i960/recovered_text.c"
+MEMORY_SOURCE = ROOT / "von/i960/recovered_memory.c"
 
 
 def main() -> int:
@@ -24,6 +25,7 @@ def main() -> int:
                 "-fPIC",
                 "-O2",
                 SOURCE,
+                MEMORY_SOURCE,
                 "-o",
                 library,
             ],
@@ -60,6 +62,13 @@ def main() -> int:
             ctypes.POINTER(ctypes.c_uint32),
         ]
         recovered.recovered_text_video_upload_plan.restype = ctypes.c_uint32
+        recovered.recovered_text_video_copy_rows.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_void_p,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+        ]
+        recovered.recovered_text_video_copy_rows.restype = None
         recovered.recovered_text_voltage_warning_plan.argtypes = [
             ctypes.c_uint32,
             ctypes.POINTER(ctypes.c_uint32),
@@ -145,6 +154,30 @@ def main() -> int:
         ) != (0x01004000, 0x02FD61D0, 0x40, 0x40):
             raise SystemExit("video upload plan mismatch")
 
+        copy_vectors = 0
+        for halfwords in (1, 2, 0x40):
+            for rows in (0, 1, 2, 64):
+                row_bytes = halfwords * 2
+                source = (ctypes.c_ubyte * max(1, rows * 0x80))()
+                destination = (ctypes.c_ubyte * max(1, rows * row_bytes))()
+                for index in range(len(source)):
+                    source[index] = (index * 13 + 7) & 0xFF
+                for index in range(len(destination)):
+                    destination[index] = 0xA5
+                recovered.recovered_text_video_copy_rows(
+                    source, destination, halfwords, rows
+                )
+                expected = bytearray(b"\xA5" * len(destination))
+                for row in range(rows):
+                    expected[row * row_bytes:(row + 1) * row_bytes] = (
+                        bytes(source[row * 0x80:row * 0x80 + row_bytes])
+                    )
+                if bytes(destination) != bytes(expected):
+                    raise SystemExit(
+                        f"video row copy mismatch halfwords={halfwords} rows={rows}"
+                    )
+                copy_vectors += 1
+
         warning_expected = (
             (4, 16, 0x000012E0),
             (4, 19, 0x000012F0),
@@ -209,8 +242,8 @@ def main() -> int:
                 plan_vectors += 1
 
     print(
-        "PASS: 4 video clear, 9 video state, 1 upload, 4 warning records, and "
-        f"{plan_vectors:,} row-transfer plan entries"
+        "PASS: 4 video clear, 9 video state, 1 upload, 4 warning records, "
+        f"{copy_vectors} row copies, and {plan_vectors:,} row-transfer plan entries"
     )
     return 0
 
