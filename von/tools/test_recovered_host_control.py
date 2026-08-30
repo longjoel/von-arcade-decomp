@@ -31,6 +31,8 @@ def main() -> int:
             check=True,
         )
         recovered = ctypes.CDLL(str(library))
+        recovered.recovered_host_timer_initial_value.restype = ctypes.c_uint32
+        recovered.recovered_host_initial_interrupt_control.restype = ctypes.c_uint32
         for name in ("recovered_host_timer_address", "recovered_host_timer_reload"):
             function = getattr(recovered, name)
             function.argtypes = [ctypes.c_uint32]
@@ -49,7 +51,12 @@ def main() -> int:
                 )
             vectors += 1
 
-    print(f"PASS: {vectors:,} host interrupt-mask vectors")
+        if recovered.recovered_host_timer_initial_value() != 0x00061A80:
+            raise SystemExit("initial timer value mismatch")
+        if recovered.recovered_host_initial_interrupt_control() != 0x0000023D:
+            raise SystemExit("initial interrupt control mismatch")
+
+    print(f"PASS: {vectors:,} host interrupt-mask vectors and timer bootstrap constants")
     return 0
 
 

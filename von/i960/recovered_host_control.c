@@ -5,6 +5,37 @@ typedef unsigned int u32;
 #define IRQ_CONTROL       (*(volatile u32 *)0x00501cd0)
 #define IRQ_CONTROL_MMIO  (*(volatile u32 *)0x00e80004)
 #define IRQ_ACK_MMIO      (*(volatile u32 *)0x00e80000)
+#define TIMER_0            (*(volatile u32 *)0x00f00000)
+#define TIMER_1            (*(volatile u32 *)0x00f00004)
+#define TIMER_2            (*(volatile u32 *)0x00f00008)
+#define TIMER_3            (*(volatile u32 *)0x00f0000c)
+#define HOST_TIMER_STATE   (*(volatile u32 *)0x0051aac0)
+
+u32 recovered_host_timer_initial_value(void)
+{
+    return 0x00061a80U;
+}
+
+u32 recovered_host_initial_interrupt_control(void)
+{
+    return 0x0000023dU;
+}
+
+/* Recovered 0x1bb8 timer and interrupt bootstrap. */
+void recovered_host_interrupt_initialize(void)
+{
+    u32 timer_value = recovered_host_timer_initial_value();
+    u32 control = recovered_host_initial_interrupt_control();
+
+    IRQ_ACK_MMIO = 0U;
+    TIMER_1 = timer_value;
+    TIMER_0 = timer_value;
+    TIMER_3 = timer_value;
+    TIMER_2 = timer_value;
+    IRQ_CONTROL = control;
+    IRQ_CONTROL_MMIO = control;
+    HOST_TIMER_STATE = 0U;
+}
 
 u32 recovered_host_timer_address(u32 mask)
 {

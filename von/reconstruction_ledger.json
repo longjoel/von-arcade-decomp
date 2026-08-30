@@ -219,6 +219,21 @@
           "notes": "Shared service-request thunk called by the audio producer. It sets bit 10 in the host control mirror and writes the same value to the interrupt-control MMIO register."
         },
         {
+          "name": "host_interrupt_initialize",
+          "start": "0x0001bb8",
+          "end": "0x0001c10",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_host_control.c",
+          "symbol": "recovered_host_interrupt_initialize",
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_host_control.py"
+          ],
+          "notes": "Initializes all four host timer reload registers to 0x61a80, acknowledges with zero, installs interrupt control 0x23d in the work mirror and MMIO register, and clears shared timer state at 0x51aac0. The source is compiled into the reconstruction, but active invocation waits for the unrecovered interrupt dispatcher at 0x1380 because enabling this mask reaches the original vector path."
+        },
+        {
           "name": "audio_queue_consumer",
           "start": "0x000016dc",
           "end": "0x00001738",

@@ -290,6 +290,17 @@ by `recovered_host_interrupt_mask_update()`. It clears the requested bit in
 The timer selection and reload table is checked for every 16-bit mask by
 `von/tools/test_recovered_host_control.py`.
 
+The adjacent bootstrap at `0x0001bb8-0x0001c10` is represented by
+`recovered_host_interrupt_initialize()`. It acknowledges with zero, loads
+`0x61a80` into timer registers `0xf00004`, `0xf00000`, `0xf0000c`, and
+`0xf00008` in the observed order, installs interrupt control `0x23d` at both
+`0x00501cd0` and `0xe80004`, and clears `0x0051aac0`. The source is compiled
+into the reconstruction, but active invocation waits for the unrecovered
+interrupt dispatcher at `0x1380`: enabling this mask reaches the original
+vector path before the current heartbeat can run. Its two constants are
+checked alongside the exhaustive interrupt-mask table by
+`von/tools/test_recovered_host_control.py`.
+
 ### Additional Audio Producer Helpers
 
 Five adjacent host-side audio units are now represented in
