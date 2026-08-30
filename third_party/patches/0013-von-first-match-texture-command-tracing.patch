@@ -1,0 +1,37 @@
+diff --git a/src/mame/sega/model2_v.cpp b/src/mame/sega/model2_v.cpp
+--- a/src/mame/sega/model2_v.cpp
++++ b/src/mame/sega/model2_v.cpp
+@@ -411,6 +411,18 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
+ 	object.texheader[1] = *th++;
+ 	object.texheader[2] = *th++;
+ 	object.texheader[3] = *th++;
++	static unsigned vonj_first_match_texture_command_trace_count;
++	static bool vonj_first_match_texture_material_valid;
++	static u32 vonj_first_match_texture_previous_tex[4];
++	const bool vonj_first_match_texture_material_changed =
++		!vonj_first_match_texture_material_valid ||
++		(vonj_first_match_texture_previous_tex[0] != object.texheader[0]) ||
++		(vonj_first_match_texture_previous_tex[1] != object.texheader[1]) ||
++		(vonj_first_match_texture_previous_tex[2] != object.texheader[2]) ||
++		(vonj_first_match_texture_previous_tex[3] != object.texheader[3]);
++	if ((machine().system().name == std::string_view("vonj")) &&
++		(machine().time().as_double() >= 27.5) &&
++		(vonj_first_match_texture_material_changed) &&
++		(vonj_first_match_texture_command_trace_count < 16384))
++	{
++		logerror("vonj_texture_command: time=%f uv=%08x header=%08x tex=%04x,%04x,%04x,%04x attr=%08x colorbase=%03x sheet=%d size=%ux%u origin=%u,%u\n",
++			machine().time().as_double(), raster->command_buffer[0], raster->command_buffer[1],
++			object.texheader[0], object.texheader[1], object.texheader[2], object.texheader[3], attr,
++			(object.texheader[3] >> 6) & 0x3ff, (object.texheader[2] & 0x1000) ? 1 : 0,
++			32 << (object.texheader[0] & 7), 32 << ((object.texheader[0] >> 3) & 7),
++			32 * (object.texheader[2] & 0x3f), 32 * ((object.texheader[2] >> 6) & 0x1f));
++		vonj_first_match_texture_command_trace_count++;
++	}
++	if (machine().time().as_double() >= 27.5)
++	{
++		vonj_first_match_texture_material_valid = true;
++		for (unsigned i = 0; i < 4; i++)
++			vonj_first_match_texture_previous_tex[i] = object.texheader[i];
++	}
+ 
+ 	/* extract the texture header offset */

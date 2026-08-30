@@ -92,6 +92,7 @@ python3 von/tools/compare_tile_trace.py --original <trace> --prototype <trace> #
 ./scripts/run-twin.sh  # launch two linked local cabinet instances
 ./scripts/trace-geometry-twin.sh # capture and export linked player-select geometry
 ./scripts/trace-geometry-first-match.sh # capture and export the deterministic first match scene
+./scripts/trace-geometry-material-twin.sh # capture first-match geometry and indexed materials
 ./scripts/test-twin.sh # configure roles, then run deterministic link/start diagnostic
 ./scripts/e2e.sh       # test and run one headless second
 ./scripts/deploy.sh    # test and create a ROM-free tarball
@@ -124,8 +125,9 @@ the optional tracing patches, use `VON_MAME_PATCH_SET=debug
 
 MAME preparation defaults to the `core` patch set, applying Virtual-On support
 and communication diagnostics. Set `VON_MAME_PATCH_SET=geometry-trace` for the
-focused geometry extraction instrumentation, or `VON_MAME_PATCH_SET=debug` to
-include all existing graphics tracing patches.
+focused geometry extraction instrumentation, `geometry-material` to add
+first-match texture-command tracing, or `VON_MAME_PATCH_SET=debug` to include
+all existing graphics tracing patches.
 
 ### Geometry capture and model extraction
 
@@ -207,6 +209,18 @@ python3 von/tools/export_geometry_frame_gltf.py \
   --output von/build/disasm/first-match-frame.gltf \
   --max-time 32.8 --min-objects 100
 ```
+
+For material evidence, build the `geometry-material` profile and run its
+passive capture wrapper:
+
+```sh
+VON_MAME_PATCH_SET=geometry-material ./scripts/remote-build.sh
+./scripts/trace-geometry-material-twin.sh
+```
+
+This records bounded texture commands beginning at the known post-selection
+transition and extracts referenced indexed texture tiles as PGM previews with
+an `index.tsv` manifest beside the scene exports.
 
 For a lightweight isolated preview, Chromium is enough; no Blender or external
 JavaScript packages are required. The viewer supports drag orbit and wheel zoom:

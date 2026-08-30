@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 COMMAND = re.compile(
-    r"vonj_texture_command: uv=([0-9a-f]+) header=([0-9a-f]+) "
+    r"vonj_texture_command: (?:time=[0-9.e+-]+ )?uv=([0-9a-f]+) header=([0-9a-f]+) "
     r"tex=([0-9a-f]+),([0-9a-f]+),([0-9a-f]+),([0-9a-f]+) "
     r"attr=([0-9a-f]+) colorbase=([0-9a-f]+) sheet=(\d+) "
     r"size=(\d+)x(\d+) origin=(\d+),(\d+)"

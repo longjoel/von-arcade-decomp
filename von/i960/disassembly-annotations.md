@@ -690,6 +690,17 @@ to be compared with the renderer's intermediate polygon stream. The trace is
 limited to accepted (non-culled) polygons and includes the effective vertex
 coordinates, attribute word, texture pointers, and timestamp.
 
+The deterministic first-match capture now has a material trace as well. A
+scene-focused patch begins recording texture commands at the observed
+27.5-second transition, after the player-select submissions, and bounds the
+stream at 16,384 records per cabinet. The linked passive capture reached
+29.309 seconds before that bound while exposing 531 distinct texture-window
+keys; 530 indexed PGM tiles were extracted from the primary decompressed
+texture bank for each cabinet. The wrapper and profile are
+`scripts/trace-geometry-material-twin.sh` and
+`VON_MAME_PATCH_SET=geometry-material`; this material manifest is the next
+input needed to associate UV records with the exported polygon meshes.
+
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
 phase operations are directly confirmed.

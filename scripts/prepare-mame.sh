@@ -12,6 +12,7 @@ TEXTURE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0003-von-texture-write-t
 TEXTURE_SOURCE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0004-von-texture-source-tracing.patch"
 PALETTE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0005-von-palette-tracing.patch"
 TEXTURE_COMMAND_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0006-von-texture-command-tracing.patch"
+FIRST_MATCH_TEXTURE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0013-von-first-match-texture-command-tracing.patch"
 GEOMETRY_OBJECT_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0007-von-geometry-object-tracing.patch"
 GEOMETRY_MATRIX_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0008-von-geometry-matrix-tracing.patch"
 GEOMETRY_POLYGON_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0009-von-geometry-polygon-tracing.patch"
@@ -55,8 +56,11 @@ case "$PATCH_SET" in
     geometry-trace)
         PATCHES=("$PATCH_FILE" "$COMM_DIAGNOSTICS_PATCH_FILE" "$PC_COVERAGE_PATCH_FILE" "$GEOMETRY_OBJECT_TRACE_PATCH_FILE" "$GEOMETRY_MATRIX_TRACE_PATCH_FILE" "$RENDERER_TRACE_PATCH_FILE")
         ;;
+    geometry-material)
+        PATCHES=("$PATCH_FILE" "$COMM_DIAGNOSTICS_PATCH_FILE" "$PC_COVERAGE_PATCH_FILE" "$FIRST_MATCH_TEXTURE_TRACE_PATCH_FILE" "$GEOMETRY_OBJECT_TRACE_PATCH_FILE" "$GEOMETRY_MATRIX_TRACE_PATCH_FILE" "$RENDERER_TRACE_PATCH_FILE")
+        ;;
     *)
-        printf 'error: unknown VON_MAME_PATCH_SET=%s (expected core, texture-trace, geometry-trace, debug, or all)\n' "$PATCH_SET" >&2
+        printf 'error: unknown VON_MAME_PATCH_SET=%s (expected core, texture-trace, geometry-trace, geometry-material, debug, or all)\n' "$PATCH_SET" >&2
         exit 1
         ;;
 esac
