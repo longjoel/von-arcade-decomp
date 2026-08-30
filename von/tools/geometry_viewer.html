@@ -22,19 +22,27 @@ if (!gl) status.textContent = "WebGL is unavailable in this browser.";
 
 const vertexSource = `
   attribute vec3 a_position, a_normal;
+  attribute vec2 a_uv;
   uniform mat4 u_view, u_projection, u_model;
   varying vec3 v_normal;
+  varying vec2 v_uv;
   void main() {
     v_normal = mat3(u_model) * a_normal;
+    v_uv = a_uv;
     gl_Position = u_projection * u_view * u_model * vec4(a_position, 1.0);
   }`;
 const fragmentSource = `
   precision mediump float;
   varying vec3 v_normal;
+  varying vec2 v_uv;
+  uniform sampler2D u_texture;
+  uniform bool u_has_texture;
+  uniform vec3 u_color;
   void main() {
     vec3 n = normalize(v_normal);
     float light = 0.28 + 0.72 * max(dot(n, normalize(vec3(-0.4, 0.8, 0.6))), 0.0);
-    gl_FragColor = vec4(vec3(0.47, 0.68, 0.88) * light, 1.0);
+    vec4 base = u_has_texture ? texture2D(u_texture, v_uv) : vec4(u_color, 1.0);
+    gl_FragColor = vec4(base.rgb * light, base.a);
   }`;
 
 function shader(type, source) {
@@ -50,11 +58,15 @@ gl.linkProgram(program);
 gl.useProgram(program);
 const positionLocation = gl.getAttribLocation(program, "a_position");
 const normalLocation = gl.getAttribLocation(program, "a_normal");
+const uvLocation = gl.getAttribLocation(program, "a_uv");
 const viewLocation = gl.getUniformLocation(program, "u_view");
 const projectionLocation = gl.getUniformLocation(program, "u_projection");
 const modelLocation = gl.getUniformLocation(program, "u_model");
-const positionBuffer = gl.createBuffer(), normalBuffer = gl.createBuffer();
-let vertexCount = 0, center = [0, 0, 0], radius = 10;
+const textureLocation = gl.getUniformLocation(program, "u_texture");
+const hasTextureLocation = gl.getUniformLocation(program, "u_has_texture");
+const colorLocation = gl.getUniformLocation(program, "u_color");
+const positionBuffer = gl.createBuffer(), normalBuffer = gl.createBuffer(), uvBuffer = gl.createBuffer();
+let batches = [], center = [0, 0, 0], radius = 10;
 let yaw = 0.7, pitch = 0.35, distance = 3;
 
 function identity() { return [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]; }
@@ -92,39 +104,80 @@ function bytes(uri) {
 function accessor(doc, buffers, index) {
   const a = doc.accessors[index], view = doc.bufferViews[a.bufferView];
   const data = new DataView(buffers[view.buffer], (view.byteOffset||0)+(a.byteOffset||0));
-  const size = {5126:4, 5125:4}[a.componentType], stride = view.byteStride || size * 3;
+  const count = {SCALAR:1, VEC2:2, VEC3:3, VEC4:4}[a.type];
+  const size = {5126:4, 5125:4}[a.componentType], stride = view.byteStride || size * count;
   const values=[];
   for (let i=0;i<a.count;i++) {
     const off=i*stride;
-    values.push(a.componentType===5125 ? data.getUint32(off,true) :
-      [data.getFloat32(off,true),data.getFloat32(off+4,true),data.getFloat32(off+8,true)]);
+    if (a.componentType===5125 && count===1) values.push(data.getUint32(off,true));
+    else {
+      const value=[];
+      for (let component=0; component<count; component++)
+        value.push(data.getFloat32(off+component*size,true));
+      values.push(value);
+    }
   }
   return values;
 }
+async function makeTexture(uri) {
+  const image = new Image();
+  image.src = uri;
+  await image.decode();
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  return texture;
+}
 async function loadDocument(doc, label) {
   const buffers = (doc.buffers||[]).map(b => bytes(b.uri));
-  const positions = [], normals = [];
+  const nextBatches = [], textureCache = new Map();
   for (const node of (doc.scenes?.[doc.scene||0]?.nodes||[]).map(i=>doc.nodes[i])) {
     const mesh = doc.meshes[node.mesh], matrix = nodeMatrix(node);
     for (const primitive of (mesh?.primitives||[])) {
       if (!primitive.attributes?.POSITION || primitive.mode !== 4) continue;
       const p = accessor(doc,buffers,primitive.attributes.POSITION);
       const idx = primitive.indices == null ? p.map((_,i)=>i) : accessor(doc,buffers,primitive.indices);
+      const rawUvs = primitive.attributes.TEXCOORD_0 == null ? null :
+        accessor(doc,buffers,primitive.attributes.TEXCOORD_0);
+      const positions = [], normals = [], uvs = [];
       for (let i=0;i+2<idx.length;i+=3) {
         const a=transform(matrix,p[idx[i]]), b=transform(matrix,p[idx[i+1]]), c=transform(matrix,p[idx[i+2]]);
         const n=normalize(cross(sub(b,a),sub(c,a)));
         positions.push(...a,...b,...c); normals.push(...n,...n,...n);
+        for (const vertexIndex of [idx[i], idx[i+1], idx[i+2]])
+          uvs.push(...(rawUvs ? rawUvs[vertexIndex] : [0,0]));
       }
+      if (!positions.length) continue;
+      const material = doc.materials?.[primitive.material] || {};
+      const pbr = material.pbrMetallicRoughness || {};
+      const factor = pbr.baseColorFactor || [0.47,0.68,0.88,1];
+      let texture = null;
+      const textureIndex = pbr.baseColorTexture?.index;
+      if (textureIndex != null) {
+        const source = doc.textures?.[textureIndex]?.source;
+        const uri = source == null ? null : doc.images?.[source]?.uri;
+        if (uri) {
+          if (!textureCache.has(uri)) textureCache.set(uri, makeTexture(uri));
+          texture = await textureCache.get(uri);
+        }
+      }
+      nextBatches.push({positions, normals, uvs, texture, color: factor.slice(0,3)});
     }
   }
-  if (!positions.length) throw Error("no triangle primitives found (only TRIANGLES are supported)");
-  const points=[]; for(let i=0;i<positions.length;i+=3) points.push(positions.slice(i,i+3));
+  if (!nextBatches.length) throw Error("no triangle primitives found (only TRIANGLES are supported)");
+  const allPositions = nextBatches.flatMap(batch => batch.positions);
+  const points=[]; for(let i=0;i<allPositions.length;i+=3) points.push(allPositions.slice(i,i+3));
   const min=points.reduce((a,p)=>a.map((v,i)=>Math.min(v,p[i])),[Infinity,Infinity,Infinity]);
   const max=points.reduce((a,p)=>a.map((v,i)=>Math.max(v,p[i])),[-Infinity,-Infinity,-Infinity]);
   center=min.map((v,i)=>(v+max[i])/2); radius=Math.max(...max.map((v,i)=>v-min[i]))/2||1; distance=3;
-  gl.bindBuffer(gl.ARRAY_BUFFER,positionBuffer); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(positions),gl.STATIC_DRAW);
-  gl.bindBuffer(gl.ARRAY_BUFFER,normalBuffer); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(normals),gl.STATIC_DRAW);
-  vertexCount=positions.length/3; status.textContent=`${label}: ${vertexCount/3|0} triangles`;
+  batches = nextBatches;
+  const triangleCount = allPositions.length / 9;
+  status.textContent=`${label}: ${triangleCount|0} triangles, ${batches.length} materials`;
 }
 async function loadUrl(url) { status.textContent="Loading…"; await loadDocument(await (await fetch(url)).json(),url); }
 document.getElementById("file").onchange = async e => { const f=e.target.files[0]; if(f) try { await loadDocument(JSON.parse(await f.text()),f.name); } catch(err) { status.textContent=err.message; } };
@@ -137,8 +190,16 @@ function frame() {
   gl.viewport(0,0,w,h); gl.enable(gl.DEPTH_TEST); gl.clearColor(.09,.10,.12,1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
   const target=center, eye=[center[0]+Math.cos(yaw)*Math.cos(pitch)*radius*distance,center[1]+Math.sin(pitch)*radius*distance,center[2]+Math.sin(yaw)*Math.cos(pitch)*radius*distance];
   gl.useProgram(program); gl.uniformMatrix4fv(viewLocation,false,new Float32Array(lookAt(eye,target,[0,1,0]))); gl.uniformMatrix4fv(projectionLocation,false,new Float32Array(perspective(1.0,w/h,.01,radius*distance*10+1))); gl.uniformMatrix4fv(modelLocation,false,new Float32Array(identity()));
-  gl.bindBuffer(gl.ARRAY_BUFFER,positionBuffer); gl.enableVertexAttribArray(positionLocation); gl.vertexAttribPointer(positionLocation,3,gl.FLOAT,false,0,0);
-  gl.bindBuffer(gl.ARRAY_BUFFER,normalBuffer); gl.enableVertexAttribArray(normalLocation); gl.vertexAttribPointer(normalLocation,3,gl.FLOAT,false,0,0); gl.drawArrays(gl.TRIANGLES,0,vertexCount); requestAnimationFrame(frame);
+  gl.enableVertexAttribArray(positionLocation); gl.enableVertexAttribArray(normalLocation); gl.enableVertexAttribArray(uvLocation);
+  for (const batch of batches) {
+    gl.bindBuffer(gl.ARRAY_BUFFER,positionBuffer); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(batch.positions),gl.STATIC_DRAW); gl.vertexAttribPointer(positionLocation,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,normalBuffer); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(batch.normals),gl.STATIC_DRAW); gl.vertexAttribPointer(normalLocation,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,uvBuffer); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(batch.uvs),gl.STATIC_DRAW); gl.vertexAttribPointer(uvLocation,2,gl.FLOAT,false,0,0);
+    gl.uniform1i(hasTextureLocation, batch.texture ? 1 : 0); gl.uniform3fv(colorLocation, batch.color);
+    if (batch.texture) { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,batch.texture); gl.uniform1i(textureLocation,0); }
+    gl.drawArrays(gl.TRIANGLES,0,batch.positions.length/3);
+  }
+  requestAnimationFrame(frame);
 }
 let dragging=false,lastX=0,lastY=0; canvas.onpointerdown=e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);}; canvas.onpointerup=()=>dragging=false; canvas.onpointermove=e=>{if(dragging){yaw+=(e.clientX-lastX)*.01;pitch=Math.max(-1.45,Math.min(1.45,pitch+(e.clientY-lastY)*.01));lastX=e.clientX;lastY=e.clientY;}}; canvas.onwheel=e=>{e.preventDefault();distance=Math.max(.35,Math.min(20,distance*Math.exp(e.deltaY*.001)));};
 const file = new URLSearchParams(location.search).get("file"); if(file) loadUrl("/"+file.replace(/^\/+/,"")).catch(e=>status.textContent=e.message); frame();

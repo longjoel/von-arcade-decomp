@@ -4,7 +4,9 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SECONDS_TO_RUN="${VON_GEOMETRY_MATERIAL_SECONDS:-35}"
 ROM="${VON_GEOMETRY_ROM:-$ROOT_DIR/von/build/disasm/geometry-rom.bin}"
+TEXTURE_ROM="${VON_GEOMETRY_TEXTURE_ROM:-$ROOT_DIR/von/build/disasm/texture-pipeline/texture-rom.bin}"
 TEXTURE_BANK="${VON_GEOMETRY_TEXTURE_BANK:-$ROOT_DIR/von/build/disasm/texture-pipeline/bank0-primary.bin}"
+TEXTURE_BANK_SECONDARY="${VON_GEOMETRY_TEXTURE_BANK_SECONDARY:-$ROOT_DIR/von/build/disasm/texture-pipeline/bank0-secondary.bin}"
 OUTPUT_ROOT="${VON_GEOMETRY_MATERIAL_OUTPUT:-$ROOT_DIR/von/build/disasm/first-match-material-twin}"
 SCRIPT="$ROOT_DIR/von/tools/gameplay_progress.lua"
 
@@ -17,7 +19,7 @@ mkdir -p "$ROOT_DIR/von/build/disasm"
 if [[ ! -f "$ROM" ]]; then
     python3 "$ROOT_DIR/von/tools/extract_geometry_rom.py" --output "$ROM"
 fi
-if [[ ! -f "$TEXTURE_BANK" ]]; then
+if [[ ! -f "$TEXTURE_ROM" || ! -f "$TEXTURE_BANK" || ! -f "$TEXTURE_BANK_SECONDARY" ]]; then
     python3 "$ROOT_DIR/von/tools/extract_texture_pipeline.py" --output-dir "$(dirname "$TEXTURE_BANK")"
 fi
 
@@ -48,6 +50,16 @@ for cabinet in p1 p2; do
     objects="$OUTPUT_DIR/$cabinet/objects"
     VON_GEOMETRY_OUTPUT="$objects" \
         "$ROOT_DIR/scripts/export-player-select-models.sh" "$trace"
+    textured_objects="$OUTPUT_DIR/$cabinet/textured-objects"
+    mkdir -p "$textured_objects"
+    while IFS=$'\t' read -r _ oba tpa tha _ _ _; do
+        [[ "$oba" == "oba" || -z "$oba" ]] && continue
+        python3 "$ROOT_DIR/von/tools/export_geometry_textured_gltf.py" \
+            --rom "$ROM" --texture-rom "$TEXTURE_ROM" \
+            --bank-primary "$TEXTURE_BANK" --bank-secondary "$TEXTURE_BANK_SECONDARY" \
+            --oba "$oba" --tpa "$tpa" --tha "$tha" \
+            --output "$textured_objects/oba-${oba#0x}.gltf"
+    done < "$objects/index.tsv"
     python3 "$ROOT_DIR/von/tools/export_geometry_frame_gltf.py" \
         --trace "$trace" --rom "$ROM" \
         --output "$OUTPUT_DIR/$cabinet/first-match-frame.gltf" \

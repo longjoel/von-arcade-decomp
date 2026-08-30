@@ -220,7 +220,17 @@ VON_MAME_PATCH_SET=geometry-material ./scripts/remote-build.sh
 
 This records bounded texture commands beginning at the known post-selection
 transition and extracts referenced indexed texture tiles as PGM previews with
-an `index.tsv` manifest beside the scene exports.
+an `index.tsv` manifest beside the scene exports. Each object also receives a
+`textured-objects/oba-*.gltf` export with UV accessors, embedded grayscale PNG
+tiles, and glTF material groups. For example:
+
+```sh
+./scripts/view-geometry.sh \
+  von/build/disasm/first-match-material-twin/<capture>/p1/textured-objects/oba-00a670ca.gltf
+```
+
+The embedded grayscale tiles preserve the recovered 4bpp texel values; palette
+and luma reconstruction remains a separate rendering pass.
 
 For a lightweight isolated preview, Chromium is enough; no Blender or external
 JavaScript packages are required. The viewer supports drag orbit and wheel zoom:
