@@ -395,6 +395,21 @@
           "notes": "Preserves the helper's single 32-bit write of its input to tile/control MMIO address 0x01800000."
         },
         {
+          "name": "text_video_upload_plan",
+          "start": "0x00020180",
+          "end": "0x000201a0",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_video_upload_plan",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_text_video.py"
+          ],
+          "notes": "Recovers the 0x20180 request shape: source 0x01004000, destination pointer slot 0x02fd61d0, 0x40 halfwords per row, and 0x40 rows. The call into the separately untriaged 0xf5d40 hardware blitter remains outside the plan."
+        },
+        {
           "name": "text_glyph_address_plan",
           "start": "0x0001d310",
           "end": "0x0001d410",

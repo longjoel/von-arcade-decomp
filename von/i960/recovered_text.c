@@ -128,6 +128,19 @@ u32 recovered_text_video_row_transfer_plan(
     return 1U;
 }
 
+/* Describe the 0x20180 upload request before it enters the row blitter. */
+u32 recovered_text_video_upload_plan(u32 *source,
+                                    u32 *destination_pointer,
+                                    u32 *halfwords,
+                                    u32 *rows)
+{
+    *source = 0x01004000U;
+    *destination_pointer = 0x02fd61d0U;
+    *halfwords = 0x40U;
+    *rows = 0x40U;
+    return 1U;
+}
+
 /* Describe the 0x1d310 glyph-table and tile-address selection. */
 u32 recovered_text_glyph_address_plan(
     u32 character,

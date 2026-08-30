@@ -53,6 +53,13 @@ def main() -> int:
             ctypes.POINTER(ctypes.c_uint32),
         ]
         recovered.recovered_text_video_row_transfer_plan.restype = ctypes.c_uint32
+        recovered.recovered_text_video_upload_plan.argtypes = [
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+        ]
+        recovered.recovered_text_video_upload_plan.restype = ctypes.c_uint32
         recovered.recovered_text_voltage_warning_plan.argtypes = [
             ctypes.c_uint32,
             ctypes.POINTER(ctypes.c_uint32),
@@ -120,6 +127,24 @@ def main() -> int:
             if valid != 0:
                 raise SystemExit(f"invalid {function_name} index accepted")
 
+        source = ctypes.c_uint32()
+        destination_pointer = ctypes.c_uint32()
+        halfwords = ctypes.c_uint32()
+        rows = ctypes.c_uint32()
+        valid = recovered.recovered_text_video_upload_plan(
+            ctypes.byref(source),
+            ctypes.byref(destination_pointer),
+            ctypes.byref(halfwords),
+            ctypes.byref(rows),
+        )
+        if valid != 1 or (
+            source.value,
+            destination_pointer.value,
+            halfwords.value,
+            rows.value,
+        ) != (0x01004000, 0x02FD61D0, 0x40, 0x40):
+            raise SystemExit("video upload plan mismatch")
+
         warning_expected = (
             (4, 16, 0x000012E0),
             (4, 19, 0x000012F0),
@@ -184,7 +209,7 @@ def main() -> int:
                 plan_vectors += 1
 
     print(
-        "PASS: 4 video clear, 9 video state, 4 warning records, and "
+        "PASS: 4 video clear, 9 video state, 1 upload, 4 warning records, and "
         f"{plan_vectors:,} row-transfer plan entries"
     )
     return 0

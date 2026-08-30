@@ -138,6 +138,11 @@ passing that byte count to the blitter. `recovered_text_video_row_transfer_plan(
 captures this schedule without dereferencing video memory; the `0x000f5d40`
 blitter itself remains untriaged.
 
+The `0x00020180` caller supplies a fixed upload request: source `0x01004000`,
+destination pointer slot `0x02fd61d0`, `0x40` halfwords per row, and `0x40`
+rows. `recovered_text_video_upload_plan()` records that exact handoff to the
+shared row scheduler without invoking the lower-level blitter.
+
 The glyph writer at `0x0001d310-0x0001d410` masks characters to seven bits,
 maps printable bytes `0x20-0x7f` to indices `0-95` and other inputs to index
 zero, then selects one of four glyph tables using `font_mode & 3`. Each glyph
