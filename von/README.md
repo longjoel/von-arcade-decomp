@@ -226,6 +226,8 @@ and embedded PNG tiles rendered through the captured palette, color-translation,
 and luma state. The same capture also emits a complete
 `first-match-frame-textured.gltf` scene with the traced object slots and
 transforms; its palette state is selected at the frame's geometry timestamp.
+The isolated object files record that same timestamp as `extras.palette_time`
+so their rendering provenance is visible without consulting the trace.
 For example:
 
 ```sh

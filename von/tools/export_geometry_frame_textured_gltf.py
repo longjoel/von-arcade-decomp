@@ -223,6 +223,13 @@ def main() -> int:
             "extras": {"geometry_object": metadata, "trace_time": selected_time},
         })
 
+    extras = {"trace_time": selected_time, "object_slots": len(objects),
+              "unique_meshes": len(meshes), "material_groups": len(materials),
+              "embedded_tiles": len(images),
+              "palette_rendered": palette_state is not None}
+    if palette_state is not None:
+        extras["palette_time"] = selected_time
+
     document = {
         "asset": {"version": "2.0",
                   "generator": "von export_geometry_frame_textured_gltf.py"},
@@ -235,10 +242,7 @@ def main() -> int:
                      "uri": "data:application/octet-stream;base64," +
                      base64.b64encode(blob).decode("ascii")}],
         "bufferViews": views, "accessors": accessors,
-        "extras": {"trace_time": selected_time, "object_slots": len(objects),
-                   "unique_meshes": len(meshes), "material_groups": len(materials),
-                   "embedded_tiles": len(images),
-                   "palette_rendered": palette_state is not None},
+        "extras": extras,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(document, indent=2) + "\n")

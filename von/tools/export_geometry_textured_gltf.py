@@ -245,6 +245,12 @@ def main() -> int:
         mesh_primitives.append({"attributes": {"POSITION": position_accessor, "TEXCOORD_0": uv_accessor},
                                 "indices": index_accessor, "material": entry["material"], "mode": 4})
 
+    extras = {"oba": args.oba, "tpa": args.tpa, "tha": args.tha,
+              "faces": len(faces), "textured_materials": sum(bool(x) for x in textures),
+              "palette_rendered": palette_state is not None}
+    if args.palette_time is not None:
+        extras["palette_time"] = args.palette_time
+
     document = {
         "asset": {"version": "2.0", "generator": "von export_geometry_textured_gltf.py"},
         "scene": 0, "scenes": [{"nodes": [0]}],
@@ -254,9 +260,7 @@ def main() -> int:
         "buffers": [{"byteLength": len(blob), "uri": "data:application/octet-stream;base64," +
                      base64.b64encode(blob).decode("ascii")}],
         "bufferViews": views, "accessors": accessors,
-        "extras": {"oba": args.oba, "tpa": args.tpa, "tha": args.tha,
-                   "faces": len(faces), "textured_materials": sum(bool(x) for x in textures),
-                   "palette_rendered": palette_state is not None},
+        "extras": extras,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(document, indent=2) + "\n")
