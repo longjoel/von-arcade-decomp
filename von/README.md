@@ -91,6 +91,7 @@ python3 von/tools/compare_tile_trace.py --original <trace> --prototype <trace> #
 ./scripts/run.sh       # launch vonj locally; pass extra MAME arguments
 ./scripts/run-twin.sh  # launch two linked local cabinet instances
 ./scripts/trace-geometry-twin.sh # capture and export linked player-select geometry
+./scripts/trace-geometry-first-match.sh # capture and export the deterministic first match scene
 ./scripts/test-twin.sh # configure roles, then run deterministic link/start diagnostic
 ./scripts/e2e.sh       # test and run one headless second
 ./scripts/deploy.sh    # test and create a ROM-free tarball
@@ -183,6 +184,29 @@ The command writes the raw per-cabinet traces below `von/captures/`, then emits
 each cabinet below `von/build/disasm/player-select-twin-*/`. The linked run must
 be allowed to bind localhost sockets; sandboxed environments may need their
 network namespace disabled for this diagnostic.
+
+After machine selection, the game plays a short in-game scene before entering
+the first match. The first opponent and arena are deterministic, making this a
+useful geometry extraction checkpoint. The first-match capture disables combat
+inputs so movement and firing do not alter the scene:
+
+```sh
+VON_MAME_PATCH_SET=geometry-trace ./scripts/remote-build.sh
+./scripts/trace-geometry-first-match.sh
+```
+
+The command records the linked raw traces below `von/captures/`, exports each
+unique polygon-ROM object as OBJ/glTF, and writes a timestamped scene glTF with
+all object slots and their traced transforms below
+`von/build/disasm/first-match-twin-*/`. The standalone frame exporter can target
+a known timestamp or automatically select the latest frame before a cutoff:
+
+```sh
+python3 von/tools/export_geometry_frame_gltf.py \
+  --trace von/captures/<capture>/p1/mame.log \
+  --output von/build/disasm/first-match-frame.gltf \
+  --max-time 32.8 --min-objects 100
+```
 
 `geometry-trace` is a smaller build profile containing only the object/matrix
 geometry instrumentation and renderer-boundary diagnostics. It avoids the

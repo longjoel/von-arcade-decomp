@@ -6,7 +6,7 @@ diff --git a/src/mame/sega/model2_v.cpp b/src/mame/sega/model2_v.cpp
  	for (i = 0; i < 12; i++)
  		geo->matrix[i] = u2f(*input++);
 +	static unsigned vonj_geometry_matrix_trace_count;
-+	if ((machine().system().name == std::string_view("vonj")) && (vonj_geometry_matrix_trace_count < 8192))
++	if ((machine().system().name == std::string_view("vonj")) && (vonj_geometry_matrix_trace_count < 65536))
 +	{
 +		logerror("vonj_geometry_matrix: time=%f m=%f,%f,%f,%f,%f,%f,%f,%f,%f t=%f,%f,%f\n",
 +			machine().time().as_double(), geo->matrix[0], geo->matrix[1], geo->matrix[2], geo->matrix[3],

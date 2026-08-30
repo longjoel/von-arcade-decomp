@@ -6,15 +6,19 @@
 --
 -- Confirmed flow (vonj-progress traces and snapshots):
 --   warning auto-dismisses, attract runs, a Coin 1 pulse at ~frame 900 opens
---   MACHINE SELECT, 1 Player Start at ~frame 1500 confirms the highlighted
---   machine and launches the battle; the battle times out around frame 7000.
--- A combat phase then cycles stick directions and pulses both shot triggers
--- so game-logic and geometry paths stay active for trace coverage.
+--   MACHINE SELECT, and 1 Player Start at ~frame 1500 confirms the highlighted
+--   machine. The game then runs its brief pre-match scene before the first
+--   deterministic battle (the first opponent and arena are fixed).
+-- An optional combat phase can cycle stick directions and pulse both shot
+-- triggers for general trace coverage; disable it when capturing the untouched
+-- first-match scene with VON_PROGRESS_COMBAT=0.
 --
 -- Every tilemap checksum change and input press is logged. emu.print_info
 -- does not reach -oslog, so we write our own log file.
 -- Environment: VON_PROGRESS_SECONDS (default 150 emulated seconds)
 --              VON_PROGRESS_LOG     (log file path)
+--              VON_PROGRESS_COMBAT  (default 1; set 0 for passive capture)
+--              VON_PROGRESS_COMBAT_START (default 1800)
 
 local SECONDS = tonumber(os.getenv("VON_PROGRESS_SECONDS") or "150")
 local TARGET_FRAMES = SECONDS * 60
@@ -139,7 +143,8 @@ local schedule_index = 1
 
 -- Combat phase: cycle the left stick around the compass and pulse both shot
 -- triggers so movement, targeting, and weapon code paths all execute.
-local COMBAT_START = 1800
+local COMBAT_ENABLED = os.getenv("VON_PROGRESS_COMBAT") ~= "0"
+local COMBAT_START = tonumber(os.getenv("VON_PROGRESS_COMBAT_START") or "1800")
 local COMBAT_END = 7000
 local DIRECTIONS = { "up", "right", "down", "left" }
 
@@ -159,11 +164,14 @@ emu.register_periodic(function()
     while schedule_index <= #schedule and frame >= schedule[schedule_index].frame do
         local step = schedule[schedule_index]
         log(string.format("progress: frame %d press %s", frame, step.key))
+        if step.key == "start" then
+            log("progress: machine selection confirmed; pre-match scene begins")
+        end
         press(step.key, frame + 8)
         schedule_index = schedule_index + 1
     end
 
-    if frame >= COMBAT_START and frame <= COMBAT_END then
+    if COMBAT_ENABLED and frame >= COMBAT_START and frame <= COMBAT_END then
         -- Change held direction every 120 frames.
         if frame % 120 == 0 then
             local key = DIRECTIONS[(math.floor(frame / 120) % #DIRECTIONS) + 1]
