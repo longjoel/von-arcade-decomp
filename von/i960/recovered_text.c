@@ -34,6 +34,7 @@ void recovered_text_emit_glyph(u32 character, u32 font_mode, u32 attributes);
 void recovered_memory_copy_forward(volatile u8 *destination,
                                    volatile const u8 *source,
                                    u32 bytes);
+void recovered_host_fatal_halt(void);
 
 void recovered_text_set_position(u32 column, u32 row)
 {
@@ -377,9 +378,10 @@ void recovered_text_voltage_warning_message_sequence(void)
     }
 }
 
-/* Recovered bit-9 interrupt branch before the separate fatal tail. */
+/* Recovered bit-9 interrupt branch and its terminal fatal tail. */
 void recovered_text_voltage_warning_interrupt_path(void)
 {
     recovered_text_video_upload();
     recovered_text_voltage_warning_message_sequence();
+    recovered_host_fatal_halt();
 }

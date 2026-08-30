@@ -33,6 +33,7 @@ def main() -> int:
         recovered = ctypes.CDLL(str(library))
         recovered.recovered_host_interrupt_route.argtypes = [ctypes.c_uint32]
         recovered.recovered_host_interrupt_route.restype = ctypes.c_uint32
+        recovered.recovered_host_fatal_halt_is_terminal.restype = ctypes.c_uint32
         recovered.recovered_host_timer_initial_value.restype = ctypes.c_uint32
         recovered.recovered_host_initial_interrupt_control.restype = ctypes.c_uint32
         for name in ("recovered_host_timer_address", "recovered_host_timer_reload"):
@@ -57,6 +58,8 @@ def main() -> int:
             raise SystemExit("initial timer value mismatch")
         if recovered.recovered_host_initial_interrupt_control() != 0x0000023D:
             raise SystemExit("initial interrupt control mismatch")
+        if recovered.recovered_host_fatal_halt_is_terminal() != 1:
+            raise SystemExit("fatal halt is not marked terminal")
 
         expected_routes = {
             0x00000001: 1,
@@ -79,7 +82,7 @@ def main() -> int:
 
     print(
         f"PASS: {vectors:,} host interrupt-mask vectors, "
-        "65,536 dispatcher routes, and timer bootstrap constants"
+        "65,536 dispatcher routes, terminal fatal halt, and timer bootstrap constants"
     )
     return 0
 

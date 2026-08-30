@@ -20,6 +20,18 @@ enum recovered_host_interrupt_route {
     HOST_INTERRUPT_ROUTE_UNHANDLED = 5U
 };
 
+/* The original 0x12d0 path flushes registers and loops forever. */
+u32 recovered_host_fatal_halt_is_terminal(void)
+{
+    return 1U;
+}
+
+void recovered_host_fatal_halt(void)
+{
+    for (;;) {
+    }
+}
+
 /* Route values selected by the common 0x1380 dispatcher. */
 u32 recovered_host_interrupt_route(u32 mask)
 {

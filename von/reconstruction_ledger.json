@@ -204,6 +204,21 @@
           "notes": "Initializes both 64-byte FIFO indices, fills the FIFO with 0x99, performs the six observed SCSP control writes with the five short delays, then sends the 0xff startup command."
         },
         {
+          "name": "host_fatal_halt",
+          "start": "0x000012d0",
+          "end": "0x000012d8",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_host_control.c",
+          "symbol": "recovered_host_fatal_halt",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_host_control.py"
+          ],
+          "notes": "Represents the terminal 0x12d0 fatal path: flush register state and loop forever. The C implementation preserves its non-returning behavior; the architecture-specific flush instruction remains subject to ABI calibration."
+        },
+        {
           "name": "host_service_request",
           "start": "0x00001348",
           "end": "0x00001370",
@@ -266,7 +281,7 @@
         {
           "name": "text_voltage_warning_interrupt_path",
           "start": "0x00001670",
-          "end": "0x000016d8",
+          "end": "0x000016dc",
           "classification": "code",
           "status": "provisional",
           "source": "von/i960/recovered_text.c",
@@ -276,7 +291,7 @@
             "von/i960/disassembly-annotations.md",
             "von/tools/test_recovered_text_video.py"
           ],
-          "notes": "Recovers the bit-9 interrupt path through the separate fatal tail: perform the fixed video upload, initialize text/video state, and emit four voltage-warning records at (4,16), (4,19), (4,25), and (20,28). The branch at 0x16d8 into the fatal tail remains outside this slice."
+          "notes": "Recovers the complete terminal bit-9 interrupt path: perform the fixed video upload, initialize text/video state, emit four voltage-warning records at (4,16), (4,19), (4,25), and (20,28), then enter the 0x12d0 fatal halt."
         },
         {
           "name": "host_interrupt_mask_update",

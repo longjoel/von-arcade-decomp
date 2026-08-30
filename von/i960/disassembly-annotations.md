@@ -335,9 +335,10 @@ downstream handlers remain separate work units.
 
 The bit-9 branch at `0x00001670` now maps to
 `recovered_text_voltage_warning_interrupt_path()`: it performs the fixed
-upload, resets text/video state, and writes four voltage-warning records at
-`(4,16)`, `(4,19)`, `(4,25)`, and `(20,28)`. The branch at `0x16d8` into the
-fatal tail remains a distinct dependency.
+upload, resets text/video state, writes four voltage-warning records at
+`(4,16)`, `(4,19)`, `(4,25)`, and `(20,28)`, then enters the fatal halt at
+`0x000012d0`. That halt executes `flushreg` and loops forever; it remains
+uninvoked by the reconstructed heartbeat.
 
 The adjacent bootstrap at `0x0001bb8-0x0001c10` is represented by
 `recovered_host_interrupt_initialize()`. It acknowledges with zero, loads

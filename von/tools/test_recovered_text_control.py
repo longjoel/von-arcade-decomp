@@ -15,6 +15,7 @@ from verify_texture_decompress import assemble_main_data
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "von/i960/recovered_text.c"
 MEMORY_SOURCE = ROOT / "von/i960/recovered_memory.c"
+HOST_CONTROL_SOURCE = ROOT / "von/i960/recovered_host_control.c"
 
 
 def main() -> int:
@@ -28,6 +29,7 @@ def main() -> int:
                 "-O2",
                 SOURCE,
                 MEMORY_SOURCE,
+                HOST_CONTROL_SOURCE,
                 "-o",
                 library,
             ],
