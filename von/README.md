@@ -367,9 +367,9 @@ audit, and MAME validation pass. The
 drone0 i960 build produces the reconstructed image, and the clean runtime
 audit confirms that all 320 visited instructions execute from generated code.
 
-The ledger currently records `5,812/5,812` classified executable bytes as
+The ledger currently records `5,860/5,860` classified executable bytes as
 C-represented behavioral reconstructions. The strict byte-match headline is
-still `0/5,812`, because these slices remain provisional pending compiler/ABI
+still `0/5,860`, because these slices remain provisional pending compiler/ABI
 calibration and byte-for-byte comparison. The refreshed 60-second attract
 worklist contains 39 represented units and 223 remaining untriaged units.
 

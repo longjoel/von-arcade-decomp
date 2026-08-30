@@ -34,6 +34,13 @@ def main() -> int:
         recovered.recovered_host_interrupt_route.argtypes = [ctypes.c_uint32]
         recovered.recovered_host_interrupt_route.restype = ctypes.c_uint32
         recovered.recovered_host_fatal_halt_is_terminal.restype = ctypes.c_uint32
+        recovered.recovered_host_interrupt_ack_value.argtypes = [ctypes.c_uint32]
+        recovered.recovered_host_interrupt_ack_value.restype = ctypes.c_uint32
+        recovered.recovered_host_interrupt_rearm_control.argtypes = [
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+        ]
+        recovered.recovered_host_interrupt_rearm_control.restype = ctypes.c_uint32
         recovered.recovered_host_timer_initial_value.restype = ctypes.c_uint32
         recovered.recovered_host_initial_interrupt_control.restype = ctypes.c_uint32
         for name in ("recovered_host_timer_address", "recovered_host_timer_reload"):
@@ -80,9 +87,28 @@ def main() -> int:
                     f"{actual} != {expected}"
                 )
 
+            expected_ack = (~mask) & 0xFFFFFFFF
+            actual_ack = recovered.recovered_host_interrupt_ack_value(mask)
+            if actual_ack != expected_ack:
+                raise SystemExit(
+                    f"interrupt ack mismatch mask=0x{mask:04x}: "
+                    f"0x{actual_ack:08x} != 0x{expected_ack:08x}"
+                )
+            control = (mask * 0x9E3779B1) & 0xFFFFFFFF
+            actual_control = recovered.recovered_host_interrupt_rearm_control(
+                control, mask
+            )
+            expected_control = control | mask
+            if actual_control != expected_control:
+                raise SystemExit(
+                    f"interrupt rearm mismatch mask=0x{mask:04x}: "
+                    f"0x{actual_control:08x} != 0x{expected_control:08x}"
+                )
+
     print(
         f"PASS: {vectors:,} host interrupt-mask vectors, "
-        "65,536 dispatcher routes, terminal fatal halt, and timer bootstrap constants"
+        "65,536 dispatcher routes/acknowledgements, terminal fatal halt, and "
+        "timer bootstrap constants"
     )
     return 0
 

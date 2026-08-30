@@ -48,6 +48,27 @@ u32 recovered_host_interrupt_route(u32 mask)
     return HOST_INTERRUPT_ROUTE_ACK;
 }
 
+u32 recovered_host_interrupt_ack_value(u32 mask)
+{
+    return ~mask;
+}
+
+u32 recovered_host_interrupt_rearm_control(u32 control, u32 mask)
+{
+    return control | mask;
+}
+
+/* Recovered dispatcher acknowledgement tail at i960 0x1750-0x1780. */
+void recovered_host_interrupt_acknowledge(u32 mask)
+{
+    u32 control;
+
+    IRQ_ACK_MMIO = recovered_host_interrupt_ack_value(mask);
+    control = recovered_host_interrupt_rearm_control(IRQ_CONTROL, mask);
+    IRQ_CONTROL = control;
+    IRQ_CONTROL_MMIO = control;
+}
+
 u32 recovered_host_timer_initial_value(void)
 {
     return 0x00061a80U;

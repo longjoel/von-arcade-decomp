@@ -294,6 +294,21 @@
           "notes": "Recovers the complete terminal bit-9 interrupt path: perform the fixed video upload, initialize text/video state, emit four voltage-warning records at (4,16), (4,19), (4,25), and (20,28), then enter the 0x12d0 fatal halt."
         },
         {
+          "name": "host_interrupt_acknowledge",
+          "start": "0x00001750",
+          "end": "0x00001780",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_host_control.c",
+          "symbol": "recovered_host_interrupt_acknowledge",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_host_control.py"
+          ],
+          "notes": "Recovers the common dispatcher acknowledgement tail: write ~mask to 0xe80000, then OR the source mask back into the 0x501cd0 mirror and 0xe80004 MMIO control register."
+        },
+        {
           "name": "host_interrupt_mask_update",
           "start": "0x000017c8",
           "end": "0x000018a8",

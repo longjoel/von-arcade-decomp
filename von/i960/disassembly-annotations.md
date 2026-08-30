@@ -333,6 +333,12 @@ service. `recovered_host_interrupt_route()` records this route contract and
 is exhaustively checked for all 65,536 16-bit masks; the side-effecting
 downstream handlers remain separate work units.
 
+The nonfatal dispatcher tail at `0x00001750-0x00001780` writes `~mask` to
+`0xe80000`, then restores `mask` in both the `0x00501cd0` mirror and
+`0xe80004` control register. `recovered_host_interrupt_acknowledge()`
+preserves this acknowledgement/rearm sequence and is checked for every
+16-bit source mask.
+
 The bit-9 branch at `0x00001670` now maps to
 `recovered_text_voltage_warning_interrupt_path()`: it performs the fixed
 upload, resets text/video state, writes four voltage-warning records at
