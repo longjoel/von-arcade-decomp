@@ -131,6 +131,13 @@ state and region descriptors are checked by
 `von/tools/test_recovered_text_video.py`; the hardware-clearing wrapper remains
 available for the future caller integration pass.
 
+The shared video helper at `0x0001bc90-0x0001bcd0` invokes the hardware
+blitter once for each requested row. Each call advances its source pointer by
+`0x80` bytes and its destination pointer by `halfwords * 2` bytes while
+passing that byte count to the blitter. `recovered_text_video_row_transfer_plan()`
+captures this schedule without dereferencing video memory; the `0x000f5d40`
+blitter itself remains untriaged.
+
 ### Formatted String Boundary
 
 The control path is also reachable through the formatter, not only the direct

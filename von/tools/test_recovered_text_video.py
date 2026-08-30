@@ -42,6 +42,17 @@ def main() -> int:
             ctypes.POINTER(ctypes.c_uint32),
         ]
         recovered.recovered_text_video_state_plan.restype = ctypes.c_uint32
+        recovered.recovered_text_video_row_transfer_plan.argtypes = [
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+        ]
+        recovered.recovered_text_video_row_transfer_plan.restype = ctypes.c_uint32
 
         clear_expected = (
             (0x01000000, 0x4000),
@@ -102,7 +113,47 @@ def main() -> int:
             if valid != 0:
                 raise SystemExit(f"invalid {function_name} index accepted")
 
-    print("PASS: 4 video clear and 9 video state plan entries")
+        plan_vectors = 0
+        for rows in (0, 1, 2, 64, 255):
+            for row in range(rows + 1):
+                source = 0x1004000
+                destination = 0x2000000
+                halfwords = 0x40
+                call_source = ctypes.c_uint32()
+                call_destination = ctypes.c_uint32()
+                call_bytes = ctypes.c_uint32()
+                valid = recovered.recovered_text_video_row_transfer_plan(
+                    row,
+                    source,
+                    destination,
+                    halfwords,
+                    rows,
+                    ctypes.byref(call_source),
+                    ctypes.byref(call_destination),
+                    ctypes.byref(call_bytes),
+                )
+                expected_valid = row < rows
+                if bool(valid) != expected_valid:
+                    raise SystemExit(f"invalid row plan acceptance row={row} rows={rows}")
+                if expected_valid:
+                    expected_bytes = halfwords * 2
+                    expected = (
+                        source + row * 0x80,
+                        destination + row * expected_bytes,
+                        expected_bytes,
+                    )
+                    actual = (call_source.value, call_destination.value, call_bytes.value)
+                    if actual != expected:
+                        raise SystemExit(
+                            f"row plan mismatch row={row} rows={rows}: "
+                            f"{actual!r} != {expected!r}"
+                        )
+                plan_vectors += 1
+
+    print(
+        "PASS: 4 video clear, 9 video state, and "
+        f"{plan_vectors:,} row-transfer plan entries"
+    )
     return 0
 
 

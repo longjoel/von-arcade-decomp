@@ -86,6 +86,28 @@ u32 recovered_text_string_font_mode(const u8 *text)
     return mode;
 }
 
+/* Describe one 0x1bc90 row transfer without entering the hardware blitter. */
+u32 recovered_text_video_row_transfer_plan(
+    u32 row,
+    u32 source,
+    u32 destination,
+    u32 halfwords,
+    u32 rows,
+    u32 *call_source,
+    u32 *call_destination,
+    u32 *call_bytes)
+{
+    u32 row_bytes;
+
+    if (row >= rows)
+        return 0U;
+    row_bytes = halfwords << 1;
+    *call_source = source + (row << 7);
+    *call_destination = destination + row * row_bytes;
+    *call_bytes = row_bytes;
+    return 1U;
+}
+
 /* Pure description of the single bus write in the 0x1ccf8 helper. */
 u32 recovered_text_tile_control_bus(u32 value, u32 *address)
 {

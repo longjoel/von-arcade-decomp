@@ -380,6 +380,21 @@
           "notes": "Preserves the helper's single 32-bit write of its input to tile/control MMIO address 0x01800000."
         },
         {
+          "name": "text_video_row_transfer_plan",
+          "start": "0x0001bc90",
+          "end": "0x0001bcd0",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_video_row_transfer_plan",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_text_video.py"
+          ],
+          "notes": "Recovers the shared video helper's row schedule: call the hardware blitter once per row, advance source by 0x80 bytes, advance destination by halfwords*2 bytes, and pass that byte count. The 0xf5d40 blitter remains a separate dependency."
+        },
+        {
           "name": "text_string_font_mode",
           "start": "0x0001da90",
           "end": "0x0001db34",
