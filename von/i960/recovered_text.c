@@ -21,6 +21,9 @@ static const u32 VIDEO_CLEAR_ADDRESSES[4] = {
     0x01000000U, 0x0100c000U, 0x01008000U, 0x0100a000U
 };
 static const u32 VIDEO_CLEAR_HALWORDS[4] = {0x4000U, 0x1000U, 0x0800U, 8U};
+static const u32 GLYPH_TABLES[4] = {
+    0x02ea11d0U, 0x02ea14d0U, 0x02ea17d0U, 0x02ea1ad0U
+};
 
 void recovered_text_set_position(u32 column, u32 row)
 {
@@ -105,6 +108,33 @@ u32 recovered_text_video_row_transfer_plan(
     *call_source = source + (row << 7);
     *call_destination = destination + row * row_bytes;
     *call_bytes = row_bytes;
+    return 1U;
+}
+
+/* Describe the 0x1d310 glyph-table and tile-address selection. */
+u32 recovered_text_glyph_address_plan(
+    u32 character,
+    u32 font_mode,
+    u32 column,
+    u32 row,
+    u32 *normalized_character,
+    u32 *font_bank,
+    u32 *glyph_descriptor,
+    u32 *tile_address_first,
+    u32 *tile_address_second)
+{
+    u32 character7 = character & 0x7fU;
+    u32 normalized = 0U;
+    u32 bank = font_mode & 3U;
+    u32 tile = 0x01000000U + (((row << 6) + column) << 1);
+
+    if (character7 >= 0x20U)
+        normalized = character7 - 0x20U;
+    *normalized_character = normalized;
+    *font_bank = bank;
+    *glyph_descriptor = GLYPH_TABLES[bank] + (normalized << 7);
+    *tile_address_first = tile;
+    *tile_address_second = tile + 0x80U;
     return 1U;
 }
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exhaustively test the recovered text/tile control bus boundary."""
+"""Exhaustively test recovered text/tile control and glyph boundaries."""
 
 from __future__ import annotations
 
@@ -39,6 +39,18 @@ def main() -> int:
             ctypes.POINTER(ctypes.c_ubyte),
         ]
         recovered.recovered_text_string_font_mode.restype = ctypes.c_uint32
+        recovered.recovered_text_glyph_address_plan.argtypes = [
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+        ]
+        recovered.recovered_text_glyph_address_plan.restype = ctypes.c_uint32
 
         vectors = 0
         for value in range(0x10000):
@@ -64,9 +76,69 @@ def main() -> int:
                     )
                 mode_vectors += 1
 
+        glyph_vectors = 0
+        for character in range(0x100):
+            for font_mode in range(8):
+                for column in (0, 1, 31, 61, 62):
+                    for row in (0, 1, 46, 47, 63):
+                        normalized = ctypes.c_uint32()
+                        bank = ctypes.c_uint32()
+                        descriptor = ctypes.c_uint32()
+                        tile_first = ctypes.c_uint32()
+                        tile_second = ctypes.c_uint32()
+                        valid = recovered.recovered_text_glyph_address_plan(
+                            character,
+                            font_mode,
+                            column,
+                            row,
+                            ctypes.byref(normalized),
+                            ctypes.byref(bank),
+                            ctypes.byref(descriptor),
+                            ctypes.byref(tile_first),
+                            ctypes.byref(tile_second),
+                        )
+                        character7 = character & 0x7F
+                        expected_normalized = (
+                            character7 - 0x20 if character7 >= 0x20 else 0
+                        )
+                        expected_bank = font_mode & 3
+                        expected_descriptor = (
+                            (0x02EA11D0, 0x02EA14D0, 0x02EA17D0, 0x02EA1AD0)[
+                                expected_bank
+                            ]
+                            + (expected_normalized << 7)
+                        )
+                        expected_tile = 0x01000000 + (
+                            ((row << 6) + column) << 1
+                        )
+                        expected = (
+                            1,
+                            expected_normalized,
+                            expected_bank,
+                            expected_descriptor,
+                            expected_tile,
+                            expected_tile + 0x80,
+                        )
+                        actual = (
+                            valid,
+                            normalized.value,
+                            bank.value,
+                            descriptor.value,
+                            tile_first.value,
+                            tile_second.value,
+                        )
+                        if actual != expected:
+                            raise SystemExit(
+                                f"glyph plan mismatch character=0x{character:02x} "
+                                f"mode={font_mode} column={column} row={row}: "
+                                f"{actual!r} != {expected!r}"
+                            )
+                        glyph_vectors += 1
+
     print(
         f"PASS: {vectors:,} text/tile control vectors and "
-        f"{mode_vectors:,} font-mode prefixes"
+        f"{mode_vectors:,} font-mode prefixes and "
+        f"{glyph_vectors:,} glyph address plans"
     )
     return 0
 

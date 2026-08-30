@@ -138,6 +138,14 @@ passing that byte count to the blitter. `recovered_text_video_row_transfer_plan(
 captures this schedule without dereferencing video memory; the `0x000f5d40`
 blitter itself remains untriaged.
 
+The glyph writer at `0x0001d310-0x0001d410` masks characters to seven bits,
+maps printable bytes `0x20-0x7f` to indices `0-95` and other inputs to index
+zero, then selects one of four glyph tables using `font_mode & 3`. Its tile
+addresses are `0x01000000 + 2 * ((row << 6) + column)` and that address plus
+`0x80` for the second row. `recovered_text_glyph_address_plan()` captures
+those pure selections; the descriptor height and bitmap reads remain tied to
+the untriaged glyph data.
+
 ### Formatted String Boundary
 
 The control path is also reachable through the formatter, not only the direct

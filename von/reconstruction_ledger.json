@@ -380,6 +380,21 @@
           "notes": "Preserves the helper's single 32-bit write of its input to tile/control MMIO address 0x01800000."
         },
         {
+          "name": "text_glyph_address_plan",
+          "start": "0x0001d310",
+          "end": "0x0001d410",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_glyph_address_plan",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_text_control.py"
+          ],
+          "notes": "Recovers the glyph writer's 7-bit normalization, printable index range, two-bit font-bank selection, four glyph-table bases, and two tile-row addresses. Runtime glyph height and bitmap reads remain a separate dependency."
+        },
+        {
           "name": "text_video_row_transfer_plan",
           "start": "0x0001bc90",
           "end": "0x0001bcd0",
