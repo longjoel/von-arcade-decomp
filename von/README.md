@@ -238,7 +238,8 @@ For example:
 The standalone exporter remains able to emit grayscale tiles when
 `--palette-trace` is omitted; this preserves the recovered 4bpp texel values
 when no palette capture is available. The material wrapper enables palette
-tracing so its model artifacts use the recovered RGB path.
+tracing so its model artifacts use the recovered RGB path and freezes isolated
+object previews at the same selected frame timestamp as the combined scene.
 
 For a lightweight isolated preview, Chromium is enough; no Blender or external
 JavaScript packages are required. The viewer supports drag orbit and wheel zoom:

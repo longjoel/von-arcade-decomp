@@ -47,6 +47,20 @@ mkdir -p "$OUTPUT_DIR/p1" "$OUTPUT_DIR/p2"
 
 for cabinet in p1 p2; do
     trace="$TWIN_DIR/$cabinet/mame.log"
+    frame_output="$OUTPUT_DIR/$cabinet/first-match-frame-textured.gltf"
+    python3 "$ROOT_DIR/von/tools/export_geometry_frame_textured_gltf.py" \
+        --trace "$trace" --rom "$ROM" --texture-rom "$TEXTURE_ROM" \
+        --bank-primary "$TEXTURE_BANK" --bank-secondary "$TEXTURE_BANK_SECONDARY" \
+        --palette-trace "$trace" --output "$frame_output" \
+        --max-time 32.8 --min-objects 100
+    frame_time="$(python3 - "$frame_output" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as stream:
+    print(json.load(stream)["extras"]["trace_time"])
+PY
+)"
     objects="$OUTPUT_DIR/$cabinet/objects"
     VON_GEOMETRY_OUTPUT="$objects" \
         "$ROOT_DIR/scripts/export-player-select-models.sh" "$trace"
@@ -57,17 +71,13 @@ for cabinet in p1 p2; do
         python3 "$ROOT_DIR/von/tools/export_geometry_textured_gltf.py" \
             --rom "$ROM" --texture-rom "$TEXTURE_ROM" \
             --bank-primary "$TEXTURE_BANK" --bank-secondary "$TEXTURE_BANK_SECONDARY" \
-            --palette-trace "$trace" --oba "$oba" --tpa "$tpa" --tha "$tha" \
+            --palette-trace "$trace" --palette-time "$frame_time" \
+            --oba "$oba" --tpa "$tpa" --tha "$tha" \
             --output "$textured_objects/oba-${oba#0x}.gltf"
     done < "$objects/index.tsv"
     python3 "$ROOT_DIR/von/tools/export_geometry_frame_gltf.py" \
         --trace "$trace" --rom "$ROM" \
         --output "$OUTPUT_DIR/$cabinet/first-match-frame.gltf" \
-        --max-time 32.8 --min-objects 100
-    python3 "$ROOT_DIR/von/tools/export_geometry_frame_textured_gltf.py" \
-        --trace "$trace" --rom "$ROM" --texture-rom "$TEXTURE_ROM" \
-        --bank-primary "$TEXTURE_BANK" --bank-secondary "$TEXTURE_BANK_SECONDARY" \
-        --palette-trace "$trace" --output "$OUTPUT_DIR/$cabinet/first-match-frame-textured.gltf" \
         --max-time 32.8 --min-objects 100
     python3 "$ROOT_DIR/von/tools/extract_texture_tiles.py" \
         --trace "$trace" --bank "$TEXTURE_BANK" \
