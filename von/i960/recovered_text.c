@@ -65,6 +65,27 @@ void recovered_text_write_string(volatile const u8 *text)
         recovered_text_emit_char(character);
 }
 
+/*
+ * The 0x1da90 string helper selects glyph mode 1 unless a lowercase ASCII
+ * byte appears after the first byte.  The per-character calls into 0x1d310
+ * remain outside this pure classifier.
+ */
+u32 recovered_text_string_font_mode(const u8 *text)
+{
+    const u8 *cursor = text;
+    u32 mode = 1U;
+
+    if (*cursor == 0U)
+        return mode;
+    ++cursor;
+    while (*cursor != 0U) {
+        if (*cursor >= (u8)'a' && *cursor <= (u8)'z')
+            mode = 0U;
+        ++cursor;
+    }
+    return mode;
+}
+
 /* Pure description of the single bus write in the 0x1ccf8 helper. */
 u32 recovered_text_tile_control_bus(u32 value, u32 *address)
 {

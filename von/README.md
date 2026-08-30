@@ -362,14 +362,15 @@ reconstructed main path:
 The producer and consumer paths are covered by exhaustive host-side tests,
 including 983,040 parameterized framing vectors, 262,144 frame vectors,
 266,240 FIFO-capacity vectors, 20,480 consumer vectors, and 65,536 interrupt
-mask vectors. The full test script, ROM audit, and MAME validation pass. The
+mask vectors and 65,536 text font-mode prefixes. The full test script, ROM
+audit, and MAME validation pass. The
 drone0 i960 build produces the reconstructed image, and the clean runtime
 audit confirms that all 320 visited instructions execute from generated code.
 
-The ledger currently records `4,860/4,860` classified executable bytes as
+The ledger currently records `5,024/5,024` classified executable bytes as
 C-represented behavioral reconstructions. The strict byte-match headline is
-still `0/4,860`, because these slices remain provisional pending compiler/ABI
+still `0/5,024`, because these slices remain provisional pending compiler/ABI
 calibration and byte-for-byte comparison. The refreshed 60-second attract
-worklist contains 35 represented units and 227 remaining untriaged units.
+worklist contains 36 represented units and 226 remaining untriaged units.
 
 Saturn and PC versions are deferred until the arcade path is understood.

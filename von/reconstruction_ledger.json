@@ -380,6 +380,21 @@
           "notes": "Preserves the helper's single 32-bit write of its input to tile/control MMIO address 0x01800000."
         },
         {
+          "name": "text_string_font_mode",
+          "start": "0x0001da90",
+          "end": "0x0001db34",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_string_font_mode",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_text_control.py"
+          ],
+          "notes": "Recovers the 0x1da90 branch contract: select glyph mode 1 unless a lowercase ASCII byte occurs after the first string byte. Per-character glyph writes through 0x1d310 remain a separate dependency."
+        },
+        {
           "name": "text_video_initialize",
           "start": "0x0001c618",
           "end": "0x0001c6f8",

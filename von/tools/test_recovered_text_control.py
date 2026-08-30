@@ -35,6 +35,10 @@ def main() -> int:
             ctypes.POINTER(ctypes.c_uint32),
         ]
         recovered.recovered_text_tile_control_bus.restype = ctypes.c_uint32
+        recovered.recovered_text_string_font_mode.argtypes = [
+            ctypes.POINTER(ctypes.c_ubyte),
+        ]
+        recovered.recovered_text_string_font_mode.restype = ctypes.c_uint32
 
         vectors = 0
         for value in range(0x10000):
@@ -47,7 +51,23 @@ def main() -> int:
                 )
             vectors += 1
 
-    print(f"PASS: {vectors:,} text/tile control vectors")
+        mode_vectors = 0
+        for first in range(0x100):
+            for second in range(0x100):
+                text = (ctypes.c_ubyte * 3)(first, second, 0)
+                expected = 0 if first != 0 and 0x61 <= second <= 0x7A else 1
+                actual = recovered.recovered_text_string_font_mode(text)
+                if actual != expected:
+                    raise SystemExit(
+                        f"font-mode mismatch first=0x{first:02x} "
+                        f"second=0x{second:02x}: {actual} != {expected}"
+                    )
+                mode_vectors += 1
+
+    print(
+        f"PASS: {vectors:,} text/tile control vectors and "
+        f"{mode_vectors:,} font-mode prefixes"
+    )
     return 0
 
 
