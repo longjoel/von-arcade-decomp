@@ -132,10 +132,74 @@ u32 recovered_text_glyph_address_plan(
         normalized = character7 - 0x20U;
     *normalized_character = normalized;
     *font_bank = bank;
-    *glyph_descriptor = GLYPH_TABLES[bank] + (normalized << 7);
+    *glyph_descriptor = GLYPH_TABLES[bank] + (normalized << 3);
     *tile_address_first = tile;
     *tile_address_second = tile + 0x80U;
     return 1U;
+}
+
+/* Describe one tile write selected by the 0x1d310 glyph loop. */
+u32 recovered_text_glyph_tile_plan(
+    u32 glyph_data,
+    u32 width,
+    u32 row,
+    u32 column,
+    u32 plane,
+    u32 entry,
+    u32 *glyph_word_address,
+    u32 *tile_address)
+{
+    if (plane >= 2U || entry >= width)
+        return 0U;
+    *glyph_word_address = glyph_data + ((plane * width + entry) << 1);
+    *tile_address = 0x01000000U
+        + (((row << 6) + column + (plane << 6) + entry) << 1);
+    return 1U;
+}
+
+u32 recovered_text_glyph_next_column(u32 normalized_character,
+                                     u32 column,
+                                     u32 width)
+{
+    if (normalized_character == 0x5cU)
+        ++column;
+    if (column <= 61U)
+        column += width;
+    return column;
+}
+
+/* Recovered glyph-table writer at i960 0x0001d310. */
+void recovered_text_emit_glyph(u32 character, u32 font_mode, u32 attributes)
+{
+    u32 normalized;
+    u32 bank;
+    u32 descriptor;
+    u32 first_tile;
+    u32 second_tile;
+    u32 width;
+    u32 plane;
+    u32 entry;
+    u32 column = *TEXT_STATE_COLUMN;
+    u32 row = *TEXT_STATE_ROW;
+    volatile const u16 *glyph;
+
+    recovered_text_glyph_address_plan(character, font_mode, column, row,
+                                      &normalized, &bank, &descriptor,
+                                      &first_tile, &second_tile);
+    (void)bank;
+    (void)first_tile;
+    (void)second_tile;
+    glyph = (volatile const u16 *)(unsigned long)
+        *(volatile const u32 *)(unsigned long)descriptor;
+    width = *(volatile const u32 *)(unsigned long)(descriptor + 4U);
+    for (plane = 0U; plane < 2U; ++plane) {
+        volatile u16 *tile = TILE_RAM + ((row + plane) << 6) + column;
+
+        for (entry = 0U; entry < width; ++entry)
+            tile[entry] = (u16)(*glyph++ | 0x8000U | attributes);
+    }
+    *TEXT_STATE_COLUMN = recovered_text_glyph_next_column(normalized, column,
+                                                           width);
 }
 
 /* Pure description of the single bus write in the 0x1ccf8 helper. */

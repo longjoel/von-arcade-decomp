@@ -386,13 +386,13 @@
           "classification": "code",
           "status": "provisional",
           "source": "von/i960/recovered_text.c",
-          "symbol": "recovered_text_glyph_address_plan",
+          "symbol": "recovered_text_emit_glyph",
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
             "von/i960/disassembly-annotations.md",
             "von/tools/test_recovered_text_control.py"
           ],
-          "notes": "Recovers the glyph writer's 7-bit normalization, printable index range, two-bit font-bank selection, four glyph-table bases, and two tile-row addresses. Runtime glyph height and bitmap reads remain a separate dependency."
+          "notes": "Recovers the glyph writer's 7-bit normalization, printable index range, two-bit font-bank selection, four glyph-table bases, eight-byte descriptor stride, two-row tile writes, attribute bits, and column advance. Every descriptor's mapped data pointer and width is validated against main_data; active caller integration remains separate."
         },
         {
           "name": "text_video_row_transfer_plan",

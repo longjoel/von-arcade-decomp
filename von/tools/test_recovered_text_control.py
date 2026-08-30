@@ -9,6 +9,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+from verify_texture_decompress import assemble_main_data
+
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "von/i960/recovered_text.c"
@@ -51,6 +53,23 @@ def main() -> int:
             ctypes.POINTER(ctypes.c_uint32),
         ]
         recovered.recovered_text_glyph_address_plan.restype = ctypes.c_uint32
+        recovered.recovered_text_glyph_tile_plan.argtypes = [
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+        ]
+        recovered.recovered_text_glyph_tile_plan.restype = ctypes.c_uint32
+        recovered.recovered_text_glyph_next_column.argtypes = [
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+        ]
+        recovered.recovered_text_glyph_next_column.restype = ctypes.c_uint32
 
         vectors = 0
         for value in range(0x10000):
@@ -106,7 +125,7 @@ def main() -> int:
                             (0x02EA11D0, 0x02EA14D0, 0x02EA17D0, 0x02EA1AD0)[
                                 expected_bank
                             ]
-                            + (expected_normalized << 7)
+                            + (expected_normalized << 3)
                         )
                         expected_tile = 0x01000000 + (
                             ((row << 6) + column) << 1
@@ -135,10 +154,86 @@ def main() -> int:
                             )
                         glyph_vectors += 1
 
+        main_data = assemble_main_data(ROOT / "von/artifacts")
+        descriptor_vectors = 0
+        for bank, base in enumerate((
+            0x02EA11D0,
+            0x02EA14D0,
+            0x02EA17D0,
+            0x02EA1AD0,
+        )):
+            for index in range(96):
+                descriptor = base + index * 8
+                offset = descriptor - 0x02000000
+                glyph_data = int.from_bytes(main_data[offset:offset + 4], "little")
+                width = int.from_bytes(main_data[offset + 4:offset + 8], "little")
+                if not 0x02000000 <= glyph_data < 0x03000000 or width not in (1, 2):
+                    raise SystemExit(
+                        f"invalid glyph descriptor bank={bank} index={index}: "
+                        f"data=0x{glyph_data:08x} width={width}"
+                    )
+                for plane in range(2):
+                    for entry in range(width):
+                        word_address = ctypes.c_uint32()
+                        tile_address = ctypes.c_uint32()
+                        valid = recovered.recovered_text_glyph_tile_plan(
+                            glyph_data,
+                            width,
+                            12,
+                            22,
+                            plane,
+                            entry,
+                            ctypes.byref(word_address),
+                            ctypes.byref(tile_address),
+                        )
+                        expected = (
+                            glyph_data + (plane * width + entry) * 2,
+                            0x01000000 + (((12 + plane) << 6) + 22 + entry) * 2,
+                        )
+                        actual = (word_address.value, tile_address.value)
+                        if valid != 1 or actual != expected:
+                            raise SystemExit(
+                                f"glyph tile plan mismatch bank={bank} index={index} "
+                                f"plane={plane} entry={entry}: {actual!r} != {expected!r}"
+                            )
+                        descriptor_vectors += 1
+                invalid_word = ctypes.c_uint32()
+                invalid_tile = ctypes.c_uint32()
+                if recovered.recovered_text_glyph_tile_plan(
+                    glyph_data,
+                    width,
+                    12,
+                    22,
+                    2,
+                    0,
+                    ctypes.byref(invalid_word),
+                    ctypes.byref(invalid_tile),
+                ) != 0:
+                    raise SystemExit("accepted invalid glyph plane")
+
+        column_vectors = 0
+        for normalized_character in range(96):
+            for column in range(64):
+                for width in range(4):
+                    expected = column + (1 if normalized_character == 0x5C else 0)
+                    if expected <= 61:
+                        expected += width
+                    actual = recovered.recovered_text_glyph_next_column(
+                        normalized_character, column, width
+                    )
+                    if actual != expected:
+                        raise SystemExit(
+                            f"glyph column mismatch character={normalized_character} "
+                            f"column={column} width={width}: {actual} != {expected}"
+                        )
+                    column_vectors += 1
+
     print(
         f"PASS: {vectors:,} text/tile control vectors and "
         f"{mode_vectors:,} font-mode prefixes and "
-        f"{glyph_vectors:,} glyph address plans"
+        f"{glyph_vectors:,} glyph address plans and "
+        f"{descriptor_vectors:,} descriptor tiles and "
+        f"{column_vectors:,} glyph column updates"
     )
     return 0
 

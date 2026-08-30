@@ -140,11 +140,14 @@ blitter itself remains untriaged.
 
 The glyph writer at `0x0001d310-0x0001d410` masks characters to seven bits,
 maps printable bytes `0x20-0x7f` to indices `0-95` and other inputs to index
-zero, then selects one of four glyph tables using `font_mode & 3`. Its tile
-addresses are `0x01000000 + 2 * ((row << 6) + column)` and that address plus
-`0x80` for the second row. `recovered_text_glyph_address_plan()` captures
-those pure selections; the descriptor height and bitmap reads remain tied to
-the untriaged glyph data.
+zero, then selects one of four glyph tables using `font_mode & 3`. Each glyph
+descriptor is eight bytes (a tile-word pointer and width). The writer copies
+`width` words into two adjacent 64-tile rows at
+`0x01000000 + 2 * ((row << 6) + column)`, ORs each with `0x8000` and the
+caller attribute bits, and then advances the column by the width. The `0x5c`
+glyph has one extra column of spacing. `recovered_text_emit_glyph()` preserves
+the mapped-memory implementation; all 384 descriptors are verified against
+the `main_data` ROM image by `von/tools/test_recovered_text_control.py`.
 
 ### Formatted String Boundary
 
