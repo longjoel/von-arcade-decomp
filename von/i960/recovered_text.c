@@ -327,6 +327,59 @@ u32 recovered_text_startup_asset_transfer_plan(
     return 1U;
 }
 
+/* Describe the fixed 0x1c730 request prepared by 0x1c220. */
+u32 recovered_text_video_control_helper_plan(
+    u32 *entry,
+    u32 *source,
+    u32 *destination,
+    u32 *flags,
+    u32 *count)
+{
+    *entry = 0x0001c730U;
+    *source = 0x02ea0bb8U;
+    *destination = 0x01080000U;
+    *flags = 0x80U;
+    *count = 1U;
+    return 1U;
+}
+
+/*
+ * Describe one direct bus/state write made by 0x1c220 before or after its
+ * 0x1c730 and 0x1c618 calls.  The original carries its caller-provided g14
+ * through these writes rather than materializing zero locally; expose that
+ * value so the plan remains instruction-faithful.
+ */
+u32 recovered_text_video_control_write_plan(
+    u32 index,
+    u32 caller_g14,
+    u32 *address,
+    u32 *value,
+    u32 *width)
+{
+    static const u32 ADDRESSES[10] = {
+        0x00504d20U, 0x01040000U, 0x01060000U, 0x00504d34U,
+        0x00504d38U, 0x00504ce4U, 0x00504ce0U, 0x00504cf4U,
+        0x00504cf8U, 0x00504d10U
+    };
+    static const u32 WIDTHS[10] = {4U, 2U, 2U, 4U, 4U, 4U, 4U, 4U, 4U, 4U};
+
+    if (index >= 10U)
+        return 0U;
+    *address = ADDRESSES[index];
+    *width = WIDTHS[index];
+    if (index == 0U)
+        *value = 0x0001c2c0U;
+    else if (index == 1U)
+        *value = 0xffacU;
+    else if (index == 2U)
+        *value = 0xfffeU;
+    else if (index == 9U)
+        *value = 0U - 1U;
+    else
+        *value = caller_g14;
+    return 1U;
+}
+
 /* Recovered fixed video upload at i960 0x00020180. */
 void recovered_text_video_upload(void)
 {

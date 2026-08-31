@@ -96,6 +96,22 @@ def main() -> int:
             ctypes.POINTER(ctypes.c_uint32),
         ]
         recovered.recovered_text_startup_asset_transfer_plan.restype = ctypes.c_uint32
+        recovered.recovered_text_video_control_helper_plan.argtypes = [
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+        ]
+        recovered.recovered_text_video_control_helper_plan.restype = ctypes.c_uint32
+        recovered.recovered_text_video_control_write_plan.argtypes = [
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+        ]
+        recovered.recovered_text_video_control_write_plan.restype = ctypes.c_uint32
         recovered.recovered_text_voltage_warning_plan.argtypes = [
             ctypes.c_uint32,
             ctypes.POINTER(ctypes.c_uint32),
@@ -335,6 +351,49 @@ def main() -> int:
             ) != 0:
                 raise SystemExit(f"startup plan did not terminate profile={profile}")
 
+        entry = ctypes.c_uint32()
+        source = ctypes.c_uint32()
+        destination = ctypes.c_uint32()
+        flags = ctypes.c_uint32()
+        count = ctypes.c_uint32()
+        if recovered.recovered_text_video_control_helper_plan(
+            ctypes.byref(entry), ctypes.byref(source), ctypes.byref(destination),
+            ctypes.byref(flags), ctypes.byref(count)
+        ) != 1 or (entry.value, source.value, destination.value, flags.value, count.value) != (
+            0x0001C730, 0x02EA0BB8, 0x01080000, 0x80, 1
+        ):
+            raise SystemExit("video control helper plan mismatch")
+
+        control_expected = (
+            (0x00504D20, 0x0001C2C0, 4),
+            (0x01040000, 0xFFAC, 2),
+            (0x01060000, 0xFFFE, 2),
+            (0x00504D34, 0x13579BDF, 4),
+            (0x00504D38, 0x13579BDF, 4),
+            (0x00504CE4, 0x13579BDF, 4),
+            (0x00504CE0, 0x13579BDF, 4),
+            (0x00504CF4, 0x13579BDF, 4),
+            (0x00504CF8, 0x13579BDF, 4),
+            (0x00504D10, 0xFFFFFFFF, 4),
+        )
+        control_vectors = 0
+        for index, expected in enumerate(control_expected):
+            address = ctypes.c_uint32()
+            value = ctypes.c_uint32()
+            width = ctypes.c_uint32()
+            valid = recovered.recovered_text_video_control_write_plan(
+                index, 0x13579BDF, ctypes.byref(address), ctypes.byref(value),
+                ctypes.byref(width)
+            )
+            actual = (address.value, value.value, width.value)
+            if valid != 1 or actual != expected:
+                raise SystemExit(f"video control write mismatch index={index}: {actual!r}")
+            control_vectors += 1
+        if recovered.recovered_text_video_control_write_plan(
+            10, 0, ctypes.byref(address), ctypes.byref(value), ctypes.byref(width)
+        ) != 0:
+            raise SystemExit("accepted invalid video control write")
+
         warning_expected = (
             (4, 16, 0x000012E0),
             (4, 19, 0x000012F0),
@@ -403,6 +462,7 @@ def main() -> int:
         f"{copy_vectors} row copies, {word_vectors:,} word expansions, "
         f"{block_vectors} block expansions, {swap_vectors:,} halfword swaps, "
         f"{swap_block_vectors} swap copies, {startup_vectors} startup transfers, "
+        f"{control_vectors} video-control writes, "
         f"and {plan_vectors:,} row-transfer plan entries"
     )
     return 0

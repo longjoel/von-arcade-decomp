@@ -356,6 +356,12 @@ four final table expansions. This makes the early graphics/asset layout
 inspectable without executing mapped hardware writes; resource names and active
 integration remain the next boundary.
 
+It also now records the adjacent `0x1c220` video-control bootstrap: two
+control-window writes, the fixed `0x1c730` helper request, six caller-value
+state writes around video clearing, and the terminal `0xffffffff` state
+sentinel. These plans are inspectable and regression-tested before mapped
+hardware-write integration.
+
 The preceding unattended pass recovered five additional host-side audio units
 from the i960 attract trace and integrated the SCSP startup sequence into the
 reconstructed main path:

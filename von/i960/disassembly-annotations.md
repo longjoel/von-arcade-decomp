@@ -159,6 +159,15 @@ windows, but does not yet assign resource names or execute the hardware writes.
 `recovered_text_startup_asset_transfer_plan()` is checked against all 37
 records (20 zero-profile and 17 alternate-profile operations).
 
+The adjacent `0x0001c220-0x0001c2b4` video-control bootstrap now has an
+instruction-level plan as well. It writes the `0x1c2c0` helper entry to
+`0x00504d20`, programs `0xffac` and `0xfffe` into the two control windows,
+prepares the fixed `0x1c730` request (`0x02ea0bb8` to `0x01080000`, flag
+`0x80`, count one), then invokes the existing clear routine at `0x1c618`.
+The ten direct writes retain the original caller-supplied `g14` value rather
+than assuming it is zero; the last write stores the explicit `0xffffffff`
+sentinel. Both the request and all write records are host-tested.
+
 The `0x00020180` caller supplies a fixed upload request: source `0x01004000`,
 destination pointer slot `0x02fd61d0`, `0x40` halfwords per row, and `0x40`
 rows. `recovered_text_video_upload()` now executes that exact handoff through

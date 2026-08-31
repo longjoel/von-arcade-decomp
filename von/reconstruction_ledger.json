@@ -530,6 +530,21 @@
           "notes": "Recovers the shared video helper's row loop: forward-copy halfwords*2 bytes once per row, advance source by 0x80 bytes, and advance destination by halfwords*2 bytes."
         },
         {
+          "name": "video_control_bootstrap_plan",
+          "start": "0x0001c220",
+          "end": "0x0001c2b8",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_video_control_write_plan",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_text_video.py"
+          ],
+          "notes": "Recovers the 0x1c220 video-control bootstrap's fixed 0x1c730 helper request and ten direct bus/state writes around the existing 0x1c618 clear call. The plan preserves caller g14 propagation and the final 0xffffffff sentinel; all records are host-tested. Active mapped-write integration remains separate."
+        },
+        {
           "name": "text_string_font_mode",
           "start": "0x0001da90",
           "end": "0x0001db34",
