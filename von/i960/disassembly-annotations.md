@@ -811,6 +811,21 @@ with the palette/color-translation/luma trace and writes palette-rendered PNG
 tiles into the UV-associated glTF material groups. The grayscale fallback keeps
 the indexed texel values available when a palette trace is not present.
 
+### UV-to-Tile Contract
+
+The texture-point stream is directly ordered as `pv, pu` 16-bit words per
+vertex. MAME converts both values from 1/8-texel units before sampling, so the
+exporter reads the pair as `(u=pu, v=pv)` and writes tile-local glTF coordinates
+`(pu / 8 / width, pv / 8 / height)`. The texture-header origin identifies the
+tile's source rectangle in the selected 2048-by-1024 texture sheet; it is not
+added to the glTF coordinates because the exported PNG already contains that
+cropped rectangle. Header bits 6/7 select U/V repeat, while bits 8/9 select
+mirrored repeat and override the corresponding repeat bit. With neither flag,
+the exporter uses clamp-to-edge, matching the renderer's non-smooth boundary
+path. The first-match P1 capture has 8,893 textured polygon faces, all using
+repeat on both axes; this validates the existing output for that capture while
+preserving correct behavior for future clamp or mirror materials.
+
 The command parameter names remain probable because the ROM exposes register
 roles rather than source-level types. The bus addresses, masks, counts, and
 phase operations are directly confirmed.

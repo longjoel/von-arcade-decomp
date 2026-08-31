@@ -24,6 +24,7 @@ python3 von/tools/test_fingerprint_geometry_assemblies.py
 python3 von/tools/test_export_geometry_family_assets.py
 python3 von/tools/test_export_geometry_family_animation.py
 python3 von/tools/test_texture_palette.py
+python3 von/tools/test_texture_uv_mapping.py
 python3 von/tools/rom_audit.py
 ROM_PATH="$(prepare_rom_path)"
 trap 'cleanup_rom_path "$ROM_PATH"' EXIT

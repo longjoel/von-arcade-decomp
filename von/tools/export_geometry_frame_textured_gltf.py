@@ -11,7 +11,8 @@ from pathlib import Path
 
 from export_geometry_frame_gltf import MATRIX, OBJECT
 from export_geometry_animation_gltf import transform_trs
-from export_geometry_textured_gltf import parse_faces, texture_size, tile_png
+from export_geometry_textured_gltf import (parse_faces, texture_sampler,
+                                           texture_size, texture_uv, tile_png)
 from render_texture_palette import parse_trace
 
 
@@ -102,8 +103,8 @@ def main() -> int:
     images: list[dict[str, str]] = []
     textures: list[dict[str, int]] = []
     texture_by_key: dict[tuple[int, int, int, int], int] = {}
-    samplers = [{"magFilter": 9729, "minFilter": 9729,
-                 "wrapS": 10497, "wrapT": 10497}]
+    samplers = []
+    sampler_by_mode: dict[tuple[int, int], int] = {}
 
     def add_blob(data: bytes, target: int | None = None) -> int:
         offset = len(blob)
@@ -125,6 +126,13 @@ def main() -> int:
         texture_index = None
         texture_key = (header[0], header[1], header[2], header[3])
         if image_data is not None:
+            sampler_mode = texture_sampler(header)
+            sampler_index = sampler_by_mode.get(sampler_mode)
+            if sampler_index is None:
+                sampler_index = len(samplers)
+                samplers.append({"magFilter": 9729, "minFilter": 9729,
+                                 "wrapS": sampler_mode[0], "wrapT": sampler_mode[1]})
+                sampler_by_mode[sampler_mode] = sampler_index
             texture_index = texture_by_key.get(texture_key)
             if texture_index is None:
                 image_index = len(images)
@@ -133,13 +141,15 @@ def main() -> int:
                     "name": f"tile_{origin_x:04x}_{origin_y:03x}_{width}x{height}",
                 })
                 texture_index = len(textures)
-                textures.append({"sampler": 0, "source": image_index})
+                textures.append({"sampler": sampler_index, "source": image_index})
                 texture_by_key[texture_key] = texture_index
         material: dict[str, object] = {
             "name": f"header_{header[0]:04x}_{header[1]:04x}_{header[2]:04x}_{header[3]:04x}",
             "extras": {"texheader": list(header), "width": width,
                        "height": height, "origin": [origin_x, origin_y],
-                       "colorbase": colorbase},
+                       "colorbase": colorbase, "uv_order": ["u", "v"],
+                       "uv_units": "1/8 texel", "uv_image_space": "tile-local",
+                       "wrap": list(texture_sampler(header))},
         }
         if texture_index is not None:
             material["pbrMetallicRoughness"] = {
@@ -167,9 +177,7 @@ def main() -> int:
                 header, {"positions": [], "uv": [], "indices": []})
             base = len(entry["positions"])
             entry["positions"].extend(points)
-            entry["uv"].extend((u / 8.0 / texture_size(header)[0],
-                                 v / 8.0 / texture_size(header)[1])
-                                for u, v in uv)
+            entry["uv"].extend(texture_uv(u, v, header) for u, v in uv)
             if len(points) == 4:
                 entry["indices"].extend((base, base + 1, base + 2,
                                           base + 1, base + 3, base + 2))

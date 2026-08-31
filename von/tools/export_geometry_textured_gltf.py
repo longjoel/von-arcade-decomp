@@ -35,6 +35,37 @@ def texture_size(header: tuple[int, int, int, int]) -> tuple[int, int, int, int,
     return width, height, origin_x, origin_y, colorbase
 
 
+def texture_uv(raw_u: int, raw_v: int,
+               header: tuple[int, int, int, int]) -> tuple[float, float]:
+    """Convert Model 2 1/8-texel UVs into tile-local glTF coordinates.
+
+    The renderer reads each texture point as ``pv`` followed by ``pu`` and
+    applies ``1 / 8`` before sampling the tile selected by the header.  The
+    header origin is deliberately not added here: exported images are cropped
+    to that tile, so glTF coordinates are tile-local.
+    """
+    width, height, _, _, _ = texture_size(header)
+    return raw_u / 8.0 / width, raw_v / 8.0 / height
+
+
+def texture_sampler(header: tuple[int, int, int, int]) -> tuple[int, int]:
+    """Return glTF wrap modes matching Model 2's regular-texture flags.
+
+    Header bits 6/7 enable smooth wrapping on the U/V axes.  Bits 8/9 mirror
+    an axis and take precedence over wrapping, matching MAME's renderer.
+    """
+    flags = header[0]
+
+    def axis(wrap_bit: int, mirror_bit: int) -> int:
+        if flags & (1 << mirror_bit):
+            return 33648  # MIRRORED_REPEAT
+        if flags & (1 << wrap_bit):
+            return 10497  # REPEAT
+        return 33071  # CLAMP_TO_EDGE
+
+    return axis(6, 8), axis(7, 9)
+
+
 def png_gray(width: int, height: int, pixels: bytes) -> bytes:
     def chunk(name: bytes, payload: bytes) -> bytes:
         return (struct.pack(">I", len(payload)) + name + payload +
@@ -176,8 +207,7 @@ def main() -> int:
         width, height, _, _, _ = texture_size(header)
         for index in range(len(points)):
             entry["positions"].append(points[index])
-            entry["uv"].append((uv[index][0] / 8.0 / width,
-                                uv[index][1] / 8.0 / height))
+            entry["uv"].append(texture_uv(uv[index][0], uv[index][1], header))
         for triangle in triangles:
             entry["indices"].extend(base + index for index in triangle)
 
@@ -194,7 +224,8 @@ def main() -> int:
     materials = []
     images = []
     textures = []
-    samplers = [{"magFilter": 9729, "minFilter": 9729, "wrapS": 10497, "wrapT": 10497}]
+    samplers = []
+    sampler_by_mode: dict[tuple[int, int], int] = {}
     for material_index, (header, entry) in enumerate(primitives.items()):
         positions = entry["positions"]
         indices = entry["indices"]
@@ -217,14 +248,24 @@ def main() -> int:
         image_data = tile_png(bank, header, palette_state) if textured else None
         texture_index = None
         if image_data is not None:
+            sampler_mode = texture_sampler(header)
+            sampler_index = sampler_by_mode.get(sampler_mode)
+            if sampler_index is None:
+                sampler_index = len(samplers)
+                samplers.append({"magFilter": 9729, "minFilter": 9729,
+                                 "wrapS": sampler_mode[0], "wrapT": sampler_mode[1]})
+                sampler_by_mode[sampler_mode] = sampler_index
             image_index = len(images)
             images.append({"uri": "data:image/png;base64," + base64.b64encode(image_data).decode("ascii"),
                            "name": f"tile_{origin_x:04x}_{origin_y:03x}_{width}x{height}"})
             texture_index = len(textures)
-            textures.append({"sampler": 0, "source": image_index})
+            textures.append({"sampler": sampler_index, "source": image_index})
         material = {"name": f"header_{header[0]:04x}_{header[1]:04x}_{header[2]:04x}_{header[3]:04x}",
                     "extras": {"texheader": list(header), "width": width, "height": height,
-                               "origin": [origin_x, origin_y], "colorbase": colorbase}}
+                               "origin": [origin_x, origin_y], "colorbase": colorbase,
+                               "uv_order": ["u", "v"], "uv_units": "1/8 texel",
+                               "uv_image_space": "tile-local",
+                               "wrap": list(texture_sampler(header))}}
         if texture_index is not None:
             material["pbrMetallicRoughness"] = {
                 "baseColorFactor": [1, 1, 1, 1],
