@@ -8,9 +8,9 @@ diff --git a/src/mame/sega/model2_v.cpp b/src/mame/sega/model2_v.cpp
 +	static unsigned vonj_geometry_object_trace_count;
 +	if ((machine().system().name == std::string_view("vonj")) && (vonj_geometry_object_trace_count < 131072))
 +	{
-+		logerror("vonj_geometry_object: time=%f tpa=%08x tha=%08x oba=%08x count=%08x mode=%u source=%s\n",
++		logerror("vonj_geometry_object: time=%f tpa=%08x tha=%08x oba=%08x count=%08x mode=%u source=%s opcode=%08x\n",
 +			machine().time().as_double(), tpa, tha, oba, obc, geo->mode & 3,
-+			(oba & 0x01000000) ? "fast-ram" : (oba & 0x00800000) ? "polygon-rom" : "slow-ram");
++			(oba & 0x01000000) ? "fast-ram" : (oba & 0x00800000) ? "polygon-rom" : "slow-ram", opcode);
 +		vonj_geometry_object_trace_count++;
 +	}
  

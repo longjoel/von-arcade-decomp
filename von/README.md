@@ -222,6 +222,13 @@ minimal validation case: it is exactly one 10,000-by-10,000 quad at local
 8–9 update the two seed points for the following record; their final hardware
 names remain intentionally undecided.
 
+The geometry trace also records the parser opcode that invokes each object
+submission. In the deterministic first-match capture at `16.288808`, all 40
+polygon-ROM submissions—including the complete slots 6–24 Virtualoid
+assembly—use `0x00800101`. This establishes one concrete model-object command
+class for the next SHARC/geometry-buffer recovery pass; it does not yet expose
+the upstream entity or transform packet format.
+
 The single-cabinet capture script uses `bin/von` directly and defaults to SDL's
 dummy video backend, so it also works on headless build hosts. A single cabinet
 can remain at the Model 2 boot screen while waiting for the twin communication
