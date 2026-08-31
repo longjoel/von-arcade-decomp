@@ -19,6 +19,7 @@ python3 von/tools/test_recovered_text_video.py
 python3 von/tools/test_summarize_mame_trace.py
 python3 von/tools/test_export_geometry_triangle_build_gltf.py
 python3 von/tools/test_export_geometry_frame_gltf.py
+python3 von/tools/test_export_geometry_assemblies.py
 python3 von/tools/test_texture_palette.py
 python3 von/tools/rom_audit.py
 ROM_PATH="$(prepare_rom_path)"

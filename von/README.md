@@ -209,6 +209,20 @@ python3 von/tools/export_geometry_frame_gltf.py \
   --output von/build/disasm/fighter-assembly-slot-06-static.gltf
 ```
 
+To avoid manually identifying slot ranges, `export_geometry_assemblies.py`
+partitions one traced frame by the world-space distance between adjacent
+submitted transforms, then exports each contiguous group as a static ROM model.
+This treats the geometry processor as an opaque producer and is sufficient for
+the deterministic first match: a distance of 15 yields three arena assemblies,
+the 19-part slots 6–24 Virtualoid, and the separate 15-part slots 25–39 model.
+
+```sh
+python3 von/tools/export_geometry_assemblies.py \
+  --trace von/captures/twin-vonj-20260831T041200Z/p2/mame.log \
+  --rom von/build/disasm/geometry-rom.bin --time 16.288808 --min-objects 40 \
+  --distance 15 --output-dir von/build/disasm/first-match-assemblies
+```
+
 The polygon-ROM decoder has a small independently verified format boundary.
 An OBA is a word address (`(oba & 0x3fffff) * 4`) into the assembled polygon
 ROM. It begins with two float3 seed points, followed by fixed-size polygon
