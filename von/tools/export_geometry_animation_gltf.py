@@ -55,7 +55,11 @@ def parse_mesh(rom: bytes, oba: int, window: int = 0x4000):
         base = len(vertices)
         vertices.extend((p0, p1, p2, p3))
         if attr & 1:
-            indices.extend((base, base + 1, base + 2, base, base + 2, base + 3))
+            # The stream presents the fourth quad corner across from p2, not
+            # after it around the perimeter: p0,p1,p2,p3 form a 2x2 grid.
+            # Sharing p0 for both halves makes the second half back-facing.
+            indices.extend((base, base + 1, base + 2,
+                            base + 1, base + 3, base + 2))
         else:
             indices.extend((base, base + 1, base + 2))
         link = (attr >> 8) & 3
