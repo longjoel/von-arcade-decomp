@@ -44,7 +44,14 @@ def main() -> int:
     parser.add_argument("--window", type=int, default=0x4000)
     parser.add_argument("--min-objects", type=int, default=1,
                         help="minimum object submissions for automatic frame selection")
+    parser.add_argument("--start-object", type=int, default=0,
+                        help="skip this many submitted object slots")
+    parser.add_argument("--max-objects", type=int,
+                        help="export at most this many submitted object slots")
     args = parser.parse_args()
+    if (args.start_object < 0 or
+            (args.max_objects is not None and args.max_objects <= 0)):
+        raise SystemExit("--start-object must be nonnegative and --max-objects positive")
 
     current = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0,
                0.0, 0.0, 0.0)
@@ -86,6 +93,11 @@ def main() -> int:
                 f"no frame within {args.tolerance:g}s of {args.time:g}; "
                 f"nearest is {selected_time:g}"
             )
+    objects = objects[args.start_object:]
+    if args.max_objects is not None:
+        objects = objects[:args.max_objects]
+    if not objects:
+        raise SystemExit("object slice selected no submitted objects")
 
     rom = args.rom.read_bytes()
     blob = bytearray()
@@ -133,7 +145,7 @@ def main() -> int:
         })
 
     nodes = []
-    for slot, (oba, matrix, metadata) in enumerate(objects):
+    for slot, (oba, matrix, metadata) in enumerate(objects, args.start_object):
         rotation, scale = transform_trs(matrix)
         nodes.append({
             "mesh": mesh_by_oba[oba],
@@ -156,6 +168,7 @@ def main() -> int:
         "bufferViews": views,
         "accessors": accessors,
         "extras": {"trace_time": selected_time, "object_slots": len(objects),
+                   "object_start": args.start_object,
                    "unique_meshes": len(meshes)},
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)

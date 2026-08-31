@@ -196,6 +196,19 @@ python3 von/tools/export_geometry_triangle_build_gltf.py \
   --output von/build/disasm/fighter-assembly-slot-06.gltf
 ```
 
+For extraction rather than diagnosis, use the static frame exporter with the
+same ROM-backed submission slice. This emits one mesh per unique ROM OBA and
+one transformed node per submitted part: it is the lightweight model file to
+open or archive.
+
+```sh
+python3 von/tools/export_geometry_frame_gltf.py \
+  --trace von/captures/twin-vonj-20260830T144329Z/p2/mame.log \
+  --rom von/build/disasm/geometry-rom.bin \
+  --time 16.288808 --min-objects 40 --start-object 6 --max-objects 19 \
+  --output von/build/disasm/fighter-assembly-slot-06-static.gltf
+```
+
 The polygon-ROM decoder has a small independently verified format boundary.
 An OBA is a word address (`(oba & 0x3fffff) * 4`) into the assembled polygon
 ROM. It begins with two float3 seed points, followed by fixed-size polygon
