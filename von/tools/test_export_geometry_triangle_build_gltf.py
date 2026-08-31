@@ -59,7 +59,8 @@ def main() -> int:
 
         # The arcade's floor object is one quad whose points are arranged as
         # p0,p1,p2,p3 = southeast,southwest,northeast,northwest.  Its two
-        # halves must retain a matching winding order.
+        # Model 2 rasterizes p1,p0,p2,p3.  The two halves must retain that
+        # matching, upward-facing winding order.
         quad = struct.pack(
             "<6fI3I6f",
             1.0, 0.0, 1.0, -1.0, 0.0, 1.0,
@@ -68,7 +69,8 @@ def main() -> int:
         vertices, indices = parse_mesh(quad, 0)
         normals = [normal(*(vertices[index] for index in indices[offset:offset + 3]))
                    for offset in range(0, len(indices), 3)]
-        if len(normals) != 2 or normals[0][1] * normals[1][1] <= 0.0:
+        if (len(normals) != 2 or normals[0][1] <= 0.0 or
+                normals[1][1] <= 0.0):
             raise SystemExit(f"quad winding disagrees: {normals}")
     print("PASS: polygon-ROM triangle build glTF export")
     return 0

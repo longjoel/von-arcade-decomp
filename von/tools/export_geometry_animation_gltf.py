@@ -54,14 +54,14 @@ def parse_mesh(rom: bytes, oba: int, window: int = 0x4000):
             p3 = p2
         base = len(vertices)
         vertices.extend((p0, p1, p2, p3))
+        # Model 2 loads the two carried vertices as v1=p0, v0=p1 before
+        # rasterizing.  Retain that front-face order in glTF.  The streamed
+        # quad is a 2x2 grid (p0,p1,p2,p3), with p3 across from p2.
         if attr & 1:
-            # The stream presents the fourth quad corner across from p2, not
-            # after it around the perimeter: p0,p1,p2,p3 form a 2x2 grid.
-            # Sharing p0 for both halves makes the second half back-facing.
-            indices.extend((base, base + 1, base + 2,
-                            base + 1, base + 3, base + 2))
+            indices.extend((base + 1, base, base + 2,
+                            base + 1, base + 2, base + 3))
         else:
-            indices.extend((base, base + 1, base + 2))
+            indices.extend((base + 1, base, base + 2))
         link = (attr >> 8) & 3
         if link in (0, 2):
             p0, p1 = p2, p3

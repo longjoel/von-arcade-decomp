@@ -201,9 +201,9 @@ def main() -> int:
         entry = primitives.setdefault(key, {"positions": [], "uv": [], "indices": []})
         base = len(entry["positions"])
         if len(points) == 4:
-            triangles = ((0, 1, 2), (0, 2, 3))
+            triangles = ((1, 0, 2), (1, 2, 3))
         else:
-            triangles = ((0, 1, 2),)
+            triangles = ((1, 0, 2),)
         width, height, _, _, _ = texture_size(header)
         for index in range(len(points)):
             entry["positions"].append(points[index])
