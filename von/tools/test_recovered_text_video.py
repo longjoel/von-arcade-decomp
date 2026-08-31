@@ -87,6 +87,15 @@ def main() -> int:
             ctypes.c_uint32,
         ]
         recovered.recovered_halfword_byte_swap_copy.restype = None
+        recovered.recovered_text_startup_asset_transfer_plan.argtypes = [
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+        ]
+        recovered.recovered_text_startup_asset_transfer_plan.restype = ctypes.c_uint32
         recovered.recovered_text_voltage_warning_plan.argtypes = [
             ctypes.c_uint32,
             ctypes.POINTER(ctypes.c_uint32),
@@ -268,6 +277,64 @@ def main() -> int:
                     )
                 swap_block_vectors += 1
 
+        startup_expected = {
+            0: (
+                (0, 0x01800020, 0x02FDEF20, 0x31),
+                (0, 0x01801020, 0x02FDF540, 0x31),
+                (0, 0x01800640, 0x02FD6EA0, 0x2E),
+                (0, 0x01801640, 0x02FD7460, 0x2E),
+                (0, 0x01800C00, 0x02FF7568, 0x0D),
+                (0, 0x01801C00, 0x02FF7568, 0x0D),
+                (1, 0x01081000, 0x02E21A74, 0x18800),
+                (1, 0x010B2000, 0x02E21054, 0x17000),
+                (1, 0x010E0000, 0x02E6DB14, 0x6800),
+            ),
+            1: (
+                (0, 0x01800020, 0x02FDEF20, 0x31),
+                (0, 0x01801020, 0x02FDF540, 0x31),
+                (0, 0x01800640, 0x02FED0E8, 0x4E),
+                (0, 0x01801640, 0x02FEDAA8, 0x4E),
+                (1, 0x01081000, 0x02E21A74, 0x18800),
+                (1, 0x010B2000, 0x02E4E0D4, 0x27000),
+            ),
+        }
+        startup_tail = (
+            (1, 0x010A9100, 0x00144CC4, 0x770),
+            (1, 0x00FFB600, 0x00146324, 0x480),
+            (1, 0x00FFA200, 0x00144184, 0x5A0),
+            (1, 0x00FFE800, 0x00145BA4, 0x3C0),
+            (1, 0x00286F80, 0x00146C24, 0x20),
+            (1, 0x01086FC0, 0x00146C64, 0x20),
+            (2, 0x010AAE00, 0x9999, 0x10),
+            (0, 0x01801520, 0x0001BB50, 1),
+            (0, 0x01801F40, 0x0001BB70, 1),
+            (0, 0x01801F60, 0x0001BB70, 1),
+            (0, 0x01801FC0, 0x0001BB70, 1),
+        )
+        startup_vectors = 0
+        for profile, expected_prefix in startup_expected.items():
+            expected = expected_prefix + startup_tail
+            for index, expected_transfer in enumerate(expected):
+                kind = ctypes.c_uint32()
+                destination = ctypes.c_uint32()
+                source_or_value = ctypes.c_uint32()
+                units = ctypes.c_uint32()
+                valid = recovered.recovered_text_startup_asset_transfer_plan(
+                    profile, index, ctypes.byref(kind), ctypes.byref(destination),
+                    ctypes.byref(source_or_value), ctypes.byref(units)
+                )
+                actual = (kind.value, destination.value, source_or_value.value, units.value)
+                if valid != 1 or actual != expected_transfer:
+                    raise SystemExit(
+                        f"startup transfer mismatch profile={profile} index={index}: {actual!r}"
+                    )
+                startup_vectors += 1
+            if recovered.recovered_text_startup_asset_transfer_plan(
+                profile, len(expected), ctypes.byref(kind), ctypes.byref(destination),
+                ctypes.byref(source_or_value), ctypes.byref(units)
+            ) != 0:
+                raise SystemExit(f"startup plan did not terminate profile={profile}")
+
         warning_expected = (
             (4, 16, 0x000012E0),
             (4, 19, 0x000012F0),
@@ -335,7 +402,8 @@ def main() -> int:
         "PASS: 4 video clear, 9 video state, 1 upload, 4 warning records, "
         f"{copy_vectors} row copies, {word_vectors:,} word expansions, "
         f"{block_vectors} block expansions, {swap_vectors:,} halfword swaps, "
-        f"{swap_block_vectors} swap copies, and {plan_vectors:,} row-transfer plan entries"
+        f"{swap_block_vectors} swap copies, {startup_vectors} startup transfers, "
+        f"and {plan_vectors:,} row-transfer plan entries"
     )
     return 0
 

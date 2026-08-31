@@ -147,6 +147,18 @@ halfwords with each source halfword's bytes reversed. The concrete
 `recovered_halfword_byte_swap_copy()` implementation and all 65,536 possible
 halfword swaps are host-tested.
 
+Its larger caller at `0x0001bda0-0x0001c21c` is now partially named as the
+startup asset loader. It selects profile zero only for a zero argument;
+nonzero arguments select the alternate profile. The recovered transfer plan
+exposes all mapped-memory operations without issuing them: profile zero has
+six block-expansion records and three bulk byte-swap records, while the
+alternate profile has four and two. Both then share six further byte-swapped
+regions, a 16-halfword `0x9999` fill, and four one-block expansions. This
+identifies a concrete ROM-to-video-RAM layout and the profile-dependent asset
+windows, but does not yet assign resource names or execute the hardware writes.
+`recovered_text_startup_asset_transfer_plan()` is checked against all 37
+records (20 zero-profile and 17 alternate-profile operations).
+
 The `0x00020180` caller supplies a fixed upload request: source `0x01004000`,
 destination pointer slot `0x02fd61d0`, `0x40` halfwords per row, and `0x40`
 rows. `recovered_text_video_upload()` now executes that exact handoff through

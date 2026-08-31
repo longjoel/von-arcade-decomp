@@ -30,6 +30,33 @@ static const u32 VOLTAGE_WARNING_TEXTS[4] = {
     0x000012e0U, 0x000012f0U, 0x00001310U, 0x00001320U
 };
 
+enum recovered_startup_transfer_kind {
+    RECOVERED_STARTUP_WORD_EXPAND = 0U,
+    RECOVERED_STARTUP_HALFWORD_SWAP = 1U,
+    RECOVERED_STARTUP_HALFWORD_FILL = 2U
+};
+
+struct recovered_startup_transfer {
+    u32 kind;
+    u32 destination;
+    u32 source_or_value;
+    u32 units;
+};
+
+/* 0x1bce0/0x1bd00: profile zero's paired block-conversion source tables. */
+static const u32 STARTUP_PROFILE_ZERO_SOURCES[2][3] = {
+    {0x02fdef20U, 0x02fd6ea0U, 0x02ff7568U},
+    {0x02fdf540U, 0x02fd7460U, 0x02ff7568U}
+};
+static const u32 STARTUP_PROFILE_ZERO_BLOCKS[3] = {0x31U, 0x2eU, 0x0dU};
+
+/* 0x1bd60/0x1bd80: nonzero profile's paired conversion tables. */
+static const u32 STARTUP_PROFILE_NONZERO_SOURCES[2][2] = {
+    {0x02fdef20U, 0x02fed0e8U},
+    {0x02fdf540U, 0x02fedaa8U}
+};
+static const u32 STARTUP_PROFILE_NONZERO_BLOCKS[2] = {0x31U, 0x4eU};
+
 void recovered_text_emit_glyph(u32 character, u32 font_mode, u32 attributes);
 void recovered_memory_copy_forward(volatile u8 *destination,
                                    volatile const u8 *source,
@@ -200,6 +227,104 @@ void recovered_halfword_byte_swap_copy(volatile u16 *destination,
 
     for (index = 0U; index < halfwords; ++index)
         destination[index] = (u16)recovered_halfword_byte_swap(source[index]);
+}
+
+/*
+ * Describe one transfer selected by the 0x1bda0 startup asset loader.
+ *
+ * The original selects the zero profile only when g0 is zero; all nonzero
+ * inputs select the alternate profile.  Units are 16-word blocks for WORD
+ * EXPAND and halfwords for the other two kinds.  This is deliberately a
+ * descriptor API: its ROM and hardware-RAM addresses are useful to tools,
+ * while executing the mapped writes remains caller-owned.
+ */
+u32 recovered_text_startup_asset_transfer_plan(
+    u32 profile,
+    u32 index,
+    u32 *kind,
+    u32 *destination,
+    u32 *source_or_value,
+    u32 *units)
+{
+    struct recovered_startup_transfer transfer;
+    u32 table_index;
+    u32 first_table_count;
+    u32 second_table_count;
+
+    if (profile == 0U) {
+        first_table_count = 3U;
+        second_table_count = 3U;
+    } else {
+        first_table_count = 2U;
+        second_table_count = 2U;
+    }
+
+    if (index < first_table_count + second_table_count) {
+        u32 table = index & 1U;
+
+        table_index = index >> 1;
+        transfer.kind = RECOVERED_STARTUP_WORD_EXPAND;
+        transfer.destination = 0x01800020U + (table << 12);
+        while (table_index != 0U) {
+            transfer.destination += (profile == 0U
+                ? STARTUP_PROFILE_ZERO_BLOCKS[table_index - 1U]
+                : STARTUP_PROFILE_NONZERO_BLOCKS[table_index - 1U]) << 5;
+            --table_index;
+        }
+        table_index = index >> 1;
+        if (profile == 0U) {
+            transfer.source_or_value =
+                STARTUP_PROFILE_ZERO_SOURCES[table][table_index];
+            transfer.units = STARTUP_PROFILE_ZERO_BLOCKS[table_index];
+        } else {
+            transfer.source_or_value =
+                STARTUP_PROFILE_NONZERO_SOURCES[table][table_index];
+            transfer.units = STARTUP_PROFILE_NONZERO_BLOCKS[table_index];
+        }
+    } else {
+        index -= first_table_count + second_table_count;
+        if (index == 0U) {
+            transfer.kind = RECOVERED_STARTUP_HALFWORD_SWAP;
+            transfer.destination = 0x01081000U;
+            transfer.source_or_value = 0x02e21a74U;
+            transfer.units = 0x18800U;
+        } else if (index == 1U) {
+            transfer.kind = RECOVERED_STARTUP_HALFWORD_SWAP;
+            transfer.destination = 0x010b2000U;
+            transfer.source_or_value = profile == 0U ? 0x02e21054U : 0x02e4e0d4U;
+            transfer.units = profile == 0U ? 0x17000U : 0x27000U;
+        } else if (profile == 0U && index == 2U) {
+            transfer.kind = RECOVERED_STARTUP_HALFWORD_SWAP;
+            transfer.destination = 0x010e0000U;
+            transfer.source_or_value = 0x02e6db14U;
+            transfer.units = 0x6800U;
+        } else {
+            static const struct recovered_startup_transfer TAIL[] = {
+                {RECOVERED_STARTUP_HALFWORD_SWAP, 0x010a9100U, 0x00144cc4U, 0x770U},
+                {RECOVERED_STARTUP_HALFWORD_SWAP, 0x00ffb600U, 0x00146324U, 0x480U},
+                {RECOVERED_STARTUP_HALFWORD_SWAP, 0x00ffa200U, 0x00144184U, 0x5a0U},
+                {RECOVERED_STARTUP_HALFWORD_SWAP, 0x00ffe800U, 0x00145ba4U, 0x3c0U},
+                {RECOVERED_STARTUP_HALFWORD_SWAP, 0x00286f80U, 0x00146c24U, 0x20U},
+                {RECOVERED_STARTUP_HALFWORD_SWAP, 0x01086fc0U, 0x00146c64U, 0x20U},
+                {RECOVERED_STARTUP_HALFWORD_FILL, 0x010aae00U, 0x9999U, 0x10U},
+                {RECOVERED_STARTUP_WORD_EXPAND, 0x01801520U, 0x0001bb50U, 1U},
+                {RECOVERED_STARTUP_WORD_EXPAND, 0x01801f40U, 0x0001bb70U, 1U},
+                {RECOVERED_STARTUP_WORD_EXPAND, 0x01801f60U, 0x0001bb70U, 1U},
+                {RECOVERED_STARTUP_WORD_EXPAND, 0x01801fc0U, 0x0001bb70U, 1U}
+            };
+            u32 tail_index = index - (profile == 0U ? 3U : 2U);
+
+            if (tail_index >= (u32)(sizeof(TAIL) / sizeof(TAIL[0])))
+                return 0U;
+            transfer = TAIL[tail_index];
+        }
+    }
+
+    *kind = transfer.kind;
+    *destination = transfer.destination;
+    *source_or_value = transfer.source_or_value;
+    *units = transfer.units;
+    return 1U;
 }
 
 /* Recovered fixed video upload at i960 0x00020180. */

@@ -500,6 +500,21 @@
           "notes": "Recovers the adjacent halfword byte-swap copy loop and exhaustively checks the transform across all 16-bit source values."
         },
         {
+          "name": "startup_asset_transfer_plan",
+          "start": "0x0001bda0",
+          "end": "0x0001c220",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_startup_asset_transfer_plan",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_text_video.py"
+          ],
+          "notes": "Captures the 0x1bda0 loader's fixed profile-dependent asset-transfer schedule without executing mapped writes. Zero profile yields 20 records and every nonzero input yields 17: block expansions, ROM halfword byte swaps, a 0x9999 fill, and four final color-table expansions. All 37 distinct records are host-tested. Resource semantics and active hardware integration remain separate."
+        },
+        {
           "name": "text_video_row_transfer_plan",
           "start": "0x0001bc90",
           "end": "0x0001bcd0",

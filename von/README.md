@@ -348,7 +348,15 @@ provisional and do not increase the headline percentage.
 
 ### Current reconstruction milestone
 
-The latest unattended pass recovered five additional host-side audio units
+The latest pass recovered the profile-dependent transfer schedule of the
+startup asset loader at `0x1bda0-0x1c21c`. Its new descriptor API identifies
+20 profile-zero and 17 alternate-profile operations: packed color-table
+expansion, ROM halfword byte swaps into mapped RAM, a small `0x9999` fill, and
+four final table expansions. This makes the early graphics/asset layout
+inspectable without executing mapped hardware writes; resource names and active
+integration remain the next boundary.
+
+The preceding unattended pass recovered five additional host-side audio units
 from the i960 attract trace and integrated the SCSP startup sequence into the
 reconstructed main path:
 
