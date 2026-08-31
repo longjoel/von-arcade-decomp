@@ -82,10 +82,23 @@ def main() -> int:
     parser.add_argument("--max-time", type=float)
     parser.add_argument("--tolerance", type=float, default=0.02)
     parser.add_argument("--min-objects", type=int, default=1)
+    parser.add_argument("--start-object", type=int, default=0,
+                        help="first submitted object slot to export")
+    parser.add_argument("--max-objects", type=int,
+                        help="maximum submitted object slots to export")
     args = parser.parse_args()
 
     selected_time, objects = select_frame(
         args.trace, args.time, args.max_time, args.tolerance, args.min_objects)
+    if args.start_object < 0:
+        raise SystemExit("--start-object must be non-negative")
+    objects = objects[args.start_object:]
+    if args.max_objects is not None:
+        if args.max_objects <= 0:
+            raise SystemExit("--max-objects must be positive")
+        objects = objects[:args.max_objects]
+    if not objects:
+        raise SystemExit("object slice is empty")
     geometry = args.rom.read_bytes()
     texture_rom = args.texture_rom.read_bytes()
     primary = args.bank_primary.read_bytes()
@@ -219,7 +232,8 @@ def main() -> int:
         return mesh_index
 
     nodes = []
-    for slot, (oba, matrix, metadata) in enumerate(objects):
+    for relative_slot, (oba, matrix, metadata) in enumerate(objects):
+        slot = args.start_object + relative_slot
         mesh_index = mesh_for(oba, int(metadata["tpa"]), int(metadata["tha"]))
         rotation, scale = transform_trs(matrix)
         nodes.append({
@@ -232,6 +246,7 @@ def main() -> int:
         })
 
     extras = {"trace_time": selected_time, "object_slots": len(objects),
+              "start_object": args.start_object,
               "unique_meshes": len(meshes), "material_groups": len(materials),
               "embedded_tiles": len(images),
               "palette_rendered": palette_state is not None}
