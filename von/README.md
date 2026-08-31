@@ -183,6 +183,19 @@ Open the result in F3D and play `triangle_submission_order`; triangles appear
 in traced submission order. Early entries are commonly arena geometry, which
 is useful for identifying the point where fighter submissions begin.
 
+The polygon-ROM decoder has a small independently verified format boundary.
+An OBA is a word address (`(oba & 0x3fffff) * 4`) into the assembled polygon
+ROM. It begins with two float3 seed points, followed by fixed-size polygon
+records. Each record contains an attribute word, three non-position words,
+and two float3 positions. Attribute bit 0 selects a quad; otherwise the final
+float3 remains present in the record but is not a polygon corner. Quads use
+the stored corner grid order `p0, p1, p2, p3` and are triangulated as
+`(p0,p1,p2)` plus `(p1,p3,p2)`. The arena floor object `0x0091af12` is the
+minimal validation case: it is exactly one 10,000-by-10,000 quad at local
+`y = -40`, and both exported halves have the same facing. Attribute bits
+8–9 update the two seed points for the following record; their final hardware
+names remain intentionally undecided.
+
 The single-cabinet capture script uses `bin/von` directly and defaults to SDL's
 dummy video backend, so it also works on headless build hosts. A single cabinet
 can remain at the Model 2 boot screen while waiting for the twin communication
