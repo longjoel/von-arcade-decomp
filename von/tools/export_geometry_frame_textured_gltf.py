@@ -192,10 +192,10 @@ def main() -> int:
             entry["positions"].extend(points)
             entry["uv"].extend(texture_uv(u, v, header) for u, v in uv)
             if len(points) == 4:
-                entry["indices"].extend((base + 1, base, base + 2,
-                                          base + 1, base + 2, base + 3))
+                entry["indices"].extend((base, base + 1, base + 2,
+                                          base, base + 2, base + 3))
             else:
-                entry["indices"].extend((base + 1, base, base + 2))
+                entry["indices"].extend((base, base + 1, base + 2))
         if not primitives_by_header:
             raise SystemExit(f"object {oba:08x} produced no textured faces")
 

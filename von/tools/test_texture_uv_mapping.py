@@ -2,8 +2,9 @@
 """Regression checks for Model 2 UV scaling and texture-header sampling flags."""
 from __future__ import annotations
 
-from export_geometry_textured_gltf import (texture_sampler, texture_sheet_xy,
-                                           texture_size, texture_uv)
+from export_geometry_textured_gltf import (raster_vertices, texture_sampler,
+                                           texture_sheet_xy, texture_size,
+                                           texture_uv)
 
 
 def expect(actual, expected, label):
@@ -36,6 +37,13 @@ def main():
     expect(texture_sheet_xy(1023, 17), (1023, 17), "left texture-sheet half")
     expect(texture_sheet_xy(1024, 17), (0, 1041), "right texture-sheet bank")
     expect(texture_sheet_xy(2047, 1023), (1023, 2047), "right edge sheet bank")
+
+    # Positions P0,P1 arrive in the opposite order from their V0,V1 UVs.
+    expect(raster_vertices(((0.0, 0.0, 0.0), (1.0, 0.0, 0.0),
+                            (0.0, 1.0, 0.0), (1.0, 1.0, 0.0))),
+           ((1.0, 0.0, 0.0), (0.0, 0.0, 0.0),
+            (0.0, 1.0, 0.0), (1.0, 1.0, 0.0)),
+           "raster vertex/UV correspondence")
     print("PASS: Model 2 UV mapping and sampler flags")
 
 

@@ -48,6 +48,17 @@ def texture_uv(raw_u: int, raw_v: int,
     return raw_u / 8.0 / width, raw_v / 8.0 / height
 
 
+def raster_vertices(points: tuple[tuple[float, float, float], ...]
+                    ) -> tuple[tuple[float, float, float], ...]:
+    """Return vertices in the Model 2 rasterizer order.
+
+    Polygon records carry P0 then P1, but the rasterizer assigns those to V1
+    then V0. UV records are subsequently read as V0, V1, V2, V3, so this swap
+    is essential to keep positions and UVs paired.
+    """
+    return (points[1], points[0], *points[2:])
+
+
 def texture_sampler(header: tuple[int, int, int, int]) -> tuple[int, int]:
     """Return glTF wrap modes matching Model 2's regular-texture flags.
 
@@ -153,10 +164,10 @@ def parse_faces(geometry: bytes, texture_data: bytes, oba: int, tpa: int, tha: i
         p2, cursor = point(values, cursor)
         if attr & 1:
             p3, cursor = point(values, cursor)
-            points = (p0, p1, p2, p3)
+            points = raster_vertices((p0, p1, p2, p3))
         else:
             cursor += 3
-            points = (p0, p1, p2)
+            points = raster_vertices((p0, p1, p2))
 
         uv = []
         for _ in points:
@@ -217,9 +228,9 @@ def main() -> int:
         entry = primitives.setdefault(key, {"positions": [], "uv": [], "indices": []})
         base = len(entry["positions"])
         if len(points) == 4:
-            triangles = ((1, 0, 2), (1, 2, 3))
+            triangles = ((0, 1, 2), (0, 2, 3))
         else:
-            triangles = ((1, 0, 2),)
+            triangles = ((0, 1, 2),)
         width, height, _, _, _ = texture_size(header)
         for index in range(len(points)):
             entry["positions"].append(points[index])
