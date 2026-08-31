@@ -2,7 +2,8 @@
 """Regression checks for Model 2 UV scaling and texture-header sampling flags."""
 from __future__ import annotations
 
-from export_geometry_textured_gltf import texture_sampler, texture_size, texture_uv
+from export_geometry_textured_gltf import (texture_sampler, texture_sheet_xy,
+                                           texture_size, texture_uv)
 
 
 def expect(actual, expected, label):
@@ -29,6 +30,12 @@ def main():
            (33648, 33071), "U mirror overrides repeat")
     expect(texture_sampler((clamp_header[0] | (1 << 7) | (1 << 9), 0, header[2], header[3])),
            (33071, 33648), "V mirror overrides repeat")
+
+    # Model 2 stores the logical right half of its 2048x1024 texture sheet
+    # in a second 1024x1024 bank, selected by Y bit 10.
+    expect(texture_sheet_xy(1023, 17), (1023, 17), "left texture-sheet half")
+    expect(texture_sheet_xy(1024, 17), (0, 1041), "right texture-sheet bank")
+    expect(texture_sheet_xy(2047, 1023), (1023, 2047), "right edge sheet bank")
     print("PASS: Model 2 UV mapping and sampler flags")
 
 

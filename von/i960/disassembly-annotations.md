@@ -813,6 +813,11 @@ the indexed texel values available when a palette trace is not present.
 
 ### UV-to-Tile Contract
 
+Texture dumps use the Model 2 sheet's physical addressing rather than a
+linear 2048x1024 image: logical X coordinates `1024..2047` are stored in the
+other 1024x1024 bank, at `(x - 1024, y ^ 1024)`.  Tile extraction applies this
+mapping before decoding packed 4bpp texels.
+
 The texture-point stream is directly ordered as `pv, pu` 16-bit words per
 vertex. MAME converts both values from 1/8-texel units before sampling, so the
 exporter reads the pair as `(u=pu, v=pv)` and writes tile-local glTF coordinates

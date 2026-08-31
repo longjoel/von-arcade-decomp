@@ -91,16 +91,32 @@ def png_rgb(width: int, height: int, pixels: bytes) -> bytes:
             chunk(b"IDAT", zlib.compress(rows, 9)) + chunk(b"IEND", b""))
 
 
-def texel(bank: bytes, x: int, y: int) -> int:
+def texture_sheet_xy(x: int, y: int) -> tuple[int, int]:
+    """Map a logical 2048x1024 Model 2 sheet coordinate to RAM storage.
+
+    The sheet's right half is stored as the other 1024x1024 bank with bit 10
+    of Y flipped.  This mirrors ``model2_renderer::get_texel``; treating the
+    dump as a linear 2048x1024 image produces plausible palette colours but
+    the wrong texture regions for tiles at X >= 1024.
+    """
     x &= 2047
     y &= 1023
+    if x >= 1024:
+        x -= 1024
+        y ^= 1024
+    return x, y
+
+
+def texel(bank: bytes, x: int, y: int) -> int:
+    local_x, local_y = x & 1, y & 1
+    x, y = texture_sheet_xy(x, y)
     offset = (y // 2) * 512 + (x // 2)
     word = int.from_bytes(bank[(offset >> 1) * 4:(offset >> 1) * 4 + 4], "little")
     if offset & 1:
         word >>= 16
-    if not (y & 1):
+    if not local_y:
         word >>= 8
-    if not (x & 1):
+    if not local_x:
         word >>= 4
     return (word & 0x0f) * 17
 

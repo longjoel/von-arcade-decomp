@@ -7,6 +7,8 @@ import argparse
 import re
 from pathlib import Path
 
+from export_geometry_textured_gltf import texel
+
 
 COMMAND = re.compile(
     r"vonj_texture_command: (?:time=[0-9.e+-]+ )?uv=([0-9a-f]+) header=([0-9a-f]+) "
@@ -32,17 +34,6 @@ def main() -> int:
     seen: set[tuple[int, int, int, int, int]] = set()
     rows: list[tuple[str, int, int, int, int, int]] = []
 
-    def texel(x: int, y: int) -> int:
-        offset = (y // 2) * 512 + (x // 2)
-        word = int.from_bytes(packed[(offset >> 1) * 4:(offset >> 1) * 4 + 4], "little")
-        if offset & 1:
-            word >>= 16
-        if not (y & 1):
-            word >>= 8
-        if not (x & 1):
-            word >>= 4
-        return (word & 0x0f) * 17
-
     for match in COMMAND.finditer(args.trace.read_text()):
         groups = match.groups()
         header = int(groups[1], 16)
@@ -56,7 +47,7 @@ def main() -> int:
         x0 = (origin_x - 2048) & 2047
         y0 = (origin_y - 1024) & 1023
         pixels = bytearray(
-            texel((x0 + x) & 2047, (y0 + y) & 1023)
+            texel(packed, x0 + x, y0 + y)
             for y in range(height) for x in range(width)
         )
         name = f"{len(rows):03d}-cb{colorbase:03x}-{width}x{height}-at{x0:04x}_{y0:03x}.pgm"
