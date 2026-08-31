@@ -167,6 +167,22 @@ python3 von/tools/export_geometry_animation_gltf.py \
   --trace von/build/disasm/vonj-geometry-select-40s.trace
 ```
 
+For a diagnostic view of polygon submission order, export a single geometry
+frame as a cumulative triangle animation. It filters to mode-3 polygon-ROM
+submissions (excluding the video/HUD path) and caps the output by default:
+
+```sh
+python3 von/tools/export_geometry_triangle_build_gltf.py \
+  --trace von/captures/twin-vonj-20260830T144329Z/p2/mame.log \
+  --rom von/build/disasm/geometry-rom.bin \
+  --time 16.288808 --min-objects 40 --max-triangles 3000 \
+  --output von/build/disasm/triangle-build.gltf
+```
+
+Open the result in F3D and play `triangle_submission_order`; triangles appear
+in traced submission order. Early entries are commonly arena geometry, which
+is useful for identifying the point where fighter submissions begin.
+
 The single-cabinet capture script uses `bin/von` directly and defaults to SDL's
 dummy video backend, so it also works on headless build hosts. A single cabinet
 can remain at the Model 2 boot screen while waiting for the twin communication
