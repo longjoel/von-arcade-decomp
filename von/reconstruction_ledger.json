@@ -545,6 +545,21 @@
           "notes": "Recovers the 0x1c220 video-control bootstrap's fixed 0x1c730 helper request and ten direct bus/state writes around the existing 0x1c618 clear call. The plan preserves caller g14 propagation and the final 0xffffffff sentinel; all records are host-tested. Active mapped-write integration remains separate."
         },
         {
+          "name": "video_byte_lane_expand",
+          "start": "0x0001c730",
+          "end": "0x0001c7d0",
+          "classification": "code",
+          "status": "provisional",
+          "source": "von/i960/recovered_text.c",
+          "symbol": "recovered_text_expand_video_blocks",
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_text_video.py"
+          ],
+          "notes": "Recovers the packed-byte expansion: each mode-masked source byte becomes two four-pixel 4-bit lane groups in a 32-bit destination word, with eight values processed per positive block. All 256 source bytes and 16 mode values are host-tested, along with block scheduling. Mapped-RAM execution remains separate."
+        },
+        {
           "name": "text_string_font_mode",
           "start": "0x0001da90",
           "end": "0x0001db34",

@@ -32,4 +32,6 @@ if [[ -f "$ERROR_LOG" ]]; then
     cp "$ERROR_LOG" "$TRACE_LOG"
 fi
 
+python3 "$ROOT_DIR/von/tools/summarize_mame_trace.py" "$TRACE_LOG"
+
 printf 'Wrote %s\n' "$TRACE_LOG"

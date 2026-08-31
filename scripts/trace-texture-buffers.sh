@@ -26,6 +26,9 @@ SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}" env $(runtime_env) \
     -seconds_to_run "$SECONDS_TO_RUN" -skip_gameinfo -nothrottle \
     > "$OUT_DIR/vonj-texture-buffers.trace" 2>&1
 
+python3 "$ROOT_DIR/von/tools/summarize_mame_trace.py" \
+    "$OUT_DIR/vonj-texture-buffers.trace"
+
 for bank in 11000000 11200000; do
     latest="$(find "$OUT_DIR" -maxdepth 1 -type f -name "texture-$bank.*.hex" -printf '%T@ %p\n' | sort -n | tail -n 1 | cut -d' ' -f2-)"
     [[ -n "$latest" ]] || { printf 'error: no texture dump was captured for %s\n' "$bank" >&2; exit 1; }

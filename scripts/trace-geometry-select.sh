@@ -30,6 +30,8 @@ VON_PROGRESS_LOG="$LUA_LOG" \
     -seconds_to_run "$SECONDS_TO_RUN" -skip_gameinfo -nothrottle \
     >"$TRACE_LOG" 2>&1
 
+python3 "$ROOT_DIR/von/tools/summarize_mame_trace.py" "$TRACE_LOG"
+
 objects=$(rg -c 'vonj_geometry_object:' "$TRACE_LOG" || echo 0)
 matrices=$(rg -c 'vonj_geometry_matrix:' "$TRACE_LOG" || echo 0)
 polygons=$(rg -c 'vonj_geometry_polygon:' "$TRACE_LOG" || echo 0)

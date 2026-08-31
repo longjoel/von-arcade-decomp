@@ -15,6 +15,7 @@ python3 von/tools/test_recovered_memory.py
 python3 von/tools/test_recovered_geometry_service.py
 python3 von/tools/test_recovered_text_control.py
 python3 von/tools/test_recovered_text_video.py
+python3 von/tools/test_summarize_mame_trace.py
 python3 von/tools/test_texture_palette.py
 python3 von/tools/rom_audit.py
 ROM_PATH="$(prepare_rom_path)"

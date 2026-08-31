@@ -112,6 +112,14 @@ def main() -> int:
             ctypes.POINTER(ctypes.c_uint32),
         ]
         recovered.recovered_text_video_control_write_plan.restype = ctypes.c_uint32
+        recovered.recovered_text_expand_video_byte.argtypes = [
+            ctypes.c_uint32, ctypes.c_uint32
+        ]
+        recovered.recovered_text_expand_video_byte.restype = ctypes.c_uint32
+        recovered.recovered_text_expand_video_blocks.argtypes = [
+            ctypes.c_void_p, ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32
+        ]
+        recovered.recovered_text_expand_video_blocks.restype = None
         recovered.recovered_text_voltage_warning_plan.argtypes = [
             ctypes.c_uint32,
             ctypes.POINTER(ctypes.c_uint32),
@@ -394,6 +402,46 @@ def main() -> int:
         ) != 0:
             raise SystemExit("accepted invalid video control write")
 
+        def expand_nibble(nibble: int, color: int) -> int:
+            return sum(
+                color << shift
+                for bit, shift in ((8, 12), (4, 8), (2, 4), (1, 0))
+                if nibble & bit
+            )
+
+        video_expand_vectors = 0
+        for source_byte in range(0x100):
+            for color in range(0x10):
+                expected = expand_nibble(source_byte >> 4, color) | (
+                    expand_nibble(source_byte, color) << 16
+                )
+                actual = recovered.recovered_text_expand_video_byte(source_byte, color)
+                if actual != expected:
+                    raise SystemExit(
+                        f"video byte expand mismatch source={source_byte:02x} color={color:x}"
+                    )
+                video_expand_vectors += 1
+
+        video_block_vectors = 0
+        for blocks in (0, 1, 2, 7):
+            source = (ctypes.c_uint8 * max(1, blocks * 8))()
+            destination = (ctypes.c_uint32 * max(1, blocks * 8))()
+            for index in range(blocks * 8):
+                source[index] = (index * 0x35 + 0x7B) & 0xFF
+                destination[index] = 0xDEADBEEF
+            recovered.recovered_text_expand_video_blocks(
+                destination, source, blocks, 0xB
+            )
+            for index in range(blocks * 8):
+                expected = expand_nibble(source[index] >> 4, 0xB) | (
+                    expand_nibble(source[index], 0xB) << 16
+                )
+                if destination[index] != expected:
+                    raise SystemExit(
+                        f"video block expand mismatch blocks={blocks} index={index}"
+                    )
+                video_block_vectors += 1
+
         warning_expected = (
             (4, 16, 0x000012E0),
             (4, 19, 0x000012F0),
@@ -463,6 +511,7 @@ def main() -> int:
         f"{block_vectors} block expansions, {swap_vectors:,} halfword swaps, "
         f"{swap_block_vectors} swap copies, {startup_vectors} startup transfers, "
         f"{control_vectors} video-control writes, "
+        f"{video_expand_vectors:,} video-byte expansions, {video_block_vectors} video-block expansions, "
         f"and {plan_vectors:,} row-transfer plan entries"
     )
     return 0

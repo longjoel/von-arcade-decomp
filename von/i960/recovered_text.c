@@ -380,6 +380,51 @@ u32 recovered_text_video_control_write_plan(
     return 1U;
 }
 
+/* Expand one source nibble into the four 4-bit lanes used by 0x1c730. */
+static u32 recovered_text_expand_video_nibble(u32 nibble, u32 color)
+{
+    u32 expanded = 0U;
+
+    if ((nibble & 8U) != 0U)
+        expanded |= color << 12;
+    if ((nibble & 4U) != 0U)
+        expanded |= color << 8;
+    if ((nibble & 2U) != 0U)
+        expanded |= color << 4;
+    if ((nibble & 1U) != 0U)
+        expanded |= color;
+    return expanded;
+}
+
+/* Recovered packed-byte to four-bit-lane expansion at i960 0x0001c730. */
+u32 recovered_text_expand_video_byte(u32 source, u32 color)
+{
+    u32 high;
+    u32 low;
+
+    source &= 0xffU;
+    color &= 0x0fU;
+    high = recovered_text_expand_video_nibble(source >> 4, color);
+    low = recovered_text_expand_video_nibble(source, color);
+    return high | (low << 16);
+}
+
+/*
+ * The original consumes and produces eight values per positive block count.
+ * A zero count is not a valid original call, but is safely empty here.
+ */
+void recovered_text_expand_video_blocks(volatile u32 *destination,
+                                        volatile const u8 *source,
+                                        u32 blocks,
+                                        u32 color)
+{
+    u32 index;
+    u32 values = blocks << 3;
+
+    for (index = 0U; index < values; ++index)
+        destination[index] = recovered_text_expand_video_byte(source[index], color);
+}
+
 /* Recovered fixed video upload at i960 0x00020180. */
 void recovered_text_video_upload(void)
 {

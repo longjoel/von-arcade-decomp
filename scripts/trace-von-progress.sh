@@ -34,5 +34,7 @@ toolbox run --container "$TOOLBOX_NAME" env \
     -seconds_to_run "$SECONDS_TO_RUN" -skip_gameinfo -nothrottle \
     >"$TRACE_LOG" 2>&1
 
+python3 "$ROOT_DIR/von/tools/summarize_mame_trace.py" "$TRACE_LOG"
+
 printf 'Wrote %s\n' "$TRACE_LOG"
 printf 'Wrote %s\n' "$LUA_LOG"

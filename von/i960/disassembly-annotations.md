@@ -168,6 +168,15 @@ The ten direct writes retain the original caller-supplied `g14` value rather
 than assuming it is zero; the last write stores the explicit `0xffffffff`
 sentinel. Both the request and all write records are host-tested.
 
+The helper reached by that bootstrap at `0x0001c730-0x0001c7d0` expands each
+input byte into two four-pixel, four-bit lane groups. Its mode argument is
+masked to four bits; each set input bit selects that mode value in one output
+nibble. The high source nibble occupies output bits `0..15`, the low source
+nibble output bits `16..31`. The helper processes eight bytes/words per block.
+`recovered_text_expand_video_byte()` and
+`recovered_text_expand_video_blocks()` preserve that conversion and are tested
+over every source byte and mode value; mapped-RAM execution remains separate.
+
 The `0x00020180` caller supplies a fixed upload request: source `0x01004000`,
 destination pointer slot `0x02fd61d0`, `0x40` halfwords per row, and `0x40`
 rows. `recovered_text_video_upload()` now executes that exact handoff through

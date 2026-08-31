@@ -362,6 +362,12 @@ state writes around video clearing, and the terminal `0xffffffff` state
 sentinel. These plans are inspectable and regression-tested before mapped
 hardware-write integration.
 
+The `0x1c730` helper behind that bootstrap is now recovered as an exhaustive
+byte-to-four-bit-lane expansion. Trace captures now automatically emit compact
+JSON and Markdown summaries with checksums, event counts, and collapsed repeated
+diagnostics. Run `python3 von/tools/summarize_mame_trace.py <trace> --archive`
+to retain a raw trace losslessly as gzip while replacing its plaintext copy.
+
 The preceding unattended pass recovered five additional host-side audio units
 from the i960 attract trace and integrated the SCSP startup sequence into the
 reconstructed main path:
