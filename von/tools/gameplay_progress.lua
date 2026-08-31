@@ -19,6 +19,8 @@
 --              VON_PROGRESS_LOG     (log file path)
 --              VON_PROGRESS_COMBAT  (default 1; set 0 for passive capture)
 --              VON_PROGRESS_COMBAT_START (default 1800)
+--              VON_PROGRESS_SELECT_STEPS (right presses before confirmation)
+--              VON_PROGRESS_AUTO_START (default 1; set 0 for selector-only capture)
 
 local SECONDS = tonumber(os.getenv("VON_PROGRESS_SECONDS") or "150")
 local TARGET_FRAMES = SECONDS * 60
@@ -135,10 +137,15 @@ end
 
 -- Boot inputs. Coin at ~frame 900 opens MACHINE SELECT; start at ~frame 1500
 -- confirms the highlighted machine and launches the battle.
-local schedule = {
-    { frame = 900,  key = "coin" },
-    { frame = 1500, key = "start" },
-}
+local SELECT_STEPS = tonumber(os.getenv("VON_PROGRESS_SELECT_STEPS") or "0")
+local AUTO_START = os.getenv("VON_PROGRESS_AUTO_START") ~= "0"
+local schedule = { { frame = 900, key = "coin" } }
+for step = 1, SELECT_STEPS do
+    schedule[#schedule + 1] = { frame = 1080 + step * 45, key = "right" }
+end
+if AUTO_START then
+    schedule[#schedule + 1] = { frame = 1500 + SELECT_STEPS * 45, key = "start" }
+end
 local schedule_index = 1
 
 -- Combat phase: cycle the left stick around the compass and pulse both shot
