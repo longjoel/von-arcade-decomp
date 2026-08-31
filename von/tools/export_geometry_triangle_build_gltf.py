@@ -53,17 +53,27 @@ def main() -> int:
     parser.add_argument("--max-time", type=float)
     parser.add_argument("--tolerance", type=float, default=0.02)
     parser.add_argument("--min-objects", type=int, default=1)
+    parser.add_argument("--start-object", type=int, default=0,
+                        help="skip this many submitted objects before exporting")
+    parser.add_argument("--max-objects", type=int,
+                        help="export at most this many submitted objects")
     parser.add_argument("--max-triangles", type=int, default=3000,
                         help="cap output size; zero means no cap")
     parser.add_argument("--seconds", type=float, default=12.0,
                         help="duration of the cumulative reveal")
     args = parser.parse_args()
-    if args.max_triangles < 0 or args.seconds <= 0.0:
-        raise SystemExit("--max-triangles must be nonnegative and --seconds must be positive")
+    if (args.max_triangles < 0 or args.start_object < 0 or
+            (args.max_objects is not None and args.max_objects <= 0) or args.seconds <= 0.0):
+        raise SystemExit("--max-triangles/--start-object/--max-objects/--seconds have invalid bounds")
 
     selected_time, objects = select_geometry(
         args.trace, args.time, args.tolerance, args.min_objects, args.max_time
     )
+    objects = objects[args.start_object:]
+    if args.max_objects is not None:
+        objects = objects[:args.max_objects]
+    if not objects:
+        raise SystemExit("object slice selected no submitted objects")
     blob = bytearray()
     views: list[dict] = []
     accessors: list[dict] = []
@@ -89,11 +99,11 @@ def main() -> int:
 
     rom = args.rom.read_bytes()
     triangle_records = []
-    for oba, matrix, metadata in objects:
+    for object_slot, (oba, matrix, metadata) in enumerate(objects, args.start_object):
         vertices, indices = parse_mesh(rom, oba)
         for cursor in range(0, len(indices), 3):
             triangle_records.append((tuple(vertices[index] for index in indices[cursor:cursor + 3]),
-                                     matrix, oba, metadata))
+                                     matrix, oba, metadata, object_slot))
             if args.max_triangles and len(triangle_records) >= args.max_triangles:
                 break
         if args.max_triangles and len(triangle_records) >= args.max_triangles:
@@ -101,7 +111,7 @@ def main() -> int:
     if not triangle_records:
         raise SystemExit("selected geometry produced no triangles")
 
-    for ordinal, (triangle, matrix, oba, metadata) in enumerate(triangle_records):
+    for ordinal, (triangle, matrix, oba, metadata, object_slot) in enumerate(triangle_records):
         position = add_accessor(b"".join(struct.pack("<3f", *vertex) for vertex in triangle),
                                 3, "VEC3", 34962)
         index = add_blob(struct.pack("<3I", 0, 1, 2), 34963)
@@ -115,6 +125,7 @@ def main() -> int:
                       "translation": list(matrix[9:12]), "rotation": list(rotation),
                       "scale": [0.0, 0.0, 0.0],
                       "extras": {"trace_time": selected_time, "submission_index": ordinal,
+                                 "object_slot": object_slot,
                                  "geometry_object": metadata, "final_scale": list(scale)}})
         reveal = args.seconds * (ordinal + 1) / len(triangle_records)
         input_accessor = add_accessor(struct.pack("<2f", 0.0, reveal), 2, "SCALAR")
@@ -136,7 +147,8 @@ def main() -> int:
                      base64.b64encode(blob).decode("ascii")}],
         "bufferViews": views, "accessors": accessors,
         "extras": {"trace_time": selected_time, "triangle_count": len(triangle_records),
-                   "object_slots": len(objects), "geometry_filter": "mode=3 source=polygon-rom"},
+        "object_slots": len(objects), "object_start": args.start_object,
+        "geometry_filter": "mode=3 source=polygon-rom"},
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(document, indent=2) + "\n")

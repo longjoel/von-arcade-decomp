@@ -51,6 +51,8 @@ def main() -> int:
             raise SystemExit("unexpected triangle animation structure")
         if document["extras"]["geometry_filter"] != "mode=3 source=polygon-rom":
             raise SystemExit("geometry filter metadata missing")
+        if document["extras"]["object_start"] != 0 or document["nodes"][0]["extras"]["object_slot"] != 0:
+            raise SystemExit("object slice provenance missing")
         accessor = document["accessors"][2]
         if accessor["min"] != [0.0] or accessor["max"] != [2.0]:
             raise SystemExit("animation input bounds missing")

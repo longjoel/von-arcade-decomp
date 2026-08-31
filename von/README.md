@@ -182,6 +182,19 @@ python3 von/tools/export_geometry_triangle_build_gltf.py \
 Open the result in F3D and play `triangle_submission_order`; triangles appear
 in traced submission order. Early entries are commonly arena geometry, which
 is useful for identifying the point where fighter submissions begin.
+Use `--start-object N --max-objects M` to isolate a contiguous submission
+assembly while retaining its original slot number in every triangle node.
+For the recorded deterministic first match, slots 6–24 form a complete
+1,706-triangle Virtualoid assembly (rather than arena geometry):
+
+```sh
+python3 von/tools/export_geometry_triangle_build_gltf.py \
+  --trace von/captures/twin-vonj-20260830T144329Z/p2/mame.log \
+  --rom von/build/disasm/geometry-rom.bin \
+  --time 16.288808 --min-objects 40 --start-object 6 --max-objects 19 \
+  --max-triangles 0 --seconds 12 \
+  --output von/build/disasm/fighter-assembly-slot-06.gltf
+```
 
 The polygon-ROM decoder has a small independently verified format boundary.
 An OBA is a word address (`(oba & 0x3fffff) * 4`) into the assembled polygon
