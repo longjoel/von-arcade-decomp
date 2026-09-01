@@ -7,6 +7,9 @@
 /von/captures/
 /von/build/
 /dist/
+# Root-level probe and emulator logs are generated artifacts.
+/*.log
+/*.trace
 /config/remote-build.local.env
 /bin/von
 /cfg/
