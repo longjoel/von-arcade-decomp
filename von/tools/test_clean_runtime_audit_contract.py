@@ -9,6 +9,7 @@ import tempfile
 
 def main() -> int:
     script = Path("scripts/audit-i960-clean-runtime.sh").read_text(encoding="utf-8")
+    lua = Path("von/tools/trace_i960_attract_coverage.lua").read_text(encoding="utf-8")
     required = (
         "MAME_STATUS=$?",
         "AUDIT_STATUS=0",
@@ -23,6 +24,8 @@ def main() -> int:
     if missing:
         raise SystemExit(f"clean runtime audit contract missing: {missing}")
     assert script.index("MAME_STATUS=$?") < script.index("audit_clean_i960_coverage.py")
+    assert "manager.machine:exit()" in lua
+    assert "emu.exit()" not in lua
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
         pcs = root / "pcs"

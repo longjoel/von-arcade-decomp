@@ -47,7 +47,7 @@ emu.register_periodic(function()
 		start_tracking()
 	end
 	if started and emu.time() >= seconds then
-		emu.exit()
+		manager.machine:exit()
 	end
 end)
 
