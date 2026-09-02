@@ -3,8 +3,8 @@
   "coverage_source": "von/build/attract-coverage/vonj-attract-60s.json",
   "discovered_units": 262,
   "represented_units": 94,
-  "modeled_units": 91,
-  "integrated_units": 3,
+  "modeled_units": 85,
+  "integrated_units": 9,
   "untriaged_units": 168,
   "ordering": "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality",
   "units": [
@@ -405,42 +405,6 @@
       ]
     },
     {
-      "entry": "0x00027e50",
-      "observed_call_edges": 3,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.texture-decompressor",
-      "sources": [
-        "von/i960/recovered_texture_decompress.c"
-      ]
-    },
-    {
-      "entry": "0x00028120",
-      "observed_call_edges": 1,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.texture-loader-profile-setup",
-      "sources": [
-        "von/i960/recovered_texture.c"
-      ]
-    },
-    {
-      "entry": "0x00028620",
-      "observed_call_edges": 1,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.geometry-program-upload",
-      "sources": [
-        "von/i960/recovered_geometry.c"
-      ]
-    },
-    {
       "entry": "0x00028840",
       "observed_call_edges": 1,
       "triage": "modeled-integration-queue",
@@ -477,18 +441,6 @@
       ]
     },
     {
-      "entry": "0x00028c08",
-      "observed_call_edges": 1,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.geometry-batch-submit",
-      "sources": [
-        "von/i960/recovered_geometry_commands.c"
-      ]
-    },
-    {
       "entry": "0x00028c80",
       "observed_call_edges": 1,
       "triage": "modeled-integration-queue",
@@ -496,30 +448,6 @@
       "priority": 0,
       "weight": null,
       "work_unit": "maincpu.geometry-command-batch-loop",
-      "sources": [
-        "von/i960/recovered_geometry_commands.c"
-      ]
-    },
-    {
-      "entry": "0x00028d30",
-      "observed_call_edges": 3,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.geometry-auxiliary-submit-select",
-      "sources": [
-        "von/i960/recovered_geometry_commands.c"
-      ]
-    },
-    {
-      "entry": "0x00028d80",
-      "observed_call_edges": 1,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.geometry-pipeline-startup",
       "sources": [
         "von/i960/recovered_geometry_commands.c"
       ]
@@ -1101,6 +1029,30 @@
       ]
     },
     {
+      "entry": "0x00027e50",
+      "observed_call_edges": 3,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.texture-decompressor",
+      "sources": [
+        "von/i960/recovered_texture_decompress.c"
+      ]
+    },
+    {
+      "entry": "0x00028120",
+      "observed_call_edges": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.texture-loader-profile-setup",
+      "sources": [
+        "von/i960/recovered_texture.c"
+      ]
+    },
+    {
       "entry": "0x00028418",
       "observed_call_edges": 1,
       "triage": "integrated-validation-queue",
@@ -1125,6 +1077,30 @@
       ]
     },
     {
+      "entry": "0x00028620",
+      "observed_call_edges": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.geometry-program-upload",
+      "sources": [
+        "von/i960/recovered_geometry.c"
+      ]
+    },
+    {
+      "entry": "0x00028c08",
+      "observed_call_edges": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.geometry-batch-submit",
+      "sources": [
+        "von/i960/recovered_geometry_commands.c"
+      ]
+    },
+    {
       "entry": "0x00028d08",
       "observed_call_edges": 1,
       "triage": "integrated-validation-queue",
@@ -1132,6 +1108,30 @@
       "priority": 1,
       "weight": null,
       "work_unit": "maincpu.geometry-register-clear",
+      "sources": [
+        "von/i960/recovered_geometry_commands.c"
+      ]
+    },
+    {
+      "entry": "0x00028d30",
+      "observed_call_edges": 3,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.geometry-auxiliary-submit-select",
+      "sources": [
+        "von/i960/recovered_geometry_commands.c"
+      ]
+    },
+    {
+      "entry": "0x00028d80",
+      "observed_call_edges": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.geometry-pipeline-startup",
       "sources": [
         "von/i960/recovered_geometry_commands.c"
       ]

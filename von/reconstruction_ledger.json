@@ -2521,10 +2521,10 @@
           }
         },
         {
-          "id": "maincpu.geometry-program-upload",
+      "id": "maincpu.geometry-program-upload",
           "name": "geometry_program_upload",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_geometry.c"
           ],
@@ -4446,10 +4446,10 @@
           }
         },
         {
-          "id": "maincpu.texture-decompressor",
+      "id": "maincpu.texture-decompressor",
           "name": "texture_decompressor",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_texture_decompress.c"
           ],
@@ -4474,10 +4474,10 @@
           }
         },
         {
-          "id": "maincpu.texture-loader-profile-setup",
+      "id": "maincpu.texture-loader-profile-setup",
           "name": "texture_loader_profile_setup",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_texture.c"
           ],
@@ -4555,10 +4555,10 @@
           }
         },
         {
-          "id": "maincpu.geometry-batch-submit",
+      "id": "maincpu.geometry-batch-submit",
           "name": "geometry_batch_submit",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_geometry_commands.c"
           ],
@@ -4609,10 +4609,10 @@
           }
         },
         {
-          "id": "maincpu.geometry-auxiliary-submit-select",
+      "id": "maincpu.geometry-auxiliary-submit-select",
           "name": "geometry_auxiliary_submit_select",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_geometry_commands.c"
           ],
@@ -4664,10 +4664,10 @@
           }
         },
         {
-          "id": "maincpu.geometry-pipeline-startup",
+      "id": "maincpu.geometry-pipeline-startup",
           "name": "geometry_pipeline_startup",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_geometry_commands.c"
           ],
