@@ -1,0 +1,79 @@
+/* Clear-flag geometry packet recovered from i960 0x9d454-0x9d59c. */
+#include <stdint.h>
+
+typedef uint32_t u32;
+
+/* Reference form of the extended-FP sequence at 0x9d454. The two constants
+ * are exact binary values; the final cast models the single-precision word
+ * written to the geometry FIFO. The packet builder still accepts an explicit
+ * result because host double is not the i960 extended format. */
+u32 recovered_geometry_clear_flag_derived_word(int16_t object_1e4)
+{
+    union {
+        float value;
+        u32 bits;
+    } result;
+    double quotient = (double)object_1e4 / 3.390625;
+
+    result.value = (float)(quotient * 3.0625);
+    return result.bits;
+}
+
+struct recovered_geometry_clear_flag_packet_plan {
+    int16_t object_1e4;
+    u32 derived_packet_word;
+    u32 fifo_address;
+    u32 fifo_word_count;
+    u32 fifo_word[9];
+    u32 board_readback_address;
+    u32 published_pointer_address;
+    u32 published_pointer_offset;
+    u32 object_flag_1de;
+    u32 frame_value;
+    u32 control_address;
+    u32 control_value;
+    u32 frame_publish_address;
+    u32 frame_word[2];
+    u32 frame_tail[2];
+    u32 frame_variant;
+};
+
+void recovered_geometry_clear_flag_packet_plan(
+    int16_t object_1e4, u32 derived_packet_word, u32 object_flag_1de,
+    u32 frame_value, u32 board_readback_address,
+    struct recovered_geometry_clear_flag_packet_plan *plan)
+{
+    plan->object_1e4 = object_1e4;
+    plan->derived_packet_word = derived_packet_word;
+    plan->fifo_address = 0x00884000U;
+    plan->fifo_word_count = 9U;
+    plan->fifo_word[0] = 19U;
+    plan->fifo_word[1] = derived_packet_word;
+    plan->fifo_word[2] = 0x40a00000U;
+    plan->fifo_word[3] = 0x3f800000U;
+    plan->fifo_word[4] = 18U;
+    plan->fifo_word[5] = 0x3f800000U;
+    plan->fifo_word[6] = 0U;
+    plan->fifo_word[7] = 0U;
+    plan->fifo_word[8] = 58U;
+    plan->board_readback_address = board_readback_address;
+    plan->published_pointer_address = 0x00801008U;
+    plan->published_pointer_offset = 0x34U;
+    plan->object_flag_1de = object_flag_1de & 0xffU;
+    plan->frame_value = frame_value;
+    plan->control_address = 0x00800010U;
+    plan->control_value = 0x101U;
+    plan->frame_publish_address = 0x00804000U;
+    plan->frame_tail[0] = 0x084553fU;
+    plan->frame_tail[1] = 1U;
+
+    if (plan->object_flag_1de == 0U) {
+        plan->frame_variant = 0U;
+        plan->frame_word[0] = 0U;
+        plan->frame_word[1] = 0x40005cU;
+    } else {
+        plan->frame_variant = 1U;
+        plan->frame_word[0] = frame_value;
+        plan->frame_word[1] = 0x40002cU;
+    }
+}

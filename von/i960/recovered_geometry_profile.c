@@ -1,6 +1,7 @@
 /* Recovered constant selection from i960 routine 0x00028840. */
 
-typedef unsigned long u32;
+/* The i960 words are 32-bit even when this host compiles the slice LP64. */
+typedef unsigned int u32;
 typedef unsigned char u8;
 
 #define BACKUP_PROFILE ((volatile const u8 *)0x01d00027)
