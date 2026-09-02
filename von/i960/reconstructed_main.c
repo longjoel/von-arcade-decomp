@@ -13,6 +13,8 @@ typedef unsigned short u16;
 #define WORKRAM ((volatile u32 *)0x00500000)
 
 u32 recovered_io_self_test(void);
+void recovered_io_failure_prepare(void);
+void recovered_io_input_initialize(void);
 void recovered_host_queue_initialize(void);
 void recovered_geometry_pipeline_startup(u32 mode);
 void recovered_audio_initialize_scsp(void);
@@ -26,8 +28,11 @@ void i960_reconstructed_main(void)
     state[0] = 0x52454330UL; /* REC0 */
     io_result = recovered_io_self_test();
     state[1] = io_result;
-    if (io_result != 0)
+    if (io_result != 0) {
+        recovered_io_failure_prepare();
+        recovered_io_input_initialize();
         recovered_host_queue_initialize();
+    }
 
     recovered_geometry_pipeline_startup(0);
     recovered_audio_initialize_scsp();
