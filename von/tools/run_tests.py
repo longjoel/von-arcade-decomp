@@ -5,8 +5,10 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
+from datetime import datetime, timezone
 import glob
 import fnmatch
+import hashlib
 import json
 import os
 import subprocess
@@ -48,6 +50,24 @@ def run_one(index: int, command: list[str], root: Path, environment: dict[str, s
     return index, command, completed.returncode, completed.stdout, time.monotonic() - started
 
 
+def record_result(root: Path, suite_name: str, manifest_sha256: str, results: list[tuple]) -> None:
+    failures = [" ".join(command) for _, command, returncode, _, _ in results if returncode]
+    document = {
+        "schema_version": 1,
+        "suite": suite_name,
+        "manifest_sha256": manifest_sha256,
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "passed": not failures,
+        "tests": len(results),
+        "commands": [command for _, command, _, _, _ in results],
+        "failures": failures,
+        "elapsed_seconds": round(sum(result[4] for result in results), 3),
+    }
+    output = root / "von/build/test-results" / f"{suite_name}.json"
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("suites", nargs="+", choices=("unit", "contract", "trace", "smoke", "attract"))
@@ -55,7 +75,9 @@ def main() -> int:
     parser.add_argument("--jobs", type=int, default=min(8, os.cpu_count() or 1))
     args = parser.parse_args()
     root = Path.cwd()
-    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+    manifest_bytes = args.manifest.read_bytes()
+    manifest = json.loads(manifest_bytes)
+    manifest_sha256 = hashlib.sha256(manifest_bytes).hexdigest()
     overall_started = time.monotonic()
     total = 0
     for suite_name in args.suites:
@@ -71,6 +93,7 @@ def main() -> int:
             if returncode:
                 failures += 1
                 print(output.rstrip())
+        record_result(root, suite_name, manifest_sha256, results)
         if failures:
             print(f"[{suite_name}] {failures} failure(s)")
             return 1
