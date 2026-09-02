@@ -22,6 +22,7 @@ def main() -> int:
         if (line := raw.strip()) and not line.startswith("#")
     }
     escaped = sorted(pc for pc in pcs if pc >= generated_end)
+    zero = 0 in pcs
     print(
         f"Clean i960 PC audit: {len(pcs)} visited instructions; "
         f"generated range 0x00000000-0x{generated_end:08x}"
@@ -31,6 +32,8 @@ def main() -> int:
         raise SystemExit(
             f"error: {len(escaped)} PCs escaped generated code; first: {sample}"
         )
+    if zero:
+        raise SystemExit("error: PC zero was executed; clean image hit an i960 exception path")
     print("PASS: every visited PC belongs to generated code")
     return 0
 
