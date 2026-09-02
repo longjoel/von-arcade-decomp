@@ -50,6 +50,26 @@ The generated listing is intentionally not checked in. Future commits should
 add address labels and short annotations here as runtime traces confirm the
 static interpretation.
 
+## `_start_ip` control-flow seed
+
+The reset continuation at `0x00000a0c` calls `_start_ip` at `0x00000a30`.
+That helper has no conditional branches: it flushes the register cache, marks
+`pfp`, initializes the first spill-frame fields at `fp-0x10` and `fp-0x0c`,
+then returns to `0x00000a10`. The continuation establishes `fp`, `pfp`, and
+`sp`, clears `g14`, and calls `0x000186f0`, labeled
+`startup_main_data_entry`. The apparent code at `0x00000a60` is outside this
+reachable `_start_ip` slice and is kept separate until a code reference is
+confirmed.
+
+The first startup routine at `0x000186f0` initializes the main-data state,
+calls helpers at `0x186c0`, `0x18960`, and `0x18a10`, then enters a repeating
+mode/device loop. Its indirect call loads a handler from the table at
+`0x00018680`, indexed by the low nibble of `0x005039f4`; a zero handler takes
+the default block at `0x18834`. The loop also reaches the status gate at
+`0x18848` and device-write block at `0x188a0`, with back-edges to `0x18724`
+and `0x187e4`. These labels identify control-flow targets without assigning
+unverified subsystem names.
+
 ## Host-Code Cross-References
 
 Generate a compact report of host instructions that reference documented Model
