@@ -1,11 +1,13 @@
 /* Recovered LZ-style decoder from i960 routine 0x00027e50. */
 
-typedef unsigned long u32;
+/* i960 words remain 32-bit when this source is compiled on an LP64 host. */
+typedef unsigned int u32;
 typedef unsigned short u16;
 typedef unsigned char u8;
 
 #define TEXTURE_RING ((volatile u8 *)0x00511bb0)
 #define TEXTURE_FORMAT_TABLE ((volatile const u8 *)0x00027c50)
+#define TEXTURE_STATUS ((volatile u32 *)0x00515080)
 
 static int texture_use_secondary_bank(u32 output_index)
 {
@@ -51,6 +53,7 @@ int recovered_texture_decompress(volatile const u8 *source,
     u32 index;
 
     /* The ROM clears 0xfed bytes of its persistent ring storage. */
+    *TEXTURE_STATUS = 0;
     for (index = 0; index < 0xfedU; ++index)
         ring[index] = 0;
 
@@ -116,5 +119,8 @@ int recovered_texture_decompress(volatile const u8 *source,
             }
         }
     }
-    return 0;
+    /* The alternate ROM exit returns a shared status latch.  The decoder
+     * itself does not assign it; hardware/other code may raise it while the
+     * stream is being expanded. */
+    return (int)*TEXTURE_STATUS;
 }

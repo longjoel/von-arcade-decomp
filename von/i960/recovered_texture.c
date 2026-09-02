@@ -1,6 +1,7 @@
 /* Recovered from i960 routine 0x00028548. */
 
-typedef unsigned long u32;
+/* i960 words remain 32-bit when this source is compiled on an LP64 host. */
+typedef unsigned int u32;
 typedef unsigned short u16;
 typedef unsigned char u8;
 
