@@ -2577,10 +2577,10 @@
           }
         },
         {
-          "id": "maincpu.geometry-initial-handshake",
+      "id": "maincpu.geometry-initial-handshake",
           "name": "geometry_initial_handshake",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_geometry_commands.c"
           ],
@@ -4392,10 +4392,10 @@
           }
         },
         {
-          "id": "maincpu.texture-initializer",
+      "id": "maincpu.texture-initializer",
           "name": "texture_initializer",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_texture.c"
           ],
@@ -4419,10 +4419,10 @@
           }
         },
         {
-          "id": "maincpu.geometry-register-clear",
+      "id": "maincpu.geometry-register-clear",
           "name": "geometry_register_clear",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_geometry_commands.c"
           ],

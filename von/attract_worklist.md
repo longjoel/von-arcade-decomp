@@ -1,8 +1,8 @@
 # Attract Reconstruction Worklist
 
 - Observed direct-call units: 262
-- Modeled integration queue: 94
-- Integrated or validated: 0
+- Modeled integration queue: 91
+- Integrated or validated: 3
 - Untriaged: 168
 
 | Entry | Edges | Triage | Work unit |
@@ -42,15 +42,12 @@
 | `0x0001de80` | 4 | modeled-integration-queue | maincpu.text-tile-block-writer |
 | `0x00027e50` | 3 | modeled-integration-queue | maincpu.texture-decompressor |
 | `0x00028120` | 1 | modeled-integration-queue | maincpu.texture-loader-profile-setup |
-| `0x00028418` | 1 | modeled-integration-queue | maincpu.geometry-initial-handshake |
-| `0x00028548` | 1 | modeled-integration-queue | maincpu.texture-initializer |
 | `0x00028620` | 1 | modeled-integration-queue | maincpu.geometry-program-upload |
 | `0x00028840` | 1 | modeled-integration-queue | maincpu.geometry-profile-dispatch |
 | `0x00028b40` | 4 | modeled-integration-queue | maincpu.geometry-float-conversion-helper |
 | `0x00028b80` | 1 | modeled-integration-queue | maincpu.geometry-buffer-prepare |
 | `0x00028c08` | 1 | modeled-integration-queue | maincpu.geometry-batch-submit |
 | `0x00028c80` | 1 | modeled-integration-queue | maincpu.geometry-command-batch-loop |
-| `0x00028d08` | 1 | modeled-integration-queue | maincpu.geometry-register-clear |
 | `0x00028d30` | 3 | modeled-integration-queue | maincpu.geometry-auxiliary-submit-select |
 | `0x00028d80` | 1 | modeled-integration-queue | maincpu.geometry-pipeline-startup |
 | `0x00028de8` | 7 | modeled-integration-queue | maincpu.geometry-frame-submission |
@@ -101,6 +98,9 @@
 | `0x000f5190` | 1 | modeled-integration-queue | maincpu.text-general-formatter-boundary |
 | `0x000f5c58` | 4 | modeled-integration-queue | maincpu.runtime-byte-compare |
 | `0x000f5d40` | 10 | modeled-integration-queue | maincpu.memory-copy-forward |
+| `0x00028418` | 1 | integrated-validation-queue | maincpu.geometry-initial-handshake |
+| `0x00028548` | 1 | integrated-validation-queue | maincpu.texture-initializer |
+| `0x00028d08` | 1 | integrated-validation-queue | maincpu.geometry-register-clear |
 | `0x00002040` | 1 | untriaged |  |
 | `0x00002080` | 2 | untriaged |  |
 | `0x000022f0` | 2 | untriaged |  |
