@@ -1,0 +1,83 @@
+diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
+--- a/src/devices/cpu/sharc/sharc.cpp
++++ b/src/devices/cpu/sharc/sharc.cpp
+@@ -1282,5 +1282,60 @@ void adsp21062_device::execute_run()
+ 			debugger_instruction_hook(m_core->pc);
+ 
+ 			m_core->opcode = m_program.read_qword(m_core->pc);
++			static unsigned vonj_sharc_boot_trace_count;
++			if ((machine().system().name == std::string_view("vonj")) &&
++				(vonj_sharc_boot_trace_count < 64))
++			{
++				logerror("vonj_sharc_pc: pc=%06x opcode=%012llx\n",
++					m_core->pc, static_cast<unsigned long long>(m_core->opcode));
++				vonj_sharc_boot_trace_count++;
++			}
++
++			// vonj geometry helper probe: capture the sole 0x20de1 caller's
++			// inputs and return value without changing the emulated state.
++			static unsigned vonj_geometry_helper_trace_count;
++			if ((machine().system().name == std::string_view("vonj")) &&
++				(vonj_geometry_helper_trace_count < 4096) &&
++				((m_core->pc == 0x0002034a) || (m_core->pc == 0x00020de1) ||
++				 (m_core->pc == 0x00020e4d) ||
++				 (m_core->pc == 0x00020e51)))
++			{
++				logerror("vonj_sharc_geometry: pc=%04x r0=%08x r1=%08x r2=%08x r3=%08x r7=%08x r8=%08x r9=%08x f0=%08x f1=%08x f4=%08x f8=%08x f9=%08x dm3010b=%08x dm3010e=%08x dm30111=%08x dm30114=%08x\n",
++					m_core->pc,
++					m_core->r[0].r, m_core->r[1].r, m_core->r[2].r, m_core->r[3].r,
++					m_core->r[7].r, m_core->r[8].r, m_core->r[9].r,
++					m_core->r[0].r, m_core->r[1].r, m_core->r[4].r,
++					m_core->r[8].r, m_core->r[9].r,
++					dm_read32(0x0003010b), dm_read32(0x0003010e),
++					dm_read32(0x00030111), dm_read32(0x00030114));
++				vonj_geometry_helper_trace_count++;
++			}
++			static unsigned vonj_sharc_service_trace_count;
++			if ((machine().system().name == std::string_view("vonj")) &&
++				(vonj_sharc_service_trace_count < 256) &&
++				(((m_core->pc >= 0x0002021b) && (m_core->pc <= 0x0002024d)) ||
++				 ((m_core->pc >= 0x0002026d) && (m_core->pc <= 0x0002027d)) ||
++				 ((m_core->pc >= 0x0002027e) && (m_core->pc <= 0x0002028c))))
++			{
++				logerror("vonj_sharc_service_pc: pc=%06x opcode=%012llx\n",
++					m_core->pc, static_cast<unsigned long long>(m_core->opcode));
++				vonj_sharc_service_trace_count++;
++			}
++			static unsigned vonj_sharc_20de1_step_trace_count;
++			if ((machine().system().name == std::string_view("vonj")) &&
++				(vonj_sharc_20de1_step_trace_count < 4096) &&
++				(m_core->pc >= 0x00020de1) && (m_core->pc <= 0x00020e53))
++			{
++				logerror("vonj_sharc_20de1_step: pc=%06x f0=%08x f1=%08x f2=%08x f3=%08x f4=%08x f5=%08x f6=%08x f7=%08x f8=%08x f9=%08x f10=%08x f11=%08x f12=%08x f13=%08x f14=%08x f15=%08x dm0=%08x dm1=%08x dm2=%08x dm3=%08x dm4=%08x dm5=%08x dm6=%08x dm7=%08x dm8=%08x\\n",
++					m_core->pc,
++					m_core->r[0].r, m_core->r[1].r, m_core->r[2].r, m_core->r[3].r,
++					m_core->r[4].r, m_core->r[5].r, m_core->r[6].r, m_core->r[7].r,
++					m_core->r[8].r, m_core->r[9].r, m_core->r[10].r, m_core->r[11].r,
++					m_core->r[12].r, m_core->r[13].r, m_core->r[14].r, m_core->r[15].r,
++					dm_read32(0x0003010b), dm_read32(0x0003010c), dm_read32(0x0003010d),
++					dm_read32(0x0003010e), dm_read32(0x0003010f), dm_read32(0x00030110),
++					dm_read32(0x00030111), dm_read32(0x00030112), dm_read32(0x00030113));
++				vonj_sharc_20de1_step_trace_count++;
++			}
+ 
+ 			// handle looping
+diff --git a/src/devices/cpu/sharc/sharcinternal.ipp b/src/devices/cpu/sharc/sharcinternal.ipp
+--- a/src/devices/cpu/sharc/sharcinternal.ipp
++++ b/src/devices/cpu/sharc/sharcinternal.ipp
+@@ -266,4 +266,14 @@ inline uint32_t adsp21062_device::dm_read32(uint32_t address)
+ inline uint32_t adsp21062_device::dm_read32(uint32_t address)
+ {
+-	return m_data.read_dword(address);
++	uint32_t data = m_data.read_dword(address);
++	static unsigned vonj_sharc_fifo_read_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) &&
++		(vonj_sharc_fifo_read_trace_count < 8192) &&
++		(address >= 0x0400000) && (address < 0x0c00000) &&
++		(m_core->pc == 0x0002012b) && (data != 0x00000008))
++	{
++		logerror("vonj_sharc_dispatch_read: pc=%06x data=%08x\n", m_core->pc, data);
++		vonj_sharc_fifo_read_trace_count++;
++	}
++	return data;
+ }

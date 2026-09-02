@@ -1,0 +1,9 @@
+diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
+index 4bbbfcc5f8..b9c1f7a2d1 100644
+--- a/src/devices/cpu/sharc/sharc.cpp
++++ b/src/devices/cpu/sharc/sharc.cpp
+@@ -878,3 +878,4 @@ void adsp21062_device::state_add(device_state_entry &entry)
+ 	state_add(SHARC_MODE2,  "MODE2", m_core->mode2).formatstr("%08X");
+ 	state_add(SHARC_ASTAT,  "ASTAT", m_core->astat).formatstr("%08X").callimport().callexport();
++	state_add(SHARC_STKY,   "STKY",  m_core->stky).formatstr("%08X");
+ 	state_add(SHARC_IRPTL,  "IRPTL", m_core->irptl).formatstr("%08X");

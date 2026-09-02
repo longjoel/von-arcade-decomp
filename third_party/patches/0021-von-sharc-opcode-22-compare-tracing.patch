@@ -1,0 +1,23 @@
+diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
+--- a/src/devices/cpu/sharc/sharc.cpp
++++ b/src/devices/cpu/sharc/sharc.cpp
+@@ -1324,1 +1324,16 @@
+ 			static unsigned vonj_sharc_4d_compare_trace_count;
++			static unsigned vonj_sharc_22_compare_trace_count;
++			if ((machine().system().name == std::string_view("vonj")) &&
++				((m_core->pc == 0x00020453) || (m_core->pc == 0x00020456) ||
++				 (m_core->pc == 0x0002045a) || (m_core->pc == 0x0002045d)) &&
++				(vonj_sharc_22_compare_trace_count < 256))
++			{
++				logerror("vonj_sharc_22_compare: pc=%06x astat=%08x f0=%08x f1=%08x f2=%08x f4=%08x f5=%08x f6=%08x f7=%08x f8=%08x f12=%08x f14=%08x f15=%08x r1=%08x r4=%08x r5=%08x r6=%08x r12=%08x r13=%08x r14=%08x r15=%08x\n",
++					m_core->pc, m_core->astat,
++					m_core->r[0].r, m_core->r[1].r, m_core->r[2].r, m_core->r[4].r,
++					m_core->r[5].r, m_core->r[6].r, m_core->r[7].r, m_core->r[8].r,
++					m_core->r[12].r, m_core->r[14].r, m_core->r[15].r,
++					m_core->r[1].r, m_core->r[4].r, m_core->r[5].r, m_core->r[6].r,
++					m_core->r[12].r, m_core->r[13].r, m_core->r[14].r, m_core->r[15].r);
++				vonj_sharc_22_compare_trace_count++;
++			}
+ 			if ((machine().system().name == std::string_view("vonj")) &&
+ 				(m_core->pc == 0x00020d3e) && (vonj_sharc_4d_compare_trace_count < 256))
+ 			{

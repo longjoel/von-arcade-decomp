@@ -1,0 +1,89 @@
+diff --git a/src/devices/cpu/sharc/sharcdrc.cpp b/src/devices/cpu/sharc/sharcdrc.cpp
+index 97683bedd0..f2d98f7c11 100644
+--- a/src/devices/cpu/sharc/sharcdrc.cpp
++++ b/src/devices/cpu/sharc/sharcdrc.cpp
+@@ -4554,7 +4554,20 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
+ 					case 0x82:      // Fn = Fx - Fy
+ 						// TODO: denormals
+ 						UML_FSCOPYI(block, F0, REG(rx));
+ 						UML_FSCOPYI(block, F1, REG(ry));
+ 						UML_FSSUB(block, F0, F0, F1);
++						// Match the interpreter's canonical NaN writeback policy.
++						{
++							uml::code_label const result_not_nan = compiler.labelnum++;
++							UML_ICOPYFS(block, I0, F0);
++							UML_BFXU(block, I1, I0, FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_BITS);
++							UML_CMP(block, I1, 0xff);
++							UML_JMPc(block, COND_NE, result_not_nan);
++							UML_TEST(block, I0, FLOAT_MANTISSA_MASK);
++							UML_JMPc(block, COND_Z, result_not_nan);
++							UML_MOV(block, I0, FLOAT_CANONICAL_NAN);
++							if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 1);
++							UML_OR(block, STKY, STKY, AIS);
++							UML_LABEL(block, result_not_nan);
++							UML_FSCOPYI(block, F0, I0);
++						}
+ 						if (AZ_CALC_REQUIRED || AN_CALC_REQUIRED)
+ 							UML_FSCMP(block, F0, mem(&m_core->fp_const.k0_0));
+@@ -4720,11 +4735,50 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
+ 					case 0xc1:      // Rn = LOGB Fx
+-						// TODO: source = zero, infinity, nan
+-						UML_BFXU(block, I0, REG(rx), FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_BITS);
+-						UML_SUB(block, REG(rn), I0, FLOAT_EXPONENT_BIAS);
++					{
++						uml::code_label const logb_finite = compiler.labelnum++;
++						uml::code_label const logb_zero = compiler.labelnum++;
++						uml::code_label const logb_nan = compiler.labelnum++;
++						uml::code_label const logb_end = compiler.labelnum++;
++
++						if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 0);
++						if (AN_CALC_REQUIRED) UML_MOV(block, ASTAT_AN, 0);
++						if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);
++						if (AC_CALC_REQUIRED) UML_MOV(block, ASTAT_AC, 0);
++						if (AS_CALC_REQUIRED) UML_MOV(block, ASTAT_AS, 0);
++						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 0);
++
++						UML_MOV(block, I0, REG(rx));
++						UML_TEST(block, I0, FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK);
++						UML_JMPc(block, COND_Z, logb_zero);
++						UML_BFXU(block, I1, I0, FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_BITS);
++						UML_CMP(block, I1, 0xff);
++						UML_JMPc(block, COND_NE, logb_finite);
++						UML_TEST(block, I0, FLOAT_MANTISSA_MASK);
++						UML_JMPc(block, COND_NZ, logb_nan);
++
++						// LOGB(+/-infinity) returns +infinity and sets AV.
++						UML_MOV(block, REG(rn), FLOAT_INFINITY);
++						if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 1);
++						UML_JMP(block, logb_end);
++
++						UML_LABEL(block, logb_zero);
++						// LOGB(+/-zero) returns signed infinity and sets AV.
++						UML_AND(block, REG(rn), I0, FLOAT_SIGN_MASK);
++						UML_OR(block, REG(rn), REG(rn), FLOAT_INFINITY);
++						if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 1);
++						UML_JMP(block, logb_end);
++
++						UML_LABEL(block, logb_nan);
++						// LOGB(NaN) returns MAME's canonical NaN and sets AI.
++						UML_MOV(block, REG(rn), FLOAT_CANONICAL_NAN);
++						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 1);
++						UML_OR(block, STKY, STKY, AIS);
++						UML_JMP(block, logb_end);
++
++						UML_LABEL(block, logb_finite);
++						UML_SUB(block, REG(rn), I1, FLOAT_EXPONENT_BIAS);
++						UML_TEST(block, REG(rn), 0xffffffff);
++						if (AZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AZ);
++						if (AN_CALC_REQUIRED) UML_SETc(block, COND_S, ASTAT_AN);
++						UML_LABEL(block, logb_end);
++						if (AF_CALC_REQUIRED) UML_MOV(block, ASTAT_AF, 1);
++						return;
++					}
+-						if (AZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AZ);
+-						if (AN_CALC_REQUIRED) UML_SETc(block, COND_S, ASTAT_AN);
+-						if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);   // TODO
+-						if (AC_CALC_REQUIRED) UML_MOV(block, ASTAT_AC, 0);
+-						if (AS_CALC_REQUIRED) UML_MOV(block, ASTAT_AS, 0);
+-						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 0);
+-						return;

@@ -1,0 +1,12 @@
+diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
+--- a/src/mame/sega/model2.cpp
++++ b/src/mame/sega/model2.cpp
+@@ -2840,4 +2840,7 @@ void model2b_state::model2b(machine_config &config)
+ 	ADSP21062(config, m_copro_adsp, 32_MHz_XTAL);
+ 	m_copro_adsp->set_boot_mode(adsp21062_device::BOOT_MODE_HOST);
+ 	m_copro_adsp->set_addrmap(AS_DATA, &model2b_state::copro_sharc_map);
+-	m_copro_adsp->enable_recompiler();
++	// Debug tracing is implemented in the interpreter execute path. Keep the
++	// SHARC interpreter active in the debug/all patch sets so service and
++	// register traces are observable.
++	// m_copro_adsp->enable_recompiler();

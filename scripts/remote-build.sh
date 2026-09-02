@@ -18,54 +18,61 @@ REMOTE_HOST="${VON_REMOTE_HOST:-drone0}"
 REMOTE_CHECKOUT="${VON_REMOTE_CHECKOUT:-/home/drone/von-arcade-decomp}"
 BUILD_IMAGE="${VON_MAME_BUILD_IMAGE:-von-mame-build:ubuntu26.04}"
 REMOTE_JOBS="${VON_REMOTE_JOBS:-$(nproc)}"
+SSH_CONFIG="${VON_SSH_CONFIG:-$HOME/.ssh/config}"
+SSH_ARGS=()
+RSYNC_SSH="ssh"
+if [[ -f "$SSH_CONFIG" ]]; then
+    SSH_ARGS=(-F "$SSH_CONFIG")
+    RSYNC_SSH="ssh -F '$SSH_CONFIG'"
+fi
 
 command -v ssh >/dev/null 2>&1 || { printf 'error: ssh is required\n' >&2; exit 1; }
 command -v rsync >/dev/null 2>&1 || { printf 'error: rsync is required\n' >&2; exit 1; }
 command -v scp >/dev/null 2>&1 || { printf 'error: scp is required\n' >&2; exit 1; }
 
 printf 'Checking remote build host %s...\n' "$REMOTE_HOST"
-ssh "$REMOTE_HOST" true || {
+ssh "${SSH_ARGS[@]}" "$REMOTE_HOST" true || {
     printf 'error: SSH connection failed for %s\n' "$REMOTE_HOST" >&2
     exit 1
 }
-ssh "$REMOTE_HOST" "test -d '$REMOTE_CHECKOUT'" || {
+ssh "${SSH_ARGS[@]}" "$REMOTE_HOST" "test -d '$REMOTE_CHECKOUT'" || {
     printf 'error: remote checkout does not exist: %s:%s\n' "$REMOTE_HOST" "$REMOTE_CHECKOUT" >&2
     exit 1
 }
-ssh "$REMOTE_HOST" 'command -v docker >/dev/null 2>&1' || {
+ssh "${SSH_ARGS[@]}" "$REMOTE_HOST" 'command -v docker >/dev/null 2>&1' || {
     printf 'error: Docker is not available on %s\n' "$REMOTE_HOST" >&2
     exit 1
 }
-ssh "$REMOTE_HOST" "docker image inspect '$BUILD_IMAGE' >/dev/null 2>&1" || {
+ssh "${SSH_ARGS[@]}" "$REMOTE_HOST" "docker image inspect '$BUILD_IMAGE' >/dev/null 2>&1" || {
     printf 'error: Docker image not found on %s: %s\n' "$REMOTE_HOST" "$BUILD_IMAGE" >&2
     exit 1
 }
 
 printf 'Synchronizing build inputs (ROMs are not copied)...\n'
-rsync -a "$ROOT_DIR/scripts/" "$REMOTE_HOST:$REMOTE_CHECKOUT/scripts/" || {
+rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/scripts/" "$REMOTE_HOST:$REMOTE_CHECKOUT/scripts/" || {
     printf 'error: failed to synchronize scripts\n' >&2; exit 1;
 }
-rsync -a --delete "$ROOT_DIR/third_party/patches/" "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/patches/" || {
+rsync -a --delete -e "$RSYNC_SSH" "$ROOT_DIR/third_party/patches/" "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/patches/" || {
     printf 'error: failed to synchronize patch inputs\n' >&2; exit 1
 }
-rsync -a "$ROOT_DIR/third_party/mame-master/src/mame/sega/m2comm.cpp" \
+rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/mame/sega/m2comm.cpp" \
     "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/mame/sega/m2comm.cpp" || {
     printf 'error: failed to synchronize communication diagnostics source\n' >&2; exit 1
 }
-rsync -a "$ROOT_DIR/third_party/mame-master/src/mame/sega/model2_v.cpp" \
+rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/mame/sega/model2_v.cpp" \
     "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/mame/sega/model2_v.cpp" || {
     printf 'error: failed to synchronize geometry tracing source\n' >&2; exit 1
 }
 
 printf 'Building MAME remotely in Docker...\n'
-ssh "$REMOTE_HOST" "cd '$REMOTE_CHECKOUT' && VON_MAME_BUILD_IMAGE='$BUILD_IMAGE' JOBS='$REMOTE_JOBS' VON_MAME_PATCH_SET='${VON_MAME_PATCH_SET:-core}' ./scripts/build-mame-docker.sh" || {
+ssh "${SSH_ARGS[@]}" "$REMOTE_HOST" "cd '$REMOTE_CHECKOUT' && VON_MAME_BUILD_IMAGE='$BUILD_IMAGE' JOBS='$REMOTE_JOBS' VON_MAME_PATCH_SET='${VON_MAME_PATCH_SET:-core}' ./scripts/build-mame-docker.sh" || {
     printf 'error: remote MAME build failed\n' >&2; exit 1
 }
 
 mkdir -p "$ROOT_DIR/bin"
 TEMP_BINARY="$ROOT_DIR/bin/.von.remote.tmp"
 rm -f "$TEMP_BINARY"
-scp "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/von" "$TEMP_BINARY" || {
+scp "${SSH_ARGS[@]}" "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/von" "$TEMP_BINARY" || {
     rm -f "$TEMP_BINARY"
     printf 'error: failed to copy the remote MAME binary\n' >&2
     exit 1

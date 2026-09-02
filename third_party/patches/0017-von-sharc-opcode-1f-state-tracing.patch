@@ -1,0 +1,14 @@
+diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
+--- a/src/devices/cpu/sharc/sharc.cpp
++++ b/src/devices/cpu/sharc/sharc.cpp
+@@ -1317,6 +1317,14 @@ void adsp21062_device::execute_run()
+ 				vonj_sharc_service_trace_count++;
+ 			}
++			if ((machine().system().name == std::string_view("vonj")) &&
++				((m_core->pc == 0x000203fa) || (m_core->pc == 0x00020408) ||
++				 (m_core->pc == 0x00020409)))
++			{
++				logerror("vonj_sharc_1f_state: pc=%06x f0=%08x f1=%08x f2=%08x f4=%08x f8=%08x f12=%08x r0=%08x\n",
++					m_core->pc, m_core->r[0].r, m_core->r[1].r, m_core->r[2].r,
++					m_core->r[4].r, m_core->r[8].r, m_core->r[12].r, m_core->r[0].r);
++			}

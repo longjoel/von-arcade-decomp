@@ -1,0 +1,33 @@
+diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
+--- a/src/devices/cpu/sharc/sharc.cpp
++++ b/src/devices/cpu/sharc/sharc.cpp
+@@ -1328,6 +1328,12 @@ void adsp21062_device::execute_run()
+ 					m_core->r[4].r, m_core->r[8].r, m_core->r[12].r, m_core->r[0].r);
+ 			}
++			if ((machine().system().name == std::string_view("vonj")) &&
++				((m_core->pc == 0x0002026e) || (m_core->pc == 0x00020d5d)))
++			{
++				logerror("vonj_sharc_0d_state: pc=%06x r0=%08x r1=%08x r2=%08x r3=%08x\n",
++					m_core->pc, m_core->r[0].r, m_core->r[1].r, m_core->r[2].r,
++					m_core->r[3].r);
++			}
+ 
+ 			// handle looping
+diff --git a/src/devices/cpu/sharc/sharcinternal.ipp b/src/devices/cpu/sharc/sharcinternal.ipp
+--- a/src/devices/cpu/sharc/sharcinternal.ipp
++++ b/src/devices/cpu/sharc/sharcinternal.ipp
+@@ -291,6 +291,16 @@ inline void adsp21062_device::dm_write32(uint32_t address, uint32_t data)
+ 		vonj_sharc_output_trace_count++;
+ 	}
++	static unsigned vonj_sharc_state_upload_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) &&
++		(address >= 0x00030105) && (address <= 0x00030108) &&
++		(m_core->pc >= 0x00020271) && (m_core->pc <= 0x0002027d) &&
++		(vonj_sharc_state_upload_trace_count < 64))
++	{
++		logerror("vonj_sharc_state_upload: pc=%06x address=%08x data=%08x\n",
++			m_core->pc, address, data);
++		vonj_sharc_state_upload_trace_count++;
++	}
+ 	m_data.write_dword(address, data);
+ }

@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Virtual-On research workspace <research@example.invalid>
+Date: Tue, 1 Sep 2026 00:00:00 -0500
+Subject: [PATCH] von: trace SHARC reciprocal service staging
+
+Record the reciprocal/division service's persistent floating lanes and FIFO
+register loads while investigating opcode 0x03-0x04 boundary behavior.
+---
+ src/devices/cpu/sharc/sharc.cpp | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
+index 0000000..0000000 100644
+--- a/src/devices/cpu/sharc/sharc.cpp
++++ b/src/devices/cpu/sharc/sharc.cpp
+@@ -1319,3 +1319,18 @@ void adsp21062_device::execute_run()
+ 				vonj_sharc_scalar_trace_count++;
+ 			}
++			static unsigned vonj_sharc_reciprocal_trace_count;
++			if ((machine().system().name == std::string_view("vonj")) &&
++				(vonj_sharc_reciprocal_trace_count < 2048) &&
++				(m_core->pc >= 0x0002014b) && (m_core->pc <= 0x0002016c))
++			{
++				logerror("vonj_sharc_reciprocal: pc=%06x f0=%08x f1=%08x f2=%08x f7=%08x f11=%08x f12=%08x r0=%08x r1=%08x r2=%08x r7=%08x r11=%08x r12=%08x\n",
++					m_core->pc, m_core->r[0].r, m_core->r[1].r, m_core->r[2].r,
++					m_core->r[7].r, m_core->r[11].r, m_core->r[12].r,
++					m_core->r[0].r, m_core->r[1].r, m_core->r[2].r,
++					m_core->r[7].r, m_core->r[11].r, m_core->r[12].r);
++				vonj_sharc_reciprocal_trace_count++;
++			}
+ 			static unsigned vonj_sharc_opcode33_trace_count;

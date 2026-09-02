@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Virtual-On research workspace <research@example.invalid>
+Date: Tue, 1 Sep 2026 00:00:00 -0500
+Subject: [PATCH] von: trace SHARC scalar service staging
+
+Record the scalar service's persistent floating registers and FIFO register
+loads while investigating opcode 0x00-0x02 operand staging.
+---
+ src/devices/cpu/sharc/sharc.cpp | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
+index 0000000..0000000 100644
+--- a/src/devices/cpu/sharc/sharc.cpp
++++ b/src/devices/cpu/sharc/sharc.cpp
+@@ -1316,3 +1316,14 @@ void adsp21062_device::execute_run()
+ 				vonj_sharc_20d68_trace_count++;
+ 			}
++			static unsigned vonj_sharc_scalar_trace_count;
++			if ((machine().system().name == std::string_view("vonj")) &&
++				(vonj_sharc_scalar_trace_count < 1024) &&
++				(m_core->pc >= 0x00020133) && (m_core->pc <= 0x0002014a))
++			{
++				logerror("vonj_sharc_scalar: pc=%06x f0=%08x f1=%08x r0=%08x r1=%08x r2=%08x r3=%08x r4=%08x\n",
++					m_core->pc, m_core->r[0].r, m_core->r[1].r,
++					m_core->r[0].r, m_core->r[1].r, m_core->r[2].r,
++					m_core->r[3].r, m_core->r[4].r);
++				vonj_sharc_scalar_trace_count++;
++			}
+ 			static unsigned vonj_sharc_opcode33_trace_count;

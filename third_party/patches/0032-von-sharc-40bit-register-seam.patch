@@ -1,0 +1,22 @@
+diff --git a/src/devices/cpu/sharc/sharc.h b/src/devices/cpu/sharc/sharc.h
+--- a/src/devices/cpu/sharc/sharc.h
++++ b/src/devices/cpu/sharc/sharc.h
+@@ -6,6 +6,7 @@
+ #pragma once
+ 
+ #include "cpu/drcuml.h"
++#include "sharcfloat40.h"
+ 
+ #include <utility>
+@@ -211,6 +212,12 @@
+ 		float f;
+ 	};
+ 
++	// The live register union remains 32-bit until the interpreter and DRC
++	// migration is complete. Keep the architectural 40-bit value available as
++	// a named MAME-side type so new code cannot accidentally treat the extended
++	// encoding as an IEEE-32 word with padding appended.
++	using SHARC_REG_EXTENDED = sharc_float40::register_value;
++
+ 	struct SHARC_DMA_REGS
+ 	{

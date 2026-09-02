@@ -1,0 +1,40 @@
+diff --git a/src/devices/cpu/sharc/sharcdrc.cpp b/src/devices/cpu/sharc/sharcdrc.cpp
+index 97683bedd0..f9b2d4aa01 100644
+--- a/src/devices/cpu/sharc/sharcdrc.cpp
++++ b/src/devices/cpu/sharc/sharcdrc.cpp
+@@ -140,6 +140,22 @@ struct adsp21062_device::cfuncs
+ 		sharc.m_flag_out_cb[N](BIT(sharc.m_core->astat, FLG0_SHIFT + N));
+ 	}
+ 
++	static void trace_angle_path(adsp21062_device &sharc)
++	{
++		static unsigned count;
++		if ((sharc.machine().system().name == std::string_view("vonj")) && (count < 512))
++		{
++			sharc.logerror("vonj_sharc_drc_angle: pc=%06x astat=%08x drc_astat=%08x stky=%08x f0=%08x f1=%08x f2=%08x f4=%08x f7=%08x f10=%08x f12=%08x f15=%08x r0=%08x r1=%08x r2=%08x r3=%08x r4=%08x\n",
++				sharc.m_core->pc, sharc.m_core->astat, sharc.m_core->astat_drc.pack(), sharc.m_core->stky,
++				sharc.m_core->r[0].r, sharc.m_core->r[1].r, sharc.m_core->r[2].r,
++				sharc.m_core->r[4].r, sharc.m_core->r[7].r, sharc.m_core->r[10].r,
++				sharc.m_core->r[12].r, sharc.m_core->r[15].r,
++				sharc.m_core->r[0].r, sharc.m_core->r[1].r, sharc.m_core->r[2].r,
++				sharc.m_core->r[3].r, sharc.m_core->r[4].r);
++			count++;
++		}
++	}
++
+ 
+ 	[[noreturn]] static void unimplemented(adsp21062_device &sharc) ATTR_COLD
+@@ -1476,6 +1492,14 @@ void adsp21062_device::generate_sequence_instruction(drcuml_block &block, compil
+ 		}
+ 	}
+ 
++	if (((desc->pc >= 0x00020285) && (desc->pc <= 0x00020289)) ||
++		((desc->pc >= 0x00020d68) && (desc->pc <= 0x00020dbd)))
++	{
++		UML_MOV(block, mem(&m_core->pc), desc->pc);
++		save_fast_iregs(block);
++		UML_CALLC(block, cfuncs::trace_angle_path, this);
++	}
++
+ 
+ 	// insert delayed MODE1 operation if needed

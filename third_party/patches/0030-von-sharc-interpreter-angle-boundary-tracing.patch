@@ -1,0 +1,24 @@
+diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
+index 4bbbfcc5f8..d4f1c2a8be 100644
+--- a/src/devices/cpu/sharc/sharc.cpp
++++ b/src/devices/cpu/sharc/sharc.cpp
+@@ -1681,6 +1681,24 @@ void adsp21062_device::execute_run()
+ 			(this->*m_sharc_op[(m_core->opcode >> 39) & 0x1ff])();
++
++			static unsigned vonj_sharc_interpreter_angle_trace_count;
++			if ((machine().system().name == std::string_view("vonj")) &&
++				(vonj_sharc_interpreter_angle_trace_count < 512) &&
++				(((m_core->pc >= 0x00020285) && (m_core->pc <= 0x00020289)) ||
++				 ((m_core->pc >= 0x00020d68) && (m_core->pc <= 0x00020dbd))))
++			{
++				logerror("vonj_sharc_interpreter_angle: pc=%06x astat=%08x stky=%08x f0=%08x f1=%08x f2=%08x f4=%08x f7=%08x f10=%08x f12=%08x f15=%08x r0=%08x r1=%08x r2=%08x r3=%08x r4=%08x\n",
++					m_core->pc, m_core->astat, m_core->stky,
++					m_core->r[0].r, m_core->r[1].r, m_core->r[2].r, m_core->r[4].r,
++					m_core->r[7].r, m_core->r[10].r, m_core->r[12].r, m_core->r[15].r,
++					m_core->r[0].r, m_core->r[1].r, m_core->r[2].r,
++					m_core->r[3].r, m_core->r[4].r);
++				vonj_sharc_interpreter_angle_trace_count++;
++			}
+ 
+ 
+ 			// System register latency effect

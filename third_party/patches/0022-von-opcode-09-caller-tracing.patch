@@ -1,0 +1,21 @@
+diff --git a/src/devices/cpu/i960/i960.cpp b/src/devices/cpu/i960/i960.cpp
+--- a/src/devices/cpu/i960/i960.cpp
++++ b/src/devices/cpu/i960/i960.cpp
+@@ -2280,1 +2280,24 @@
+ 		if ((machine().system().name == std::string_view("vonj")) &&
+ 			(m_IP == 0x00041fbc))
+ 		{
+ 			static unsigned vonj_opcode_09_caller_trace_count;
+ 			if (vonj_opcode_09_caller_trace_count < 256)
+ 			{
+ 				logerror("vonj_opcode_09_caller: pc=%08x r4=%08x lane0=%08x,%08x,%08x,%08x lane1=%08x,%08x,%08x,%08x lane2=%08x,%08x,%08x,%08x\n",
+ 					m_IP, m_r[4],
+ 					m_program.read_dword(m_r[4] + 0x08), m_program.read_dword(m_r[4] + 0x0c),
+ 					m_program.read_dword(m_r[4] + 0x10), m_program.read_dword(m_r[4] + 0x14),
+ 					m_program.read_dword(m_r[4] + 0x18), m_program.read_dword(m_r[4] + 0x1c),
+ 					m_program.read_dword(m_r[4] + 0x20), m_program.read_dword(m_r[4] + 0x24),
+ 					m_program.read_dword(m_r[4] + 0x28), m_program.read_dword(m_r[4] + 0x2c),
+ 					m_program.read_dword(m_r[4] + 0x30), m_program.read_dword(m_r[4] + 0x34));
+ 				vonj_opcode_09_caller_trace_count++;
+ 			}
+ 		}

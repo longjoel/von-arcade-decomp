@@ -1,0 +1,20 @@
+diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
+--- a/src/devices/cpu/sharc/sharc.cpp
++++ b/src/devices/cpu/sharc/sharc.cpp
+@@ -1282,2 +1282,15 @@ void adsp21062_device::execute_run()
+ 			m_core->opcode = m_program.read_qword(m_core->pc);
++			static unsigned vonj_sharc_reduction_trace_count;
++			if ((machine().system().name == std::string_view("vonj")) &&
++				(vonj_sharc_reduction_trace_count < 2048) &&
++				(((m_core->pc >= 0x00020dca) && (m_core->pc <= 0x00020ddf)) ||
++					((m_core->pc >= 0x000203b7) && (m_core->pc <= 0x000203bd))))
++			{
++				logerror("vonj_sharc_reduction: pc=%06x f0=%08x f1=%08x f2=%08x f4=%08x f7=%08x f8=%08x f12=%08x f15=%08x r2=%08x r7=%08x r8=%08x r10=%08x r12=%08x dm3030c=%08x dm3030d=%08x\n",
++					m_core->pc,
++					m_core->r[0].r, m_core->r[1].r, m_core->r[2].r, m_core->r[4].r,
++					m_core->r[7].r, m_core->r[8].r, m_core->r[12].r, m_core->r[15].r,
++					m_core->r[2].r, m_core->r[7].r, m_core->r[8].r, m_core->r[10].r,
++					m_core->r[12].r, dm_read32(0x0003030c), dm_read32(0x0003030d));
++				vonj_sharc_reduction_trace_count++;
++			}
+ 			static unsigned vonj_sharc_opcode33_trace_count;

@@ -1,0 +1,244 @@
+diff --git a/src/devices/cpu/sharc/sharcfloat40.h b/src/devices/cpu/sharc/sharcfloat40.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..8e774c815821b87360c4497fd865910a6518dedc
+--- /dev/null
++++ b/src/devices/cpu/sharc/sharcfloat40.h
+@@ -0,0 +1,238 @@
++// license:BSD-3-Clause
++// copyright-holders:Virtual-On decompilation contributors
++//
++// Small, host-independent normal/zero subset of the ADSP-2106x extended
++// floating-point format.  Keep this separate from the register file while the
++// interpreter and DRC are being converted; it is also useful as an executable
++// architectural contract for those two implementations.
++
++#ifndef MAME_CPU_SHARC_SHARCFLOAT40_H
++#define MAME_CPU_SHARC_SHARCFLOAT40_H
++
++#include <cstdint>
++#include <stdexcept>
++
++namespace sharc_float40
++{
++
++using raw_t = std::uint64_t;
++
++constexpr int fraction_bits = 31;
++constexpr int exponent_bias = 127;
++constexpr raw_t sign_mask = raw_t(1) << 39;
++
++// The extended encoding is not an IEEE-32 word with eight bits appended:
++// its sign and exponent move up by eight bits. Keep both projections named.
++inline raw_t from_ieee32(std::uint32_t bits)
++{
++	return raw_t(bits) << 8;
++}
++
++inline std::uint32_t to_ieee32(raw_t raw)
++{
++	return std::uint32_t(raw >> 8);
++}
++
++struct register_value
++{
++	raw_t extended = 0;
++
++	std::uint32_t storage_low_word() const { return std::uint32_t(extended); }
++	std::uint32_t ieee32_word() const { return to_ieee32(extended); }
++
++	void set_extended(raw_t raw) { extended = raw & ((raw_t(1) << 40) - 1); }
++	void set_ieee32(std::uint32_t bits) { extended = from_ieee32(bits); }
++};
++
++struct value
++{
++	bool negative;
++	std::uint64_t significand;
++	int shift;
++};
++
++enum class category
++{
++	zero,
++	normal,
++	denormal,
++	infinity,
++	nan
++};
++
++inline category classify(raw_t raw)
++{
++	const unsigned exponent = unsigned((raw >> fraction_bits) & 0xffU);
++	const std::uint32_t fraction = std::uint32_t(raw & 0x7fff'ffffU);
++	if (exponent == 0)
++		return fraction == 0 ? category::zero : category::denormal;
++	if (exponent == 0xffU)
++		return fraction == 0 ? category::infinity : category::nan;
++	return category::normal;
++}
++
++inline value decode(raw_t raw)
++{
++	const category type = classify(raw);
++	if (type == category::zero)
++		return { (raw & sign_mask) != 0, 0, 0 };
++	if (type != category::normal)
++		throw std::domain_error("SHARC 40-bit non-normal value is outside this seam");
++	const unsigned exponent = unsigned((raw >> fraction_bits) & 0xffU);
++	const std::uint32_t fraction = std::uint32_t(raw & 0x7fff'ffffU);
++
++	// This seam deliberately covers only normal values and signed zero. The
++	// exception path remains in the existing SHARC implementation until the
++	// register representation is converted.
++	return {
++		(raw & sign_mask) != 0,
++		(std::uint64_t(1) << fraction_bits) | fraction,
++		int(exponent) - exponent_bias - fraction_bits
++	};
++}
++
++inline unsigned bit_length(std::uint64_t value)
++{
++	unsigned result = 0;
++	while (value)
++	{
++		++result;
++		value >>= 1;
++	}
++	return result;
++}
++
++inline raw_t encode(value input, unsigned precision, bool truncate)
++{
++	if (input.significand == 0)
++		return input.negative ? sign_mask : 0;
++
++	const unsigned length = bit_length(input.significand);
++	int exponent = int(length) - 1 + input.shift;
++	std::uint64_t significand;
++
++	if (length > precision)
++	{
++		const unsigned dropped = length - precision;
++		significand = input.significand >> dropped;
++		const std::uint64_t remainder = input.significand - (significand << dropped);
++		if (!truncate)
++		{
++			const std::uint64_t halfway = std::uint64_t(1) << (dropped - 1);
++			if (remainder > halfway || (remainder == halfway && (significand & 1)))
++				++significand;
++		}
++	}
++	else
++	{
++		significand = input.significand << (precision - length);
++	}
++
++	if (significand == (std::uint64_t(1) << precision))
++	{
++		significand >>= 1;
++		++exponent;
++	}
++
++	const unsigned exponent_field = unsigned(exponent + exponent_bias);
++	const std::uint64_t fraction = (significand - (std::uint64_t(1) << (precision - 1)))
++		<< (32 - precision);
++	raw_t result = (raw_t(exponent_field) << fraction_bits) | fraction;
++	if (input.negative)
++		result |= sign_mask;
++	return result;
++}
++
++inline value rounded_input(raw_t raw, bool rnd32, bool truncate)
++{
++	const value input = decode(raw);
++	return decode(encode(input, rnd32 ? 24 : 32, truncate));
++}
++
++inline raw_t add(raw_t x, raw_t y, bool rnd32, bool truncate)
++{
++	const value left = rounded_input(x, rnd32, truncate);
++	const value right = rounded_input(y, rnd32, truncate);
++	const unsigned precision = rnd32 ? 24 : 32;
++	if (left.significand == 0)
++		return encode(right, precision, truncate);
++	if (right.significand == 0)
++		return encode(left, precision, truncate);
++	// Aligning a much smaller operand by shifting the larger significand can
++	// overflow uint64_t even though the rounded result is representable.  Once
++	// the exponent distance exceeds the destination precision, the smaller
++	// operand cannot affect either truncation or round-to-nearest.  At exactly
++	// the precision boundary it can affect the half-ULP decision, so handle
++	// that case explicitly without constructing a too-wide intermediate.
++	value larger = left;
++	value smaller = right;
++	if (larger.shift < smaller.shift)
++	{
++		larger = right;
++		smaller = left;
++	}
++	const int distance = larger.shift - smaller.shift;
++	if (distance > int(precision))
++		return encode(larger, precision, truncate);
++	if (distance == int(precision))
++	{
++		std::uint64_t significand = larger.significand;
++		if (!truncate)
++		{
++			const std::uint64_t halfway = std::uint64_t(1) << (precision - 1);
++			const bool away = smaller.significand > halfway ||
++				(smaller.significand == halfway && (significand & 1));
++			if (away)
++			{
++				if (larger.negative == smaller.negative)
++					++significand;
++				else
++					--significand;
++			}
++		}
++		return encode({ larger.negative, significand, larger.shift }, precision, truncate);
++	}
++	const int result_shift = (left.shift < right.shift) ? left.shift : right.shift;
++	const unsigned left_shift = unsigned(left.shift - result_shift);
++	const unsigned right_shift = unsigned(right.shift - result_shift);
++	const std::uint64_t left_magnitude = left_shift < 64 ? left.significand << left_shift : 0;
++	const std::uint64_t right_magnitude = right_shift < 64 ? right.significand << right_shift : 0;
++	bool negative;
++	std::uint64_t magnitude;
++	if (left.negative == right.negative)
++	{
++		negative = left.negative;
++		magnitude = left_magnitude + right_magnitude;
++	}
++	else if (left_magnitude >= right_magnitude)
++	{
++		negative = left.negative;
++		magnitude = left_magnitude - right_magnitude;
++	}
++	else
++	{
++		negative = right.negative;
++		magnitude = right_magnitude - left_magnitude;
++	}
++	return encode({ negative, magnitude, result_shift }, rnd32 ? 24 : 32, truncate);
++}
++
++inline raw_t multiply(raw_t x, raw_t y, bool rnd32, bool truncate)
++{
++	const value left = rounded_input(x, rnd32, truncate);
++	const value right = rounded_input(y, rnd32, truncate);
++	return encode({ left.negative != right.negative,
++		left.significand * right.significand, left.shift + right.shift },
++		rnd32 ? 24 : 32, truncate);
++}
++
++inline raw_t integer_to_float(std::int32_t input)
++{
++	const bool negative = input < 0;
++	const std::uint64_t magnitude = negative ? std::uint64_t(-std::int64_t(input)) : std::uint64_t(input);
++	return encode({ negative, magnitude, 0 }, 32, true);
++}
++
++} // namespace sharc_float40
++
++#endif // MAME_CPU_SHARC_SHARCFLOAT40_H

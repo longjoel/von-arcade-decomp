@@ -3,16 +3,27 @@
 
 CPUS["I960"] = true
 CPUS["ADSP2106X"] = true
+CPUS["MB86233"] = true
 CPUS["M68000"] = true
 CPUS["Z80"] = true
 
 SOUNDS["SCSP"] = true
 SOUNDS["MULTIPCM"] = true
+SOUNDS["MPEG_AUDIO"] = true
 
 MACHINES["CXD1095"] = true
 MACHINES["EEPROMDEV"] = true
+MACHINES["GEN_FIFO"] = true
+MACHINES["I8251"] = true
 MACHINES["MB8421"] = true
+MACHINES["MB3773"] = true
 MACHINES["MSM6253"] = true
+MACHINES["Z80CTC"] = true
+MACHINES["Z80PIO"] = true
+MACHINES["Z80SIO"] = true
+
+BUSES["RS232"] = true
+VIDEOS["HD44780"] = true
 
 function createProjects_mame_von(_target, _subtarget)
 	project("mame_von")

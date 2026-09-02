@@ -1,0 +1,51 @@
+diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
+--- a/src/mame/sega/model2.cpp
++++ b/src/mame/sega/model2.cpp
+@@ -673,7 +673,33 @@ u32 model2b_state::copro_fifo_r()
+ 	if ((machine().system().name == std::string_view("vonj")) && (vonj_copro_response_trace_count < 256))
+ 	{
+ 		logerror("vonj_copro_response: pc=%08x data=%08x\n", m_maincpu->pc(), data);
+ 		vonj_copro_response_trace_count++;
+ 	}
++	static unsigned vonj_geometry_projection_response_trace_count;
++	static unsigned vonj_geometry_result_response_trace_count;
++	static unsigned vonj_geometry_object_response_trace_count;
++	offs_t pc = m_maincpu->pc();
++	const bool projection_response = (pc >= 0x0006f7ac) && (pc < 0x0006f820);
++	const bool result_response = (pc >= 0x0009de9c) && (pc < 0x0009ec00);
++	const bool object_response = ((pc >= 0x000343f0) && (pc < 0x00034400)) ||
++		((pc >= 0x00034490) && (pc < 0x000344a0)) ||
++		((pc >= 0x00034988) && (pc < 0x000349b0)) ||
++		((pc >= 0x00034bc0) && (pc < 0x00034be4)) ||
++		((pc >= 0x00034cbc) && (pc < 0x00034ce4)) ||
++		((pc >= 0x00034e90) && (pc < 0x00034ec8));
++	if ((machine().system().name == std::string_view("vonj")) &&
++		(projection_response || result_response || object_response) &&
++		(projection_response ? (vonj_geometry_projection_response_trace_count < 8192) :
++			(result_response ? (vonj_geometry_result_response_trace_count < 8192) :
++				(vonj_geometry_object_response_trace_count < 512))))
++	{
++		logerror("vonj_geometry_response: pc=%08x data=%08x\n", pc, data);
++		if (projection_response)
++			vonj_geometry_projection_response_trace_count++;
++		else if (result_response)
++			vonj_geometry_result_response_trace_count++;
++		else
++			vonj_geometry_object_response_trace_count++;
++	}
+ 	return data;
+ }
+@@ -887,6 +916,14 @@ void model2_state::geo_w(offs_t offset, u32 data)
+ {
+ 	int address = offset * 4;
++	static unsigned vonj_geometry_write_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) &&
++		(address < 0x1000) && (data != 0) &&
++		(vonj_geometry_write_trace_count < 4096))
++	{
++		logerror("vonj_geometry_write: pc=%08x address=%04x data=%08x\n",
++			m_maincpu->pc(), address, data);
++		vonj_geometry_write_trace_count++;
++	}
+
+ 	if (address < 0x1000)

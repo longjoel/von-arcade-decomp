@@ -11,6 +11,14 @@ ROM_PATH="$(prepare_rom_path)"
 trap 'cleanup_rom_path "$ROM_PATH"' EXIT
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 TWIN_DIR="$CAPTURE_DIR/twin-$SET_NAME-$STAMP"
+GEOMETRY_STATE_LOG_ROOT="${VON_PROGRESS_GEOMETRY_STATE_LOG_ROOT:-}"
+P1_GEOMETRY_STATE_ENV=()
+P2_GEOMETRY_STATE_ENV=()
+if [[ -n "$GEOMETRY_STATE_LOG_ROOT" ]]; then
+    mkdir -p "$GEOMETRY_STATE_LOG_ROOT"
+    P1_GEOMETRY_STATE_ENV=("VON_PROGRESS_GEOMETRY_STATE_LOG=$GEOMETRY_STATE_LOG_ROOT/p1.log")
+    P2_GEOMETRY_STATE_ENV=("VON_PROGRESS_GEOMETRY_STATE_LOG=$GEOMETRY_STATE_LOG_ROOT/p2.log")
+fi
 
 if command -v ss >/dev/null 2>&1; then
     ACTIVE_SOCKETS="$(ss -ltn 2>/dev/null || true)"
@@ -62,6 +70,7 @@ printf 'Twin capture directory: %s\n' "$TWIN_DIR"
 
 env $(runtime_env) \
     VON_PROGRESS_LOG="$TWIN_DIR/p1/progress.lua.log" \
+    "${P1_GEOMETRY_STATE_ENV[@]}" \
     stdbuf -oL -eL "$MAME_BIN" "$SET_NAME" \
         -rompath "$ROM_PATH" \
         -cfg_directory "$TWIN_DIR/p1/cfg" \
@@ -75,6 +84,7 @@ P1_PID=$!
 
 env $(runtime_env) \
     VON_PROGRESS_LOG="$TWIN_DIR/p2/progress.lua.log" \
+    "${P2_GEOMETRY_STATE_ENV[@]}" \
     stdbuf -oL -eL "$MAME_BIN" "$SET_NAME" \
         -rompath "$ROM_PATH" \
         -cfg_directory "$TWIN_DIR/p2/cfg" \
