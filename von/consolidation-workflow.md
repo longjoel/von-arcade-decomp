@@ -65,3 +65,10 @@ MAME with `I960: 0: Unhandled 00`. This is the earliest named integration
 failure. The passing PC audit is evidence about code provenance, not permission
 to mark the attract suite passing; the process exception remains a milestone
 failure until its control-flow cause is integrated and trace-validated.
+
+The current terminal path visits `0x00003ae4`, the return at the end of
+`recovered_texture_decompress()`, immediately before PC zero. The emitted
+listing also contains an out-of-line `callx 0x38e0` for the bank-selection
+helper inside that routine. The active repair hypothesis is that this nested
+call overwrites the decompressor's return link; the helper is forced inline in
+the source, pending verification with the pinned i960 compiler.
