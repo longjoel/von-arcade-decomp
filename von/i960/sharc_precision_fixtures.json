@@ -1,0 +1,127 @@
+{
+  "format": {
+    "width_bits": 40,
+    "sign_bit": 39,
+    "exponent_bits": [38, 31],
+    "fraction_bits": [30, 0],
+    "description": "ADSP-2106x extended float: 8-bit exponent and 32-bit significand including the hidden bit"
+  },
+  "vectors": [
+    {
+      "name": "fadd_preserves_extended_lsb",
+      "operation": "FADD",
+      "x": "0x0000000000",
+      "y": "0x3f80000001",
+      "mode1": {"trunc": true, "rnd32": false},
+      "expected": "0x3f80000001",
+      "reason": "40-bit mode must retain the low extended mantissa bit"
+    },
+    {
+      "name": "fadd_rnd32_clears_input_and_output_lsb",
+      "operation": "FADD",
+      "x": "0x0000000000",
+      "y": "0x3f80000001",
+      "mode1": {"trunc": true, "rnd32": true},
+      "expected": "0x3f80000000",
+      "reason": "RND32 clears each input's eight extended bits and the result's eight low bits"
+    },
+    {
+      "name": "fmul_preserves_extended_lsb",
+      "operation": "FMUL",
+      "x": "0x3f80000001",
+      "y": "0x3f80000000",
+      "mode1": {"trunc": true, "rnd32": false},
+      "expected": "0x3f80000001",
+      "reason": "multiplication by one must not discard a representable extended bit"
+    },
+    {
+      "name": "fmul_rnd32_clears_input_and_output_lsb",
+      "operation": "FMUL",
+      "x": "0x3f80000001",
+      "y": "0x3f80000000",
+      "mode1": {"trunc": true, "rnd32": true},
+      "expected": "0x3f80000000",
+      "reason": "RND32 applies to multiplier inputs as well as its destination"
+    },
+    {
+      "name": "fadd_negative_preserves_extended_lsb",
+      "operation": "FADD",
+      "x": "0x8000000000",
+      "y": "0xbf80000001",
+      "mode1": {"trunc": true, "rnd32": false},
+      "expected": "0xbf80000001",
+      "reason": "the signed 40-bit path must retain extended precision for negative results"
+    },
+    {
+      "name": "fmul_negative_preserves_extended_lsb",
+      "operation": "FMUL",
+      "x": "0x3f80000001",
+      "y": "0xbf80000000",
+      "mode1": {"trunc": true, "rnd32": false},
+      "expected": "0xbf80000001",
+      "reason": "multiplication must preserve both sign and a representable extended bit"
+    },
+    {
+      "name": "fadd_nearest_even_tie_down",
+      "operation": "FADD",
+      "x": "0x3f80000000",
+      "y": "0x2f80000000",
+      "mode1": {"trunc": false, "rnd32": false},
+      "expected": "0x3f80000000",
+      "reason": "a halfway result keeps the even extended significand"
+    },
+    {
+      "name": "fadd_nearest_even_tie_up",
+      "operation": "FADD",
+      "x": "0x3f80000001",
+      "y": "0x2f80000000",
+      "mode1": {"trunc": false, "rnd32": false},
+      "expected": "0x3f80000002",
+      "reason": "a halfway result rounds an odd extended significand upward"
+    },
+    {
+      "name": "fadd_truncate_tie",
+      "operation": "FADD",
+      "x": "0x3f80000001",
+      "y": "0x2f80000000",
+      "mode1": {"trunc": true, "rnd32": false},
+      "expected": "0x3f80000001",
+      "reason": "TRUNC selects round-toward-zero at the 40-bit boundary"
+    },
+    {
+      "name": "fmul_wide_significand_does_not_wrap",
+      "operation": "FMUL",
+      "x": "0x3fffffffff",
+      "y": "0x3fffffffff",
+      "mode1": {"trunc": true, "rnd32": false},
+      "expected": "0x407ffffffe",
+      "reason": "two 33-bit significands require a 66-bit product before 40-bit normalization"
+    },
+    {
+      "name": "fmul_wide_significand_rnd32_does_not_wrap",
+      "operation": "FMUL",
+      "x": "0x3fffffffff",
+      "y": "0x3fffffffff",
+      "mode1": {"trunc": true, "rnd32": true},
+      "expected": "0x407ffffe00",
+      "reason": "RND32 still requires a wide product before the 24-bit destination boundary"
+    },
+    {
+      "name": "fadd_far_exponent_does_not_overflow_alignment",
+      "operation": "FADD",
+      "x": "0x3f80000000",
+      "y": "0x2f00000000",
+      "mode1": {"trunc": true, "rnd32": false},
+      "expected": "0x3f80000000",
+      "reason": "an exponent gap beyond the destination precision must not wrap a uint64 alignment shift"
+    },
+    {
+      "name": "float_3_is_always_extended_boundary",
+      "operation": "FLOAT",
+      "integer": 3,
+      "mode1": {"trunc": true, "rnd32": true},
+      "expected": "0x4040000000",
+      "reason": "fixed-point-to-float conversion uses the 40-bit boundary even with RND32"
+    }
+  ]
+}
