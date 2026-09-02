@@ -44,6 +44,7 @@ def main():
            ((1.0, 0.0, 0.0), (0.0, 0.0, 0.0),
             (0.0, 1.0, 0.0), (1.0, 1.0, 0.0)),
            "raster vertex/UV correspondence")
+
     print("PASS: Model 2 UV mapping and sampler flags")
 
 

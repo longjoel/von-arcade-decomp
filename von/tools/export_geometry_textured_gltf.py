@@ -180,9 +180,9 @@ def parse_faces(geometry: bytes, texture_data: bytes, oba: int, tpa: int, tha: i
         if header_offset & 0x10:
             header_offset -= 32
         header_address += header_offset * 4
-        faces.append((attr, points, uv, header))
 
         link = (attr >> 8) & 3
+        faces.append((attr, points, uv, header))
         if link in (0, 2):
             p0, p1 = p2, points[-1]
         elif link == 1:

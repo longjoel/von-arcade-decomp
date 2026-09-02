@@ -86,6 +86,8 @@ def main() -> int:
                         help="first submitted object slot to export")
     parser.add_argument("--max-objects", type=int,
                         help="maximum submitted object slots to export")
+    parser.add_argument("--exclude-object", type=int, action="append", default=[],
+                        help="relative object slot to omit after --start-object")
     args = parser.parse_args()
 
     selected_time, objects = select_frame(
@@ -97,6 +99,14 @@ def main() -> int:
         if args.max_objects <= 0:
             raise SystemExit("--max-objects must be positive")
         objects = objects[:args.max_objects]
+    object_slots = list(range(args.start_object,
+                              args.start_object + len(objects)))
+    excluded = set(args.exclude_object)
+    if any(slot < 0 or slot >= len(objects) for slot in excluded):
+        raise SystemExit("--exclude-object is outside the selected object slice")
+    objects, object_slots = zip(*[
+        (item, slot) for relative_slot, (item, slot) in enumerate(
+            zip(objects, object_slots)) if relative_slot not in excluded])
     if not objects:
         raise SystemExit("object slice is empty")
     geometry = args.rom.read_bytes()
@@ -232,8 +242,7 @@ def main() -> int:
         return mesh_index
 
     nodes = []
-    for relative_slot, (oba, matrix, metadata) in enumerate(objects):
-        slot = args.start_object + relative_slot
+    for slot, (oba, matrix, metadata) in zip(object_slots, objects):
         mesh_index = mesh_for(oba, int(metadata["tpa"]), int(metadata["tha"]))
         rotation, scale = transform_trs(matrix)
         nodes.append({

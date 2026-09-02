@@ -110,6 +110,8 @@ def main() -> int:
                         default=Path("von/build/disasm/geometry-rom.bin"))
     parser.add_argument("--output", type=Path,
                         default=Path("von/build/disasm/player-select-animation.gltf"))
+    parser.add_argument("--start-object", type=int, default=0)
+    parser.add_argument("--max-objects", type=int)
     args = parser.parse_args()
 
     events = []
@@ -149,6 +151,16 @@ def main() -> int:
     slots = [oba for oba, _, _ in frames[times[0]]]
     if any([oba for oba, _, _ in frames[time]] != slots for time in times):
         raise SystemExit("object order changed between frames")
+    if args.start_object < 0:
+        raise SystemExit("--start-object must be non-negative")
+    if args.max_objects is not None and args.max_objects <= 0:
+        raise SystemExit("--max-objects must be positive")
+    end = (args.start_object + args.max_objects
+           if args.max_objects is not None else None)
+    slots = slots[args.start_object:end]
+    frames = {time: objects[args.start_object:end] for time, objects in frames.items()}
+    if not slots:
+        raise SystemExit("object slice is empty")
 
     blob = bytearray()
     views = []
