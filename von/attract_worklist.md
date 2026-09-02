@@ -1,8 +1,8 @@
 # Attract Reconstruction Worklist
 
 - Observed direct-call units: 262
-- Modeled integration queue: 82
-- Integrated or validated: 12
+- Modeled integration queue: 81
+- Integrated or validated: 13
 - Untriaged: 168
 
 | Entry | Edges | Triage | Work unit |
@@ -49,7 +49,6 @@
 | `0x0002a4e0` | 24 | modeled-integration-queue | maincpu.audio-command-u16-send |
 | `0x0002a5f0` | 7 | modeled-integration-queue | maincpu.audio-command-u16-send-when-idle |
 | `0x0002a870` | 1 | modeled-integration-queue | maincpu.audio-selector-zero-send |
-| `0x0002a8a0` | 1 | modeled-integration-queue | maincpu.audio-scsp-queue-initialize |
 | `0x0002a990` | 3 | modeled-integration-queue | maincpu.geometry-service-submit |
 | `0x0006ece0` | 15 | modeled-integration-queue | maincpu.geometry-coordinate-submit |
 | `0x0006f6f0` | 5 | modeled-integration-queue | maincpu.geometry-projection-packet-core |
@@ -101,6 +100,7 @@
 | `0x00028d08` | 1 | integrated-validation-queue | maincpu.geometry-register-clear |
 | `0x00028d30` | 3 | integrated-validation-queue | maincpu.geometry-auxiliary-submit-select |
 | `0x00028d80` | 1 | integrated-validation-queue | maincpu.geometry-pipeline-startup |
+| `0x0002a8a0` | 1 | integrated-validation-queue | maincpu.audio-scsp-queue-initialize |
 | `0x00002040` | 1 | untriaged |  |
 | `0x00002080` | 2 | untriaged |  |
 | `0x000022f0` | 2 | untriaged |  |

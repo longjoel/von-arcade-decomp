@@ -3,8 +3,8 @@
   "coverage_source": "von/build/attract-coverage/vonj-attract-60s.json",
   "discovered_units": 262,
   "represented_units": 94,
-  "modeled_units": 82,
-  "integrated_units": 12,
+  "modeled_units": 81,
+  "integrated_units": 13,
   "untriaged_units": 168,
   "ordering": "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality",
   "units": [
@@ -508,18 +508,6 @@
       "priority": 0,
       "weight": null,
       "work_unit": "maincpu.audio-selector-zero-send",
-      "sources": [
-        "von/i960/recovered_audio_queue.c"
-      ]
-    },
-    {
-      "entry": "0x0002a8a0",
-      "observed_call_edges": 1,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.audio-scsp-queue-initialize",
       "sources": [
         "von/i960/recovered_audio_queue.c"
       ]
@@ -1134,6 +1122,18 @@
       "work_unit": "maincpu.geometry-pipeline-startup",
       "sources": [
         "von/i960/recovered_geometry_commands.c"
+      ]
+    },
+    {
+      "entry": "0x0002a8a0",
+      "observed_call_edges": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.audio-scsp-queue-initialize",
+      "sources": [
+        "von/i960/recovered_audio_queue.c"
       ]
     },
     {

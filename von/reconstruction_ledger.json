@@ -2260,10 +2260,10 @@
           }
         },
         {
-          "id": "maincpu.audio-scsp-queue-initialize",
+      "id": "maincpu.audio-scsp-queue-initialize",
           "name": "audio_scsp_queue_initialize",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_audio_queue.c"
           ],
@@ -2398,10 +2398,10 @@
           }
         },
         {
-          "id": "maincpu.audio-queue-consumer",
+      "id": "maincpu.audio-queue-consumer",
           "name": "audio_queue_consumer",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_audio_queue.c"
           ],
