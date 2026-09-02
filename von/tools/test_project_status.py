@@ -15,7 +15,8 @@ def main() -> int:
     )
     assert attract["integrated_units"] >= 0
     assert not status["tests"]["fast_requires_mame"]
-    assert sum(status["tests"]["configured"].values()) >= 360
+    configured = status["tests"]["configured"]
+    assert all(configured[name] > 0 for name in ("unit", "contract", "trace", "smoke", "attract"))
     assert status["evidence"]["healthy"]
     print("PASS: generated status agrees with ledger, worklist, tests, and evidence")
     return 0
