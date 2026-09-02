@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Guard the generic MAME SHARC STKY state exposure patch."""
 
+import json
 from pathlib import Path
+
+from patchset_manifest import resolve
 
 
 ROOT = Path(__file__).resolve().parents[2]
 PATCH = ROOT / "third_party/patches/0029-von-sharc-expose-stky-state.patch"
-PREPARE = ROOT / "scripts/prepare-mame.sh"
+MANIFEST = ROOT / "third_party/patches/patchsets.json"
 
 
 def main() -> int:
@@ -19,8 +22,9 @@ def main() -> int:
     ):
         if fragment not in patch:
             raise SystemExit(f"STKY state patch missing {fragment}")
-    if "SHARC_STKY_STATE_PATCH_FILE" not in PREPARE.read_text(encoding="utf-8"):
-        raise SystemExit("prepare-mame.sh does not install the STKY state patch")
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    if PATCH.name not in resolve(manifest, "sharc-diagnostics"):
+        raise SystemExit("sharc-diagnostics profile does not install the STKY state patch")
     print("PASS: SHARC STKY architectural-state patch contract")
     return 0
 

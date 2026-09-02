@@ -39,11 +39,16 @@ local function write_coverage()
     debug:track_pc(false, false)
 end
 
+-- Use emulated time rather than callback count: periodic callbacks are a
+-- UI/debug timer, and frame-done callbacks are not delivered with -video none.
 emu.register_periodic(function()
-    frame = frame + 1
-    if not started then
-        start_tracking()
-    end
+	frame = frame + 1
+	if not started then
+		start_tracking()
+	end
+	if started and emu.time() >= seconds then
+		emu.exit()
+	end
 end)
 
 -- Retain the subscription after the autoboot chunk returns.  Notifier

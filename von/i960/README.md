@@ -37,6 +37,11 @@ fails if any observed PC lies beyond the generated-code extent.
 The current eight-second baseline visits 564 distinct PCs, all within the
 generated `0x00000000-0x00002520` range.
 
+The recovered object-state arm models and their context-based dispatcher are
+also compiled into the reconstructed i960 images. They are linkable behavioral
+code, but startup does not invoke them until the original object-pointer
+lifecycle and input-driven transition timing are correlated.
+
 Run the host-side exhaustive checks for recovered deterministic runtime leaves
 with `python3 von/tools/test_recovered_runtime_math.py`.
 
@@ -51,8 +56,8 @@ python3 von/tools/reconstruction_progress.py \
   --generated von/build/i960/reconstructed_reset.bin
 ```
 
-The current result is 35 of 184 bytes equal, so this slice remains
-provisional.
+The comparison result is research evidence only; lifecycle state comes from
+the ledger and generated status.
 
 Coverage has two deliberately separate reports:
 
@@ -60,7 +65,7 @@ Coverage has two deliberately separate reports:
 # Strict headline metric: only byte-for-byte C matches.
 python3 von/tools/reconstruction_progress.py --report
 
-# C-represented slices with evidence; never substitute this for the headline.
+# Modeled-or-later semantic ranges; never substitute this for byte validation.
 python3 von/tools/reconstruction_progress.py --semantic-report
 ```
 

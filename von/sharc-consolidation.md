@@ -6,10 +6,10 @@ raw emulator observations and unfinished experiments.
 
 ## Current result
 
-The reconstruction ledger contains 90 SHARC entries: 88 code units, one data
-unit, and one behavior-only unit. All remain `provisional`. The pass therefore
-produced broad behavioral coverage, but no SHARC unit has crossed the project's
-strict byte-validation boundary.
+SHARC is frozen as a modeled evidence library for the active C-only i960
+attract milestone. Current counts come from `./scripts/status.sh`; this document
+does not duplicate them. No SHARC work unit is promoted merely because a probe
+or recovered model exists.
 
 The local evidence snapshot at consolidation contains 249 generated SHARC
 artifacts (566,363,342 bytes), 69 recovered C models, 133 probe stimuli, 18
@@ -17,13 +17,9 @@ trace verifiers, and 68 focused recovered-model tests. Twenty-three small probe
 logs started without a completion marker; the inventory labels these incomplete
 rather than allowing their existence to imply a result.
 
-The whole reconstruction ledger currently has 27 pre-existing validation
-errors. They include schema drift (`data` and `behavior` classifications),
-deliberately nested parent/sub-slices that the original non-overlap validator
-cannot represent, one comma-separated two-file source field, and one reversed
-range. The inventory records every error. This checkpoint does not rewrite
-those unrelated or ambiguous ledger entries; ledger-schema/range normalization
-is a separate cleanup boundary.
+The schema-v2 ledger separates non-overlapping physical ranges from nestable
+semantic work units. `python3 von/tools/validate_reconstruction_ledger.py` must
+report zero errors before a checkpoint.
 
 The strongest reusable results are:
 

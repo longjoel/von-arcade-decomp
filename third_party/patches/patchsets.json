@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "order": [
+    "0001-von-mame-support.patch",
+    "0010-von-communication-diagnostics.patch",
+    "0011-mame-lua-pc-coverage.patch",
+    "0002-von-sharc-tracing.patch",
+    "0003-von-texture-write-tracing.patch",
+    "0004-von-texture-source-tracing.patch",
+    "0005-von-palette-tracing.patch",
+    "0006-von-texture-command-tracing.patch",
+    "0007-von-geometry-object-tracing.patch",
+    "0008-von-geometry-matrix-tracing.patch",
+    "0009-von-geometry-polygon-tracing.patch",
+    "0012-von-renderer-boundary-tracing.patch",
+    "0013-von-first-match-texture-command-tracing.patch",
+    "0014-von-geometry-response-tracing.patch",
+    "0015-von-sharc-20de1-tracing.patch",
+    "0016-von-sharc-interpreter-tracing.patch",
+    "0017-von-sharc-opcode-1f-state-tracing.patch",
+    "0018-von-sharc-output-tracing.patch",
+    "0019-von-sharc-state-upload-tracing.patch",
+    "0020-von-sharc-opcode-0c-output-tracing.patch",
+    "0021-von-sharc-opcode-22-compare-tracing.patch",
+    "0022-von-opcode-09-caller-tracing.patch",
+    "0023-von-sharc-reduction-tracing.patch",
+    "0024-von-sharc-20d68-tracing.patch",
+    "0025-von-sharc-scalar-tracing.patch",
+    "0026-von-sharc-reciprocal-tracing.patch",
+    "0027-von-sharc-drc-angle-tracing.patch",
+    "0028-von-sharc-drc-float-special-cases.patch",
+    "0029-von-sharc-expose-stky-state.patch",
+    "0030-von-sharc-interpreter-angle-boundary-tracing.patch",
+    "0031-von-sharc-40bit-header.patch",
+    "0032-von-sharc-40bit-register-seam.patch",
+    "0033-von-sharc-drc-compound-abs-special-cases.patch"
+  ],
+  "profiles": {
+    "core": ["0001-von-mame-support.patch", "0010-von-communication-diagnostics.patch", "0011-mame-lua-pc-coverage.patch"],
+    "link": ["core", "0002-von-sharc-tracing.patch"],
+    "geometry": ["core", "0007-von-geometry-object-tracing.patch", "0008-von-geometry-matrix-tracing.patch", "0009-von-geometry-polygon-tracing.patch", "0012-von-renderer-boundary-tracing.patch", "0014-von-geometry-response-tracing.patch"],
+    "texture": ["core", "0003-von-texture-write-tracing.patch", "0004-von-texture-source-tracing.patch", "0005-von-palette-tracing.patch", "0006-von-texture-command-tracing.patch", "0013-von-first-match-texture-command-tracing.patch"],
+    "sharc-diagnostics": ["core", "0002-von-sharc-tracing.patch", "0015-von-sharc-20de1-tracing.patch", "0016-von-sharc-interpreter-tracing.patch", "0017-von-sharc-opcode-1f-state-tracing.patch", "0018-von-sharc-output-tracing.patch", "0019-von-sharc-state-upload-tracing.patch", "0020-von-sharc-opcode-0c-output-tracing.patch", "0021-von-sharc-opcode-22-compare-tracing.patch", "0022-von-opcode-09-caller-tracing.patch", "0023-von-sharc-reduction-tracing.patch", "0024-von-sharc-20d68-tracing.patch", "0025-von-sharc-scalar-tracing.patch", "0026-von-sharc-reciprocal-tracing.patch", "0027-von-sharc-drc-angle-tracing.patch", "0029-von-sharc-expose-stky-state.patch", "0030-von-sharc-interpreter-angle-boundary-tracing.patch"],
+    "sharc-precision": ["core", "0028-von-sharc-drc-float-special-cases.patch", "0031-von-sharc-40bit-header.patch", "0032-von-sharc-40bit-register-seam.patch", "0033-von-sharc-drc-compound-abs-special-cases.patch"],
+    "debug": ["geometry", "texture", "sharc-diagnostics", "sharc-precision"]
+  },
+  "aliases": {
+    "all": "debug",
+    "geometry-trace": "geometry",
+    "geometry-material": "geometry",
+    "texture-trace": "texture"
+  }
+}

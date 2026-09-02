@@ -9,13 +9,11 @@ import json
 from pathlib import Path
 import sys
 
-
-VALID_CLASSIFICATIONS = {"code", "constant/data", "padding", "unknown"}
-VALID_STATUSES = {"planned", "byte-validated", "provisional", "blocked"}
+from reconstruction_ledger import merged_intervals, number, validate as validate_v2
 
 
 def address(value: str | int) -> int:
-    return int(value, 0) if isinstance(value, str) else value
+    return number(value)
 
 
 def load(path: Path) -> dict:
@@ -24,47 +22,11 @@ def load(path: Path) -> dict:
 
 
 def validate(ledger: dict, root: Path) -> list[str]:
-    errors: list[str] = []
-    if ledger.get("schema_version") != 1:
-        errors.append("unsupported or missing schema_version")
+    return validate_v2(ledger, root)
 
-    names: set[str] = set()
-    for image in ledger.get("images", []):
-        image_name = image.get("name", "<unnamed>")
-        if image_name in names:
-            errors.append(f"duplicate image: {image_name}")
-        names.add(image_name)
-        size = image.get("size")
-        ranges: list[tuple[int, int, str]] = []
-        for slice_entry in image.get("slices", []):
-            name = slice_entry.get("name", "<unnamed slice>")
-            classification = slice_entry.get("classification")
-            status = slice_entry.get("status")
-            if classification not in VALID_CLASSIFICATIONS:
-                errors.append(f"{image_name}/{name}: invalid classification {classification!r}")
-            if status not in VALID_STATUSES:
-                errors.append(f"{image_name}/{name}: invalid status {status!r}")
-            try:
-                start = address(slice_entry["start"])
-                end = address(slice_entry["end"])
-            except (KeyError, TypeError, ValueError) as exc:
-                errors.append(f"{image_name}/{name}: invalid range ({exc})")
-                continue
-            if end <= start:
-                errors.append(f"{image_name}/{name}: end must be greater than start")
-            if size is not None and (start < 0 or end > size):
-                errors.append(f"{image_name}/{name}: range exceeds image size")
-            ranges.append((start, end, name))
-            source = slice_entry.get("source")
-            if source and not (root / source).exists():
-                errors.append(f"{image_name}/{name}: missing source {source}")
-        ranges.sort()
-        for previous, current in zip(ranges, ranges[1:]):
-            if current[0] < previous[1]:
-                errors.append(
-                    f"{image_name}: overlapping slices {previous[2]} and {current[2]}"
-                )
-    return errors
+
+def interval_bytes(intervals: list[tuple[int, int]]) -> int:
+    return sum(end - start for start, end in merged_intervals(intervals))
 
 
 def report(ledger: dict) -> str:
@@ -73,13 +35,10 @@ def report(ledger: dict) -> str:
     lines = []
     for image in ledger.get("images", []):
         code = matched = 0
-        for slice_entry in image.get("slices", []):
-            if slice_entry.get("classification") != "code":
-                continue
-            count = address(slice_entry["end"]) - address(slice_entry["start"])
-            code += count
-            if slice_entry.get("status") == "byte-validated":
-                matched += count
+        code_ranges = [(address(item["start"]), address(item["end"])) for item in image.get("physical_ranges", []) if item.get("classification") == "code"]
+        matched_ranges = [(address(r["start"]), address(r["end"])) for unit in image.get("work_units", []) if unit.get("classification") == "code" and unit.get("stage") == "byte-validated" for r in unit.get("ranges", [])]
+        code = interval_bytes(code_ranges)
+        matched = interval_bytes(matched_ranges)
         total_code += code
         matched_code += matched
         if code:
@@ -98,13 +57,8 @@ def semantic_report(ledger: dict) -> str:
     lines = []
     for image in ledger.get("images", []):
         code = represented = 0
-        for slice_entry in image.get("slices", []):
-            if slice_entry.get("classification") != "code":
-                continue
-            count = address(slice_entry["end"]) - address(slice_entry["start"])
-            code += count
-            if slice_entry.get("status") in {"provisional", "byte-validated"}:
-                represented += count
+        code = interval_bytes([(address(item["start"]), address(item["end"])) for item in image.get("physical_ranges", []) if item.get("classification") == "code"])
+        represented = interval_bytes([(address(r["start"]), address(r["end"])) for unit in image.get("work_units", []) if unit.get("classification") == "code" and unit.get("stage") in {"modeled", "integrated", "trace-validated", "byte-validated"} for r in unit.get("ranges", [])])
         total_code += code
         represented_code += represented
         if code:
@@ -130,10 +84,10 @@ def find_slice(ledger: dict, identifier: str) -> tuple[dict, dict]:
     for image in ledger.get("images", []):
         if image.get("name") != image_name:
             continue
-        for slice_entry in image.get("slices", []):
-            if slice_entry.get("name") == slice_name:
-                return image, slice_entry
-    raise ValueError(f"unknown slice: {identifier}")
+        for work_unit in image.get("work_units", []):
+            if work_unit.get("name") == slice_name or work_unit.get("id") == identifier.replace("/", ".", 1):
+                return image, work_unit
+    raise ValueError(f"unknown work unit: {identifier}")
 
 
 def compare_slice(
@@ -141,8 +95,11 @@ def compare_slice(
 ) -> tuple[str, bool]:
     image, slice_entry = find_slice(ledger, identifier)
     del image
-    start = address(slice_entry["start"])
-    size = address(slice_entry["end"]) - start
+    ranges = slice_entry.get("ranges", [])
+    if len(ranges) != 1:
+        raise ValueError("comparison requires a work unit with exactly one semantic range")
+    start = address(ranges[0]["start"])
+    size = address(ranges[0]["end"]) - start
     with original_path.open("rb") as stream:
         stream.seek(start)
         original = stream.read(size)
@@ -171,7 +128,7 @@ def main() -> int:
     parser.add_argument(
         "--semantic-report",
         action="store_true",
-        help="print provisional-or-validated C coverage; not the byte-match metric",
+        help="print modeled-or-later C coverage; not the byte-match metric",
     )
     parser.add_argument("--compare", metavar="IMAGE/SLICE", help="compare one ledger slice")
     parser.add_argument("--original", type=Path, help="original flat firmware image")

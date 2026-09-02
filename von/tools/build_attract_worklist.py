@@ -23,13 +23,19 @@ def main() -> int:
 
     coverage = json.loads(args.coverage.read_text(encoding="utf-8"))
     ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
-    slices = []
+    work_units = []
+    milestone_units = {}
     for image in ledger.get("images", []):
         if image.get("name") != "maincpu":
             continue
-        for entry in image.get("slices", []):
-            if entry.get("classification") == "code":
-                slices.append((number(entry["start"]), number(entry["end"]), entry))
+        for entry in image.get("work_units", []):
+            milestone = entry.get("milestones", {}).get("c-only-i960-attract-60s", {})
+            for target in milestone.get("entries", []):
+                milestone_units[number(target)] = entry
+            if entry.get("classification") != "code":
+                continue
+            for semantic_range in entry.get("ranges", []):
+                work_units.append((number(semantic_range["start"]), number(semantic_range["end"]), entry))
 
     edge_counts = Counter(
         number(edge["target"]) for edge in coverage.get("executed_direct_edges", [])
@@ -37,26 +43,37 @@ def main() -> int:
     units = []
     for target_text in coverage.get("executed_direct_targets", []):
         target = number(target_text)
-        matched = next((entry for start, end, entry in slices if start <= target < end), None)
-        represented = bool(matched and matched.get("status") in {"provisional", "byte-validated"})
+        # Explicit milestone membership is authoritative. This avoids a newly
+        # nested semantic helper silently changing the closure denominator.
+        matched = milestone_units.get(target)
+        stage = matched.get("stage") if matched else None
+        represented = stage in {"modeled", "integrated", "trace-validated", "byte-validated"}
         units.append(
             {
                 "entry": f"0x{target:08x}",
                 "observed_call_edges": edge_counts[target],
-                "triage": "represented-needs-integration" if represented else "untriaged",
+                "triage": "modeled-integration-queue" if stage == "modeled" else ("integrated-validation-queue" if represented else "untriaged"),
+                "stage": stage or "planned",
+                "priority": 0 if stage == "modeled" else (1 if represented else 2),
                 "weight": None,
-                "slice": matched.get("name") if matched else None,
-                "source": matched.get("source") if matched else None,
+                "work_unit": matched.get("id") if matched else None,
+                "sources": matched.get("sources", []) if matched else [],
             }
         )
 
-    represented_count = sum(unit["triage"] == "represented-needs-integration" for unit in units)
+    units.sort(key=lambda unit: (unit["priority"], number(unit["entry"])))
+    represented_count = sum(unit["priority"] < 2 for unit in units)
+    modeled_count = sum(unit["stage"] == "modeled" for unit in units)
+    integrated_count = sum(unit["stage"] in {"integrated", "trace-validated", "byte-validated"} for unit in units)
     output = {
         "schema_version": 1,
         "coverage_source": str(args.coverage),
         "discovered_units": len(units),
         "represented_units": represented_count,
+        "modeled_units": modeled_count,
+        "integrated_units": integrated_count,
         "untriaged_units": len(units) - represented_count,
+        "ordering": "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality",
         "units": units,
     }
     args.json.parent.mkdir(parents=True, exist_ok=True)
@@ -66,16 +83,17 @@ def main() -> int:
         "# Attract Reconstruction Worklist",
         "",
         f"- Observed direct-call units: {len(units)}",
-        f"- Already represented in replacement source, pending validation: {represented_count}",
+        f"- Modeled integration queue: {modeled_count}",
+        f"- Integrated or validated: {integrated_count}",
         f"- Untriaged: {len(units) - represented_count}",
         "",
-        "| Entry | Edges | Triage | Existing slice |",
+        "| Entry | Edges | Triage | Work unit |",
         "| --- | ---: | --- | --- |",
     ]
     for unit in units:
         lines.append(
             f"| `{unit['entry']}` | {unit['observed_call_edges']} | "
-            f"{unit['triage']} | {unit['slice'] or ''} |"
+            f"{unit['triage']} | {unit['work_unit'] or ''} |"
         )
     args.markdown.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines[:7]))

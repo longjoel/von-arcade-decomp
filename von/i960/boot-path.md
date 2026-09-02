@@ -69,6 +69,53 @@ The first boot-related sites are:
 | `0x00028690` / `0x0002873c` | `0x00980008` | Geometry upload start/stop |
 | `0x00028710` | `0x00804000` | Geometry stream loop |
 
+The I/O self-test branch is also bounded. `0x00002768` returns directly when
+the low-byte check succeeds. On failure it calls `0x00002700`, which clears
+byte fields at `0x00502480`, `0x005023f0`, `0x00502481`, and `0x00502482`,
+clears the halfword at `0x00502484`, invokes the input initializer at
+`0x00002bb0`, and then initializes the 16-byte host queue at `0x00018488`.
+`recovered_io_failure_reset()` is the pure five-field translation of the
+deterministic stores. The input initializer's 60 index values and 1,170-byte
+port-write plan are checked by `von/tools/test_recovered_io.py`; its mapped
+port execution remains separate from the pure plan.
+
+The normal-mode command builder at `0x00002ab0` is now bounded as well. It
+emits a 34-byte sequence: the nine-byte inline prefix at `0x00002aa0`, five
+`0x51/0x71` plus `0xd1/0xf1` pairs selected from input-index bits 5 through 9,
+five corresponding pairs selected from table-value bits 15 through 11, and
+the fixed tail `01 01 51 d1 51`. Its final wait on the controller status port
+is not folded into the pure command model. The plan is checked across all 60
+input indices and representative edge/full-mask table values.
+
+The following input sampler loop at `0x00002da0` normalizes the eight-byte
+state block at `0x00502490` through `0x00502497`: each byte becomes the floor
+average of its previous value and the low byte read from `0x01c0001e`. The
+control writes and subsequent packed-status synthesis use additional device
+reads and remain separate. The averaging transform is covered for every
+possible sampled byte.
+
+The remainder of `0x00002da0` is now represented as a pure packed-state
+transform. Reads at controller offsets `+2`, `+4`, `+6`, and `+c` form the
+24-bit mask written through `status_49c` and the three low-byte status fields;
+the ROM then applies `andnot`/`notand` operations to the work words at
+`0x005024a0–0x005024bc`. The transform is vector-tested with edge masks and
+nontrivial prior state, while controller write timing and input-bit labels
+remain unassigned.
+
+The normal-mode wrapper at `0x00002c10` now has a complete host-side schedule:
+for each of 30 table entries it emits the 21-byte setup sequence followed by
+the indexed 34-byte command, then repeats the same table with indices offset
+by 30. It then emits the fixed 21-byte sequence at `0x000028b0`, yielding
+3,321 bytes in the exact ROM order. Only the per-byte controller wait remains
+outside the pure schedule.
+
+The failure-mode sampler at `0x00002cf8` is also bounded. After writing `0x4f`
+to `0x01c00010`, it masks the sampled input byte with the low byte of the
+`0x01c00002` word, stores the resulting byte and complementary status bytes
+at `0x005023f0`, `0x00502480`, `0x00502481`, and `0x00502482`, and latches
+the saved halfword to `0x01c0000a`. The pure transform is covered by the same
+I/O vector test; the meanings of individual input bits remain unassigned.
+
 This gives us an initial host-code order for the next annotations: I/O board
 startup, SHARC bootstrap, geometry bootstrap, then the main-data copy and
 decompression callers.
@@ -99,6 +146,75 @@ dispatches through `0xf5190`, whose output loop calls `0x1cc40` byte by byte.
 The format string at `0x0c57a0` is `"Result : Node ID = %-2d\n"`, providing
 a concrete newline-bearing caller even though the warning table itself only
 contains printable ASCII.
+
+The formatter boundary is now more specific. `0xf5100` saves the incoming
+register arguments in a 0x40-byte local context, stores the format-string
+pointer and an initial argument cursor, then enters `0xf5190`. That routine
+handles ordinary bytes immediately through `0x1cc40`; other bytes are decoded
+through the 0x100-entry table at `0xf5210`, with unsupported entries landing at
+`0xf5bf4`. The parser maintains a flag bitfield in `r9`, a separate argument
+cursor in `r5`, and pending numeric/width state in the local context. The
+table has distinct live handlers for flag updates, width/alignment, character
+and string arguments, signed integer conversion, and floating-point
+conversion. This explains why the existing plain-string walker and two-digit
+formatter are safe isolated slices, while the general formatter still needs
+conversion-specific vectors before it can be replaced.
+
+The dispatch table can now be stated exactly from the listing. The parser's
+`g4 <= 120` guard means only the first 121 table slots are reachable. Slot
+zero returns through the ordinary end-of-string path; slots 1-31 and the
+remaining slots are unsupported and land at `0xf5bf4`. There are 39
+non-default slots in the reachable range. The live slots are:
+
+```text
+  ' ' -> f53f4       '#' -> f5408       '%' -> f5608
+  '*' -> f5410       '+' -> f5474       '-' -> f546c
+  '.' -> f547c       '0' -> f5544       '1'..'9' -> f554c
+  'D' -> f561c       'E','G','e','f','g' -> f5688
+  'L' -> f5588       'O' -> f5800       'U' -> f5954
+  'X' -> f59b4       'c' -> f55a0       'd','i' -> f5620
+  'h' -> f5590       'l' -> f5598       'n' -> f5790
+  'o' -> f5804       'p' -> f5860       's' -> f58bc
+  'u' -> f5958       'x' -> f59bc
+```
+
+This separates syntax from conversion semantics: space, hash, plus, minus,
+zero, length/precision punctuation, and decimal digits update parser state;
+`c`, `d`/`i`, `e`/`f`/`g`, `o`, `s`, `u`, and `x` reach conversion handlers.
+The uppercase `D`, `E`, `G`, `L`, `O`, `U`, and `X` entries are not aliases
+that can be assumed from their lowercase neighbors: they select distinct
+ROM handlers or flag updates. The map is static evidence only; conversion
+width, argument consumption, and output rounding still require vectors.
+
+The integer handlers share a single emission tail at `0xf5a24`-`0xf5c04`.
+The signed `d`/`i` handler at `0xf5620` reads one 32-bit argument, converts a
+negative value to its magnitude, records `'-'` as the prefix, and selects
+radix 10. The `u` handler at `0xf5958` selects radix 10 without signed
+normalization; `o` at `0xf5804` selects radix 8; and `x` at `0xf59bc`
+selects radix 16. Digits are generated by repeated remainder/division while
+walking backward from the local buffer at `0x19c(fp)`. The lowercase path
+uses the `0123456789abcdef` table at `0xf5150`; `X` first switches to the
+uppercase table at `0xf5170` and then uses the same radix-16 tail. `D`, `O`,
+and `U` enter their lowercase counterparts after setting the formatter's
+bit-zero mode, so they are distinct ROM entry points rather than aliases in
+the dispatch table.
+
+The common tail then computes the required field width, emits leading
+padding or the recorded prefix, emits the reversed digit buffer, and applies
+trailing padding for left alignment. A zero value has a separate path at
+`0xf5a38`; alternate-form handling can replace the digit alphabet pointer
+with the lowercase table at `0xf5a68`. This closes the integer formatter's
+control flow, but the exact caller-visible contract for precision zero,
+alternate prefixes, and the uppercase mode still needs runtime vectors.
+
+There are now two concrete integer call sites besides the standalone format
+string: `0x00c57b84` formats `"Result : Node ID = %-2d\n"`, and
+`0x00c5a88` formats `"Total Nodes = %-2d"`. The same diagnostic block calls
+the formatter with `"%s"` at `0x00c57ffc`, giving a direct string-conversion
+vector in addition to the integer vectors. These callers pass the text origin
+through `0x1cac8` immediately before the formatter call, so their output can
+be checked in a future trace by correlating the resulting tile writes at
+`0x01000000` with the formatter's shared sink.
 
 The five-second boot trace also exercises the loader's `"Done\n"` string at
 `0x00028170`. It writes `Done` at offsets `0x0323`-`0x0326`; the following

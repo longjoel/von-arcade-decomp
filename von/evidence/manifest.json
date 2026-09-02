@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "storage": {
+    "raw_blobs": "von/build/evidence/sha256",
+    "quarantine": "von/build/evidence/quarantine",
+    "tracked_content": "manifests, compact fixtures, summaries, and verifiers only"
+  },
+  "entries": [
+    {
+      "id": "sharc-precision-fixtures-v1",
+      "canonical": true,
+      "aliases": ["sharc_precision_fixtures.json"],
+      "stimulus": {
+        "kind": "bounded-vector-suite",
+        "description": "Finite and exceptional SHARC arithmetic vectors documented by the fixture"
+      },
+      "configuration": {
+        "mame_revision": "569c5e9d4534cb244ff67ebbdb5f9fe69a465318",
+        "patch_profile": "sharc-precision",
+        "execution_engine": "interpreter-and-drc"
+      },
+      "artifacts": [
+        {
+          "path": "von/i960/sharc_precision_fixtures.json",
+          "sha256": "6a5cd2ecde2481a44c4cb78971ef619975d498ccb2d4a46d1fc2ab2dabb7e098",
+          "compact": true
+        }
+      ],
+      "verifier": "von/tools/test_sharc_precision_fixtures.py",
+      "outcome": "pass",
+      "consumers": ["maincpu.opcode-0b-vector-service"]
+    }
+  ]
+}

@@ -65,6 +65,60 @@ Virtual-On dump. The Virtual-On sets use a dedicated configuration that removes
 that unused controller rather than substituting fabricated ROM data. Other Model
 2 drivers retain the billboard device unchanged.
 
+### MAME code reuse boundary
+
+MAME is both the runtime oracle and a possible source of reusable Model 2
+infrastructure. Generic geometry helpers in `src/mame/sega/model2_v.cpp`—such
+as the column-major point/vector transforms, normalization, dot products, and
+cross products—can be adapted into this reconstruction when their behavior
+matches the captured Virtual-On stream. The SHARC interpreter and DMA/FIFO
+plumbing are likewise useful implementation references.
+
+That reuse does not establish the semantics of Virtual-On's uploaded SHARC
+program. The opcode handlers, interpolation coefficients, reciprocal edge
+cases, and clipping decisions remain ROM-derived and must be validated against
+traces before entering the reconstructed C model. MAME-specific device and
+renderer state should not be copied into the decomp merely because it produces
+a plausible image.
+
+Any copied MAME implementation must retain its original license header and
+copyright attribution. The project keeps MAME changes as reproducible patches
+under `third_party/patches/`; prospective upstream fixes should be separated
+from the reverse-engineered C model and accompanied by a minimal reproduction.
+
+### Possible MAME improvements
+
+The decomp is also exposing several candidates for improvements to MAME itself.
+The highest-value one is still the SHARC floating-point representation: the
+current core keeps register values in a C++ `float`, while the ADSP-2106x has a
+40-bit internal format and a `MODE1_RND32` mode that controls where values are
+rounded. The Virtual-On opcode-0x35 case now matches after reproducing the ROM's
+per-instruction quotient/residual rounding schedule, so it is no longer direct
+evidence of a generic MAME precision failure. A future MAME change could still
+preserve the extended value internally, apply the documented `RND32`/`TRUNC`
+boundary at the appropriate operations, and add focused tests for `RECIPS`,
+`FIX`, `FLOAT`, and multiply/add chains.
+The detailed precision/upstream test boundary is tracked in
+`von/i960/mame-sharc-precision-upstream.md`.
+The current ROM-derived SHARC fixture is more specific than a generic game
+output: helper `0x20d68` is checked at the `2-sqrt(3)` threshold, across
+finite ratios, and at the exact 124-step `LOGB` boundary. These captures are
+verified by the focused tools under `von/tools/verify_sharc_20d68_*.py` and
+should be converted into a synthetic SHARC CPU test before changing the core.
+The completed broad probing pass and its evidence tiers are recorded in
+[`sharc-consolidation.md`](sharc-consolidation.md). Run
+`./scripts/test-sharc-recovered.sh` for the MAME-independent model checkpoint,
+or `python3 von/tools/inventory_sharc_evidence.py` to inventory local generated
+traces without modifying them.
+
+Other candidates are lower risk: turn the current Virtual-On observations into
+a Model 2 regression test for SHARC FIFO/DMA traffic, and keep the diagnostic
+PC/register tracing behind a debug option rather than in the normal driver
+path. The temporary patches in `third_party/patches/` are evidence-gathering
+tools, not proposed upstream code. Any eventual submission should include a
+small synthetic SHARC program and expected register/FIFO results, so it tests
+the CPU behavior independently of the reverse-engineered game ROM.
+
 ## Project scripts
 
 Run the project workflow from the repository root:
@@ -347,6 +401,32 @@ The generated i960 host ROM can be run directly with:
 ./scripts/run-i960-clean.sh
 ```
 
+After regenerating the input-free attract coverage, summarize the shared
+object-state helper's exercised arms with:
+
+```sh
+python3 von/tools/analyze_object_state_coverage.py \
+  von/build/attract-coverage/vonj-attract-60s.pcs
+```
+
+The recovered coordinate lookup and its 0x35 FIFO packet can be checked with:
+
+```sh
+python3 von/tools/test_recovered_geometry_coordinate.py
+```
+
+The fixed-record occupancy scanner can be checked with:
+
+```sh
+python3 von/tools/test_recovered_record_scan.py
+```
+
+The deterministic core of the second geometry projection path can be checked with:
+
+```sh
+python3 von/tools/test_recovered_geometry_projection.py
+```
+
 `run-twin.sh` starts two Model 2 cabinet processes with reversed communication
 ports and isolated state directories. P2 is silent by default; P1 retains normal
 audio. Each emulator process exposes its own P1 cabinet controls; host-level
@@ -396,12 +476,11 @@ The full ROM-to-C work list is tracked in
 progress is tracked in [`reconstruction_ledger.json`](reconstruction_ledger.json).
 Phase 0 inventory evidence is recorded in
 [`phase0-inventory.md`](phase0-inventory.md).
-The headline percentage counts only confirmed executable firmware bytes whose
-generated C image matches the original bytes exactly. Validate and print the
-current report with:
+Byte coverage counts the union of physical code ranges, while delivery status
+uses the semantic work-unit lifecycle. Print the generated current report with:
 
 ```sh
-python3 von/tools/reconstruction_progress.py --report
+./scripts/status.sh
 ```
 
 Compare a candidate image against one ledger slice with:
@@ -419,10 +498,16 @@ change the ledger status automatically.
 Each unit follows [`reconstruction_work_unit.md`](reconstruction_work_unit.md):
 classify a bounded slice, recover it into C, build it with the pinned target
 toolchain, byte-compare it, run the relevant regression, and then update the
-ledger. Behavioral reconstructions that do not yet byte-match remain
-provisional and do not increase the headline percentage.
+ledger. Behavioral reconstructions remain `modeled` until linked, then advance
+through `integrated` and `trace-validated` without implying a byte match.
 
 ### Current reconstruction milestone
+
+The authoritative live totals are in
+[`generated-status.md`](generated-status.md) and the ordered integration queue
+is in [`attract_worklist.md`](attract_worklist.md). Both are generated from
+tracked machine-readable inputs, so copied progress totals are intentionally
+omitted here.
 
 The latest pass recovered the profile-dependent transfer schedule of the
 startup asset loader at `0x1bda0-0x1c21c`. Its new descriptor API identifies
@@ -462,11 +547,5 @@ mask vectors and 65,536 text font-mode prefixes. The full test script, ROM
 audit, and MAME validation pass. The
 drone0 i960 build produces the reconstructed image, and the clean runtime
 audit confirms that all 320 visited instructions execute from generated code.
-
-The ledger currently records `6,116/6,116` classified executable bytes as
-C-represented behavioral reconstructions. The strict byte-match headline is
-still `0/6,116`, because these slices remain provisional pending compiler/ABI
-calibration and byte-for-byte comparison. The refreshed 60-second attract
-worklist contains 41 represented units and 221 remaining untriaged units.
 
 Saturn and PC versions are deferred until the arcade path is understood.

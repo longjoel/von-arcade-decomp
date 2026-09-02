@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "suites": {
+    "unit": {
+      "description": "Recovered C models; no MAME binary or ROMs",
+      "discover": ["von/tools/test_recovered_*.py"],
+      "commands": [
+        ["python3", "von/tools/test_texture_palette.py"],
+        ["python3", "von/tools/test_texture_uv_mapping.py"]
+      ]
+    },
+    "contract": {
+      "description": "Ledger, evidence, patch, and tool contracts",
+      "discover": ["von/tools/test_*.py"],
+      "exclude": [
+        "von/tools/test_recovered_*.py",
+        "von/tools/test_*trace*.py",
+        "von/tools/test_texture_palette.py",
+        "von/tools/test_texture_uv_mapping.py",
+        "von/tools/test_mame_sharc_float40.py",
+        "von/tools/test_sharc_drc_abs_special_cases.py",
+        "von/tools/test_sharc_helper_20de1.py",
+        "von/tools/test_sharc_drc_state_export.py"
+      ],
+      "commands": [
+        ["python3", "von/tools/test_reconstruction_ledger.py"],
+        ["python3", "von/tools/validate_reconstruction_ledger.py"],
+        ["python3", "von/tools/test_evidence_manifest.py"],
+        ["python3", "von/tools/test_patchset_manifest.py"],
+        ["python3", "von/tools/test_project_status.py"],
+        ["python3", "von/tools/test_mame_von_subtarget.py"]
+      ]
+    },
+    "trace": {
+      "description": "Canonical compact fixtures and evidence verifiers",
+      "discover": ["von/tools/test_*trace*.py"],
+      "exclude": [
+        "von/tools/test_geometry_projection_runtime_trace.py",
+        "von/tools/test_sharc_opcode_17_trace_analyzer.py",
+        "von/tools/test_sharc_opcode_33_asymmetric_trace.py",
+        "von/tools/test_sharc_opcode_33_combined_trace.py",
+        "von/tools/test_sharc_opcode_42_combined_trace.py"
+      ],
+      "fixture_verifiers": [
+        "von/tools/test_sharc_opcode_33_asymmetric_trace.py",
+        "von/tools/test_sharc_opcode_33_combined_trace.py",
+        "von/tools/test_sharc_opcode_42_combined_trace.py"
+      ],
+      "commands": [["python3", "von/tools/evidence_manifest.py", "--run-verifiers"]]
+    },
+    "smoke": {
+      "description": "MAME validation and short reconstructed boot",
+      "commands": [
+        ["python3", "von/tools/test_geometry_projection_runtime_trace.py"],
+        ["python3", "von/tools/test_sharc_opcode_17_trace_analyzer.py"],
+        ["python3", "von/tools/test_mame_sharc_float40.py"],
+        ["python3", "von/tools/test_sharc_drc_abs_special_cases.py"],
+        ["python3", "von/tools/test_sharc_helper_20de1.py"],
+        ["python3", "von/tools/test_sharc_drc_state_export.py"],
+        ["bash", "scripts/test-mame-smoke.sh"]
+      ]
+    },
+    "attract": {
+      "description": "Full 60-second C-only i960 run and PC escape audit",
+      "environment": {"VON_CLEAN_AUDIT_SECONDS": "60"},
+      "commands": [["bash", "scripts/audit-i960-clean-runtime.sh"]]
+    }
+  }
+}

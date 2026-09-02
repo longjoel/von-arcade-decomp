@@ -20,30 +20,26 @@ host path is substantially reconstructed. Graphics, geometry, textures,
 samples, ordinary constants, padding, and not-yet-classified bytes are not
 counted as executable C code.
 
-Every slice is tracked as `planned`, `provisional`, `byte-validated`, or
-`blocked`. Only `byte-validated` slices increase the percentage. The current
-ledger report is generated with:
+Semantic work units are tracked as `planned`, `modeled`, `integrated`,
+`trace-validated`, `byte-validated`, or `blocked`. Physical ranges are tracked
+separately as `code`, `data`, `padding`, or `unknown`; only the union of
+physical `code` ranges contributes byte coverage. The current status is
+generated with:
 
 ```sh
-python3 von/tools/reconstruction_progress.py --report
+./scripts/status.sh
 ```
 
-Current baseline: fourteen i960 slices are classified, totaling 2,436
-executable bytes; none has passed the byte-match gate, so headline progress is
-0.00%. All currently classified slices are provisionally represented in
-production C; semantic coverage is therefore 100.00%, while strict coverage
-remains 0.00%.
-
-The companion semantic measure reports executable bytes represented by checked-in
-C (`provisional` or `byte-validated`) without claiming a byte match:
+The generated report is authoritative; this roadmap intentionally carries no
+copied totals. The companion semantic measure reports work-unit lifecycle
+stages without claiming a byte match:
 
 ```sh
-python3 von/tools/reconstruction_progress.py --semantic-report
+./scripts/status.sh --json
 ```
 
-This measure describes the fourteen currently selected slices only; it is not
-overall project progress. Active completion uses ROM classification, weighted
-attract-closure recovery, and runtime-checkpoint percentages.
+Active completion uses attract closure and runtime checkpoints. Byte matching
+remains a research metric.
 
 ## Phase 0: inventory and classification
 
@@ -144,7 +140,7 @@ test.
 ## Phase 7: completion and cleanup
 
 - Resolve remaining unknown code/data ranges.
-- Replace provisional C with byte-validated implementations.
+- Integrate modeled C, trace-validate it, and pursue byte validation separately.
 - Run boot, attract, single-player, versus, graphics, and audio regressions.
 - Publish final per-firmware and overall coverage reports.
 - Document intentionally unimplemented hardware and asset data.
@@ -159,11 +155,11 @@ Each unit uses [`reconstruction_work_unit.md`](reconstruction_work_unit.md):
 4. Implement the slice in production C; do not add comparison-only wrappers or
    no-op dependency stubs.
 5. Prove its behavior with the smallest relevant static, unit, trace, or runtime
-   check and mark it `provisional` only when that evidence exists.
+   check and mark it `modeled` only when that evidence exists.
 6. Build with the pinned remote toolchain and run the runtime regression.
 7. Run byte comparison only after compiler/ABI calibration supports the
    instruction family used by the slice.
-8. Mark the unit `byte-validated`, `provisional`, or `blocked`, and update both
+8. Mark the unit at its exact lifecycle stage or `blocked`, and update both
    headline and semantic reports.
 
 ## Current adaptation gate

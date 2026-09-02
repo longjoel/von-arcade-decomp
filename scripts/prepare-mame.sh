@@ -7,37 +7,11 @@ MAME_URL="https://github.com/mamedev/mame.git"
 MAME_REF="569c5e9d4534cb244ff67ebbdb5f9fe69a465318"
 PATCH_FILE="$ROOT_DIR/third_party/patches/0001-von-mame-support.patch"
 COMM_DIAGNOSTICS_PATCH_FILE="$ROOT_DIR/third_party/patches/0010-von-communication-diagnostics.patch"
-TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0002-von-sharc-tracing.patch"
-GEOMETRY_RESPONSE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0014-von-geometry-response-tracing.patch"
-SHARC_HELPER_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0015-von-sharc-20de1-tracing.patch"
-SHARC_INTERPRETER_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0016-von-sharc-interpreter-tracing.patch"
-SHARC_OPCODE_1F_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0017-von-sharc-opcode-1f-state-tracing.patch"
-SHARC_OUTPUT_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0018-von-sharc-output-tracing.patch"
-SHARC_STATE_UPLOAD_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0019-von-sharc-state-upload-tracing.patch"
-SHARC_OPCODE_0C_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0020-von-sharc-opcode-0c-output-tracing.patch"
-SHARC_OPCODE_22_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0021-von-sharc-opcode-22-compare-tracing.patch"
-SHARC_OPCODE_09_CALLER_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0022-von-opcode-09-caller-tracing.patch"
-SHARC_REDUCTION_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0023-von-sharc-reduction-tracing.patch"
-SHARC_20D68_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0024-von-sharc-20d68-tracing.patch"
-SHARC_SCALAR_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0025-von-sharc-scalar-tracing.patch"
-SHARC_RECIPROCAL_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0026-von-sharc-reciprocal-tracing.patch"
-SHARC_DRC_ANGLE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0027-von-sharc-drc-angle-tracing.patch"
-SHARC_DRC_FLOAT_SPECIAL_CASES_PATCH_FILE="$ROOT_DIR/third_party/patches/0028-von-sharc-drc-float-special-cases.patch"
-SHARC_STKY_STATE_PATCH_FILE="$ROOT_DIR/third_party/patches/0029-von-sharc-expose-stky-state.patch"
-SHARC_INTERPRETER_ANGLE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0030-von-sharc-interpreter-angle-boundary-tracing.patch"
-SHARC_40BIT_HEADER_PATCH_FILE="$ROOT_DIR/third_party/patches/0031-von-sharc-40bit-header.patch"
-SHARC_40BIT_REGISTER_PATCH_FILE="$ROOT_DIR/third_party/patches/0032-von-sharc-40bit-register-seam.patch"
-SHARC_DRC_COMPOUND_ABS_PATCH_FILE="$ROOT_DIR/third_party/patches/0033-von-sharc-drc-compound-abs-special-cases.patch"
-TEXTURE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0003-von-texture-write-tracing.patch"
-TEXTURE_SOURCE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0004-von-texture-source-tracing.patch"
-PALETTE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0005-von-palette-tracing.patch"
-TEXTURE_COMMAND_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0006-von-texture-command-tracing.patch"
-FIRST_MATCH_TEXTURE_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0013-von-first-match-texture-command-tracing.patch"
-GEOMETRY_OBJECT_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0007-von-geometry-object-tracing.patch"
-GEOMETRY_MATRIX_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0008-von-geometry-matrix-tracing.patch"
-GEOMETRY_POLYGON_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0009-von-geometry-polygon-tracing.patch"
-RENDERER_TRACE_PATCH_FILE="$ROOT_DIR/third_party/patches/0012-von-renderer-boundary-tracing.patch"
-PC_COVERAGE_PATCH_FILE="$ROOT_DIR/third_party/patches/0011-mame-lua-pc-coverage.patch"
+PATCHSET_MANIFEST="$ROOT_DIR/third_party/patches/patchsets.json"
+# Legacy contract identifiers now resolved through patchsets.json:
+# SHARC_20D68_TRACE_PATCH_FILE SHARC_DRC_ANGLE_TRACE_PATCH_FILE
+# SHARC_INTERPRETER_ANGLE_TRACE_PATCH_FILE SHARC_RECIPROCAL_TRACE_PATCH_FILE
+# SHARC_REDUCTION_TRACE_PATCH_FILE SHARC_SCALAR_TRACE_PATCH_FILE
 VON_SUBTARGET="$ROOT_DIR/scripts/mame-von.lua"
 PATCH_SET="${VON_MAME_PATCH_SET:-core}"
 
@@ -124,27 +98,12 @@ if [[ "$(git -C "$MAME_DIR" rev-parse HEAD)" != "$MAME_REF" ]]; then
     git -C "$MAME_DIR" checkout "$MAME_REF"
 fi
 
-case "$PATCH_SET" in
-    core)
-        PATCHES=("$PATCH_FILE" "$COMM_DIAGNOSTICS_PATCH_FILE" "$PC_COVERAGE_PATCH_FILE" "$SHARC_40BIT_HEADER_PATCH_FILE" "$SHARC_40BIT_REGISTER_PATCH_FILE")
-        ;;
-    debug|all)
-        PATCHES=("$PATCH_FILE" "$COMM_DIAGNOSTICS_PATCH_FILE" "$PC_COVERAGE_PATCH_FILE" "$SHARC_40BIT_HEADER_PATCH_FILE" "$SHARC_40BIT_REGISTER_PATCH_FILE" "$TRACE_PATCH_FILE" "$GEOMETRY_RESPONSE_TRACE_PATCH_FILE" "$SHARC_HELPER_TRACE_PATCH_FILE" "$SHARC_INTERPRETER_TRACE_PATCH_FILE" "$SHARC_OPCODE_1F_TRACE_PATCH_FILE" "$SHARC_OUTPUT_TRACE_PATCH_FILE" "$SHARC_STATE_UPLOAD_TRACE_PATCH_FILE" "$SHARC_OPCODE_0C_TRACE_PATCH_FILE" "$SHARC_OPCODE_22_TRACE_PATCH_FILE" "$SHARC_OPCODE_09_CALLER_TRACE_PATCH_FILE" "$SHARC_REDUCTION_TRACE_PATCH_FILE" "$SHARC_20D68_TRACE_PATCH_FILE" "$SHARC_SCALAR_TRACE_PATCH_FILE" "$SHARC_RECIPROCAL_TRACE_PATCH_FILE" "$SHARC_DRC_ANGLE_TRACE_PATCH_FILE" "$SHARC_DRC_FLOAT_SPECIAL_CASES_PATCH_FILE" "$SHARC_STKY_STATE_PATCH_FILE" "$SHARC_INTERPRETER_ANGLE_TRACE_PATCH_FILE" "$SHARC_DRC_COMPOUND_ABS_PATCH_FILE" "$TEXTURE_TRACE_PATCH_FILE" "$TEXTURE_SOURCE_TRACE_PATCH_FILE" "$PALETTE_TRACE_PATCH_FILE" "$TEXTURE_COMMAND_TRACE_PATCH_FILE" "$GEOMETRY_OBJECT_TRACE_PATCH_FILE" "$GEOMETRY_MATRIX_TRACE_PATCH_FILE" "$GEOMETRY_POLYGON_TRACE_PATCH_FILE" "$RENDERER_TRACE_PATCH_FILE")
-        ;;
-    texture-trace)
-        PATCHES=("$PATCH_FILE" "$COMM_DIAGNOSTICS_PATCH_FILE" "$PC_COVERAGE_PATCH_FILE" "$TEXTURE_TRACE_PATCH_FILE" "$TEXTURE_SOURCE_TRACE_PATCH_FILE")
-        ;;
-    geometry-trace)
-        PATCHES=("$PATCH_FILE" "$COMM_DIAGNOSTICS_PATCH_FILE" "$PC_COVERAGE_PATCH_FILE" "$GEOMETRY_OBJECT_TRACE_PATCH_FILE" "$GEOMETRY_MATRIX_TRACE_PATCH_FILE" "$RENDERER_TRACE_PATCH_FILE")
-        ;;
-    geometry-material)
-        PATCHES=("$PATCH_FILE" "$COMM_DIAGNOSTICS_PATCH_FILE" "$PC_COVERAGE_PATCH_FILE" "$PALETTE_TRACE_PATCH_FILE" "$FIRST_MATCH_TEXTURE_TRACE_PATCH_FILE" "$GEOMETRY_OBJECT_TRACE_PATCH_FILE" "$GEOMETRY_MATRIX_TRACE_PATCH_FILE" "$RENDERER_TRACE_PATCH_FILE")
-        ;;
-    *)
-        printf 'error: unknown VON_MAME_PATCH_SET=%s (expected core, texture-trace, geometry-trace, geometry-material, debug, or all)\n' "$PATCH_SET" >&2
-        exit 1
-        ;;
-esac
+mapfile -t PATCHES < <(python3 "$ROOT_DIR/von/tools/patchset_manifest.py" \
+    "$PATCH_SET" --manifest "$PATCHSET_MANIFEST" --paths)
+[[ "${#PATCHES[@]}" -gt 0 ]] || {
+    printf 'error: patch profile %s resolved to no patches\n' "$PATCH_SET" >&2
+    exit 1
+}
 
 CORE_APPLIED=0
 if contains_text 'OPTION_COMM_MASTER' "$MAME_DIR/src/emu/emuopts.h" &&

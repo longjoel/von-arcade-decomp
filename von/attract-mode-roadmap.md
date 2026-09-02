@@ -27,12 +27,10 @@ unobserved branches are discovered. Every denominator change is recorded. The
 older byte-match and provisional-byte reports remain useful engineering
 measurements, but are not project completion percentages.
 
-The first complete input-free 60-second trace establishes the initial closure
-seed: 24,807 distinct instructions (99,228 instruction bytes), 611 observed
-direct-call edges, and 262 direct-call work units. Nineteen units overlap
-replacement-source slices and 243 remain untriaged. This is a discovery count,
-not yet the weighted completion percentage; weights are assigned only as each
-function boundary and responsibility are reviewed.
+The tracked [generated status](generated-status.md) and
+[attract worklist](attract_worklist.md) contain the current closure totals.
+They are regenerated from the ledger and the canonical 60-second coverage
+input; this roadmap intentionally carries no copied totals.
 
 Work units receive 1, 2, 3, or 5 points for simple leaf, ordinary control,
 complex algorithm, or stateful/hardware-facing behavior. A unit counts only
@@ -66,11 +64,12 @@ after its C implementation is integrated and trace-validated.
 
 ## Current engineering order
 
-1. Triage the 243 observed but unclassified direct-call units, assigning
-   boundaries, responsibilities, dependencies, and weights.
-2. Recover scheduler, interrupts, timers, UI/title state, rendering commands,
+1. Integrate the modeled queue before opening another modeled-only unit.
+2. Triage remaining direct-call units in earliest failing-checkpoint and
+   dependency order, assigning boundaries, responsibilities, and weights.
+3. Recover scheduler, interrupts, timers, UI/title state, rendering commands,
    and audio commands in closure order.
-3. Extend runtime PC auditing into the final 60-second equivalence regression.
+4. Extend runtime PC auditing into the final 60-second equivalence regression.
 
 Resolved foundation: replacement startup now initializes the i960 ABI
 register-stack spill area, and the complete recovered zero-mode geometry

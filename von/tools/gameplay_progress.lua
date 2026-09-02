@@ -21,10 +21,12 @@
 --              VON_PROGRESS_COMBAT_START (default 1800)
 --              VON_PROGRESS_SELECT_STEPS (right presses before confirmation)
 --              VON_PROGRESS_AUTO_START (default 1; set 0 for selector-only capture)
+--              VON_PROGRESS_GEOMETRY_STATE_LOG (optional state log path)
 
 local SECONDS = tonumber(os.getenv("VON_PROGRESS_SECONDS") or "150")
 local TARGET_FRAMES = SECONDS * 60
 local LOG_PATH = os.getenv("VON_PROGRESS_LOG") or "vonj-progress-lua.log"
+local GEOMETRY_STATE_LOG_PATH = os.getenv("VON_PROGRESS_GEOMETRY_STATE_LOG")
 
 local TILE_BASE = 0x01000000
 local ROWS = 64
@@ -34,9 +36,23 @@ local log_file = assert(io.open(LOG_PATH, "w"))
 log_file:write("progress: session start\n")
 log_file:flush()
 
+local geometry_state_file
+if GEOMETRY_STATE_LOG_PATH then
+    geometry_state_file = assert(io.open(GEOMETRY_STATE_LOG_PATH, "w"))
+    geometry_state_file:write("geometry-state: session start\n")
+    geometry_state_file:flush()
+end
+
 local function log(message)
     log_file:write(message .. "\n")
     log_file:flush()
+end
+
+local function log_geometry_state(message)
+    if geometry_state_file then
+        geometry_state_file:write(message .. "\n")
+        geometry_state_file:flush()
+    end
 end
 
 local frame = 0
@@ -44,6 +60,69 @@ local space
 local fields = {}
 local last_screen_hash = nil
 local pressed_until = {}
+local last_geometry_state
+
+local function geometry_state()
+    if not space or not geometry_state_file then
+        return
+    end
+    local function read_word(address)
+        local ok, value = pcall(function() return space:read_u32(address) end)
+        if ok then
+            return value
+        end
+        return 0xffffffff
+    end
+    local function read_byte(address)
+        local ok, value = pcall(function() return space:read_u8(address) end)
+        if ok then
+            return value
+        end
+        return 0xff
+    end
+    -- These are the host-side state words consumed by 0x6f6f0 after its
+    -- opcode-0x41 lookup: mode, callback byte-map base, selected record
+    -- table, alternate record field, and the two output mask globals.
+    local values = {
+        mode = space:read_u32(0x005770f0),
+        byte_map = space:read_u32(0x0051bb20),
+        records = space:read_u32(0x0051bb24),
+        record_aux = space:read_u32(0x0051bb28),
+        mask_special = space:read_u32(0x00562c80),
+        mask_general = space:read_u32(0x00562c84),
+    }
+    local record_words = {}
+    for _, selector in ipairs({ 0, 6, 13 }) do
+        local base = values.records + selector * 20
+        local words = {}
+        for offset = 0, 16, 4 do
+            words[#words + 1] = read_word(base + offset)
+        end
+        record_words[#record_words + 1] = string.format(
+            "%d:%08x,%08x,%08x,%08x,%08x", selector,
+            words[1], words[2], words[3], words[4], words[5])
+    end
+    local map_bytes = {}
+    for offset = 0, 31 do
+        map_bytes[#map_bytes + 1] = string.format(
+            "%02x", read_byte(values.byte_map + offset))
+    end
+    local state = string.format(
+        "%08x/%08x/%08x/%08x/%08x/%08x/%s/%s",
+        values.mode, values.byte_map, values.records, values.record_aux,
+        values.mask_special, values.mask_general,
+        table.concat(record_words, "/"), table.concat(map_bytes))
+    if state ~= last_geometry_state then
+        log_geometry_state(string.format(
+            "geometry-state: frame %d mode=%08x byte_map=%08x records=%08x " ..
+            "record_aux=%08x mask_special=%08x mask_general=%08x " ..
+            "records012: %s map[0:32]=%s",
+            frame, values.mode, values.byte_map, values.records,
+            values.record_aux, values.mask_special, values.mask_general,
+            table.concat(record_words, "/"), table.concat(map_bytes)))
+        last_geometry_state = state
+    end
+end
 
 -- Confirmed field names on the vonj driver (IN0/IN1/IN2).
 local FIELD_NAMES = {
@@ -201,6 +280,7 @@ emu.register_periodic(function()
     -- Poll the tilemap once per second: checksum change detection plus any
     -- ASCII text overlay.
     if frame % 30 == 0 then
+        geometry_state()
         local ok, sum = pcall(tile_checksum)
         if ok then
             if sum ~= last_screen_hash then

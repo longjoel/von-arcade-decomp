@@ -1,0 +1,3053 @@
+{
+  "schema_version": 1,
+  "coverage_source": "von/build/attract-coverage/vonj-attract-60s.json",
+  "discovered_units": 262,
+  "represented_units": 94,
+  "modeled_units": 94,
+  "integrated_units": 0,
+  "untriaged_units": 168,
+  "ordering": "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality",
+  "units": [
+    {
+      "entry": "0x00000a30",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.reset-register-stack-setup",
+      "sources": [
+        "von/i960/start_reconstructed.s",
+        "von/build/attract-coverage/vonj-attract-1s.pcs",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00001348",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.host-service-request",
+      "sources": [
+        "von/i960/recovered_audio_queue.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_audio_queue.py"
+      ]
+    },
+    {
+      "entry": "0x00001380",
+      "observed_call_edges": 2,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.host-interrupt-dispatch-route",
+      "sources": [
+        "von/i960/recovered_host_control.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_host_control.py"
+      ]
+    },
+    {
+      "entry": "0x000017c8",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.host-interrupt-mask-update",
+      "sources": [
+        "von/i960/recovered_host_control.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_host_control.py"
+      ]
+    },
+    {
+      "entry": "0x00001bb8",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.host-interrupt-initialize",
+      "sources": [
+        "von/i960/recovered_host_control.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_host_control.py"
+      ]
+    },
+    {
+      "entry": "0x00002330",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-startup-table-copy-wrapper",
+      "sources": [
+        "von/i960/disassembly-annotations.md",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/recovered_memory.c"
+      ]
+    },
+    {
+      "entry": "0x00002700",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.io-failure-state-reset",
+      "sources": [
+        "von/i960/recovered_io.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/tools/test_recovered_io.py"
+      ]
+    },
+    {
+      "entry": "0x00002730",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.io-self-test-core",
+      "sources": [
+        "von/i960/recovered_io.c",
+        "von/build/attract-coverage/vonj-attract-1s.pcs",
+        "von/i960/boot-path.md"
+      ]
+    },
+    {
+      "entry": "0x000027d8",
+      "observed_call_edges": 13,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.shared-abi-tail-return-trampoline",
+      "sources": [
+        "von/i960/disassembly-annotations.md",
+        "von/build/attract-coverage/vonj-attract-60s.worklist.json"
+      ]
+    },
+    {
+      "entry": "0x000028b0",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.io-final-setup-sequence",
+      "sources": [
+        "von/i960/recovered_io.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/tools/test_recovered_io.py"
+      ]
+    },
+    {
+      "entry": "0x00002bb0",
+      "observed_call_edges": 2,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.io-input-initializer",
+      "sources": [
+        "von/i960/recovered_io.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/tools/test_recovered_io.py"
+      ]
+    },
+    {
+      "entry": "0x00002cf8",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.io-failure-input-sampler",
+      "sources": [
+        "von/i960/recovered_io.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/tools/test_recovered_io.py"
+      ]
+    },
+    {
+      "entry": "0x00002da0",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.io-controller-byte-average",
+      "sources": [
+        "von/i960/recovered_io.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/tools/test_recovered_io.py"
+      ]
+    },
+    {
+      "entry": "0x00003120",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.runtime-crc16-table-checksum",
+      "sources": [
+        "von/i960/recovered_crc16_table.c",
+        "von/i960/disassembly-annotations.md",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/tools/test_recovered_crc16_table.py"
+      ]
+    },
+    {
+      "entry": "0x00018488",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.host-byte-queue-initialize",
+      "sources": [
+        "von/i960/recovered_host_queue.c",
+        "von/build/attract-coverage/vonj-attract-1s.pcs",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00018ab0",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.timing-sample-extrema-update",
+      "sources": [
+        "von/i960/recovered_timing_sample.c",
+        "von/i960/disassembly-annotations.md",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/tools/test_recovered_timing_sample.py"
+      ]
+    },
+    {
+      "entry": "0x0001bb90",
+      "observed_call_edges": 6,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.word-expand-blocks",
+      "sources": [
+        "von/i960/recovered_text.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_video.py"
+      ]
+    },
+    {
+      "entry": "0x0001bc20",
+      "observed_call_edges": 3,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.halfword-byte-swap-copy",
+      "sources": [
+        "von/i960/recovered_text.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_video.py"
+      ]
+    },
+    {
+      "entry": "0x0001bc90",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-video-row-transfer-plan",
+      "sources": [
+        "von/i960/recovered_text.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_video.py"
+      ]
+    },
+    {
+      "entry": "0x0001bda0",
+      "observed_call_edges": 2,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.startup-asset-transfer-plan",
+      "sources": [
+        "von/i960/recovered_text.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_video.py"
+      ]
+    },
+    {
+      "entry": "0x0001c220",
+      "observed_call_edges": 2,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.video-control-bootstrap-plan",
+      "sources": [
+        "von/i960/recovered_text.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_video.py"
+      ]
+    },
+    {
+      "entry": "0x0001c618",
+      "observed_call_edges": 8,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-video-initialize",
+      "sources": [
+        "von/i960/recovered_text.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_video.py"
+      ]
+    },
+    {
+      "entry": "0x0001c730",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.video-byte-lane-expand",
+      "sources": [
+        "von/i960/recovered_text.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_video.py"
+      ]
+    },
+    {
+      "entry": "0x0001cac8",
+      "observed_call_edges": 23,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-position-state",
+      "sources": [
+        "von/i960/recovered_text.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x0001cc40",
+      "observed_call_edges": 2,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-character-output",
+      "sources": [
+        "von/i960/recovered_text.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x0001ccf8",
+      "observed_call_edges": 7,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-tile-control-write",
+      "sources": [
+        "von/i960/recovered_text.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_control.py"
+      ]
+    },
+    {
+      "entry": "0x0001ce00",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-alternate-two-row-glyph-plan",
+      "sources": [
+        "von/i960/recovered_text_alt_glyph.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_alt_glyph.py"
+      ]
+    },
+    {
+      "entry": "0x0001cea0",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-alternate-two-row-glyph-plan",
+      "sources": [
+        "von/i960/recovered_text_alt_glyph.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_alt_glyph.py"
+      ]
+    },
+    {
+      "entry": "0x0001d1b0",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-string-byte-dispatch",
+      "sources": [
+        "von/i960/recovered_text_string_walk.c",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_string_walk.py"
+      ]
+    },
+    {
+      "entry": "0x0001d310",
+      "observed_call_edges": 5,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-glyph-address-plan",
+      "sources": [
+        "von/i960/recovered_text.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_control.py"
+      ]
+    },
+    {
+      "entry": "0x0001d9e0",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-alternate-string-font-mode",
+      "sources": [
+        "von/i960/recovered_text_alt_string.c",
+        "von/i960/disassembly-annotations.md",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/tools/test_recovered_text_alt_string.py"
+      ]
+    },
+    {
+      "entry": "0x0001da90",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-string-font-mode",
+      "sources": [
+        "von/i960/recovered_text.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_control.py"
+      ]
+    },
+    {
+      "entry": "0x0001de80",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-tile-block-writer",
+      "sources": [
+        "von/i960/recovered_text_tile_block.c",
+        "von/i960/disassembly-annotations.md",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/tools/test_recovered_text_tile_block.py"
+      ]
+    },
+    {
+      "entry": "0x00027e50",
+      "observed_call_edges": 3,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.texture-decompressor",
+      "sources": [
+        "von/i960/recovered_texture_decompress.c",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/verify_texture_decompress.py"
+      ]
+    },
+    {
+      "entry": "0x00028120",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.texture-loader-profile-setup",
+      "sources": [
+        "von/i960/recovered_texture.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00028418",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-initial-handshake",
+      "sources": [
+        "von/i960/recovered_geometry_commands.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00028548",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.texture-initializer",
+      "sources": [
+        "von/i960/recovered_texture.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00028620",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-program-upload",
+      "sources": [
+        "von/i960/recovered_geometry.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00028840",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-profile-dispatch",
+      "sources": [
+        "von/i960/recovered_geometry_profile.c",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_geometry_profile.py"
+      ]
+    },
+    {
+      "entry": "0x00028b40",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-float-conversion-helper",
+      "sources": [
+        "von/i960/recovered_geometry.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00028b80",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-buffer-prepare",
+      "sources": [
+        "von/i960/recovered_geometry.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00028c08",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-batch-submit",
+      "sources": [
+        "von/i960/recovered_geometry_commands.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00028c80",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-command-batch-loop",
+      "sources": [
+        "von/i960/recovered_geometry_commands.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00028d08",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-register-clear",
+      "sources": [
+        "von/i960/recovered_geometry_commands.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00028d30",
+      "observed_call_edges": 3,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-auxiliary-submit-select",
+      "sources": [
+        "von/i960/recovered_geometry_commands.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00028d80",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-pipeline-startup",
+      "sources": [
+        "von/i960/recovered_geometry_commands.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00028de8",
+      "observed_call_edges": 7,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-frame-submission",
+      "sources": [
+        "von/i960/recovered_geometry_commands.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00028e88",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-function-command-submit",
+      "sources": [
+        "von/i960/recovered_geometry_commands.c",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x0002a430",
+      "observed_call_edges": 5,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.audio-short-delay",
+      "sources": [
+        "von/i960/recovered_audio_queue.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_audio_helpers.py"
+      ]
+    },
+    {
+      "entry": "0x0002a458",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.audio-queue-capacity-check",
+      "sources": [
+        "von/i960/recovered_audio_queue.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_audio_queue.py"
+      ]
+    },
+    {
+      "entry": "0x0002a4a8",
+      "observed_call_edges": 10,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.audio-queue-byte-push",
+      "sources": [
+        "von/i960/recovered_audio_queue.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_audio_queue.py"
+      ]
+    },
+    {
+      "entry": "0x0002a4e0",
+      "observed_call_edges": 24,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.audio-command-u16-send",
+      "sources": [
+        "von/i960/recovered_audio_queue.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_audio_queue.py"
+      ]
+    },
+    {
+      "entry": "0x0002a5f0",
+      "observed_call_edges": 7,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.audio-command-u16-send-when-idle",
+      "sources": [
+        "von/i960/recovered_audio_queue.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_audio_queue.py"
+      ]
+    },
+    {
+      "entry": "0x0002a870",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.audio-selector-zero-send",
+      "sources": [
+        "von/i960/recovered_audio_queue.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_audio_helpers.py"
+      ]
+    },
+    {
+      "entry": "0x0002a8a0",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.audio-scsp-queue-initialize",
+      "sources": [
+        "von/i960/recovered_audio_queue.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_audio_helpers.py"
+      ]
+    },
+    {
+      "entry": "0x0002a990",
+      "observed_call_edges": 3,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-service-submit",
+      "sources": [
+        "von/i960/recovered_geometry.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_geometry_service.py"
+      ]
+    },
+    {
+      "entry": "0x0006ece0",
+      "observed_call_edges": 15,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-coordinate-submit",
+      "sources": [
+        "von/i960/recovered_geometry_coordinate.c",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_geometry_coordinate.py"
+      ]
+    },
+    {
+      "entry": "0x0006f6f0",
+      "observed_call_edges": 5,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-projection-packet-core",
+      "sources": [
+        "von/i960/recovered_geometry_projection.c",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_geometry_projection.py"
+      ]
+    },
+    {
+      "entry": "0x0006fa48",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-slot-pool-cursors",
+      "sources": [
+        "von/i960/recovered_geometry_slot_pool.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_geometry_slot_pool.py"
+      ]
+    },
+    {
+      "entry": "0x0006fad8",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-slot-pool-cursors",
+      "sources": [
+        "von/i960/recovered_geometry_slot_pool.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_geometry_slot_pool.py"
+      ]
+    },
+    {
+      "entry": "0x0006fb18",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-slot-pool-cursors",
+      "sources": [
+        "von/i960/recovered_geometry_slot_pool.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_geometry_slot_pool.py"
+      ]
+    },
+    {
+      "entry": "0x0006fb90",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-record-initialization",
+      "sources": [
+        "von/i960/recovered_geometry_record_init.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_geometry_record_init.py"
+      ]
+    },
+    {
+      "entry": "0x0006fec0",
+      "observed_call_edges": 6,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-control-selector-zero-pulse",
+      "sources": [
+        "von/i960/disassembly-annotations.md",
+        "von/build/disasm/vonj-maincpu.lst"
+      ]
+    },
+    {
+      "entry": "0x00073508",
+      "observed_call_edges": 20,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.signed-runtime-band-classifier",
+      "sources": [
+        "von/i960/recovered_runtime_math.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x00077e60",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.action-state-dispatcher",
+      "sources": [
+        "von/i960/recovered_action_dispatch.c",
+        "von/i960/disassembly-annotations.md",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/tools/test_recovered_action_dispatch.py"
+      ]
+    },
+    {
+      "entry": "0x000783c8",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-action-wrapper",
+      "sources": [
+        "von/i960/recovered_transition_wrapper.c",
+        "von/i960/disassembly-annotations.md",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/tools/test_recovered_transition_wrapper.py"
+      ]
+    },
+    {
+      "entry": "0x00079050",
+      "observed_call_edges": 11,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.shared-object-state-transition",
+      "sources": [
+        "von/i960/disassembly-annotations.md",
+        "von/build/attract-coverage/vonj-attract-60s.worklist.json",
+        "von/tools/test_recovered_object_state_zero.py",
+        "von/tools/test_recovered_object_state_one.py",
+        "von/tools/test_recovered_object_state_two.py",
+        "von/tools/test_recovered_object_state_three.py",
+        "von/tools/test_recovered_object_state_four.py",
+        "von/tools/test_recovered_object_state_five.py",
+        "von/tools/test_recovered_object_state_six.py",
+        "von/tools/test_recovered_object_state_seven.py",
+        "von/tools/test_recovered_object_state_terminal.py"
+      ]
+    },
+    {
+      "entry": "0x00079d60",
+      "observed_call_edges": 5,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.secondary-object-state-transition",
+      "sources": [
+        "von/i960/disassembly-annotations.md",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/build/attract-coverage/vonj-attract-60s.worklist.json",
+        "von/tools/test_secondary_object_state_dispatch.py"
+      ]
+    },
+    {
+      "entry": "0x0009e050",
+      "observed_call_edges": 6,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-result-builder",
+      "sources": [
+        "von/i960/disassembly-annotations.md",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/recovered_geometry_result_delta.c",
+        "von/tools/test_recovered_geometry_result_delta.py",
+        "third_party/patches/0014-von-geometry-response-tracing.patch"
+      ]
+    },
+    {
+      "entry": "0x000bf0c0",
+      "observed_call_edges": 15,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.fixed-record-last-nonempty-scan",
+      "sources": [
+        "von/i960/recovered_record_scan.c",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_record_scan.py"
+      ]
+    },
+    {
+      "entry": "0x000c5130",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.object-pool-create",
+      "sources": [
+        "von/i960/recovered_object_pool_create.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_object_pool_create.py"
+      ]
+    },
+    {
+      "entry": "0x000c5240",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.object-pool-create-constant-variant",
+      "sources": [
+        "von/i960/recovered_object_pool_create.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_object_pool_create.py"
+      ]
+    },
+    {
+      "entry": "0x000c5310",
+      "observed_call_edges": 2,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.object-pool-create-rebased-variant",
+      "sources": [
+        "von/i960/recovered_object_pool_create.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_object_pool_create.py"
+      ]
+    },
+    {
+      "entry": "0x000c5530",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.object-pool-dispatch",
+      "sources": [
+        "von/i960/recovered_object_pool_create.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_object_pool_create.py"
+      ]
+    },
+    {
+      "entry": "0x000c55a8",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.object-pool-reset",
+      "sources": [
+        "von/i960/recovered_object_pool_create.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_object_pool_create.py"
+      ]
+    },
+    {
+      "entry": "0x000c5608",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.communication-control-reset",
+      "sources": [
+        "von/i960/recovered_comm_status.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_comm_status.py"
+      ]
+    },
+    {
+      "entry": "0x000c5870",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.communication-board-recovery-state-machine",
+      "sources": [
+        "von/i960/recovered_comm_status.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_comm_status.py"
+      ]
+    },
+    {
+      "entry": "0x000c5d48",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.zero-sixteen-bytes",
+      "sources": [
+        "von/i960/recovered_zero_16.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_zero_16.py"
+      ]
+    },
+    {
+      "entry": "0x000c5d70",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-profile-packet-builder",
+      "sources": [
+        "von/i960/recovered_geometry_profile_packet.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_geometry_profile_packet.py"
+      ]
+    },
+    {
+      "entry": "0x000c8f10",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.command-profile-dispatch-wrapper",
+      "sources": [
+        "von/i960/recovered_command_profile_dispatch.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_command_profile_dispatch.py"
+      ]
+    },
+    {
+      "entry": "0x000c8f60",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.command-profile-advance-wrapper",
+      "sources": [
+        "von/i960/recovered_command_profile_dispatch.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_command_profile_dispatch.py"
+      ]
+    },
+    {
+      "entry": "0x000c8fa0",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.command-profile-initializer",
+      "sources": [
+        "von/i960/recovered_command_profile_initialize.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_command_profile_initialize.py"
+      ]
+    },
+    {
+      "entry": "0x000e1e08",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.video-palette-lookup-initialize",
+      "sources": [
+        "von/i960/recovered_video_palette.c",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_video_palette.py"
+      ]
+    },
+    {
+      "entry": "0x000e1f20",
+      "observed_call_edges": 14,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.video-tile-expand",
+      "sources": [
+        "von/i960/recovered_video_tiles.c",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_video_tiles.py"
+      ]
+    },
+    {
+      "entry": "0x000e2040",
+      "observed_call_edges": 7,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.video-tile-expand-mirrored",
+      "sources": [
+        "von/i960/recovered_video_tiles.c",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_video_tiles.py"
+      ]
+    },
+    {
+      "entry": "0x000e2120",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.video-tile-expand-index-wrapper",
+      "sources": [
+        "von/i960/recovered_video_tiles.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_video_tiles.py"
+      ]
+    },
+    {
+      "entry": "0x000e2130",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.video-asset-setup",
+      "sources": [
+        "von/i960/recovered_video_setup.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_video_setup.py"
+      ]
+    },
+    {
+      "entry": "0x000e2330",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.video-dispatch-prefix",
+      "sources": [
+        "von/i960/recovered_video_dispatch.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_video_dispatch.py"
+      ]
+    },
+    {
+      "entry": "0x000e3a10",
+      "observed_call_edges": 6,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-two-digit-formatter",
+      "sources": [
+        "von/i960/recovered_text_two_digit.c",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_text_two_digit.py"
+      ]
+    },
+    {
+      "entry": "0x000f5058",
+      "observed_call_edges": 28,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.runtime-random-step",
+      "sources": [
+        "von/i960/recovered_runtime_math.c",
+        "von/build/attract-coverage/vonj-attract-60s.pcs",
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
+      "entry": "0x000f5100",
+      "observed_call_edges": 9,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-general-formatter-boundary",
+      "sources": [
+        "von/i960/disassembly-annotations.md",
+        "von/i960/boot-path.md",
+        "von/build/disasm/vonj-maincpu.lst"
+      ]
+    },
+    {
+      "entry": "0x000f5190",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-general-formatter-boundary",
+      "sources": [
+        "von/i960/disassembly-annotations.md",
+        "von/i960/boot-path.md",
+        "von/build/disasm/vonj-maincpu.lst"
+      ]
+    },
+    {
+      "entry": "0x000f5c58",
+      "observed_call_edges": 4,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.runtime-byte-compare",
+      "sources": [
+        "von/i960/recovered_byte_compare.c",
+        "von/i960/disassembly-annotations.md",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/tools/test_recovered_byte_compare.py"
+      ]
+    },
+    {
+      "entry": "0x000f5d40",
+      "observed_call_edges": 10,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.memory-copy-forward",
+      "sources": [
+        "von/i960/recovered_memory.c",
+        "von/build/disasm/vonj-maincpu.lst",
+        "von/i960/disassembly-annotations.md",
+        "von/tools/test_recovered_memory.py"
+      ]
+    },
+    {
+      "entry": "0x00002040",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00002080",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000022f0",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00002440",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00002850",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00002990",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00002c70",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00002cb0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00002d60",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000034c0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00003540",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00003a38",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00003ae0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00003ba0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000183b8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00018438",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00018538",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000186c0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000186f0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00018918",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00018960",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00018a10",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001c2c0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001cbb8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001d090",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001d1d0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001d210",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001d570",
+      "observed_call_edges": 3,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001d880",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001dc10",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001dc90",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001dd10",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001df00",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001df70",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001e030",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001ef70",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001f010",
+      "observed_call_edges": 3,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001f060",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0001f0d0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00020210",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000226b0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00023670",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00023ce8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00025040",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00027550",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000281f0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000282e0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000284b8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000292d8",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000294b0",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000295d0",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000296d0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00029738",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00029778",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00029a80",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00029ae8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00029b20",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00029c08",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00029ca0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00029d50",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0002b430",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0002be30",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0002d9a0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0002e1c8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0002e1e8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00032810",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000371e0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0003ecd0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0003ed60",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0003ef50",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0003f4e8",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00041f20",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000423a8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0006ede0",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0006f600",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0006f908",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0006f9e8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00072c10",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00072ea0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00073498",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000735d0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00074860",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00074e60",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00075200",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00075d90",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000761b0",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00076590",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00076b00",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00077470",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000778b0",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00077c40",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00077de0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00077e20",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00078090",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00078408",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000784c8",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000786d0",
+      "observed_call_edges": 4,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00078818",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00078bd8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00078dd0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00079630",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00079c10",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007a318",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007a3e0",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007a9f0",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007b430",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007bf10",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007d1f0",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007d670",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007dcc0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007e390",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007ea10",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007f4d0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007fca0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0007ff40",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00080710",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000807d0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000810d0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00081120",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00081610",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00081b30",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00081e60",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00081f60",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00082040",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00082650",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00082800",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00082ae0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00083110",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00083ac0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x00086240",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000866c0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000881b8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0008d400",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0008d5d0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0008dd40",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0008dfc0",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0009b288",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0009b308",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0009b320",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0009b498",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0009c050",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0009de50",
+      "observed_call_edges": 3,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0009e250",
+      "observed_call_edges": 3,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0009e650",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0009e880",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x0009eab0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000bd5a8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000bd6b8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000bd730",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000bd810",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000bd8e0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000be1f0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000bece0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000bedf0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000beee0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000befd0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000bf2f0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000de670",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000de990",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000df070",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000e37f0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000e3830",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000e39c0",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000e39f0",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000e3a70",
+      "observed_call_edges": 2,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000e5d30",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000e5da0",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    },
+    {
+      "entry": "0x000f50a8",
+      "observed_call_edges": 1,
+      "triage": "untriaged",
+      "stage": "planned",
+      "priority": 2,
+      "weight": null,
+      "work_unit": null,
+      "sources": []
+    }
+  ]
+}
