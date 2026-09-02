@@ -9,7 +9,7 @@ typedef unsigned char u8;
 #define TEXTURE_FORMAT_TABLE ((volatile const u8 *)0x00027c50)
 #define TEXTURE_STATUS ((volatile u32 *)0x00515080)
 
-static int texture_use_secondary_bank(u32 output_index)
+static __inline__ __attribute__((always_inline)) int texture_use_secondary_bank(u32 output_index)
 {
     u8 low = TEXTURE_FORMAT_TABLE[output_index & 0x1ffU];
     u8 high = TEXTURE_FORMAT_TABLE[(output_index >> 8) & 0x1feU];
