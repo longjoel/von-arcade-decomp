@@ -9,6 +9,11 @@ command -v docker >/dev/null 2>&1 || {
     exit 1
 }
 
+if ! docker info >/dev/null 2>&1; then
+    printf 'error: Docker daemon is unavailable or the current user cannot access it; i960 build requires the pinned compiler image\n' >&2
+    exit 1
+fi
+
 mkdir -p "$ROOT_DIR/von/build/i960"
 python3 "$ROOT_DIR/von/tools/extract_maincpu.py" \
     --output "$ROOT_DIR/von/build/i960/vonj-original-maincpu.bin"
