@@ -1,0 +1,45 @@
+diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
+index 790baf6415..225cfa045d 100644
+--- a/src/devices/cpu/sharc/sharc.cpp
++++ b/src/devices/cpu/sharc/sharc.cpp
+@@ -17,6 +17,7 @@
+ #include "endianness.h"
+ 
+ #include <algorithm>
++#include <cstdlib>
+ #include <cstdio>
+ #include <locale>
+ #include <sstream>
+@@ -1283,6 +1284,32 @@ void adsp21062_device::execute_run()
+ 
+ 			m_core->opcode = m_program.read_qword(m_core->pc);
+ 
++			// Runtime-filtered diagnostics for bounded SHARC investigations.  A
++			// disabled filter has no logging path; callers opt in with an inclusive
++			// PC range and may cap the number of emitted records.
++			static char const *const von_trace_start_text = std::getenv("VON_SHARC_TRACE_START");
++			static uint32_t const von_trace_start = von_trace_start_text
++				? uint32_t(std::strtoul(von_trace_start_text, nullptr, 0)) : 0;
++			static char const *const von_trace_end_text = std::getenv("VON_SHARC_TRACE_END");
++			static uint32_t const von_trace_end = von_trace_end_text
++				? uint32_t(std::strtoul(von_trace_end_text, nullptr, 0)) : von_trace_start;
++			static char const *const von_trace_limit_text = std::getenv("VON_SHARC_TRACE_LIMIT");
++			static unsigned const von_trace_limit = von_trace_limit_text
++				? unsigned(std::strtoul(von_trace_limit_text, nullptr, 0)) : 1024U;
++			static unsigned von_trace_count;
++			if (von_trace_start_text && (m_core->pc >= von_trace_start) &&
++				(m_core->pc <= von_trace_end) && (von_trace_count < von_trace_limit))
++			{
++				logerror("von_sharc_diag: pc=%06x opcode=%012llx astat=%08x stky=%08x r0=%08x r1=%08x r2=%08x r3=%08x r4=%08x r8=%08x r9=%08x r10=%08x r11=%08x r12=%08x r13=%08x r14=%08x r15=%08x\n",
++					m_core->pc, static_cast<unsigned long long>(m_core->opcode),
++					m_core->astat, m_core->stky,
++					m_core->r[0].r, m_core->r[1].r, m_core->r[2].r, m_core->r[3].r,
++					m_core->r[4].r, m_core->r[8].r, m_core->r[9].r, m_core->r[10].r,
++					m_core->r[11].r, m_core->r[12].r, m_core->r[13].r, m_core->r[14].r,
++					m_core->r[15].r);
++				von_trace_count++;
++			}
++
+ 			// handle looping
+ 			if (!(m_core->stky & LSEM) && (m_core->pc == m_core->laddr.addr))
+ 			{

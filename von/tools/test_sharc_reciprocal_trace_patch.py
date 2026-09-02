@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Guard the reproducible runtime trace hook for SHARC 0x03/0x04 services."""
 
+import json
 from pathlib import Path
+
+from patchset_manifest import resolve
 
 
 ROOT = Path(__file__).resolve().parents[2]
 PATCH = ROOT / "third_party/patches/0026-von-sharc-reciprocal-tracing.patch"
-PREPARE = ROOT / "scripts/prepare-mame.sh"
+MANIFEST = ROOT / "third_party/patches/patchsets.json"
 
 
 def main() -> int:
@@ -20,8 +23,9 @@ def main() -> int:
     ):
         if fragment not in patch:
             raise SystemExit(f"reciprocal trace patch missing {fragment}")
-    if "SHARC_RECIPROCAL_TRACE_PATCH_FILE" not in PREPARE.read_text(encoding="utf-8"):
-        raise SystemExit("prepare-mame.sh does not install the reciprocal trace patch")
+    profile = resolve(json.loads(MANIFEST.read_text(encoding="utf-8")), "sharc-diagnostics")
+    if PATCH.name in profile or "0034-von-sharc-runtime-diagnostics.patch" not in profile:
+        raise SystemExit("historical reciprocal tracing was not superseded by runtime diagnostics")
     print("PASS: SHARC reciprocal-service trace patch contract")
     return 0
 

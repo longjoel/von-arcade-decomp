@@ -108,6 +108,10 @@ clear; ordinary zero and denormal handling remains the existing signed-zero
 path. The neutral source patch is
 `third_party/patches/0033-von-sharc-drc-compound-abs-special-cases.patch` and
 its contract is checked by `von/tools/test_sharc_drc_abs_special_cases.py`.
+This patch and the scalar DRC special-case patch remain preserved candidates;
+they are not part of the active `sharc-precision` profile because they do not
+apply independently to the pinned core tree. The active profile contains only
+the clean 40-bit header and register-seam patches.
 
 ## New runtime boundary from the twin capture
 
@@ -233,6 +237,8 @@ sequence still matches as well. The returned-word parity is runtime-verified
 by `von/tools/verify_sharc_opcode_0f_nonfinite_poll.py`; the sticky-flag writes
 are currently source-verified and need a dedicated state-register probe before
 this is treated as a complete upstream fix.
+It remains evidence for a future rebased precision change, not an active build
+patch.
 
 The state-register probe is available through the same Lua FIFO harness.
 Registering `SHARC_STKY` with MAME's state table made it readable from Lua.

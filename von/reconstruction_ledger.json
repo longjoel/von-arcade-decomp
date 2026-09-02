@@ -1058,9 +1058,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_scalar_services.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1081,16 +1079,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_reciprocal_services.py",
-            "von/tools/probe_sharc_reciprocal_services.lua",
-            "von/tools/probe_sharc_reciprocal_edges.lua",
-            "von/tools/verify_sharc_reciprocal_edges.py",
-            "von/tools/probe_sharc_opcode_04.lua",
-            "von/i960/recovered_sharc_opcode_35.c",
-            "von/i960/recovered_sharc_reciprocal_services.c",
-            "von/tools/test_recovered_sharc_reciprocal_services.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1118,9 +1107,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_state_services.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1141,12 +1128,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_sharc_matrix_state_service.py",
-            "von/tools/test_recovered_sharc_opcode_09_caller.py",
-            "third_party/patches/0022-von-opcode-09-caller-tracing.patch"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1170,12 +1152,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_0a.py",
-            "von/tools/probe_sharc_opcode_0a.lua",
-            "von/i960/recovered_sharc_opcode_0a.c",
-            "von/tools/test_recovered_sharc_opcode_0a.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1199,14 +1176,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_0b.py",
-            "von/i960/recovered_sharc_opcode_0b.c",
-            "von/tools/test_recovered_sharc_opcode_0b.py",
-            "von/tools/probe_sharc_opcode_0b.lua",
-            "third_party/mame-master/src/devices/cpu/sharc/sharc.cpp",
-            "third_party/mame-master/src/devices/cpu/sharc/sharcinternal.ipp"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1232,15 +1202,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_0c.py",
-            "von/i960/recovered_sharc_opcode_0c.c",
-            "von/tools/test_recovered_sharc_opcode_0c.py",
-            "von/tools/probe_sharc_opcode_0c.lua",
-            "von/tools/probe_sharc_opcode_0c_edges.lua",
-            "third_party/patches/0016-von-sharc-interpreter-tracing.patch",
-            "third_party/patches/0018-von-sharc-output-tracing.patch"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1267,15 +1229,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_0d.py",
-            "von/i960/recovered_sharc_opcode_0d.c",
-            "von/tools/test_recovered_sharc_opcode_0d.py",
-            "von/tools/probe_sharc_opcode_0d.lua",
-            "von/tools/test_sharc_helper_20d5d.py",
-            "third_party/patches/0015-von-sharc-20de1-tracing.patch",
-            "third_party/patches/0019-von-sharc-state-upload-tracing.patch"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1302,9 +1256,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_0e.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1325,18 +1277,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_0f.py",
-            "von/i960/recovered_sharc_opcode_0f.c",
-            "von/tools/test_recovered_sharc_opcode_0f.py",
-            "von/tools/probe_sharc_opcode_0f_single.lua",
-            "von/tools/probe_sharc_opcode_0f_zero_early.lua",
-            "von/tools/probe_sharc_opcode_0f_nonfinite_poll.lua",
-            "von/tools/verify_sharc_opcode_0f_nonfinite_poll.py",
-            "von/tools/verify_sharc_opcode_0f_state.py",
-            "third_party/patches/0015-von-sharc-20de1-tracing.patch",
-            "third_party/patches/0018-von-sharc-output-tracing.patch"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1366,9 +1307,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_10.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1389,9 +1328,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_11.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1412,11 +1349,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_12.py",
-            "von/i960/recovered_sharc_opcode_12.c",
-            "von/tools/test_recovered_sharc_opcode_12.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1439,11 +1372,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_13.py",
-            "von/i960/recovered_sharc_opcode_13.c",
-            "von/tools/test_recovered_sharc_opcode_13.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1466,19 +1395,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_14.py",
-            "von/tools/probe_sharc_rotation_zero.lua",
-            "von/tools/probe_sharc_rotation_snapshot.lua",
-            "von/tools/probe_sharc_rotation_quarter.lua",
-            "von/i960/recovered_sharc_opcode_14.c",
-            "von/tools/test_recovered_sharc_opcode_14.py",
-            "von/tools/probe_sharc_rotation_siblings.lua",
-            "von/i960/recovered_sharc_opcode_15.c",
-            "von/tools/test_recovered_sharc_opcode_15.py",
-            "von/i960/recovered_sharc_opcode_16.c",
-            "von/tools/test_recovered_sharc_opcode_16.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1509,9 +1426,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_15.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1532,9 +1447,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_16.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1555,11 +1468,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_17.py",
-            "von/tools/probe_sharc_opcode_17.lua",
-            "von/tools/probe_sharc_opcode_17_nonzero.lua"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1582,14 +1491,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_service_2039b.py",
-            "von/tools/probe_sharc_service_1a.lua",
-            "von/tools/probe_sharc_service_1a_scaled.lua",
-            "von/tools/probe_sharc_opcode_07_affine.lua",
-            "von/i960/recovered_sharc_opcode_1a.c",
-            "von/tools/test_recovered_sharc_opcode_1a.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1615,11 +1517,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_helper_20d5d.py",
-            "von/i960/recovered_sharc_helper_20d5d.c",
-            "von/tools/test_recovered_sharc_helper_20d5d.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1642,19 +1540,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_helper_20d68.py",
-            "von/tools/probe_sharc_opcode_0f_zero_early.lua",
-            "von/tools/probe_sharc_opcode_0f_nonfinite.lua",
-            "von/tools/test_sharc_opcode_0f_nonfinite_probe.py",
-            "von/tools/probe_sharc_opcode_0f_nonfinite_poll.lua",
-            "von/tools/verify_sharc_opcode_0f_nonfinite_poll.py",
-            "von/tools/verify_sharc_20d68_nonfinite_trace.py",
-            "third_party/patches/0028-von-sharc-drc-float-special-cases.patch",
-            "von/i960/recovered_sharc_helper_20d68_candidate.c",
-            "von/tools/test_recovered_sharc_helper_20d68_candidate.py",
-            "von/i960/mame-sharc-precision-upstream.md"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1685,9 +1571,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_helpers_20dbe.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1708,12 +1592,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_helper_20de1.py",
-            "von/i960/recovered_sharc_helper_20de1.c",
-            "von/build/disasm/von-sharc-opcode-17-nonzero.runtime.log",
-            "third_party/patches/0015-von-sharc-20de1-tracing.patch"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1737,12 +1616,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_fixed_point_services.py",
-            "von/tools/probe_sharc_opcode_1b.lua",
-            "von/i960/recovered_sharc_opcode_1b.c",
-            "von/tools/test_recovered_sharc_opcode_1bc.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1766,12 +1640,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_fixed_point_services.py",
-            "von/tools/probe_sharc_opcode_1c.lua",
-            "von/i960/recovered_sharc_opcode_1c.c",
-            "von/tools/test_recovered_sharc_opcode_1bc.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1795,12 +1664,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_fixed_point_services.py",
-            "von/tools/probe_sharc_opcode_1d.lua",
-            "von/i960/recovered_sharc_opcode_1d.c",
-            "von/tools/test_recovered_sharc_opcode_1d.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1824,12 +1688,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_1e.py",
-            "von/tools/probe_sharc_opcode_1e.lua",
-            "von/i960/recovered_sharc_opcode_1e.c",
-            "von/tools/test_recovered_sharc_opcode_1e.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1853,9 +1712,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/reconstructed_reset.c",
-            "von/i960/boot-path.md",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/reconstructed_reset.c"
           ],
           "evidence": [
             "von/i960/boot-path.md",
@@ -1876,9 +1733,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/start_reconstructed.s",
-            "von/build/attract-coverage/vonj-attract-1s.pcs",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/start_reconstructed.s"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-1s.pcs",
@@ -1906,9 +1761,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_io.c",
-            "von/build/attract-coverage/vonj-attract-1s.pcs",
-            "von/i960/boot-path.md"
+            "von/i960/recovered_io.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-1s.pcs",
@@ -1936,9 +1789,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_io.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_io.py"
+            "von/i960/recovered_io.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -1966,9 +1817,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/reconstructed_main.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/boot-path.md"
+            "von/i960/reconstructed_main.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -1989,9 +1838,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_io.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_io.py"
+            "von/i960/recovered_io.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -2019,9 +1866,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_io.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_io.py"
+            "von/i960/recovered_io.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -2049,9 +1894,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_io.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_io.py"
+            "von/i960/recovered_io.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -2072,9 +1915,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_io.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_io.py"
+            "von/i960/recovered_io.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -2102,9 +1943,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_io.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_io.py"
+            "von/i960/recovered_io.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -2125,9 +1964,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_io.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_io.py"
+            "von/i960/recovered_io.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -2148,9 +1985,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_io.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_io.py"
+            "von/i960/recovered_io.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -2178,9 +2013,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_host_queue.c",
-            "von/build/attract-coverage/vonj-attract-1s.pcs",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_host_queue.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-1s.pcs",
@@ -2208,9 +2041,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_runtime_math.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_runtime_math.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2238,10 +2069,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_audio_queue.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_audio_queue.py"
+            "von/i960/recovered_audio_queue.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2270,10 +2098,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_audio_queue.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_audio_queue.py"
+            "von/i960/recovered_audio_queue.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2302,10 +2127,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_audio_queue.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_audio_queue.py"
+            "von/i960/recovered_audio_queue.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2334,10 +2156,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_audio_queue.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_audio_helpers.py"
+            "von/i960/recovered_audio_queue.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2366,10 +2185,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_audio_queue.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_audio_queue.py"
+            "von/i960/recovered_audio_queue.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2398,10 +2214,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_audio_queue.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_audio_helpers.py"
+            "von/i960/recovered_audio_queue.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2423,10 +2236,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_audio_queue.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_audio_helpers.py"
+            "von/i960/recovered_audio_queue.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2455,10 +2265,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_audio_queue.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_audio_helpers.py"
+            "von/i960/recovered_audio_queue.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2487,10 +2294,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_host_control.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_host_control.py"
+            "von/i960/recovered_host_control.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -2512,10 +2316,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_audio_queue.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_audio_queue.py"
+            "von/i960/recovered_audio_queue.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2544,10 +2345,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_host_control.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_host_control.py"
+            "von/i960/recovered_host_control.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2576,10 +2374,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_host_control.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_host_control.py"
+            "von/i960/recovered_host_control.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2608,10 +2403,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_audio_queue.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_audio_queue_consumer.py"
+            "von/i960/recovered_audio_queue.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2633,10 +2425,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_video.py"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -2658,10 +2447,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_host_control.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_host_control.py"
+            "von/i960/recovered_host_control.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -2683,10 +2469,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_host_control.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_host_control.py"
+            "von/i960/recovered_host_control.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2715,9 +2498,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_runtime_math.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_runtime_math.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2745,8 +2526,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_geometry.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -2773,10 +2553,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_service.py"
+            "von/i960/recovered_geometry.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2805,8 +2582,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_commands.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_geometry_commands.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -2833,8 +2609,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -2861,8 +2636,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -2889,8 +2663,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -2910,10 +2683,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_control.py"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -2942,10 +2712,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_memory.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_memory.py"
+            "von/i960/recovered_memory.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -2974,10 +2741,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_video.py"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -2999,10 +2763,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_clear_g14_return_20160.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_clear_g14_return_20160.py"
+            "von/i960/recovered_clear_g14_return_20160.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3024,10 +2785,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_profile_upload.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_video_profile_upload.py"
+            "von/i960/recovered_video_profile_upload.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3049,10 +2807,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_mixed_upload.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_video_mixed_upload.py"
+            "von/i960/recovered_video_mixed_upload.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3074,10 +2829,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_attribute_pair_writer.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_attribute_pair_writer.py"
+            "von/i960/recovered_attribute_pair_writer.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3099,10 +2851,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_upload_20390_panel17.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_video_upload_20390_panel17.py"
+            "von/i960/recovered_video_upload_20390_panel17.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3124,10 +2873,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_profile_upload_panel_wrappers.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_profile_upload_panel_wrappers.py"
+            "von/i960/recovered_profile_upload_panel_wrappers.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3149,10 +2895,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_upload_20460_panel18.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_upload_20460_panel18.py"
+            "von/i960/recovered_upload_20460_panel18.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3174,10 +2917,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_repeated_status_routes.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_repeated_status_routes.py"
+            "von/i960/recovered_repeated_status_routes.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3199,10 +2939,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_block_routes_20660.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_block_routes_20660.py"
+            "von/i960/recovered_status_block_routes_20660.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3224,10 +2961,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_block_routes_206f0.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_block_routes_206f0.py"
+            "von/i960/recovered_status_block_routes_206f0.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3249,10 +2983,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_transition_routes.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_transition_routes.py"
+            "von/i960/recovered_status_transition_routes.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3274,10 +3005,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_attributed_status_routes_20840.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_attributed_status_routes_20840.py"
+            "von/i960/recovered_attributed_status_routes_20840.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3299,10 +3027,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_attributed_status_routes_209c0.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_attributed_status_routes_209c0.py"
+            "von/i960/recovered_attributed_status_routes_209c0.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3324,10 +3049,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_strip_builder.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_strip_builder.py"
+            "von/i960/recovered_text_strip_builder.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3349,10 +3071,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_hardware_strip_clear.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_hardware_strip_clear.py"
+            "von/i960/recovered_hardware_strip_clear.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3374,10 +3093,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_weapon_record_dispatch.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_weapon_record_dispatch.py"
+            "von/i960/recovered_weapon_record_dispatch.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3399,10 +3115,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_weapon_three_point_handlers.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_weapon_three_point_handlers.py"
+            "von/i960/recovered_weapon_three_point_handlers.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3424,10 +3137,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_weapon_five_marker_handler.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_weapon_five_marker_handler.py"
+            "von/i960/recovered_weapon_five_marker_handler.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3449,10 +3159,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_weapon_three_quad_marker_handler.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_weapon_three_quad_marker_handler.py"
+            "von/i960/recovered_weapon_three_quad_marker_handler.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3474,10 +3181,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_weapon_irregular_handlers.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_weapon_irregular_handlers.py"
+            "von/i960/recovered_weapon_irregular_handlers.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3499,10 +3203,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_loop_entry_reset.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_loop_entry_reset.py"
+            "von/i960/recovered_status_loop_entry_reset.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3524,10 +3225,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_low_latch_upload.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_low_latch_upload.py"
+            "von/i960/recovered_status_low_latch_upload.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3549,10 +3247,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_mid_latch_route.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_mid_latch_route.py"
+            "von/i960/recovered_status_mid_latch_route.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3574,10 +3269,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_upper_latch_routes.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_upper_latch_routes.py"
+            "von/i960/recovered_status_upper_latch_routes.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3599,10 +3291,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_grid_initializer.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_grid_initializer.py"
+            "von/i960/recovered_status_grid_initializer.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3624,10 +3313,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_patterned_fill.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_patterned_fill.py"
+            "von/i960/recovered_status_patterned_fill.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3649,10 +3335,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_tile_pattern_228f0.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_tile_pattern_228f0.py"
+            "von/i960/recovered_status_tile_pattern_228f0.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3674,10 +3357,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_wide_tile_patterns.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_wide_tile_patterns.py"
+            "von/i960/recovered_status_wide_tile_patterns.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3699,10 +3379,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_plane_full_clear_thunks.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_plane_full_clear_thunks.py"
+            "von/i960/recovered_plane_full_clear_thunks.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3724,10 +3401,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_hud_reset_22d30.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_hud_reset_22d30.py"
+            "von/i960/recovered_hud_reset_22d30.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3749,10 +3423,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_strip_reset_23510.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_strip_reset_23510.py"
+            "von/i960/recovered_status_strip_reset_23510.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3774,10 +3445,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_mode_renderer_23410.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_mode_renderer_23410.py"
+            "von/i960/recovered_status_mode_renderer_23410.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3799,10 +3467,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_string_glyph_23560.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_string_glyph_23560.py"
+            "von/i960/recovered_status_string_glyph_23560.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3824,10 +3489,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_indexed_glyph_23620.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_indexed_glyph_23620.py"
+            "von/i960/recovered_status_indexed_glyph_23620.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3849,10 +3511,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_object_init_23670.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_object_init_23670.py"
+            "von/i960/recovered_geometry_object_init_23670.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3874,10 +3533,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_object_transform_update_2381c.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_object_transform_update_2381c.py"
+            "von/i960/recovered_geometry_object_transform_update_2381c.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3899,10 +3555,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_object_branch_dispatch_237ac.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_object_branch_dispatch_237ac.py"
+            "von/i960/recovered_geometry_object_branch_dispatch_237ac.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3924,10 +3577,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_object_alternate_update_238a0.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_object_alternate_update_238a0.py"
+            "von/i960/recovered_geometry_object_alternate_update_238a0.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3949,10 +3599,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_object_lifecycle_tail_23954.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_object_lifecycle_tail_23954.py"
+            "von/i960/recovered_geometry_object_lifecycle_tail_23954.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3974,10 +3621,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_object_variant_23980.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_object_variant_23980.py"
+            "von/i960/recovered_geometry_object_variant_23980.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -3999,10 +3643,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_cleanup_helper_23ca0.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_cleanup_helper_23ca0.py"
+            "von/i960/recovered_geometry_cleanup_helper_23ca0.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4024,10 +3665,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_position_delta_23ce8.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_position_delta_23ce8.py"
+            "von/i960/recovered_geometry_position_delta_23ce8.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4049,10 +3687,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_board_setup_23d60.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_board_setup_23d60.py"
+            "von/i960/recovered_geometry_board_setup_23d60.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4074,10 +3709,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_response_selector_23ef0.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_response_selector_23ef0.py"
+            "von/i960/recovered_geometry_response_selector_23ef0.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4099,10 +3731,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_clip_calls_240dc.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_clip_calls_240dc.py"
+            "von/i960/recovered_geometry_clip_calls_240dc.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4124,10 +3753,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_object_response_selector_24460.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_object_response_selector_24460.py"
+            "von/i960/recovered_geometry_object_response_selector_24460.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4149,10 +3775,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_object_clip_calls_24540.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_object_clip_calls_24540.py"
+            "von/i960/recovered_geometry_object_clip_calls_24540.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4174,10 +3797,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_mode_zero_clip_calls_24cc8.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_mode_zero_clip_calls_24cc8.py"
+            "von/i960/recovered_geometry_mode_zero_clip_calls_24cc8.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4199,10 +3819,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_command6_loop_24690.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_command6_loop_24690.py"
+            "von/i960/recovered_geometry_command6_loop_24690.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4224,10 +3841,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_object_state_packet_24eb4.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_object_state_packet_24eb4.py"
+            "von/i960/recovered_geometry_object_state_packet_24eb4.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4249,10 +3863,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_global_countdowns_9d0d0.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_global_countdowns_9d0d0.py"
+            "von/i960/recovered_geometry_global_countdowns_9d0d0.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4274,10 +3885,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_board_update_gate_9d170.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_board_update_gate_9d170.py"
+            "von/i960/recovered_geometry_board_update_gate_9d170.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4299,10 +3907,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_command19_branch_9d1ec.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_command19_branch_9d1ec.py"
+            "von/i960/recovered_geometry_command19_branch_9d1ec.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4324,10 +3929,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_flagged_state_packet_9d334.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_flagged_state_packet_9d334.py"
+            "von/i960/recovered_geometry_flagged_state_packet_9d334.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4349,10 +3951,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_clear_flag_packet_9d454.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_clear_flag_packet_9d454.py"
+            "von/i960/recovered_geometry_clear_flag_packet_9d454.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4374,10 +3973,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_command19_branch_9d59c.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_command19_branch_9d59c.py"
+            "von/i960/recovered_geometry_command19_branch_9d59c.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4399,10 +3995,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_second_flagged_state_packet_9d730.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_second_flagged_state_packet_9d730.py"
+            "von/i960/recovered_geometry_second_flagged_state_packet_9d730.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4424,10 +4017,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_second_clear_flag_packet_9d858.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_second_clear_flag_packet_9d858.py"
+            "von/i960/recovered_geometry_second_clear_flag_packet_9d858.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4449,10 +4039,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_command19_branch_9d9a0.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_command19_branch_9d9a0.py"
+            "von/i960/recovered_geometry_command19_branch_9d9a0.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4475,10 +4062,7 @@
           "stage": "modeled",
           "sources": [
             "von/i960/recovered_geometry_third_flagged_state_packet_9db3c.c",
-            "von/i960/recovered_geometry_third_clear_flag_packet_9dc64.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_third_state_packets_9db3c.py"
+            "von/i960/recovered_geometry_third_clear_flag_packet_9dc64.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4500,10 +4084,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_post_state_gate_9ddac.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_post_state_gate_9ddac.py"
+            "von/i960/recovered_geometry_post_state_gate_9ddac.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4525,10 +4106,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_control.py"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -4557,10 +4135,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_alt_glyph.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_alt_glyph.py"
+            "von/i960/recovered_text_alt_glyph.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -4590,10 +4165,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_video.py"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -4622,10 +4194,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_video.py"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -4654,10 +4223,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_video.py"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -4686,10 +4252,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_video.py"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -4718,10 +4281,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_video.py"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -4750,10 +4310,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_video.py"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -4782,10 +4339,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_control.py"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -4814,10 +4368,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text.c",
-            "von/build/attract-coverage/vonj-attract-60s.pcs",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_video.py"
+            "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
@@ -4846,8 +4397,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_texture.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_texture.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -4874,8 +4424,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_commands.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_geometry_commands.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -4902,9 +4451,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_texture_decompress.c",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/verify_texture_decompress.py"
+            "von/i960/recovered_texture_decompress.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -4932,8 +4479,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_texture.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_texture.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -4960,8 +4506,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_geometry.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -4988,8 +4533,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_geometry.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -5016,8 +4560,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_commands.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_geometry_commands.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -5044,8 +4587,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_commands.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_geometry_commands.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -5072,8 +4614,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_commands.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_geometry_commands.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -5100,9 +4641,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_profile.c",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_profile.py"
+            "von/i960/recovered_geometry_profile.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -5130,8 +4669,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_commands.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_geometry_commands.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -5158,8 +4696,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_commands.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_geometry_commands.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -5186,8 +4723,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_commands.c",
-            "von/i960/disassembly-annotations.md"
+            "von/i960/recovered_geometry_commands.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md"
@@ -5214,10 +4750,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_command_profile_initialize.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_command_profile_initialize.py"
+            "von/i960/recovered_command_profile_initialize.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5246,10 +4779,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_command_profile_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_command_profile_dispatch.py"
+            "von/i960/recovered_command_profile_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5278,10 +4808,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_command_profile_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_command_profile_dispatch.py"
+            "von/i960/recovered_command_profile_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5310,10 +4837,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_pool_create.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_pool_create.py"
+            "von/i960/recovered_object_pool_create.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5342,10 +4866,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_comm_status.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_comm_status.py"
+            "von/i960/recovered_comm_status.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5374,10 +4895,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_profile_packet.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_profile_packet.py"
+            "von/i960/recovered_geometry_profile_packet.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5406,10 +4924,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_zero_16.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_zero_16.py"
+            "von/i960/recovered_zero_16.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5438,10 +4953,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_comm_status.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_comm_status.py"
+            "von/i960/recovered_comm_status.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5470,10 +4982,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_pool_create.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_pool_create.py"
+            "von/i960/recovered_object_pool_create.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5502,10 +5011,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_pool_create.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_pool_create.py"
+            "von/i960/recovered_object_pool_create.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5534,10 +5040,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_pool_create.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_pool_create.py"
+            "von/i960/recovered_object_pool_create.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5566,10 +5069,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_pool_create.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_pool_create.py"
+            "von/i960/recovered_object_pool_create.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5598,17 +5098,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/attract-coverage/vonj-attract-60s.worklist.json",
-            "von/tools/test_recovered_object_state_zero.py",
-            "von/tools/test_recovered_object_state_one.py",
-            "von/tools/test_recovered_object_state_two.py",
-            "von/tools/test_recovered_object_state_three.py",
-            "von/tools/test_recovered_object_state_four.py",
-            "von/tools/test_recovered_object_state_five.py",
-            "von/tools/test_recovered_object_state_six.py",
-            "von/tools/test_recovered_object_state_seven.py",
-            "von/tools/test_recovered_object_state_terminal.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -5644,10 +5134,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/build/attract-coverage/vonj-attract-60s.worklist.json",
-            "von/tools/test_secondary_object_state_dispatch.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -5676,10 +5163,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_secondary_transition.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_secondary_transition.py"
+            "von/i960/recovered_secondary_transition.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5701,10 +5185,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_state_tail.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_state_tail.py"
+            "von/i960/recovered_object_state_tail.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5726,10 +5207,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_state_random_selector.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_state_random_selector.py"
+            "von/i960/recovered_object_state_random_selector.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5751,9 +5229,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_state_dispatch.c",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_state_dispatch.py"
+            "von/i960/recovered_object_state_dispatch.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -5774,10 +5250,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_state_zero.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_state_zero.py"
+            "von/i960/recovered_object_state_zero.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5799,10 +5272,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_state_seven.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_state_seven.py"
+            "von/i960/recovered_object_state_seven.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5824,10 +5294,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_state_six.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_state_six.py"
+            "von/i960/recovered_object_state_six.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5849,10 +5316,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_state_one.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_state_one.py"
+            "von/i960/recovered_object_state_one.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5874,10 +5338,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_state_two.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_state_two.py"
+            "von/i960/recovered_object_state_two.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5899,10 +5360,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_state_four.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_state_four.py"
+            "von/i960/recovered_object_state_four.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5924,10 +5382,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_state_three.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_state_three.py"
+            "von/i960/recovered_object_state_three.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5949,10 +5404,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_state_five.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_state_five.py"
+            "von/i960/recovered_object_state_five.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5974,10 +5426,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_object_state_terminal.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_object_state_terminal.py"
+            "von/i960/recovered_object_state_terminal.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -5999,10 +5448,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6024,10 +5470,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6049,10 +5492,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6074,10 +5514,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6099,11 +5536,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "third_party/mame-master/src/devices/cpu/i960/i960.cpp",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6126,10 +5559,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6151,10 +5581,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6176,10 +5603,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6201,10 +5625,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6226,10 +5647,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6251,10 +5669,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6276,10 +5691,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6301,10 +5713,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6326,10 +5735,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6351,11 +5757,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "third_party/mame-master/src/devices/cpu/i960/i960.cpp",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6378,10 +5780,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_timing_variant.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_timing_variant.py"
+            "von/i960/recovered_timing_variant.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6403,10 +5802,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_transition_selector_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_transition_selector_dispatch.py"
+            "von/i960/recovered_transition_selector_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6428,10 +5824,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_transition_selector_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_transition_selector_dispatch.py"
+            "von/i960/recovered_transition_selector_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6453,10 +5846,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_transition_selector_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_transition_selector_dispatch.py"
+            "von/i960/recovered_transition_selector_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6478,10 +5868,7 @@
           "classification": "data",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_transition_selector_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_transition_selector_dispatch.py"
+            "von/i960/recovered_transition_selector_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6503,10 +5890,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_transition_selector_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_transition_selector_dispatch.py"
+            "von/i960/recovered_transition_selector_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6528,10 +5912,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6553,10 +5934,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6578,10 +5956,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6603,10 +5978,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6628,10 +6000,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6653,10 +6022,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6678,10 +6044,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6703,10 +6066,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6722,10 +6082,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6747,10 +6104,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6772,10 +6126,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6797,10 +6148,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6822,10 +6170,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6847,10 +6192,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6872,10 +6214,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6897,10 +6236,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6922,10 +6258,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6947,10 +6280,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6972,10 +6302,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -6997,10 +6324,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7022,10 +6346,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7047,10 +6368,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7072,10 +6390,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7097,10 +6412,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7122,10 +6434,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7147,10 +6456,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7172,10 +6478,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7197,10 +6500,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_dispatch.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_dispatch.py"
+            "von/i960/recovered_video_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7229,10 +6529,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_setup.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_setup.py"
+            "von/i960/recovered_video_setup.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7261,9 +6558,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_tiles.c",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_tiles.py"
+            "von/i960/recovered_video_tiles.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7291,10 +6586,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_tiles.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_tiles.py"
+            "von/i960/recovered_video_tiles.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7323,9 +6615,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_tiles.c",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_tiles.py"
+            "von/i960/recovered_video_tiles.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7353,9 +6643,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_video_palette.c",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_video_palette.py"
+            "von/i960/recovered_video_palette.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7383,9 +6671,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_coordinate.c",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_coordinate.py"
+            "von/i960/recovered_geometry_coordinate.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7413,10 +6699,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_35_producer_6f600.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_35_producer_6f600.py"
+            "von/i960/recovered_geometry_35_producer_6f600.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7439,9 +6722,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_record_scan.c",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_record_scan.py"
+            "von/i960/recovered_record_scan.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7469,8 +6750,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/attract-coverage/vonj-attract-60s.worklist.json"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7497,9 +6777,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_projection.c",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_projection.py"
+            "von/i960/recovered_geometry_projection.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7527,11 +6805,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_projection.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_projection.py",
-            "von/tools/test_geometry_projection_descriptor_table.py"
+            "von/i960/recovered_geometry_projection.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7554,10 +6828,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_slot_pool.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_slot_pool.py"
+            "von/i960/recovered_geometry_slot_pool.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7588,10 +6859,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_record_init.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_record_init.py"
+            "von/i960/recovered_geometry_record_init.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7620,10 +6888,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_allocator_commit.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_allocator_commit.py"
+            "von/i960/recovered_geometry_allocator_commit.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7645,10 +6910,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_link_release.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_link_release.py"
+            "von/i960/recovered_geometry_link_release.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7670,8 +6932,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7698,10 +6959,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_command_packet.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_command_packet.py"
+            "von/i960/recovered_geometry_command_packet.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7723,10 +6981,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_command_packet_variant.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_command_packet_variant.py"
+            "von/i960/recovered_geometry_command_packet_variant.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7748,10 +7003,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_clip_region.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_clip_region.py"
+            "von/i960/recovered_geometry_clip_region.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7773,10 +7025,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_packet_tail.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_packet_tail.py"
+            "von/i960/recovered_geometry_packet_tail.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7798,10 +7047,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_object_packet.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_object_packet.py"
+            "von/i960/recovered_geometry_object_packet.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -7824,11 +7070,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/recovered_geometry_result_delta.c",
-            "von/tools/test_recovered_geometry_result_delta.py",
-            "third_party/patches/0014-von-geometry-response-tracing.patch"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7858,14 +7100,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_result_builder_9de50.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_recovered_geometry_result_builder_9de50.py",
-            "von/tools/test_sharc_opcode_1f.py",
-            "von/i960/recovered_sharc_opcode_1f.c",
-            "von/tools/test_recovered_sharc_opcode_1f.py"
+            "von/i960/recovered_geometry_result_builder_9de50.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7891,10 +7126,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_result_builder_9e250.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_result_builder_9e250.py"
+            "von/i960/recovered_geometry_result_builder_9e250.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7917,10 +7149,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_result_builder_9e450.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_result_builder_9e450.py"
+            "von/i960/recovered_geometry_result_builder_9e450.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7943,10 +7172,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_result_builder_9e880.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_result_builder_9e880.py"
+            "von/i960/recovered_geometry_result_builder_9e880.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7969,10 +7195,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_result_builder_9eab0.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_geometry_result_builder_9eab0.py"
+            "von/i960/recovered_geometry_result_builder_9eab0.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -7995,10 +7218,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_transition_wrapper.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_transition_wrapper.py"
+            "von/i960/recovered_transition_wrapper.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -8027,10 +7247,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_timing_sample.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_timing_sample.py"
+            "von/i960/recovered_timing_sample.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -8059,10 +7276,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_action_dispatch.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_action_dispatch.py"
+            "von/i960/recovered_action_dispatch.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -8091,10 +7305,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_tile_block.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_tile_block.py"
+            "von/i960/recovered_text_tile_block.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -8123,10 +7334,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_alt_string.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_alt_string.py"
+            "von/i960/recovered_text_alt_string.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -8155,10 +7363,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_crc16_table.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_crc16_table.py"
+            "von/i960/recovered_crc16_table.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -8187,9 +7392,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/recovered_memory.c"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -8217,10 +7420,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_byte_compare.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_byte_compare.py"
+            "von/i960/recovered_byte_compare.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -8249,9 +7449,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/i960/boot-path.md",
-            "von/build/disasm/vonj-maincpu.lst"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -8280,9 +7478,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_two_digit.c",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_two_digit.py"
+            "von/i960/recovered_text_two_digit.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -8310,9 +7506,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_string_walk.c",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_string_walk.py"
+            "von/i960/recovered_text_string_walk.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -8613,9 +7807,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_08.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -8636,11 +7828,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_44.py",
-            "von/i960/recovered_sharc_opcode_44.c",
-            "von/tools/test_recovered_sharc_opcode_44.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -8663,12 +7851,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/tools/sharc_service_contract.py",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_sharc_opcode_1e.py",
-            "von/i960/recovered_sharc_opcode_18.c",
-            "von/tools/test_recovered_sharc_opcode_18.py"
+            "von/tools/sharc_service_contract.py"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -8693,18 +7876,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_1f.py",
-            "von/i960/recovered_sharc_opcode_1f.c",
-            "von/tools/test_recovered_sharc_opcode_1f.py",
-            "third_party/mame-master/src/devices/cpu/sharc/compute.hxx",
-            "third_party/mame-master/src/devices/cpu/sharc/sharcops.hxx",
-            "third_party/patches/0015-von-sharc-20de1-tracing.patch",
-            "third_party/patches/0016-von-sharc-interpreter-tracing.patch",
-            "third_party/patches/0017-von-sharc-opcode-1f-state-tracing.patch",
-            "third_party/patches/0018-von-sharc-output-tracing.patch",
-            "von/tools/probe_sharc_opcode_1f.lua"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -8734,15 +7906,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_22.py",
-            "von/tools/probe_sharc_opcode_22_edges.lua",
-            "von/tools/probe_sharc_opcode_22_thresholds.lua",
-            "von/tools/probe_sharc_opcode_22_nonzero_w.lua",
-            "von/i960/recovered_sharc_opcode_22.c",
-            "von/tools/test_recovered_sharc_opcode_22.py",
-            "third_party/mame-master/src/devices/cpu/sharc/sharcinternal.ipp"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -8769,10 +7933,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_20.py",
-            "von/tools/probe_sharc_opcode_20_tail.lua"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -8794,10 +7955,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_21.py",
-            "von/tools/test_sharc_opcode_22.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -8819,16 +7977,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_23.py",
-            "von/i960/recovered_geometry_state_packets.c",
-            "von/tools/test_recovered_geometry_state_packets.py",
-            "von/tools/probe_sharc_opcode_23_axes.lua",
-            "von/tools/probe_sharc_opcode_23_state_vectors.lua",
-            "von/i960/recovered_sharc_opcode_23.c",
-            "von/tools/test_recovered_sharc_opcode_23.py",
-            "third_party/mame-master/src/devices/cpu/sharc/sharcinternal.ipp"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -8856,14 +8005,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_24.py",
-            "von/tools/probe_sharc_opcode_24_vectors.lua",
-            "von/tools/probe_sharc_opcode_24_state_vectors.lua",
-            "von/i960/recovered_sharc_opcode_24.c",
-            "von/tools/test_recovered_sharc_opcode_24.py",
-            "third_party/mame-master/src/devices/cpu/sharc/sharcinternal.ipp"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -8889,14 +8031,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_25.py",
-            "von/tools/probe_sharc_opcode_25_vectors.lua",
-            "von/tools/probe_sharc_opcode_25_diagonal.lua",
-            "third_party/mame-master/src/devices/cpu/sharc/sharcinternal.ipp",
-            "von/i960/recovered_sharc_opcode_25.c",
-            "von/tools/test_recovered_sharc_opcode_25.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -8922,9 +8057,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_26.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -8945,11 +8078,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_27.py",
-            "von/i960/recovered_sharc_opcode_27.c",
-            "von/tools/test_recovered_sharc_opcode_27.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -8972,12 +8101,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_28.py",
-            "von/tools/probe_sharc_opcode_28_identity.lua",
-            "von/i960/recovered_sharc_opcode_28.c",
-            "von/tools/test_recovered_sharc_opcode_28.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9001,12 +8125,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_29.py",
-            "von/tools/probe_sharc_opcode_29_state.lua",
-            "von/i960/recovered_sharc_opcode_29.c",
-            "von/tools/test_recovered_sharc_opcode_29.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9030,11 +8149,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_2a.py",
-            "von/i960/recovered_sharc_opcode_2a.c",
-            "von/tools/test_recovered_sharc_opcode_2a.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9057,9 +8172,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_2b.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9080,15 +8193,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_2c.py",
-            "von/tools/probe_sharc_opcode_2c_float_single.lua",
-            "von/tools/probe_sharc_opcode_2c_dispatch.lua",
-            "von/tools/probe_sharc_opcode_2c_r14.lua",
-            "von/tools/probe_sharc_opcode_2c_axes.lua",
-            "von/i960/recovered_sharc_opcode_2c.c",
-            "von/tools/test_recovered_sharc_opcode_2c.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9115,9 +8220,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_2d.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9138,14 +8241,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_2e.py",
-            "von/tools/probe_sharc_opcode_2e_serialized.lua",
-            "von/tools/probe_sharc_opcode_2e_angle_encoding.lua",
-            "von/tools/probe_sharc_opcode_2e_combined.lua",
-            "von/i960/recovered_sharc_opcode_2e.c",
-            "von/tools/test_recovered_sharc_opcode_2e.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9171,10 +8267,7 @@
           "classification": "code",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_2f.py",
-            "von/build/disasm/von-sharc-opcode-2f-rotation.mame.log"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9196,15 +8289,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_30.py",
-            "von/tools/probe_sharc_opcode_30_float_single.lua",
-            "von/tools/probe_sharc_opcode_30_angles.lua",
-            "von/tools/probe_sharc_opcode_30_r13_scale.lua",
-            "von/tools/probe_sharc_opcode_30_scalar_readback.lua",
-            "von/i960/recovered_sharc_opcode_30.c",
-            "von/tools/test_recovered_sharc_opcode_30.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9231,17 +8316,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_31.py",
-            "von/tools/probe_sharc_opcode_31_angles.lua",
-            "von/tools/probe_sharc_opcode_31_r9_single.lua",
-            "von/tools/probe_sharc_opcode_31_r9_r10.lua",
-            "von/tools/probe_sharc_opcode_31_direct_fields.lua",
-            "von/tools/probe_sharc_opcode_31_combined.lua",
-            "von/tools/probe_sharc_opcode_31_basis.lua",
-            "von/i960/recovered_sharc_opcode_31.c",
-            "von/tools/test_recovered_sharc_opcode_31.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9270,15 +8345,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_32.py",
-            "von/tools/probe_sharc_opcode_32_single_angle.lua",
-            "von/tools/probe_sharc_opcode_32_combined.lua",
-            "von/tools/probe_sharc_opcode_32_asymmetric.lua",
-            "von/tools/probe_sharc_opcode_32_retained.lua",
-            "von/i960/recovered_sharc_opcode_32.c",
-            "von/tools/test_recovered_sharc_opcode_32.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9305,16 +8372,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_33.py",
-            "von/i960/recovered_sharc_opcode_33.c",
-            "von/tools/test_recovered_sharc_opcode_33.py",
-            "von/tools/probe_sharc_opcode_33_single_angle.lua",
-            "von/tools/probe_sharc_opcode_33_combined.lua",
-            "von/tools/test_sharc_opcode_33_combined_trace.py",
-            "von/tools/probe_sharc_opcode_33_asymmetric.lua",
-            "von/tools/test_sharc_opcode_33_asymmetric_trace.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9342,15 +8400,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/probe_sharc_opcode_34_float.lua",
-            "von/tools/probe_sharc_opcode_34_fields.lua",
-            "von/tools/probe_sharc_opcode_34_single.lua",
-            "von/tools/test_sharc_opcode_34.py",
-            "von/tools/probe_sharc_opcode_34_combined.lua",
-            "von/i960/recovered_sharc_opcode_34.c",
-            "von/tools/test_recovered_sharc_opcode_34.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9377,12 +8427,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/tools/sharc_service_contract.py",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_sharc_service_contract.py",
-            "von/i960/recovered_sharc_opcode_40.c",
-            "von/tools/test_recovered_sharc_opcode_40_41.py"
+            "von/tools/sharc_service_contract.py"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9406,12 +8451,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/tools/sharc_service_contract.py",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_sharc_service_contract.py",
-            "von/i960/recovered_sharc_opcode_41.c",
-            "von/tools/test_recovered_sharc_opcode_40_41.py"
+            "von/tools/sharc_service_contract.py"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9435,12 +8475,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_35.py",
-            "von/build/disasm/von-sharc-opcode-17-helper-sweep-expanded.mame.log",
-            "von/i960/recovered_sharc_opcode_35.c",
-            "von/tools/test_recovered_sharc_opcode_35.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9465,13 +8500,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/probe_sharc_opcode_36_single.lua",
-            "von/tools/test_sharc_opcode_36.py",
-            "von/tools/probe_sharc_opcode_36_chained.lua",
-            "von/i960/recovered_sharc_opcode_36.c",
-            "von/tools/test_recovered_sharc_opcode_36.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9496,12 +8525,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/probe_sharc_opcode_37_single.lua",
-            "von/tools/test_sharc_opcode_37.py",
-            "von/i960/recovered_sharc_opcode_37.c",
-            "von/tools/test_recovered_sharc_opcode_37.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9525,13 +8549,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_38.py",
-            "von/build/disasm/von-sharc-opcode-38-matrix.mame.log",
-            "von/build/disasm/von-sharc-opcode-38-rotation.mame.log",
-            "von/i960/recovered_sharc_opcode_38.c",
-            "von/tools/test_recovered_sharc_opcode_38.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9556,11 +8574,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_39.py",
-            "von/i960/recovered_sharc_opcode_39.c",
-            "von/tools/test_recovered_sharc_opcode_39.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9583,11 +8597,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_3a.py",
-            "von/i960/recovered_sharc_opcode_3a.c",
-            "von/tools/test_recovered_sharc_opcode_3a.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9610,11 +8620,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_3b.py",
-            "von/i960/recovered_sharc_opcode_3b.c",
-            "von/tools/test_recovered_sharc_opcode_3b.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9637,13 +8643,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_3c.py",
-            "von/build/disasm/von-sharc-opcode-3c-state.mame.log",
-            "von/i960/recovered_sharc_opcode_3c.c",
-            "von/tools/test_recovered_sharc_opcode_3c_3d.py",
-            "von/tools/test_recovered_sharc_opcode_3c.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9668,14 +8668,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_3d.py",
-            "von/build/disasm/von-sharc-opcode-3d-state.mame.log",
-            "von/tools/probe_sharc_opcode_3d_edges.lua",
-            "von/i960/recovered_sharc_opcode_3d.c",
-            "von/tools/test_recovered_sharc_opcode_3c_3d.py",
-            "von/tools/test_recovered_sharc_opcode_3d.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9701,13 +8694,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_3e.py",
-            "von/build/disasm/von-sharc-opcode-3e-distance.mame.log",
-            "von/i960/recovered_sharc_opcode_3e.c",
-            "von/tools/test_recovered_sharc_opcode_3c_3d.py",
-            "von/tools/test_recovered_sharc_opcode_3e.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9732,14 +8719,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_3f.py",
-            "von/build/disasm/von-sharc-opcode-3f-followup.mame.log",
-            "von/tools/probe_sharc_opcode_3f_edge.lua",
-            "von/i960/recovered_sharc_opcode_3f.c",
-            "von/tools/test_recovered_sharc_opcode_3f.py",
-            "von/tools/test_recovered_sharc_opcode_3c_3d.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9765,15 +8745,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/probe_sharc_opcode_42_single.lua",
-            "von/tools/probe_sharc_opcode_42_combined.lua",
-            "von/tools/probe_sharc_opcode_42_asymmetric.lua",
-            "von/tools/test_sharc_opcode_42_combined_trace.py",
-            "von/tools/test_sharc_opcode_42.py",
-            "von/i960/recovered_sharc_opcode_42.c",
-            "von/tools/test_recovered_sharc_opcode_42.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9800,12 +8772,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_43.py",
-            "von/build/disasm/von-sharc-opcode-43-projection.mame.log",
-            "von/i960/recovered_sharc_opcode_43.c",
-            "von/tools/test_recovered_sharc_opcode_3c_3d.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9829,12 +8796,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_45.py",
-            "von/build/disasm/von-sharc-opcode-45-trig-nonsingular.mame.log",
-            "von/i960/recovered_sharc_opcode_45.c",
-            "von/tools/test_recovered_sharc_opcode_3c_3d.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9858,12 +8820,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_46.py",
-            "von/tools/probe_sharc_opcode_47_single.lua",
-            "von/i960/recovered_sharc_opcode_46.c",
-            "von/tools/test_recovered_sharc_opcode_46.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9887,14 +8844,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_47.py",
-            "von/build/disasm/von-sharc-opcode-47-single-interior-final.mame.log",
-            "von/build/disasm/von-sharc-opcode-47-single-traced.mame.log",
-            "von/i960/recovered_sharc_opcode_47.c",
-            "von/tools/test_recovered_sharc_opcode_47.py",
-            "von/tools/test_recovered_sharc_opcode_3c_3d.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9920,11 +8870,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_48.py",
-            "von/i960/recovered_sharc_opcode_48.c",
-            "von/tools/test_recovered_sharc_opcode_48.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9947,13 +8893,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_49.py",
-            "von/build/disasm/von-sharc-opcode-49-predicate.mame.log",
-            "von/i960/recovered_sharc_opcode_49.c",
-            "von/tools/test_recovered_sharc_opcode_49.py",
-            "von/tools/test_recovered_sharc_opcode_3c_3d.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -9978,13 +8918,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_4a.py",
-            "von/build/disasm/von-sharc-opcode-4a-predicate.mame.log",
-            "von/i960/recovered_sharc_opcode_4a.c",
-            "von/tools/test_recovered_sharc_opcode_4a.py",
-            "von/tools/test_recovered_sharc_opcode_3c_3d.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -10009,11 +8943,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_4b.py",
-            "von/i960/recovered_sharc_opcode_4b.c",
-            "von/tools/test_recovered_sharc_opcode_4b.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -10036,12 +8966,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_4c.py",
-            "von/i960/recovered_sharc_opcode_4c.c",
-            "von/tools/test_recovered_sharc_opcode_4c.py",
-            "von/tools/test_recovered_sharc_opcode_3c_3d.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -10065,15 +8990,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/probe_sharc_opcode_4d_threshold.lua",
-            "von/tools/test_sharc_opcode_4d.py",
-            "von/i960/recovered_sharc_opcode_4d_decision.c",
-            "von/tools/test_recovered_sharc_opcode_4d_decision.py",
-            "von/i960/recovered_sharc_opcode_4d_horizontal_seed.c",
-            "von/tools/test_recovered_sharc_opcode_4d_horizontal_seed.py",
-            "von/tools/test_recovered_sharc_opcode_4d_angle_setup.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -10100,9 +9017,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_sharc_opcode_4d_horizontal_seed.c",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_recovered_sharc_opcode_4d_horizontal_seed.py"
+            "von/i960/recovered_sharc_opcode_4d_horizontal_seed.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -10124,10 +9039,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_sharc_opcode_4d_refined_bound.c",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_sharc_opcode_4d_refined_bound.py"
+            "von/i960/recovered_sharc_opcode_4d_refined_bound.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -10150,10 +9062,7 @@
           "classification": "behavior",
           "stage": "planned",
           "sources": [
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/probe_sharc_opcode_4d_edge.lua",
-            "von/tools/test_recovered_sharc_opcode_4d_seed_edges.py"
+            "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -10169,10 +9078,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_mode_setup.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_mode_setup.py"
+            "von/i960/recovered_text_mode_setup.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10194,11 +9100,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_status_glyph.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_status_glyph.py",
-            "von/tools/test_recovered_text_control.py"
+            "von/i960/recovered_text_status_glyph.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10221,10 +9123,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_status_string.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_status_string.py"
+            "von/i960/recovered_text_status_string.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10246,10 +9145,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_plane0_block.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_plane0_block.py"
+            "von/i960/recovered_text_plane0_block.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10271,10 +9167,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_plane0_attributed_block.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_plane0_attributed_block.py"
+            "von/i960/recovered_text_plane0_attributed_block.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10296,10 +9189,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_plane0_fill.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_plane0_fill.py"
+            "von/i960/recovered_text_plane0_fill.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10321,10 +9211,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_status_render_route.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_status_render_route.py"
+            "von/i960/recovered_text_status_render_route.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10346,10 +9233,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_video_upload_wrapper.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_video_upload_wrapper.py"
+            "von/i960/recovered_text_video_upload_wrapper.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10371,10 +9255,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_panel_builder.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_panel_builder.py"
+            "von/i960/recovered_status_panel_builder.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10396,10 +9277,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_panel_sequence.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_panel_sequence.py"
+            "von/i960/recovered_status_panel_sequence.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10421,10 +9299,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_fixed_panel_transfer.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_fixed_panel_transfer.py"
+            "von/i960/recovered_fixed_panel_transfer.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10446,10 +9321,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_fixed_panel_transfer2.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_fixed_panel_transfer2.py"
+            "von/i960/recovered_fixed_panel_transfer2.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10471,10 +9343,7 @@
           "classification": "data",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_code_table.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_code_table.py"
+            "von/i960/recovered_status_code_table.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10496,10 +9365,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_code_dispatch.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_code_dispatch.py"
+            "von/i960/recovered_status_code_dispatch.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10521,10 +9387,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_clear_g14_return.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_clear_g14_return.py"
+            "von/i960/recovered_clear_g14_return.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10546,10 +9409,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_continued_renderer.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_continued_renderer.py"
+            "von/i960/recovered_continued_renderer.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10571,10 +9431,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_panel5_source_fill_route.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_panel5_source_fill_route.py"
+            "von/i960/recovered_panel5_source_fill_route.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10596,10 +9453,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_panel6_source_fill_route.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_panel6_panel7.py"
+            "von/i960/recovered_panel6_source_fill_route.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10621,10 +9475,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_panel7_transfer.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_panel6_panel7.py"
+            "von/i960/recovered_panel7_transfer.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10646,10 +9497,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_panel8_panel9_routes.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_panel8_panel9_routes.py"
+            "von/i960/recovered_panel8_panel9_routes.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10671,10 +9519,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_panel10_transfer.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_panel10_transfer.py"
+            "von/i960/recovered_panel10_transfer.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10696,10 +9541,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_status_value_renderer.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_status_value_renderer.py"
+            "von/i960/recovered_status_value_renderer.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10721,10 +9563,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_scoreboard_renderer.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_scoreboard_renderer.py"
+            "von/i960/recovered_scoreboard_renderer.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10746,10 +9585,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_panel11_panel12_routes.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_panel11_panel12_routes.py"
+            "von/i960/recovered_panel11_panel12_routes.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10771,10 +9607,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_multi_region_clear.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_multi_region_clear.py"
+            "von/i960/recovered_multi_region_clear.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10796,10 +9629,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_panel13_source_fill_route.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_panel13_source_fill_route.py"
+            "von/i960/recovered_panel13_source_fill_route.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10821,10 +9651,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_panel14_lookup_renderer.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_panel14_lookup_renderer.py"
+            "von/i960/recovered_panel14_lookup_renderer.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10846,10 +9673,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_panel15_source_fill_route.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_panel15_source_fill_route.py"
+            "von/i960/recovered_panel15_source_fill_route.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10871,10 +9695,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_panel16_source_fill_route.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_panel16_source_fill_route.py"
+            "von/i960/recovered_panel16_source_fill_route.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10896,10 +9717,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_streak_status_renderer.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_streak_status_renderer.py"
+            "von/i960/recovered_streak_status_renderer.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10921,10 +9739,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_status_panel_route.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_status_panel_route.py"
+            "von/i960/recovered_text_status_panel_route.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10946,10 +9761,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_status_panel2_route.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_status_panel2_route.py"
+            "von/i960/recovered_text_status_panel2_route.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10971,10 +9783,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_text_status_panel3_route.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_status_panel3_route.py"
+            "von/i960/recovered_text_status_panel3_route.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -10996,10 +9805,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_press_start_renderer.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_press_start_renderer.py"
+            "von/i960/recovered_press_start_renderer.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -11021,10 +9827,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_insert_coin_renderer.c",
-            "von/i960/disassembly-annotations.md",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_insert_coin_renderer.py"
+            "von/i960/recovered_insert_coin_renderer.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -11046,10 +9849,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_projection_interval_gate_df120.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_projection_interval_gate_df120.py"
+            "von/i960/recovered_geometry_projection_interval_gate_df120.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -11071,12 +9871,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_object_packet.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_object_packet.py",
-            "von/tools/test_recovered_sharc_opcode_1a.py"
+            "von/i960/recovered_geometry_object_packet.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
@@ -11100,15 +9895,7 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/recovered_geometry_dual_distance_predicate_df2f4.c",
-            "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/recovered_sharc_opcode_1f.c",
-            "von/i960/recovered_geometry_object_packet.c",
-            "von/i960/recovered_geometry_residual_operand_flow_df2f4.c",
-            "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_geometry_dual_distance_predicate_df2f4.py",
-            "von/tools/test_recovered_geometry_residual_operand_flow_df2f4.py",
-            "von/tools/test_recovered_geometry_descriptor_scale_motif.py"
+            "von/i960/recovered_geometry_dual_distance_predicate_df2f4.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",

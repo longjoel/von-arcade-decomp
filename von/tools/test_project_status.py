@@ -13,6 +13,7 @@ def main() -> int:
     assert status["attract"]["modeled_units"] == 94
     assert status["attract"]["untriaged_units"] == 168
     assert not status["tests"]["fast_requires_mame"]
+    assert sum(status["tests"]["configured"].values()) >= 360
     assert status["evidence"]["healthy"]
     print("PASS: generated status agrees with ledger, worklist, tests, and evidence")
     return 0

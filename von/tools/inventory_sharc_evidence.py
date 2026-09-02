@@ -100,12 +100,12 @@ def generated_inventory(root: Path) -> list[dict]:
 def ledger_inventory(root: Path) -> dict:
     ledger = json.loads((root / "von" / "reconstruction_ledger.json").read_text(encoding="utf-8"))
     image = next(item for item in ledger["images"] if item["name"] == "sharc")
-    statuses = Counter(item["status"] for item in image["slices"])
-    classifications = Counter(item["classification"] for item in image["slices"])
+    stages = Counter(item["stage"] for item in image["work_units"])
+    classifications = Counter(item["classification"] for item in image["work_units"])
     validation_errors = reconstruction_progress.validate(ledger, root)
     return {
-        "entries": len(image["slices"]),
-        "statuses": dict(sorted(statuses.items())),
+        "entries": len(image["work_units"]),
+        "stages": dict(sorted(stages.items())),
         "classifications": dict(sorted(classifications.items())),
         "whole_ledger_validation_errors": validation_errors,
     }
@@ -123,7 +123,7 @@ def build_report(root: Path) -> dict:
         default=0,
     )
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "evidence_as_of": datetime.fromtimestamp(latest_mtime, timezone.utc).isoformat(),
         "ledger": ledger_inventory(root),
         "source_artifacts": source_inventory(root),
@@ -154,7 +154,7 @@ def markdown(report: dict) -> str:
         "## Checkpoint",
         "",
         f"- Ledger entries: {ledger['entries']}",
-        f"- Statuses: {', '.join(f'{key}={value}' for key, value in ledger['statuses'].items())}",
+        f"- Stages: {', '.join(f'{key}={value}' for key, value in ledger['stages'].items())}",
         f"- Classifications: {', '.join(f'{key}={value}' for key, value in ledger['classifications'].items())}",
         f"- Whole-ledger validation errors: {len(ledger['whole_ledger_validation_errors'])}",
         f"- Generated artifacts: {generated['files']} files, {generated['bytes']:,} bytes",
@@ -183,7 +183,7 @@ def markdown(report: dict) -> str:
         "",
         "The JSON inventory contains the complete per-file list. Generated traces are",
         "evidence inputs, not source files; their presence does not promote a ledger entry",
-        "from `provisional` to `byte-validated`.",
+        "from `modeled` to `trace-validated` or `byte-validated`.",
         "",
     ])
     return "\n".join(lines)

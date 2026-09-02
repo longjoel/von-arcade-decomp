@@ -11,7 +11,7 @@ attract milestone. Current counts come from `./scripts/status.sh`; this document
 does not duplicate them. No SHARC work unit is promoted merely because a probe
 or recovered model exists.
 
-The local evidence snapshot at consolidation contains 249 generated SHARC
+The historical local evidence snapshot taken at consolidation contained 249 generated SHARC
 artifacts (566,363,342 bytes), 69 recovered C models, 133 probe stimuli, 18
 trace verifiers, and 68 focused recovered-model tests. Twenty-three small probe
 logs started without a completion marker; the inventory labels these incomplete

@@ -53,6 +53,10 @@ and captured evidence cannot discriminate it, the hypothesis predicts a
 specific result, the run is bounded, and a verifier or recovered-model test
 will consume the result. Precision fixes remain separate from Virtual-On
 diagnostics through the patch profiles in `third_party/patches/patchsets.json`.
+The active diagnostics profile uses the single runtime PC-range filter in
+`0034-von-sharc-runtime-diagnostics.patch`. Historical opcode patches and DRC
+special-case candidates remain tracked for provenance but are not applied by
+an active profile.
 
 ## Current integration blocker
 

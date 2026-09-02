@@ -8,10 +8,6 @@ MAME_REF="569c5e9d4534cb244ff67ebbdb5f9fe69a465318"
 PATCH_FILE="$ROOT_DIR/third_party/patches/0001-von-mame-support.patch"
 COMM_DIAGNOSTICS_PATCH_FILE="$ROOT_DIR/third_party/patches/0010-von-communication-diagnostics.patch"
 PATCHSET_MANIFEST="$ROOT_DIR/third_party/patches/patchsets.json"
-# Legacy contract identifiers now resolved through patchsets.json:
-# SHARC_20D68_TRACE_PATCH_FILE SHARC_DRC_ANGLE_TRACE_PATCH_FILE
-# SHARC_INTERPRETER_ANGLE_TRACE_PATCH_FILE SHARC_RECIPROCAL_TRACE_PATCH_FILE
-# SHARC_REDUCTION_TRACE_PATCH_FILE SHARC_SCALAR_TRACE_PATCH_FILE
 VON_SUBTARGET="$ROOT_DIR/scripts/mame-von.lua"
 PATCH_SET="${VON_MAME_PATCH_SET:-core}"
 
@@ -69,6 +65,8 @@ patch_already_applied() {
             contains_text 'using SHARC_REG_EXTENDED = sharc_float40::register_value;' "$MAME_DIR/src/devices/cpu/sharc/sharc.h" ;;
         0033-von-sharc-drc-compound-abs-special-cases.patch)
             contains_text 'FABS(NaN) returns the canonical NaN' "$MAME_DIR/src/devices/cpu/sharc/sharcdrc.cpp" ;;
+        0034-von-sharc-runtime-diagnostics.patch)
+            contains_text 'VON_SHARC_TRACE_START' "$MAME_DIR/src/devices/cpu/sharc/sharc.cpp" ;;
         0006-von-texture-command-tracing.patch)
             contains_text 'vonj_texture_command' "$MAME_DIR/src/mame/sega/model2_v.cpp" ;;
         0007-von-geometry-object-tracing.patch)

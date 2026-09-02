@@ -30,9 +30,11 @@ def main() -> int:
         if fragment not in patch:
             raise SystemExit(f"DRC special-case patch missing {fragment}")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if PATCH.name not in resolve(manifest, "sharc-precision"):
-        raise SystemExit("sharc-precision profile does not install the DRC special-case patch")
-    print("PASS: SHARC DRC floating-point special-case patch contract")
+    if PATCH.name in resolve(manifest, "sharc-precision"):
+        raise SystemExit("non-applicable DRC candidate must not be in the active precision profile")
+    if PATCH.name not in manifest.get("candidates", {}).get("sharc-precision-unmerged", []):
+        raise SystemExit("DRC special-case patch is not preserved as a candidate")
+    print("PASS: archived SHARC DRC floating-point candidate contract")
     return 0
 
 

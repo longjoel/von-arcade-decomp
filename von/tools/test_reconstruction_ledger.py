@@ -22,6 +22,8 @@ def main() -> int:
     assert not validate(ledger)
     assert code_coverage(ledger)["total"] == 0x20
     assert ledger["images"][0]["work_units"][1]["stage"] == "modeled"
+    assert ledger["images"][0]["work_units"][1]["sources"] == ["model.c"]
+    assert ledger["images"][0]["work_units"][1]["evidence"] == ["von/i960/recovered_example.c"]
     assert ledger["images"][0]["work_units"][2]["stage"] == "planned"
     assert "sources" in ledger["images"][0]["work_units"][0]
     broken = copy.deepcopy(ledger)

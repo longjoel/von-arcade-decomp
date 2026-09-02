@@ -52,7 +52,7 @@ def markdown(status: dict) -> str:
     tests = status["tests"]["configured"]
     return "\n".join([
         "# Generated Reconstruction Status", "",
-        "Generated from `von/reconstruction_ledger.json`, `von/attract_worklist.json`, ",
+        "Generated from `von/reconstruction_ledger.json`, `von/attract_worklist.json`,",
         "`von/tests/manifest.json`, and `von/evidence/manifest.json`.", "",
         f"- Active objective: `{status['objective']}`",
         f"- Ledger: {'valid' if status['ledger']['valid'] else 'invalid'} ({len(status['ledger']['errors'])} errors)",

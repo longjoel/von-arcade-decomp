@@ -16,7 +16,7 @@ def slug(value: str) -> str:
 
 
 def model_sources(entry: dict) -> list[str]:
-    values = [entry.get("source"), *entry.get("sources", []), *entry.get("evidence", [])]
+    values = [entry.get("source"), *entry.get("sources", [])]
     expanded = []
     for value in values:
         if not isinstance(value, str):
@@ -43,7 +43,10 @@ def migrate(old: dict) -> dict:
         for entry in image.get("slices", []):
             classification = entry.get("classification", "unknown")
             sources = model_sources(entry)
-            recovered = [path for path in sources if re.search(r"/recovered_[^/]+\.c$", path)]
+            recovered = [
+                path for path in [*sources, *entry.get("evidence", [])]
+                if re.search(r"/recovered_[^/]+\.c$", path)
+            ]
             stage = entry.get("status", "planned")
             if stage == "provisional":
                 stage = "modeled" if recovered else "planned"

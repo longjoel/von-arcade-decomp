@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Guard the reproducible runtime trace hook for SHARC helper 0x20d68."""
 
+import json
 from pathlib import Path
+
+from patchset_manifest import resolve
 
 
 ROOT = Path(__file__).resolve().parents[2]
 PATCH = ROOT / "third_party/patches/0024-von-sharc-20d68-tracing.patch"
-PREPARE = ROOT / "scripts/prepare-mame.sh"
+MANIFEST = ROOT / "third_party/patches/patchsets.json"
 
 
 def main() -> int:
@@ -21,8 +24,9 @@ def main() -> int:
     ):
         if fragment not in patch:
             raise SystemExit(f"20d68 trace patch missing {fragment}")
-    if "SHARC_20D68_TRACE_PATCH_FILE" not in PREPARE.read_text(encoding="utf-8"):
-        raise SystemExit("prepare-mame.sh does not install the 20d68 trace patch")
+    profile = resolve(json.loads(MANIFEST.read_text(encoding="utf-8")), "sharc-diagnostics")
+    if PATCH.name in profile or "0034-von-sharc-runtime-diagnostics.patch" not in profile:
+        raise SystemExit("historical 20d68 tracing was not superseded by runtime diagnostics")
     print("PASS: SHARC helper-0x20d68 trace patch contract")
     return 0
 

@@ -1,5 +1,9 @@
 # Phase 0 ROM Inventory
 
+This is a historical inventory snapshot. Lifecycle labels below have been
+updated to schema-v2 terminology; current totals and stages come from
+`./scripts/status.sh`.
+
 Inventory completed against the `vonj` ROM definition in
 `third_party/patches/0001-von-mame-support.patch`.
 
@@ -56,8 +60,8 @@ The first two i960 code ranges registered in
 
 | Slice | Range | Bytes | Status |
 | --- | --- | ---: | --- |
-| reset/startup | `0x00000930–0x000009e8` | 184 | provisional |
-| geometry program upload | `0x00028620–0x00028758` | 312 | provisional |
+| reset/startup | `0x00000930–0x000009e8` | 184 | planned |
+| geometry program upload | `0x00028620–0x00028758` | 312 | modeled |
 
 The ledger now also contains the bounded geometry and texture routines listed
 in the reconstruction roadmap as `planned`; those additional ranges bring the
