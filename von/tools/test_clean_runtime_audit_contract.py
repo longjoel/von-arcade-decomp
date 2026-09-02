@@ -16,7 +16,7 @@ def main() -> int:
         "MAME produced no i960 PC coverage",
         'if [[ "$MAME_STATUS" -ne 0 ]]',
         'RUN_LOG=',
-        "Unhandled 00|Unhandled exception",
+        "Unhandled 00|Unhandled exception|\\[LUA ERROR\\]",
         'exit "$AUDIT_STATUS"',
     )
     missing = [fragment for fragment in required if fragment not in script]

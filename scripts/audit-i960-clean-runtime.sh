@@ -40,8 +40,8 @@ if [[ "$MAME_STATUS" -ne 0 ]]; then
     printf 'error: MAME clean runtime exited with status %d\n' "$MAME_STATUS" >&2
     exit "$MAME_STATUS"
 fi
-if rg -q 'Unhandled 00|Unhandled exception' "$RUN_LOG"; then
-    printf 'error: MAME reported an i960 exception; see %s\n' "$RUN_LOG" >&2
+if rg -q 'Unhandled 00|Unhandled exception|\[LUA ERROR\]' "$RUN_LOG"; then
+    printf 'error: MAME reported an i960 or instrumentation failure; see %s\n' "$RUN_LOG" >&2
     exit 1
 fi
 exit "$AUDIT_STATUS"
