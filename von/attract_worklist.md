@@ -1,8 +1,8 @@
 # Attract Reconstruction Worklist
 
 - Observed direct-call units: 262
-- Modeled integration queue: 85
-- Integrated or validated: 9
+- Modeled integration queue: 82
+- Integrated or validated: 12
 - Untriaged: 168
 
 | Entry | Edges | Triage | Work unit |
@@ -14,14 +14,12 @@
 | `0x00001bb8` | 1 | modeled-integration-queue | maincpu.host-interrupt-initialize |
 | `0x00002330` | 4 | modeled-integration-queue | maincpu.text-startup-table-copy-wrapper |
 | `0x00002700` | 1 | modeled-integration-queue | maincpu.io-failure-state-reset |
-| `0x00002730` | 1 | modeled-integration-queue | maincpu.io-self-test-core |
 | `0x000027d8` | 13 | modeled-integration-queue | maincpu.shared-abi-tail-return-trampoline |
 | `0x000028b0` | 1 | modeled-integration-queue | maincpu.io-final-setup-sequence |
 | `0x00002bb0` | 2 | modeled-integration-queue | maincpu.io-input-initializer |
 | `0x00002cf8` | 1 | modeled-integration-queue | maincpu.io-failure-input-sampler |
 | `0x00002da0` | 1 | modeled-integration-queue | maincpu.io-controller-byte-average |
 | `0x00003120` | 4 | modeled-integration-queue | maincpu.runtime-crc16-table-checksum |
-| `0x00018488` | 1 | modeled-integration-queue | maincpu.host-byte-queue-initialize |
 | `0x00018ab0` | 4 | modeled-integration-queue | maincpu.timing-sample-extrema-update |
 | `0x0001bb90` | 6 | modeled-integration-queue | maincpu.word-expand-blocks |
 | `0x0001bc20` | 3 | modeled-integration-queue | maincpu.halfword-byte-swap-copy |
@@ -30,7 +28,6 @@
 | `0x0001c220` | 2 | modeled-integration-queue | maincpu.video-control-bootstrap-plan |
 | `0x0001c618` | 8 | modeled-integration-queue | maincpu.text-video-initialize |
 | `0x0001c730` | 1 | modeled-integration-queue | maincpu.video-byte-lane-expand |
-| `0x0001cac8` | 23 | modeled-integration-queue | maincpu.text-position-state |
 | `0x0001cc40` | 2 | modeled-integration-queue | maincpu.text-character-output |
 | `0x0001ccf8` | 7 | modeled-integration-queue | maincpu.text-tile-control-write |
 | `0x0001ce00` | 1 | modeled-integration-queue | maincpu.text-alternate-two-row-glyph-plan |
@@ -92,6 +89,9 @@
 | `0x000f5190` | 1 | modeled-integration-queue | maincpu.text-general-formatter-boundary |
 | `0x000f5c58` | 4 | modeled-integration-queue | maincpu.runtime-byte-compare |
 | `0x000f5d40` | 10 | modeled-integration-queue | maincpu.memory-copy-forward |
+| `0x00002730` | 1 | integrated-validation-queue | maincpu.io-self-test-core |
+| `0x00018488` | 1 | integrated-validation-queue | maincpu.host-byte-queue-initialize |
+| `0x0001cac8` | 23 | integrated-validation-queue | maincpu.text-position-state |
 | `0x00027e50` | 3 | integrated-validation-queue | maincpu.texture-decompressor |
 | `0x00028120` | 1 | integrated-validation-queue | maincpu.texture-loader-profile-setup |
 | `0x00028418` | 1 | integrated-validation-queue | maincpu.geometry-initial-handshake |

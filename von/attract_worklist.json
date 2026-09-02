@@ -3,8 +3,8 @@
   "coverage_source": "von/build/attract-coverage/vonj-attract-60s.json",
   "discovered_units": 262,
   "represented_units": 94,
-  "modeled_units": 85,
-  "integrated_units": 9,
+  "modeled_units": 82,
+  "integrated_units": 12,
   "untriaged_units": 168,
   "ordering": "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality",
   "units": [
@@ -93,18 +93,6 @@
       ]
     },
     {
-      "entry": "0x00002730",
-      "observed_call_edges": 1,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.io-self-test-core",
-      "sources": [
-        "von/i960/recovered_io.c"
-      ]
-    },
-    {
       "entry": "0x000027d8",
       "observed_call_edges": 13,
       "triage": "modeled-integration-queue",
@@ -174,18 +162,6 @@
       "work_unit": "maincpu.runtime-crc16-table-checksum",
       "sources": [
         "von/i960/recovered_crc16_table.c"
-      ]
-    },
-    {
-      "entry": "0x00018488",
-      "observed_call_edges": 1,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.host-byte-queue-initialize",
-      "sources": [
-        "von/i960/recovered_host_queue.c"
       ]
     },
     {
@@ -280,18 +256,6 @@
       "priority": 0,
       "weight": null,
       "work_unit": "maincpu.video-byte-lane-expand",
-      "sources": [
-        "von/i960/recovered_text.c"
-      ]
-    },
-    {
-      "entry": "0x0001cac8",
-      "observed_call_edges": 23,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.text-position-state",
       "sources": [
         "von/i960/recovered_text.c"
       ]
@@ -1026,6 +990,42 @@
       "work_unit": "maincpu.memory-copy-forward",
       "sources": [
         "von/i960/recovered_memory.c"
+      ]
+    },
+    {
+      "entry": "0x00002730",
+      "observed_call_edges": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.io-self-test-core",
+      "sources": [
+        "von/i960/recovered_io.c"
+      ]
+    },
+    {
+      "entry": "0x00018488",
+      "observed_call_edges": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.host-byte-queue-initialize",
+      "sources": [
+        "von/i960/recovered_host_queue.c"
+      ]
+    },
+    {
+      "entry": "0x0001cac8",
+      "observed_call_edges": 23,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.text-position-state",
+      "sources": [
+        "von/i960/recovered_text.c"
       ]
     },
     {

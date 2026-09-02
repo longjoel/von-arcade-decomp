@@ -1756,10 +1756,10 @@
           }
         },
         {
-          "id": "maincpu.io-self-test-core",
+      "id": "maincpu.io-self-test-core",
           "name": "io_self_test_core",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_io.c"
           ],
@@ -2008,10 +2008,10 @@
           }
         },
         {
-          "id": "maincpu.host-byte-queue-initialize",
+      "id": "maincpu.host-byte-queue-initialize",
           "name": "host_byte_queue_initialize",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_host_queue.c"
           ],
@@ -2604,10 +2604,10 @@
           }
         },
         {
-          "id": "maincpu.text-position-state",
+      "id": "maincpu.text-position-state",
           "name": "text_position_state",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
@@ -2658,10 +2658,10 @@
           }
         },
         {
-          "id": "maincpu.text-string-output",
+      "id": "maincpu.text-string-output",
           "name": "text_string_output",
           "classification": "code",
-          "stage": "modeled",
+      "stage": "integrated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
