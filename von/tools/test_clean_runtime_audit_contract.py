@@ -15,6 +15,8 @@ def main() -> int:
         "audit_clean_i960_coverage.py",
         "MAME produced no i960 PC coverage",
         'if [[ "$MAME_STATUS" -ne 0 ]]',
+        'RUN_LOG=',
+        "Unhandled 00|Unhandled exception",
         'exit "$AUDIT_STATUS"',
     )
     missing = [fragment for fragment in required if fragment not in script]
