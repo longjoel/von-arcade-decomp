@@ -573,6 +573,10 @@ label(0x0004af20, "geometry_object_profile_phase_transition_variant_d",
       "Alternate profile phase transition using descriptor pairs at 0x469f0/0x469f4 and the shared cursor state.")
 label(0x0004aff0, "geometry_object_profile_phase_transition_variant_e",
       "Profile phase transition using the next descriptor pair and bounded object phase reset behavior.")
+label(0x0004b090, "geometry_object_profile_phase_transition_variant_f",
+      "Profile phase transition using descriptor data at 0x46a20 and the shared cursor globals, with bounded phase reset behavior.")
+label(0x0004b150, "geometry_object_profile_state_event_update",
+      "Updates profile event state, derives shared cursor values from the active object, and routes phase-triggered status changes.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1260,6 +1264,8 @@ ensure_function(0x0004ad50, "geometry_object_profile_phase_transition_variant_b"
 ensure_function(0x0004ae70, "geometry_object_profile_phase_transition_variant_c", 0x0004af20)
 ensure_function(0x0004af20, "geometry_object_profile_phase_transition_variant_d", 0x0004aff0)
 ensure_function(0x0004aff0, "geometry_object_profile_phase_transition_variant_e", 0x0004b08c)
+ensure_function(0x0004b090, "geometry_object_profile_phase_transition_variant_f", 0x0004b14c)
+ensure_function(0x0004b150, "geometry_object_profile_state_event_update", 0x0004b5f4)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

@@ -2138,6 +2138,14 @@ shared cursor globals, and has a mode-specific reset path.  Their returns at
 `0x4ad48`, `0x4ae60`, `0x4af1c`, `0x4afec`, and `0x4b088` establish five more
 standalone handlers in this family.
 
+The next descriptor-backed transition at `0x4b090` consumes the `0x46a20`
+records and returns at `0x4b148`.  The larger routine at `0x4b150` combines
+profile cursor updates with event/status handling: it selects additional
+descriptor records, advances the object phase, sets event flags, and emits
+mode-dependent status identifiers through the existing text/status service.
+Its normal and alternate exits at `0x4b560` and `0x4b5f0` delimit it from the
+following runtime state routine.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
