@@ -2470,6 +2470,11 @@ the `0x47ed0` record and ends at `0x5a4dc`, while `0x5a4e0` uses `0x47ee0` and
 ends at `0x5a5dc`; both advance or reset the shared phase counter at their
 terminal thresholds.
 
+The compact transition siblings continue at `0x5a5e0` with the `0x47ef0`
+record, ending at `0x5a67c`, and at `0x5a680` with the `0x47f00` record,
+ending at `0x5a77c`.  Both preserve the shared cursor publication pattern while
+advancing or resetting the profile phase counter.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
