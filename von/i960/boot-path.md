@@ -2714,6 +2714,17 @@ and `0x48a00` record tables respectively.  Both publish paired cursor data,
 apply status/phase gates, and perform terminal object-state transitions; their
 boundaries are `0x672b8` and `0x675f8`.
 
+The indexed family continues at `0x67600`, `0x67800`, and `0x67a30`, using
+the `0x48a30`/`0x48a34`, `0x48a90`/`0x48a94`, and `0x48af4` record tables; their
+boundaries are `0x677f4`, `0x67950`, and `0x67ba4`.  These handlers publish
+paired cursor values and apply the same phase-limit and terminal-state
+protocol as the preceding indexed controllers.
+
+The packed-record controllers at `0x67c90`, `0x67e40`, and `0x68040` use the
+`0x48b50`, `0x48b70`, and `0x48b90` pairs respectively.  They advance the
+phase cursor, publish the active record pair, and handle terminal transitions;
+their boundaries are `0x67e38`, `0x68034`, and `0x68228`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

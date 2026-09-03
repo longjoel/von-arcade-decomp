@@ -993,6 +993,18 @@ label(0x00066f90, "geometry_object_profile_indexed_phase_controller_variant_g",
       "Indexed phase controller using the 0x489d0 record table, paired cursor publication, and terminal object-state transitions.")
 label(0x000672c0, "geometry_object_profile_indexed_phase_controller_variant_h",
       "Indexed phase controller using the 0x48a00 record table, paired cursor publication, and terminal object-state transitions.")
+label(0x00067600, "geometry_object_profile_indexed_phase_controller_variant_i",
+      "Indexed phase controller using the 0x48a34 record table, paired cursor publication, and terminal object-state transitions.")
+label(0x00067800, "geometry_object_profile_indexed_phase_controller_variant_j",
+      "Indexed phase controller using the paired 0x48a90/0x48a94 record table, paired cursor publication, and terminal object-state transitions.")
+label(0x00067a30, "geometry_object_profile_indexed_phase_controller_variant_k",
+      "Indexed phase controller using the 0x48af4 record table, paired cursor publication, and terminal object-state transitions.")
+label(0x00067c90, "geometry_object_profile_phase_controller_variant_q",
+      "Profile phase controller using the packed 0x48b50 record pair and the phase-7 threshold transition.")
+label(0x00067e40, "geometry_object_profile_phase_controller_variant_r",
+      "Profile phase controller using the packed 0x48b70 record pair, cursor progression, and terminal phase handling.")
+label(0x00068040, "geometry_object_profile_phase_controller_variant_s",
+      "Profile phase controller using the packed 0x48b90 record pair, cursor progression, and terminal phase handling.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1890,6 +1902,12 @@ ensure_function(0x00066cc0, "geometry_object_profile_object_state_controller_var
 ensure_function(0x00066d70, "geometry_object_profile_phase_controller_variant_p", 0x00066f84)
 ensure_function(0x00066f90, "geometry_object_profile_indexed_phase_controller_variant_g", 0x000672b8)
 ensure_function(0x000672c0, "geometry_object_profile_indexed_phase_controller_variant_h", 0x000675f8)
+ensure_function(0x00067600, "geometry_object_profile_indexed_phase_controller_variant_i", 0x000677f4)
+ensure_function(0x00067800, "geometry_object_profile_indexed_phase_controller_variant_j", 0x00067950)
+ensure_function(0x00067a30, "geometry_object_profile_indexed_phase_controller_variant_k", 0x00067ba4)
+ensure_function(0x00067c90, "geometry_object_profile_phase_controller_variant_q", 0x00067e38)
+ensure_function(0x00067e40, "geometry_object_profile_phase_controller_variant_r", 0x00068034)
+ensure_function(0x00068040, "geometry_object_profile_phase_controller_variant_s", 0x00068228)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
