@@ -2306,6 +2306,18 @@ messages on completion.  The internal returns at `0x52f2c`, `0x52fa8`,
 `0x53020`, and `0x53040` are contained within the parent, which ends at the
 aligned `0x53044` boundary.
 
+The `0xa9dc` entry at `0x534d0` is a further profile phase-state dispatcher.
+It refreshes derived object field `0x2e`, selects among the large profile data
+ranges rooted at `0x22749d8`, `0x22770e8`, and `0x22749e0`, and publishes the
+shared cursor/status state.  Its short and completion exits at `0x53558`,
+`0x535ec`, `0x53654`, and `0x5367c` delimit it from the next target.
+
+The following `0xa9e0` target at `0x53680` marks a subsystem boundary.  It
+performs floating-point/fixed-point runtime geometry math, derives a correction
+for object field `0x150`, updates `0x192` and `0x1c4`, and emits the associated
+status/geometry state.  Its return at `0x53a10` and aligned end at `0x53a14`
+separate this math service from the later transition entries.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
