@@ -1918,6 +1918,12 @@ the `0x800010`/`0x804000` tuple-window setup.  Its internal branch target at
 `0x3a138` and the terminal `ret` is at `0x3a13c`.  The next distinct entry is
 `0x3a140`.
 
+`0x3a140` is a separate selector geometry emitter.  It derives a
+selector-dependent floating-point value, emits the `5,18` prefix and the
+corresponding constants through `0x884000`, and has internal packet-layout
+arms at `0x3a1b0` and `0x3a360`.  The routine returns at `0x3a504`; the next
+framed status/geometry routine begins at `0x3a510`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
