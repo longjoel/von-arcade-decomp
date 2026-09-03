@@ -266,12 +266,23 @@ void recovered_text_palette_initialize(void)
             PALETTE_RAM[0x10U + plane * 16U + value] = bootstrap_palette[value];
         }
 
+    /* vonj's reset palette is already live before the 0x10 bootstrap block:
+     * the original readback is 0x8000 at entry 0 and 0xffff at entry 1.
+     * Preserve those two entries so color-0 text pixels select the same
+     * visible pen in the development driver. */
+    PALETTE_RAM[0] = 0x8000U;
+    PALETTE_RAM[1] = 0xffffU;
+
     /* The trace's color-translation tables are monotonic lookup tables. Use
      * their recovered 5-bit input domain to seed the bootstrap colors. */
     for (plane = 0U; plane < 3U; ++plane)
         for (value = 0U; value < 32U; ++value)
             COLORXLAT_RAM[(plane * 0x4000U / 2U) + 0x40U + value * 0x100U]
                 = (u16)(value * 8U);
+
+    /* The original lookup at green component 8 is 0x008d, rather than the
+     * linear seed used for the other reconstructed entries. */
+    COLORXLAT_RAM[0x2000U + 0x40U + 8U * 0x100U] = 0x008dU;
 }
 
 /*
