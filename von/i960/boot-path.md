@@ -2616,6 +2616,18 @@ ends at `0x61e0c`; `0x61e10` uses `0x47ad0`/`0x47ad4` and ends at `0x61edc`;
 `0x61ee0` uses `0x47af0` and ends at `0x61f78`; and `0x61f80` uses
 `0x47b00`/`0x47b04` and ends at `0x62038`.
 
+The object-state controllers at `0x62040` and `0x62260` use the
+`0x2338078` asset base plus `0xb3e98`, publishing active object data and
+applying visibility/state gates.  They end at `0x62258` and `0x62570`.
+The indexed transition at `0x62580` uses the paired `0x47b20`/`0x47b24`
+records and ends at `0x62918`.
+
+At `0x62920` the code switches to geometry setup: it clears object selectors,
+recomputes the centered coordinate, emits object words through the `0x884000`
+FIFO, and calculates the fixed-point transform value stored at `0x1c4`; the
+handler ends at `0x62d28`.  The following phase transition at `0x62d30` uses
+the `0x47c00`/`0x47c08` records and ends at `0x62fc8`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
