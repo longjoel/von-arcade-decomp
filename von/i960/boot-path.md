@@ -2089,6 +2089,13 @@ table at `0x43fc8` using object offset `0x64`, computes bounded `0xc2`/`0xc8`
 values, and returns at `0x44388`.  The table and its branch arms are therefore
 one dispatch routine, rather than eight independent top-level functions.
 
+The caller-facing timing/state routine at `0x44390` updates the active
+object's `0x172`/`0x17a` timing fields according to the global mode at
+`0x51c9d0`.  Its mode-specific paths can invoke the `0x43fa8` phase dispatcher
+for both the object and its associated state record; the early and late returns
+at `0x44498`, `0x44518`, and `0x44590` are internal exits of this one routine,
+whose next aligned code begins at `0x445a0`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
