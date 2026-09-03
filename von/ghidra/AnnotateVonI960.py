@@ -388,6 +388,14 @@ label(0x000d1280, "startup_profile_handler_2_geometry_setup",
       "Builds the profile-2 geometry records and resets its status workspace.")
 label(0x000d1ab0, "startup_profile_handler_3_geometry_setup",
       "Builds the profile-3 geometry records and resets its status workspace.")
+label(0x000de670, "startup_geometry_status_workspace_init",
+      "Initializes status/geometry workspace fields and emits setup packets.")
+label(0x000423a8, "startup_record_table_clear",
+      "Clears the two startup record tables and seeds record sentinels.")
+label(0x0009b498, "startup_geometry_record_pool_clear",
+      "Clears the 16-entry geometry record pool and its allocation index.")
+label(0x000c55a8, "startup_device_table_clear",
+      "Clears the mapped device table and initializes its sentinel fields.")
 ensure_function(0x0002b500, "startup_status_arm_video_reset", 0x0002b54c)
 ensure_function(0x0002b550, "startup_status_arm_geometry_workspace", 0x0002b65c)
 ensure_function(0x0002b660, "startup_status_arm_geometry_service", 0x0002b6f4)
@@ -406,6 +414,10 @@ ensure_function(0x000d0820, "startup_profile_handler_0_geometry_setup", 0x000d09
 ensure_function(0x000d0d10, "startup_profile_handler_1_geometry_setup", 0x000d0e5c)
 ensure_function(0x000d1280, "startup_profile_handler_2_geometry_setup", 0x000d13ac)
 ensure_function(0x000d1ab0, "startup_profile_handler_3_geometry_setup", 0x000d1bd8)
+ensure_function(0x000de670, "startup_geometry_status_workspace_init", 0x000de988)
+ensure_function(0x000423a8, "startup_record_table_clear", 0x00042460)
+ensure_function(0x0009b498, "startup_geometry_record_pool_clear", 0x0009b4c0)
+ensure_function(0x000c55a8, "startup_device_table_clear", 0x000c55fc)
 
 # Trace-confirmed call sites inside the system-setup helper.
 label(0x00018960, "startup_call_io_self_test")

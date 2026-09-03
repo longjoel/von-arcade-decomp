@@ -287,6 +287,17 @@ handler 3 uses `0x19360`, `0xc2700000`, `0x428c0000`, and `0x43160000`.
 The differing operands are evidence of four profile geometry variants, not
 four unrelated routines.
 
+The common calls after each profile setup are also now seeded as functions.
+`0xde670` initializes the status/geometry workspace at `0x504b90–0x504bd4`,
+emits selectors `30`, `27`, `29`, and `22` through `0x884000`, and derives
+the packed values later consumed by the geometry service. `0x423a8` clears two
+record tables with bounds `0x33c` and `0x508`, using `0xffff` sentinels, while
+`0x9b498` clears sixteen `0x10`-byte geometry slots at `0x562b80` and resets
+`0x562b70`. `0xc55a8` clears the mapped table at `0x576c50` through its
+`0x3f4`-byte span and initializes the related `0x577070` entries. These
+helpers are setup primitives shared by the profile arms, not per-profile
+state machines.
+
 The geometry arms at `0x2dc50` and `0x2dd30` form an initialization/build
 pair. `0x2dc50` clears the video context, initializes service pointers through
 `0x296d0`, seeds `0x51aaf8/0x51aafc` to `1`, clears geometry/status fields at
