@@ -256,15 +256,21 @@ void recovered_text_palette_initialize(void)
     u32 plane;
     u32 value;
 
-    for (plane = 1U; plane <= 3U; ++plane)
+    /* The startup trace begins the block at palette offset 0x10.  The tile
+     * device's color-0 text layer addresses the corresponding first bank,
+     * so mirror the recovered block at offset 0 for the development driver. */
+    for (plane = 0U; plane <= 3U; ++plane)
         for (value = 0U; value < 16U; ++value)
+        {
             PALETTE_RAM[plane * 16U + value] = bootstrap_palette[value];
+            PALETTE_RAM[0x10U + plane * 16U + value] = bootstrap_palette[value];
+        }
 
     /* The trace's color-translation tables are monotonic lookup tables. Use
      * their recovered 5-bit input domain to seed the bootstrap colors. */
     for (plane = 0U; plane < 3U; ++plane)
         for (value = 0U; value < 32U; ++value)
-            COLORXLAT_RAM[(plane * 0x2000U / 2U) + 0x40U + value * 0x100U]
+            COLORXLAT_RAM[(plane * 0x4000U / 2U) + 0x40U + value * 0x100U]
                 = (u16)(value * 8U);
 }
 
@@ -462,6 +468,21 @@ void recovered_text_expand_video_blocks(volatile u32 *destination,
 
     for (index = 0U; index < values; ++index)
         destination[index] = recovered_text_expand_video_byte(source[index], color);
+}
+
+/*
+ * 0x1c220 -> 0x1c730: initialize the ASCII tile font used by the plain
+ * status-string writer.  The bootstrap loads the source pointer at
+ * 0x02e60bb8, passes destination 0x01080000, block count 0x80, and color 1.
+ * 0x1c730 consumes eight packed bytes per block and emits eight u32 values,
+ * so this fills the first 0x1000 bytes of character RAM (256 8x8 glyphs).
+ */
+void recovered_text_ascii_font_initialize(void)
+{
+    recovered_text_expand_video_blocks(
+        (volatile u32 *)(unsigned long)0x01080000U,
+        (volatile const u8 *)(unsigned long)0x02e60bb8U,
+        0x80U, 1U);
 }
 
 /* Recovered fixed video upload at i960 0x00020180. */
