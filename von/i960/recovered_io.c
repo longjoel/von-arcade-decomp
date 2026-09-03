@@ -9,6 +9,9 @@ typedef unsigned char u8;
 #define IO_INPUT_CONTROL      (*(volatile u8 *)0x01c00000)
 #define IO_INPUT_TABLE_FIRST  ((volatile u16 *)0x00502400)
 #define IO_INPUT_TABLE_SECOND ((volatile u16 *)0x00502440)
+#define IO_CONTROLLER         ((volatile u16 *)0x01c00000)
+#define IO_RUNTIME_BYTES      ((volatile u8 *)0x00502490)
+#define IO_RUNTIME_STATUS     (*(volatile u32 *)0x0050249c)
 
 static const u8 io_setup_first[21] = {
     0x11, 0x11, 0x51, 0xd1, 0x71, 0xf1, 0x51,
@@ -214,6 +217,54 @@ void recovered_io_input_initialize(void)
         for (byte = 0; byte < sizeof(io_setup_second); ++byte)
             IO_INPUT_CONTROL = io_setup_second[byte];
     recovered_io_fill_input_indices(IO_INPUT_TABLE_FIRST, IO_INPUT_TABLE_SECOND);
+}
+
+/* Per-frame sampler recovered from i960 0x00002d60 -> 0x00002da0. */
+void recovered_io_service(void)
+{
+    struct recovered_io_packed_state result;
+    u16 controller_word;
+    u16 port_2;
+    u16 port_4;
+    u16 port_6;
+    u16 port_c;
+    u32 prior_49c = IO_RUNTIME_STATUS;
+    u32 prior_a4 = *(volatile u32 *)0x005024a4;
+    u32 prior_a8 = *(volatile u32 *)0x005024a8;
+    u32 prior_ac = *(volatile u32 *)0x005024ac;
+    u32 prior_b4 = *(volatile u32 *)0x005024b4;
+    u32 prior_b8 = *(volatile u32 *)0x005024b8;
+    u32 prior_bc = *(volatile u32 *)0x005024bc;
+    u32 index;
+
+    IO_CONTROLLER[0x1e / 2] = 0U;
+    controller_word = IO_CONTROLLER[0x1e / 2];
+    for (index = 0U; index < 8U; ++index)
+        IO_RUNTIME_BYTES[index] = (u8)(((u32)IO_RUNTIME_BYTES[index] +
+                                        (controller_word & 0xffU)) >> 1);
+
+    IO_CONTROLLER[0x10 / 2] = 0x4fU;
+    IO_CONTROLLER[0] = 0U;
+    port_2 = IO_CONTROLLER[0x2 / 2];
+    port_4 = IO_CONTROLLER[0x4 / 2];
+    port_6 = IO_CONTROLLER[0x6 / 2];
+    port_c = IO_CONTROLLER[0xc / 2];
+    recovered_io_pack_controller_state(
+        prior_49c, prior_a4, prior_a8, prior_ac,
+        prior_b4, prior_b8, prior_bc,
+        port_2, port_4, port_6, port_c, &result);
+    IO_RUNTIME_STATUS = result.status_49c;
+    *(volatile u8 *)0x00502498 = result.status_498;
+    *(volatile u8 *)0x00502499 = result.status_499;
+    *(volatile u8 *)0x0050249a = result.status_49a;
+    *(volatile u32 *)0x005024a0 = result.work_a0;
+    *(volatile u32 *)0x005024a4 = result.work_a4;
+    *(volatile u32 *)0x005024a8 = result.work_a8;
+    *(volatile u32 *)0x005024ac = result.work_ac;
+    *(volatile u32 *)0x005024b0 = result.work_b0;
+    *(volatile u32 *)0x005024b4 = result.work_b4;
+    *(volatile u32 *)0x005024b8 = result.work_b8;
+    *(volatile u32 *)0x005024bc = result.work_bc;
 }
 
 /* Deterministic stores at 0x00002700-0x00002728. */

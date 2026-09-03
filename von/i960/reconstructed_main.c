@@ -23,6 +23,7 @@ static const unsigned char TEXT_BANK1_STATUS[] = "Loading Texture  Bank1 ... Don
 u32 recovered_io_self_test(void);
 void recovered_io_failure_prepare(void);
 void recovered_io_input_initialize(void);
+void recovered_io_service(void);
 void recovered_host_queue_initialize(void);
 void recovered_audio_initialize_scsp(void);
 void recovered_audio_service_pending(void);
@@ -80,6 +81,7 @@ void i960_reconstructed_main(void)
     state[4] = 0x494e4954UL; /* INIT */
 
     for (;;) {
+        recovered_io_service();
         recovered_audio_service_pending();
         state[5] = state[5] + 1;
     }
