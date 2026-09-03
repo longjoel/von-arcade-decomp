@@ -1660,6 +1660,10 @@ records begin at `0xedd20`, while the `SDB_*` record family begins at
 `0xeff60`. Their indexed prefix and terminated ASCII names should be treated
 as lookup data rather than i960 instructions.
 
+The CRT/test-pattern service at `0xf04d0` initializes the diagnostic state,
+renders the CRT labels, and cycles indexed pattern data through its six-entry
+arm table at `0xf0674`; its final return is at `0xf0938`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

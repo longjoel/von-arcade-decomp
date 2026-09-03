@@ -590,6 +590,10 @@ label(0x000edd20, "diagnostic_sde_name_records",
       "Indexed SDE diagnostic event-name records used by the runtime trace/debug services.")
 label(0x000eff60, "diagnostic_sdb_name_records",
       "Indexed SDB diagnostic event-name records used by the runtime trace/debug services.")
+label(0x000f0674, "diagnostic_crt_pattern_handler_table",
+      "Six-entry internal handler table for the CRT diagnostic pattern service.")
+label(0x000f04d0, "diagnostic_crt_test_service",
+      "Initializes and renders the CRT/test-pattern diagnostic, cycling indexed pattern data.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -721,6 +725,7 @@ ensure_function(0x000ed2e4, "diagnostic_result_service_fallback", 0x000ed304)
 ensure_function(0x000ed320, "diagnostic_input_test_service", 0x000ed43c)
 ensure_function(0x000ed5c0, "diagnostic_input_status_render", 0x000ed970)
 ensure_function(0x000eda30, "diagnostic_billboard_test_render", 0x000edcfc)
+ensure_function(0x000f04d0, "diagnostic_crt_test_service", 0x000f0940)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
