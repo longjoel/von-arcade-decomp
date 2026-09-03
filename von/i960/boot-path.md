@@ -2464,6 +2464,12 @@ the `0x47e40`/`0x47e44`/`0x47e48`/`0x47e4c` records and ends at `0x59f3c`.
 and `0x47e88` records to advance frame counters and reset phase status; its
 aligned end is `0x5a194`.
 
+The next controller at `0x5a1a0` selects the `0x47ea0`/`0x47ea4`/`0x47ea8`
+records and ends at `0x5a438`.  Two compact siblings follow: `0x5a440` uses
+the `0x47ed0` record and ends at `0x5a4dc`, while `0x5a4e0` uses `0x47ee0` and
+ends at `0x5a5dc`; both advance or reset the shared phase counter at their
+terminal thresholds.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
