@@ -1031,6 +1031,8 @@ label(0x0006eb40, "geometry_motion_math_callback_bridge",
       "Minimal callback bridge for the motion math dispatch cluster.")
 label(0x0006ef70, "geometry_command_packet_emit_site_variant_a",
       "Instruction-site target inside the larger geometry renderer; emits the assembled vertex/attribute packet to the 0x884000 FIFO and is referenced by the late geometry callback table.")
+label(0x0006efd0, "geometry_vertex_attribute_packet_renderer",
+      "Geometry vertex/attribute renderer that combines two object vectors, converts them to fixed-point packet fields, and emits the resulting command sequence to the 0x884000 FIFO.")
 label(0x00068550, "geometry_object_profile_geometry_bounds_flags_update_variant_f",
       "Third parallel geometry bounds evaluator that clamps extents, applies object-record offsets, updates axis collision flags, and computes derived ratios.")
 label(0x00068770, "geometry_object_profile_phase_selection_controller_variant_b",
@@ -1972,6 +1974,7 @@ ensure_function(0x0006e8f0, "geometry_motion_math_dispatch_variant_c", 0x0006e93
 ensure_function(0x0006e940, "geometry_motion_math_dispatch_variant_d", 0x0006ea34)
 ensure_function(0x0006ea40, "geometry_motion_math_dispatch_variant_e", 0x0006eb34)
 ensure_function(0x0006eb40, "geometry_motion_math_callback_bridge", 0x0006eb54)
+ensure_function(0x0006efd0, "geometry_vertex_attribute_packet_renderer", 0x0006efcc)
 ensure_function(0x00068550, "geometry_object_profile_geometry_bounds_flags_update_variant_f", 0x0006876c)
 ensure_function(0x00068770, "geometry_object_profile_phase_selection_controller_variant_b", 0x00068a3c)
 ensure_function(0x00068a40, "geometry_command_packet_writer_variant_c", 0x00069040)

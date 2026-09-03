@@ -2757,6 +2757,10 @@ larger renderer beginning at `0x6efd0`.  This site emits the assembled
 vertex/attribute packet to the `0x884000` FIFO; it is intentionally recorded
 as an internal target, not as a separate function entry.
 
+The complete renderer boundary is `0x6efd0–0x6efcc`.  It combines two object
+vectors, converts them to fixed-point packet fields, emits the command
+sequence to `0x884000`, and contains the `0x6ef70` callback-table target.
+
 The parallel bounds evaluator at `0x68550` repeats the extent clamp,
 object-offset, axis-flag, and derived-ratio sequence, returning through its
 saved callback at `0x6876c`.  The separate phase/selection controller at
