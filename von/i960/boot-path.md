@@ -1811,10 +1811,16 @@ callback helpers, ending at the object-motion table beginning at `0x32560`.
 
 `0x32810` is the next large object-state machine.  Its prologue saves the
 caller frame, the internal table at `0x32968` selects fourteen state arms from
-field `0x1b2`, and the machine eventually restores the frame and returns at
-`0x360bc`.  The state arms combine fixed-point motion, geometry FIFO packets,
-profile projection, and scene/object callback updates; entries after
-`0x360c0` are kept separate until their independent callers are established.
+field `0x1b2`, and the machine restores the frame across several return arms
+through `0x3645c`.  The state arms combine fixed-point motion, geometry FIFO
+packets, profile projection, and scene/object callback updates.
+
+The table at `0x37130` confirms the following fourteen sibling entries:
+`0x36460`, `0x36690`, `0x367f0`, `0x36980`, `0x36af0`, `0x36bb0`, `0x36c40`,
+`0x36cc0`, `0x36d50`, `0x36de0`, `0x36e70`, `0x36ef0`, `0x36f90`, and
+`0x37060`.  They cover profile-state initialization, object coordinate
+transforms, and profile transition predicates, with continuation returns at
+the end of each table slot.
 
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics

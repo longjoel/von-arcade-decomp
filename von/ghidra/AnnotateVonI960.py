@@ -292,6 +292,34 @@ label(0x00032810, "geometry_object_state_machine",
       "Updates one runtime object through its state dispatch, geometry motion, profile output, and frame-result paths.")
 label(0x00032968, "geometry_object_state_dispatch_table",
       "Fourteen internal object-state arms selected from the state field at offset 0x1b2.")
+label(0x00036460, "geometry_object_profile_state_variant_a",
+      "Selects a profile-dependent object state, initializes geometry fields, and returns through a continuation.")
+label(0x00036690, "geometry_object_profile_state_variant_b",
+      "Parallel profile/state initializer using the alternate transition conditions.")
+label(0x000367f0, "geometry_object_profile_state_variant_c",
+      "Initializes the next profile/state combination and returns through the shared continuation.")
+label(0x00036980, "geometry_object_profile_state_variant_d",
+      "Initializes the fourth profile/state combination and updates the object transition fields.")
+label(0x00036af0, "geometry_object_profile_state_variant_e",
+      "Adjusts object motion timing and selects the next state through a supplied continuation.")
+label(0x00036bb0, "geometry_object_transform_variant_a",
+      "Transforms object coordinates and applies the shared position/state completion rules.")
+label(0x00036c40, "geometry_object_transform_variant_b",
+      "Updates position bounds and transforms the object through the alternate completion path.")
+label(0x00036cc0, "geometry_object_transform_variant_c",
+      "Transforms object coordinates with the neighboring timing limits and state reset rules.")
+label(0x00036d50, "geometry_object_transform_variant_d",
+      "Parallel coordinate transform/update path using the adjacent motion timing profile.")
+label(0x00036de0, "geometry_object_transform_variant_e",
+      "Transforms coordinates and selects the terminal or reset state based on object flags.")
+label(0x00036e70, "geometry_object_profile_transition_variant_a",
+      "Tests the active profile and advances the object state when the transition predicate succeeds.")
+label(0x00036ef0, "geometry_object_profile_transition_variant_b",
+      "Initializes a profile transition from object flags and returns through its continuation.")
+label(0x00036f90, "geometry_object_profile_transition_variant_c",
+      "Parallel profile transition handler with the shared motion/timing update sequence.")
+label(0x00037060, "geometry_object_profile_transition_variant_d",
+      "Final profile transition handler before the table-backed object callback family ends.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -864,7 +892,21 @@ ensure_function(0x00032120, "geometry_object_motion_variant_x", 0x00032330)
 ensure_function(0x00032330, "geometry_object_motion_variant_y", 0x000324e0)
 ensure_function(0x000324e0, "geometry_object_motion_phase_helper_a", 0x00032540)
 ensure_function(0x00032540, "geometry_object_motion_phase_helper_b", 0x00032560)
-ensure_function(0x00032810, "geometry_object_state_machine", 0x000360c0)
+ensure_function(0x00032810, "geometry_object_state_machine", 0x00036460)
+ensure_function(0x00036460, "geometry_object_profile_state_variant_a", 0x00036690)
+ensure_function(0x00036690, "geometry_object_profile_state_variant_b", 0x000367f0)
+ensure_function(0x000367f0, "geometry_object_profile_state_variant_c", 0x00036980)
+ensure_function(0x00036980, "geometry_object_profile_state_variant_d", 0x00036af0)
+ensure_function(0x00036af0, "geometry_object_profile_state_variant_e", 0x00036bb0)
+ensure_function(0x00036bb0, "geometry_object_transform_variant_a", 0x00036c40)
+ensure_function(0x00036c40, "geometry_object_transform_variant_b", 0x00036cc0)
+ensure_function(0x00036cc0, "geometry_object_transform_variant_c", 0x00036d50)
+ensure_function(0x00036d50, "geometry_object_transform_variant_d", 0x00036de0)
+ensure_function(0x00036de0, "geometry_object_transform_variant_e", 0x00036e70)
+ensure_function(0x00036e70, "geometry_object_profile_transition_variant_a", 0x00036ef0)
+ensure_function(0x00036ef0, "geometry_object_profile_transition_variant_b", 0x00036f90)
+ensure_function(0x00036f90, "geometry_object_profile_transition_variant_c", 0x00037060)
+ensure_function(0x00037060, "geometry_object_profile_transition_variant_d", 0x00037130)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
