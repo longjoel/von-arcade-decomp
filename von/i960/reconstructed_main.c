@@ -23,6 +23,9 @@ static const unsigned char TEXT_MECH_NAME[] = "VR.TEMJIN";
 static const unsigned char TEXT_WEAPON_RIFLE[] = "BEAM RIFLE";
 static const unsigned char TEXT_WEAPON_BOMB[] = "BOMB";
 static const unsigned char TEXT_WEAPON_SWORD[] = "BEAM SWORD";
+static const unsigned char TEXT_TAKEOFF[] = "TAKEOFF SEQUENCE";
+static const unsigned char TEXT_LEVEL_INTRO[] = "LEVEL INTRO";
+static const unsigned char TEXT_MATCH_ENTRY[] = "MATCH ENTRY";
 
 #define WORKRAM ((volatile u32 *)0x00500000)
 
@@ -55,6 +58,13 @@ static void recovered_render_mech_select(void)
     recovered_text_write_string(TEXT_WEAPON_BOMB);
     recovered_text_set_position(8U, 22U);
     recovered_text_write_string(TEXT_WEAPON_SWORD);
+}
+
+static void recovered_render_phase(const unsigned char *title)
+{
+    recovered_text_video_initialize();
+    recovered_text_set_position(20U, 30U);
+    recovered_text_write_string(title);
 }
 
 void i960_reconstructed_main(void)
@@ -118,6 +128,18 @@ void i960_reconstructed_main(void)
         if (state[9] == 0U && state[5] >= 360000U) {
             recovered_render_mech_select();
             state[9] = 1U;
+        }
+        if (state[9] == 1U && state[5] >= 780000U) {
+            recovered_render_phase(TEXT_TAKEOFF);
+            state[9] = 2U;
+        }
+        if (state[9] == 2U && state[5] >= 1400000U) {
+            recovered_render_phase(TEXT_LEVEL_INTRO);
+            state[9] = 3U;
+        }
+        if (state[9] == 3U && state[5] >= 2400000U) {
+            recovered_render_phase(TEXT_MATCH_ENTRY);
+            state[9] = 4U;
         }
     }
 }
