@@ -1998,6 +1998,12 @@ profile-specific payload through `0x804000`.  The variants share the same
 record contract but use different ROM payload tables, so they are retained as
 separate functions rather than merged into one generalized C routine.
 
+After the `0x40270` dispatch/data table, `0x406d0` is another command-5
+emitter.  It performs the same profile comparison and coordinate submission,
+then emits two successive payloads from `0x2be3eb4` and `0x2be4034` before
+returning at `0x408a4`.  This is a separate two-stage variant, not a fall-through
+continuation of the framed `0x40310` routine.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
