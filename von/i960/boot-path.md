@@ -2555,6 +2555,19 @@ using `0x48370`/`0x48374`, `0x5e200` through `0x5e298` using `0x48390`, and
 progress and apply the corresponding object-phase reset paths at their
 thresholds.
 
+The next controller at `0x5e360` derives the object coordinate from fields
+`0x34`, `0x184`, and `0x2e`, then drives several phase arms.  It publishes
+`0x79034`-based assets through `0x51ab08`/`0x51ab0c`, advances the shared phase
+counter, and performs terminal object-state resets before returning at
+`0x5e520`.
+
+The indexed transition at `0x5e530` uses the paired `0x483c0`/`0x483c4`
+records, publishing the selected pair and entering the terminal progression
+path when the phase reaches its threshold; it ends at `0x5e724`.  Its sibling
+at `0x5e730` uses the `0x48420` records and returns through a saved callback,
+ending at `0x5e900`.  The parallel controller at `0x5e910` repeats the
+multi-arm `0x79034` asset/phase pattern and ends at `0x5eae4`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
