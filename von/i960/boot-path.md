@@ -1611,6 +1611,13 @@ The bounded entries through `0xec1e0` use the alternate workspace slots at
 base before invoking its scanner. This establishes a second data-family
 pipeline without conflating its record widths with the first family.
 
+The continuation through `0xec8e4` extends that alternate pipeline: the
+initializers/scanners at `0xec290`, `0xec330`, `0xec3e0`, `0xec6a0`, and
+`0xec760` cover additional packed layouts; `0xec480` selects the matching
+ROM base; and `0xec630` copies the selected table. The builder at `0xec820`
+expands the literal records from `0xead20` into the command lookup table, and
+`0xec8f0` orchestrates the pipeline before returning at `0xec91c`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

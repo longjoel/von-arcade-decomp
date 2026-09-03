@@ -516,6 +516,24 @@ label(0x000ec140, "runtime_alt_record_table_init_d",
       "Initializes the fourth alternate packed-record workspace and match marker.")
 label(0x000ec1e0, "runtime_alt_packed_record_scan_e",
       "Scans the fifth packed-record format and records its masked match location.")
+label(0x000ec290, "runtime_alt_record_table_init_e",
+      "Initializes the sixth alternate packed-record workspace and match marker.")
+label(0x000ec330, "runtime_alt_packed_record_scan_f",
+      "Scans the sixth packed-record format and records its masked match location.")
+label(0x000ec3e0, "runtime_alt_record_table_init_f",
+      "Initializes the seventh alternate packed-record workspace and match marker.")
+label(0x000ec480, "runtime_alt_record_base_select",
+      "Selects the active alternate ROM base from the accumulated match markers.")
+label(0x000ec630, "runtime_alt_record_table_copy",
+      "Copies the selected alternate record table into the active workspace.")
+label(0x000ec6a0, "runtime_alt_packed_record_scan_g",
+      "Scans the selected alternate table and records its masked match location.")
+label(0x000ec760, "runtime_alt_record_table_init_g",
+      "Initializes the final alternate packed-record workspace and match marker.")
+label(0x000ec820, "geometry_event_lookup_table_build",
+      "Expands the geometry-event lookup records into the command lookup table.")
+label(0x000ec8f0, "runtime_alt_record_pipeline_dispatch",
+      "Runs the alternate record pipeline and advances the runtime service counter.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -619,6 +637,15 @@ ensure_function(0x000ebfd0, "runtime_alt_record_table_init_c", 0x000ec090)
 ensure_function(0x000ec090, "runtime_alt_packed_record_scan_d", 0x000ec140)
 ensure_function(0x000ec140, "runtime_alt_record_table_init_d", 0x000ec1e0)
 ensure_function(0x000ec1e0, "runtime_alt_packed_record_scan_e", 0x000ec290)
+ensure_function(0x000ec290, "runtime_alt_record_table_init_e", 0x000ec330)
+ensure_function(0x000ec330, "runtime_alt_packed_record_scan_f", 0x000ec3e0)
+ensure_function(0x000ec3e0, "runtime_alt_record_table_init_f", 0x000ec480)
+ensure_function(0x000ec480, "runtime_alt_record_base_select", 0x000ec624)
+ensure_function(0x000ec630, "runtime_alt_record_table_copy", 0x000ec69c)
+ensure_function(0x000ec6a0, "runtime_alt_packed_record_scan_g", 0x000ec760)
+ensure_function(0x000ec760, "runtime_alt_record_table_init_g", 0x000ec820)
+ensure_function(0x000ec820, "geometry_event_lookup_table_build", 0x000ec8e8)
+ensure_function(0x000ec8f0, "runtime_alt_record_pipeline_dispatch", 0x000ec920)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
