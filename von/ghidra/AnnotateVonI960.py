@@ -678,24 +678,34 @@ ensure_function(0x000e2a40, "video_dispatch_arm16", 0x000e2a48)
 ensure_function(0x000e2a48, "video_dispatch_arm17", 0x000e2ad4)
 label(0x000e2ad4, "video_dispatch_arm18",
       "Emits six tiles 1,3,5,7,9,11 with bank-dependent six-source sets; exits through 0xe30a8 or 0xe30cc.")
+ensure_function(0x000e2ad4, "video_dispatch_arm18", 0x000e2b88)
 label(0x000e2b88, "video_dispatch_arm19",
       "Emits four tiles 5,7,9,11 with bank-dependent four-source sets; exits through 0xe2f24 or 0xe2f48.")
+ensure_function(0x000e2b88, "video_dispatch_arm19", 0x000e2c14)
 label(0x000e2c14, "video_dispatch_arm20",
       "Emits four bank-dependent entries for tiles 9,11,1,3; exits through 0xe2f70 or 0xe2f94.")
+ensure_function(0x000e2c14, "video_dispatch_arm20", 0x000e2ca0)
 label(0x000e2ca0, "video_dispatch_arm21",
       "Emits four bank-dependent entries for tiles 1,3,5,7; exits through 0xe2fbc or 0xe2fe0.")
+ensure_function(0x000e2ca0, "video_dispatch_arm21", 0x000e2d2c)
 label(0x000e2d2c, "video_dispatch_arm22",
       "Emits six bank-dependent entries for tiles 5,7,9,11,13,15; exits through 0xe33f4.")
+ensure_function(0x000e2d2c, "video_dispatch_arm22", 0x000e2df8)
 label(0x000e2df8, "video_dispatch_arm23",
       "Emits tiles 9,11 with bank-dependent sources 0x2fb5290/0x2fb5350 or 0x2fb5410/0x2fb54d0; exits through 0xe3008 or 0xe304c.")
+ensure_function(0x000e2df8, "video_dispatch_arm23", 0x000e2e44)
 label(0x000e2e44, "video_dispatch_arm24",
       "Performs only the bank-dependent continuation choice 0xe3008 or 0xe304c.")
+ensure_function(0x000e2e44, "video_dispatch_arm24", 0x000e2e4c)
 label(0x000e2eec, "video_dispatch_arm27",
       "Emits tiles 9,11 with bank-dependent sources 0x2fb4c90/0x2fb4d50 or 0x2fb4e10/0x2fb4ed0; exits through 0xe30a8 or 0xe30cc.")
 label(0x000e2e4c, "video_dispatch_arm25",
       "Emits tiles 1,3 with bank-dependent source pairs and exits through 0xe33f4.")
+ensure_function(0x000e2e4c, "video_dispatch_arm25", 0x000e2ea0)
 label(0x000e2ea0, "video_dispatch_arm26",
       "Emits tiles 5,7 with bank-dependent source pairs and exits through 0xe33f4.")
+ensure_function(0x000e2ea0, "video_dispatch_arm26", 0x000e2eec)
+ensure_function(0x000e2eec, "video_dispatch_arm27", 0x000e2f20)
 label(0x000e3004, "video_dispatch_arm28",
       "Emits tiles 1,3,5,7 with bank-dependent sources and exits through 0xe33f4.")
 label(0x000e3090, "video_dispatch_arm29",
