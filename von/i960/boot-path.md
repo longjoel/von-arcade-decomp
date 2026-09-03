@@ -1822,6 +1822,20 @@ The table at `0x37130` confirms the following fourteen sibling entries:
 transforms, and profile transition predicates, with continuation returns at
 the end of each table slot.
 
+The next executable boundary is `0x371e0`.  This routine reads the active
+object pointer from `0x6c`, performs the per-frame decrement of the `0x1db` and
+`0x1dc` timers, advances the fixed-point fields at offsets `0x32` and `0x34`,
+and selects phase/state transitions through the table at `0x37130`.  Its last
+return is at `0x37f30`; the words at `0x37f40` are data, so `0x37f50` is a
+separate entry rather than a continuation of the same bounded function.
+
+`0x37f50` is a motion-output continuation.  It clears transient fields at
+`0x186`/`0x188`, clamps the signed fixed-point delta applied to object field
+`0x2e`, advances or reverses phase field `0x194`, and publishes a geometry
+resource pointer/value through `0x51acfc`/`0x51ad00`.  Its branches return via
+the caller-supplied address in `g2` at `0x380c8`, `0x381b4`, `0x38218`,
+`0x3826c`, and `0x382dc`, followed by the routine boundary at `0x382e0`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

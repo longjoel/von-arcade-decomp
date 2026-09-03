@@ -320,6 +320,12 @@ label(0x00036f90, "geometry_object_profile_transition_variant_c",
       "Parallel profile transition handler with the shared motion/timing update sequence.")
 label(0x00037060, "geometry_object_profile_transition_variant_d",
       "Final profile transition handler before the table-backed object callback family ends.")
+label(0x00037130, "geometry_object_profile_state_dispatch_table",
+      "Fourteen-entry continuation table used by the runtime object phase/state updater.")
+label(0x000371e0, "geometry_object_runtime_update",
+      "Advances one runtime object through fixed-point motion, phase predicates, and callback/state transitions.")
+label(0x00037f50, "geometry_object_runtime_motion_continuation",
+      "Continuation-style motion handler; clamps the signed fixed-point coordinate and publishes the selected geometry result.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -907,6 +913,8 @@ ensure_function(0x00036e70, "geometry_object_profile_transition_variant_a", 0x00
 ensure_function(0x00036ef0, "geometry_object_profile_transition_variant_b", 0x00036f90)
 ensure_function(0x00036f90, "geometry_object_profile_transition_variant_c", 0x00037060)
 ensure_function(0x00037060, "geometry_object_profile_transition_variant_d", 0x00037130)
+ensure_function(0x000371e0, "geometry_object_runtime_update", 0x00037f50)
+ensure_function(0x00037f50, "geometry_object_runtime_motion_continuation", 0x000382e0)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
