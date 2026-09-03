@@ -2519,6 +2519,10 @@ records and the object arrays, ending at `0x5c97c` after its terminal
 phase/status arms.  Its reset helper at `0x5c980` selects the mode-specific
 record and reinitializes object state through `0x5c9e8`.
 
+The following indexed transition at `0x5c9f0` uses the paired
+`0x48150`/`0x48154` records and the object arrays; its forward arms converge at
+`0x5cd04` and end at `0x5cd18`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
