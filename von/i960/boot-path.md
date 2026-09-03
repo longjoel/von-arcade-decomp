@@ -2318,6 +2318,19 @@ for object field `0x150`, updates `0x192` and `0x1c4`, and emits the associated
 status/geometry state.  Its return at `0x53a10` and aligned end at `0x53a14`
 separate this math service from the later transition entries.
 
+The next table entries are a pair of larger profile status transitions at
+`0x53a20` and `0x53d00`.  They share the phase tests, cursor publication, and
+status-reset protocol, but select different descriptor ranges:
+`0x473c0`/`0x473c8`/`0x473d0` for the first and
+`0x473e0`/`0x473e8`/`0x473f0` for the second.  Their returns at `0x53cf8`
+and `0x53fdc` delimit the siblings.
+
+The following `0x53fe0` and `0x540a0` entries are compact transition handlers.
+They use descriptor bases `0x473f8` and `0x47400`, respectively, publish the
+same shared cursor fields, reset phase/status state at their low range, and
+return through saved completion links.  Their direct returns at `0x5409c` and
+`0x5415c` keep these arms separate from the larger `0x54160` dispatcher.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

@@ -665,6 +665,14 @@ label(0x000534d0, "geometry_object_profile_phase_state_dispatch_variant_g",
       "Profile phase-state dispatcher using the large profile data ranges, shared cursor publication, and mode-specific status completion paths.")
 label(0x00053680, "geometry_profile_runtime_geometry_math_update",
       "Runtime profile geometry update that derives floating-point/fixed-point correction values, updates object timing fields, and publishes status state.")
+label(0x00053a20, "geometry_object_profile_status_transition_variant_a",
+      "Profile status transition using the 0x473c0/0x473c8/0x473d0 descriptor ranges, shared cursor publication, and mode-specific status resets.")
+label(0x00053d00, "geometry_object_profile_status_transition_variant_b",
+      "Alternate profile status transition using the 0x473e0/0x473e8/0x473f0 descriptor ranges and the shared cursor/status protocol.")
+label(0x00053fe0, "geometry_object_profile_status_transition_variant_c",
+      "Compact profile transition using the 0x473f8 descriptor range, shared cursor publication, and an indirect completion return.")
+label(0x000540a0, "geometry_object_profile_status_transition_variant_d",
+      "Alternate compact profile transition using the 0x47400 descriptor range, shared cursor publication, and an indirect completion return.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1398,6 +1406,10 @@ ensure_function(0x00053050, "geometry_object_profile_phase_transition_variant_l"
 ensure_function(0x00053280, "geometry_object_profile_phase_dispatch_variant_f", 0x000534c4)
 ensure_function(0x000534d0, "geometry_object_profile_phase_state_dispatch_variant_g", 0x00053680)
 ensure_function(0x00053680, "geometry_profile_runtime_geometry_math_update", 0x00053a14)
+ensure_function(0x00053a20, "geometry_object_profile_status_transition_variant_a", 0x00053cfc)
+ensure_function(0x00053d00, "geometry_object_profile_status_transition_variant_b", 0x00053fe0)
+ensure_function(0x00053fe0, "geometry_object_profile_status_transition_variant_c", 0x000540a0)
+ensure_function(0x000540a0, "geometry_object_profile_status_transition_variant_d", 0x00054160)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
