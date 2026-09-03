@@ -229,6 +229,17 @@ void recovered_halfword_byte_swap_copy(volatile u16 *destination,
         destination[index] = (u16)recovered_halfword_byte_swap(source[index]);
 }
 
+/* The first profile-zero startup transfer installs the font data consumed by
+ * recovered_text_emit_glyph().  Its source, destination, and count are
+ * preserved from the captured 0x1bc20 transfer descriptor. */
+void recovered_text_font_asset_initialize(void)
+{
+    recovered_halfword_byte_swap_copy(
+        (volatile u16 *)0x01081000U,
+        (volatile const u16 *)0x02e21a74U,
+        0x18800U);
+}
+
 /*
  * Describe one transfer selected by the 0x1bda0 startup asset loader.
  *

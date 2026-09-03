@@ -13,6 +13,9 @@ end
 
 emu.register_periodic(function()
     frame = frame + 1
+    if frame == 60 then
+        pcall(function() manager.machine.video:snapshot() end)
+    end
     if frame % 10 == 0 then
         log(string.format("frame=%d render_mode=%08x videoctl=%08x init=%08x texture_status=%08x heartbeat=%08x attract_tick=%08x transition=%08x done0=%04x bank1=%04x",
             frame,

@@ -21,6 +21,10 @@ void recovered_io_input_initialize(void);
 void recovered_host_queue_initialize(void);
 void recovered_audio_initialize_scsp(void);
 void recovered_audio_service_pending(void);
+void recovered_text_video_initialize(void);
+void recovered_text_font_asset_initialize(void);
+void recovered_text_set_position(u32 column, u32 row);
+void recovered_text_write_glyph_string(volatile const unsigned char *text);
 
 void i960_reconstructed_main(void)
 {
@@ -37,6 +41,11 @@ void i960_reconstructed_main(void)
     }
 
     recovered_geometry_pipeline_startup(0);
+    recovered_text_video_initialize();
+    recovered_text_font_asset_initialize();
+    recovered_text_set_position(8U, 12U);
+    recovered_text_write_glyph_string(
+        (volatile const unsigned char *)0x0001f440U);
     /* vonjdev does not map the recovered SCSP control window. Keep the
      * recovered routine linked for oracle work, but skip its MMIO writes in
      * this development image so the attract-state adapter can run. */
