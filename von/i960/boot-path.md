@@ -364,6 +364,12 @@ table at `0x142f34` begins with the same sequence and then diverges for the
 status-specific entries later in the table. The selector wrapper therefore
 does not need to know the asset format itself.
 
+The shared initializer at `0xe2130` is the first higher-level consumer of this
+bank: it expands the bank-selected tile set through `0xe1f20`, then derives
+five runtime pointers from the `0x2f8d890` source base and stores them at
+`0x577594`, `0x577598`, `0x57759c`, `0x5775a0`, `0x5775a4`, and `0x5775a8`.
+Its return at `0xe2320` cleanly precedes the next status routine at `0xe2330`.
+
 The geometry arms at `0x2dc50` and `0x2dd30` form an initialization/build
 pair. `0x2dc50` clears the video context, initializes service pointers through
 `0x296d0`, seeds `0x51aaf8/0x51aafc` to `1`, clears geometry/status fields at
