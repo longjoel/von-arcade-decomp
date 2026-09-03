@@ -2004,6 +2004,15 @@ then emits two successive payloads from `0x2be3eb4` and `0x2be4034` before
 returning at `0x408a4`.  This is a separate two-stage variant, not a fall-through
 continuation of the framed `0x40310` routine.
 
+The next packet-producer family begins at `0x408b0`.  Its six verified entries
+at `0x408b0`, `0x40a80`, `0x40bc0`, `0x40d00`, `0x40e10`, and `0x40f50`
+decrement the active record state, emit command-5 object coordinates, and
+submit variant-specific command-18/19/21/30 payloads through `0x804000`.
+Their payload tables are distinct (`0x2be0ef4`, `0x2be129c`, `0x2be0f9c`,
+`0x2be105c`, `0x2be135c`, and `0x2be17dc`), which confirms six ROM-backed
+variants sharing a protocol skeleton rather than one function with an
+accidental linear split.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

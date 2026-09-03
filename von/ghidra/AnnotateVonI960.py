@@ -445,6 +445,18 @@ label(0x00040310, "geometry_profile_command5_emit_g",
       "Command-5 geometry emitter with a stack frame, shared profile comparison, and the payload table at 0x2be41d8.")
 label(0x000406d0, "geometry_profile_command5_emit_h",
       "Command-5 geometry emitter that submits two successive profile payloads from the 0x2be3eb4 and 0x2be4034 tables while advancing the record selector.")
+label(0x000408b0, "geometry_object_packet_variant_a",
+      "Emits the command-5 object packet, selects payload words from 0x2be0ef4, and applies the profile-dependent object coordinate increment.")
+label(0x00040a80, "geometry_object_packet_variant_b",
+      "Emits the command-5/18/21 object packet sequence using the selector table at 0x2be129c and advances the record state.")
+label(0x00040bc0, "geometry_object_packet_variant_c",
+      "Parallel command-5/18/21 object packet path using the selector table at 0x2be0f9c and its alternate payload constants.")
+label(0x00040d00, "geometry_object_packet_variant_d",
+      "Emits the command-5/18/19 object packet sequence and submits profile payloads from 0x2be105c.")
+label(0x00040e10, "geometry_object_packet_variant_e",
+      "Parallel command-5/18/19 object packet path using payloads from 0x2be135c.")
+label(0x00040f50, "geometry_object_packet_variant_f",
+      "Emits the command-5/18/19/30/21 object packet sequence and selects the payload table at 0x2be17dc.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1079,6 +1091,12 @@ ensure_function(0x0003ff80, "geometry_profile_command5_emit_e", 0x000400f0)
 ensure_function(0x000400f0, "geometry_profile_command5_emit_f", 0x00040310)
 ensure_function(0x00040310, "geometry_profile_command5_emit_g", 0x000406cc)
 ensure_function(0x000406d0, "geometry_profile_command5_emit_h", 0x000408a8)
+ensure_function(0x000408b0, "geometry_object_packet_variant_a", 0x00040a80)
+ensure_function(0x00040a80, "geometry_object_packet_variant_b", 0x00040bc0)
+ensure_function(0x00040bc0, "geometry_object_packet_variant_c", 0x00040d00)
+ensure_function(0x00040d00, "geometry_object_packet_variant_d", 0x00040e10)
+ensure_function(0x00040e10, "geometry_object_packet_variant_e", 0x00040f50)
+ensure_function(0x00040f50, "geometry_object_packet_variant_f", 0x00041090)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
