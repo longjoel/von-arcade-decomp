@@ -811,6 +811,10 @@ label(0x0005bc70, "geometry_object_profile_indexed_transition_variant_n",
       "Large indexed profile transition using the paired 0x48030/0x48034 records, status gating, shared cursor publication, and object-state setup.")
 label(0x0005bff0, "geometry_object_profile_indexed_transition_variant_o",
       "Large indexed profile transition using the paired 0x48060/0x48064 records, status gating, shared cursor publication, and object-state setup.")
+label(0x0005c370, "geometry_object_profile_indexed_transition_variant_p",
+      "Multi-arm indexed profile transition using the 0xfc/0xf8 object arrays and paired 0x48090/0x48094 records, with terminal status progression.")
+label(0x0005c650, "geometry_object_profile_transition_reset_helper",
+      "Profile transition reset helper that selects the mode-specific reset record, clears object phase fields, and initializes the next state.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1617,6 +1621,8 @@ ensure_function(0x0005ba50, "geometry_object_profile_phase_transition_variant_u"
 ensure_function(0x0005bb60, "geometry_object_profile_phase_transition_variant_v", 0x0005bc64)
 ensure_function(0x0005bc70, "geometry_object_profile_indexed_transition_variant_n", 0x0005bfe0)
 ensure_function(0x0005bff0, "geometry_object_profile_indexed_transition_variant_o", 0x0005c360)
+ensure_function(0x0005c370, "geometry_object_profile_indexed_transition_variant_p", 0x0005c648)
+ensure_function(0x0005c650, "geometry_object_profile_transition_reset_helper", 0x0005c6b8)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

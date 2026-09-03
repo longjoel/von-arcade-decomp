@@ -2508,6 +2508,12 @@ The parallel indexed transition at `0x5bff0` uses the `0x48060`/`0x48064`
 records, repeats the status-gated threshold and object-state setup pattern, and
 ends at its linked return boundary `0x5c360`.
 
+The next multi-arm indexed transition begins at `0x5c370`, uses the object
+`0xfc`/`0xf8` arrays and the paired `0x48090`/`0x48094` records, and ends at
+`0x5c648`.  Its separate reset helper at `0x5c650` selects the mode-specific
+record, clears phase fields, and initializes the next state before returning at
+`0x5c6b8`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
