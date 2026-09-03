@@ -2400,6 +2400,13 @@ The following indexed siblings at `0x56930` and `0x56b30` use the paired
 `0x17a`, publish paired cursor coordinates, and enter the shared reset path at
 their range limits; their aligned ends are `0x56b28` and `0x56d08`.
 
+The `0x56d10` handler begins another parent phase-state dispatch.  It clears
+object fields `0x186`/`0x188`, recomputes derived field `0x2e`, and selects the
+`0x477a0`/`0x477a8`/`0x477b0` records while publishing phase and status state;
+its internal arms end at `0x56f3c`.  The larger `0x56f40` sibling uses the
+`0x477c0`/`0x477c8`/`0x477d0` records and adds collision-flag checks and status
+message paths before its aligned end at `0x57264`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
