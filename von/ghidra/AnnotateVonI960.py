@@ -423,6 +423,12 @@ label(0x0003f4e0, "geometry_runtime_record_seed_selector10",
       "Clears the bounded runtime record table, seeds the first slot with selector 10, and returns through its caller continuation.")
 label(0x0003f550, "geometry_runtime_record_table_seed_pair",
       "Walks the runtime record table, fills available slots with the requested selector pair, and returns after the bounded scan.")
+label(0x0003f5f0, "geometry_runtime_record_seed_command17",
+      "Finds a free 0x24-byte runtime record, stores the caller fields, and fills its twelve-word payload from command 17 readbacks.")
+label(0x0003f6e0, "geometry_runtime_record_seed_command17_alt",
+      "Alternate free-record initializer using command 17 and an explicit selector word at record offset zero.")
+label(0x0003f7d0, "geometry_runtime_record_seed_command17_bounded",
+      "Finds a free record in the 0x508-byte pool, marks it active, and copies the command 17 payload into its 0x30-byte record area.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1046,6 +1052,9 @@ ensure_function(0x0003f380, "geometry_runtime_record_packet_initialize_alt", 0x0
 ensure_function(0x0003f470, "geometry_runtime_record_table_clear", 0x0003f4e0)
 ensure_function(0x0003f4e0, "geometry_runtime_record_seed_selector10", 0x0003f550)
 ensure_function(0x0003f550, "geometry_runtime_record_table_seed_pair", 0x0003f5e8)
+ensure_function(0x0003f5f0, "geometry_runtime_record_seed_command17", 0x0003f6e0)
+ensure_function(0x0003f6e0, "geometry_runtime_record_seed_command17_alt", 0x0003f7d0)
+ensure_function(0x0003f7d0, "geometry_runtime_record_seed_command17_bounded", 0x0003f8d0)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

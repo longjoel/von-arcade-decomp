@@ -1980,6 +1980,15 @@ separate bounded scan that fills available slots with the requested selector
 pair and returns at `0x3f5e4`.  These are record-pool management services
 called by the geometry paths, not additional object-motion variants.
 
+The next three continuation-style services (`0x3f5f0`, `0x3f6e0`, and
+`0x3f7d0`) seed free runtime records from command-17 readbacks.  The first two
+scan the 23-entry `0x51b070` pool and copy twelve payload words into the
+record; the second additionally writes selector `1` at offset zero.  The
+`0x3f7d0` variant scans the larger `0x508`-byte pool, marks the selected slot
+with state `2`, and copies the command payload into its 0x30-byte record
+area.  Each has a continuation pointer in `g14` and returns via `bx (g2)`;
+their terminal `ret` instructions are separate continuation targets.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
