@@ -715,6 +715,12 @@ label(0x000564e0, "geometry_object_profile_compact_transition_variant_d",
       "Compact profile transition using the 0x476b0 descriptor and shared cursor publication, with phase/state reset completion.")
 label(0x00056580, "geometry_object_profile_compact_transition_variant_e",
       "Compact profile transition using the 0x476c0 indexed descriptor and shared cursor publication, with phase/state reset completion.")
+label(0x00056640, "geometry_object_profile_phase_state_dispatch_variant_i",
+      "Parent profile phase-state dispatcher that recomputes derived field 0x2e and selects the 0x2563700/0x2564a28/0x2566a30 record families.")
+label(0x00056930, "geometry_object_profile_indexed_transition_variant_d",
+      "Indexed profile transition using paired records at 0x476e0/0x476e4, with phase advancement, cursor publication, and status completion.")
+label(0x00056b30, "geometry_object_profile_indexed_transition_variant_e",
+      "Indexed profile transition using paired records at 0x47740/0x47744, with phase advancement, cursor publication, and indirect completion return.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1473,6 +1479,9 @@ ensure_function(0x00056320, "geometry_object_profile_indexed_transition_variant_
 ensure_function(0x000563f0, "geometry_object_profile_indexed_transition_variant_c", 0x000564dc)
 ensure_function(0x000564e0, "geometry_object_profile_compact_transition_variant_d", 0x0005657c)
 ensure_function(0x00056580, "geometry_object_profile_compact_transition_variant_e", 0x0005663c)
+ensure_function(0x00056640, "geometry_object_profile_phase_state_dispatch_variant_i", 0x0005692c)
+ensure_function(0x00056930, "geometry_object_profile_indexed_transition_variant_d", 0x00056b28)
+ensure_function(0x00056b30, "geometry_object_profile_indexed_transition_variant_e", 0x00056d08)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

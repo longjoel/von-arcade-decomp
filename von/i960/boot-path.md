@@ -2389,6 +2389,17 @@ cursor fields and either advance phase or enter the common reset state.  Their
 aligned ends are `0x561e8`, `0x5631c`, `0x563ec`, `0x564dc`, `0x5657c`, and
 `0x5663c`, respectively.
 
+At `0x56640`, the code changes back to a parent phase-state dispatcher.  It
+recomputes derived object field `0x2e`, then selects among record families
+rooted at `0x2563700`, `0x2564a28`, and `0x2566a30`, publishing cursor state and
+status messages for each arm.  The internal completion returns through
+`0x56724`, `0x56890`, `0x56908`, and `0x56928`; the parent ends at `0x5692c`.
+
+The following indexed siblings at `0x56930` and `0x56b30` use the paired
+`0x476e0`/`0x476e4` and `0x47740`/`0x47744` records.  They advance phase
+`0x17a`, publish paired cursor coordinates, and enter the shared reset path at
+their range limits; their aligned ends are `0x56b28` and `0x56d08`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
