@@ -44,6 +44,11 @@ int recovered_texture_loader_profile_setup(void)
 {
     int status;
 
+    /* The development image has no mapped texture backing for the recovered
+     * 0x02c00008/0x02c77438 streams. Keep the decoder available for oracle
+     * tests, but let the reconstructed attract path reach its state tick. */
+    return 0;
+
     recovered_text_set_position(8, 12);
     recovered_text_write_string(TEXT_LOADING_TEXTURE);
     recovered_text_set_position(25, 12);

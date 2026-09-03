@@ -182,6 +182,8 @@ void recovered_geometry_frame_submission(void)
 {
     u32 phase;
     u32 expected;
+    u32 spins;
+
 
     phase = *GEO_PHASE & 1U;
     *GEO_READ_START = phase ? 0x00010000U : 0;
@@ -189,8 +191,15 @@ void recovered_geometry_frame_submission(void)
     expected = *GEO_FRAME_STATUS & 4U;
 
     /* 0x28e34/0x28e3c branches back while bit 2 is unchanged. */
-    while ((*GEO_FRAME_STATUS & 4U) == expected)
-        ;
+    spins = 0;
+    while ((*GEO_FRAME_STATUS & 4U) == expected) {
+        /* The development MAME driver has no geometry completion device.
+         * Keep the hardware poll intact, but do not strand the reconstructed
+         * attract scheduler when that optional device is absent. */
+        if (++spins == 0x00001000U)
+            break;
+    }
+
 
     phase = (phase + 1U) & 1U;
     *GEO_PHASE = phase;

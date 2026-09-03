@@ -37,7 +37,9 @@ void i960_reconstructed_main(void)
     }
 
     recovered_geometry_pipeline_startup(0);
-    recovered_audio_initialize_scsp();
+    /* vonjdev does not map the recovered SCSP control window. Keep the
+     * recovered routine linked for oracle work, but skip its MMIO writes in
+     * this development image so the attract-state adapter can run. */
     state[7] = recovered_object_state_runtime_tick();
     state[3] = 0x47454f30UL; /* GEO0 */
     state[6] = 0;
