@@ -375,6 +375,12 @@ label(0x0002b7b0, "startup_status_arm_counter_plus_two")
 label(0x0002b7e0, "startup_status_arm_counter_plus_one")
 label(0x0002b810, "startup_status_arm_text_asset_reset")
 label(0x0002b870, "startup_status_arm_progress_text")
+label(0x0002b700, "startup_status_arm_post_test_transition",
+      "Performs the post-test command/video transition and advances the startup mode.")
+label(0x0002b770, "startup_status_arm_subcounter_decrement",
+      "Decrements the status subcounter and resets the startup mode when it expires.")
+label(0x0002b940, "startup_status_arm_continuation_trampoline",
+      "Indirect continuation trampoline used by the status dispatcher tail.")
 label(0x0002dc50, "startup_status_arm_geometry_init")
 label(0x0002dd30, "startup_status_arm_geometry_build")
 label(0x0002ded0, "startup_status_arm_geometry_frame_service",
@@ -706,6 +712,9 @@ ensure_function(0x0002b7b0, "startup_status_arm_counter_plus_two", 0x0002b7dc)
 ensure_function(0x0002b7e0, "startup_status_arm_counter_plus_one", 0x0002b80c)
 ensure_function(0x0002b810, "startup_status_arm_text_asset_reset", 0x0002b864)
 ensure_function(0x0002b870, "startup_status_arm_progress_text", 0x0002b934)
+ensure_function(0x0002b700, "startup_status_arm_post_test_transition", 0x0002b770)
+ensure_function(0x0002b770, "startup_status_arm_subcounter_decrement", 0x0002b7b0)
+ensure_function(0x0002b940, "startup_status_arm_continuation_trampoline", 0x0002b960)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

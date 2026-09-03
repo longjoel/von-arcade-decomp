@@ -271,6 +271,11 @@ entries are `0:0x2b500`, `1:0x2b7b0`, `2:0x2b7e0`, `3:0x2b810`,
 null-result fallback in the caller. The gaps are intentional/default service
 slots, not undecoded instructions.
 
+The late populated arms are also bounded: `0x2b700` performs a post-test
+command/video transition and returns at `0x2b76c`; `0x2b770` decrements the
+status subcounter and returns through `0x2b7a4`; and `0x2b940` is a small
+continuation trampoline ending at `0x2b954`.
+
 Several entries are already structurally identifiable from their boundaries:
 `0x2b500` performs a video/status setup and advances the mode;
 `0x2b550` initializes a geometry-record workspace; `0x2b660` continues that
