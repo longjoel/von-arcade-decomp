@@ -1802,6 +1802,11 @@ the recovered object/update code: it rejects selectors outside its accepted
 range, while valid selectors program `0x800030` and the `0x804000` command
 window.
 
+The following callback builder at `0x6ff20–0x6fff4` is also now bounded as a
+function (exclusive end `0x70000`). It emits the fixed command preamble and
+the caller-supplied vector words through `0x804000`, then branches through
+the continuation saved in `g7`; the `0x6fff8` `ret` is its normal stub.
+
 The motion/update family continues through `0x2f360–0x30220`.  The aligned
 entries at `0x2f360`, `0x2f460`, `0x2f580`, `0x2f930`, `0x2fb20`, `0x2fe30`,
 `0x2ff80`, and `0x300c0` are phase-specific object state/callback handlers.
