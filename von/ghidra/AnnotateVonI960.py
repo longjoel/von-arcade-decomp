@@ -531,6 +531,12 @@ label(0x00043d50, "geometry_object_profile_state_variant_o",
       "Floating-point profile transition variant using the 0x43d20 descriptor table and updating object field 0xac.")
 label(0x00043e00, "geometry_object_profile_state_variant_p",
       "Alternate floating-point profile transition using the 0x43d40 descriptor pair, bounded scaling, and object field 0xac.")
+label(0x00043ee0, "geometry_profile_runtime_pool_clear",
+      "Clears the per-mode runtime profile pools and associated phase latch fields for both configured runtime contexts.")
+label(0x00043fc8, "geometry_profile_phase_dispatch_table",
+      "Eight-entry phase/geometry dispatch table selected by the object state field at offset 0x64.")
+label(0x00043fa0, "geometry_profile_phase_dispatch",
+      "Selects a phase-specific geometry state arm from the 0x43fc8 table and computes bounded object offsets 0xc2/0xc8.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1198,6 +1204,8 @@ ensure_function(0x00043bb0, "geometry_object_profile_state_variant_m", 0x00043ca
 ensure_function(0x00043cb0, "geometry_object_profile_state_variant_n", 0x00043d10)
 ensure_function(0x00043d50, "geometry_object_profile_state_variant_o", 0x00043e00)
 ensure_function(0x00043e00, "geometry_object_profile_state_variant_p", 0x00043edc)
+ensure_function(0x00043ee0, "geometry_profile_runtime_pool_clear", 0x00043fa0)
+ensure_function(0x00043fa0, "geometry_profile_phase_dispatch", 0x0004438c)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

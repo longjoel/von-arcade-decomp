@@ -2081,6 +2081,14 @@ the object scalar at `0xac` while retaining the shared cursor/timing protocol.
 Returns at `0x43b88`, `0x43ca0`, `0x43d0c`, `0x43dfc`, and `0x43ed8` delimit
 these handlers from their tables and padding.
 
+At `0x43ee0`, the runtime profile pools are cleared across both configured
+contexts, including their indexed phase arrays and phase latch bytes; the
+routine returns through `0x43f90`/`0x43f94`.  The next entry, `0x43fa0`, is a
+real indexed phase dispatcher: it selects one of eight state arms through the
+table at `0x43fc8` using object offset `0x64`, computes bounded `0xc2`/`0xc8`
+values, and returns at `0x44388`.  The table and its branch arms are therefore
+one dispatch routine, rather than eight independent top-level functions.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
