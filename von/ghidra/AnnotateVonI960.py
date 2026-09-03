@@ -320,12 +320,16 @@ label(0x00019180, "startup_mode_handler_4")
 label(0x000f3f00, "startup_mode_handler_5")
 label(0x000f3fe0, "startup_mode_handler_6")
 label(0x000f3d30, "startup_mode_handler_7")
+label(0x000f3ec0, "diagnostic_service_handler_table",
+      "Literal diagnostic service-handler targets selected by startup mode handler 6.")
 label(0x00018620, "startup_mode_handler_8_and_15")
 ensure_function(0x00003c40, "startup_mode_handler_0", 0x00003d64)
 ensure_function(0x0002b9e0, "startup_mode_handler_1_status_dispatch", 0x0002bb5c)
 ensure_function(0x00018620, "startup_mode_handler_8_and_15", 0x00018648)
 ensure_function(0x00018650, "startup_mode_handler_2", 0x00018678)
 ensure_function(0x000f3f00, "startup_mode_handler_5", 0x000f3fbc)
+ensure_function(0x000f3fe0, "startup_mode_handler_6", 0x000f4140)
+ensure_function(0x000f3d30, "startup_mode_handler_7", 0x000f3ec0)
 
 # Second-level status/service dispatch table selected by the low five bits of
 # 0x503a00 from startup_mode_handler_1_status_dispatch.

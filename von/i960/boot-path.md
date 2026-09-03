@@ -239,6 +239,12 @@ identify a missing handler; it proves the null-entry recovery branch at
 and 8 are now explicitly seeded as indirect-call targets in the annotation
 script. Their higher-level UI meanings remain intentionally unresolved.
 
+The handler-7 body at `0xf3d30` initializes the text/video phase, selects
+startup messages, and advances or resets `0x503a00`; it returns before the
+diagnostic target table at `0xf3ec0`. Handler 6 at `0xf3fe0` services the
+counter, selects from that table, mirrors input state into the runtime buffer,
+and returns at `0xf4138`.
+
 Slot 1 (`0x2b9e0`) is a real status/service dispatcher. It first checks the
 hardware mode byte at `0x503a08` and controller/status bytes at
 `0x1d00034`, `0x5023f2`, and `0x1d00038`. One guarded path loads `29` into
