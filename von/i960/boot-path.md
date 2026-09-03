@@ -2504,6 +2504,10 @@ The next frame-transition pair begins at `0x5ba50` and `0x5bb60`, using the
 `0x5bc70` then expands this into a larger indexed transition using the paired
 `0x48030`/`0x48034` records; its linked completion boundary is `0x5bfe0`.
 
+The parallel indexed transition at `0x5bff0` uses the `0x48060`/`0x48064`
+records, repeats the status-gated threshold and object-state setup pattern, and
+ends at its linked return boundary `0x5c360`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
