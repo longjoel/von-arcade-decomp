@@ -2644,6 +2644,26 @@ The generated-asset controller at `0x63d60` uses the
 `0x47d00`/`0x47d08`/`0x47d10` records, scales the cursor in fixed point,
 updates state flags, and returns through its callback at `0x63f24`.
 
+The indexed transition at `0x63f30` uses the paired `0x47d20`/`0x47d24`
+records and publishes the selected cursor pair before applying its phase
+limit and terminal object-state reset; it ends at `0x64190`.  The late
+indexed sibling at `0x641a0` uses `0x47d80`/`0x47d84`; its alternate arm
+continues through `0x6422c`, so the complete function boundary is `0x64300`.
+
+The phase controller at `0x64310` advances the paired counters at `0x1f8`
+and `0x1fa`, selects `0x47dc0`/`0x47dc4` records, publishes the active
+cursor pair, and performs terminal progression through `0x6459c`.
+
+At `0x645a0` the geometry bounds evaluator clamps the three extents, applies
+the object-record offsets, updates the `0x1dd`/`0x1de`/`0x1df` axis flags,
+and computes the derived ratios at `0x1e4`/`0x1e2`/`0x1e6`; it returns through
+its saved callback at `0x648c4`.
+
+The object-state controllers at `0x648d0` and `0x64b00` are parallel
+callback-driven handlers.  The first uses `0x486f0`/`0x486f8` records and
+movement flags, ending at `0x64af0`; the second indexes the `0x48710` table
+using the object selector at `0x188`, ending at `0x64d3c`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
