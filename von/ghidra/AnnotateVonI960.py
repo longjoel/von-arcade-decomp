@@ -381,6 +381,8 @@ label(0x00039910, "geometry_object_resource_remainder_continuation",
       "Publishes the remainder-based resource result and returns through the caller continuation.")
 label(0x00039980, "geometry_object_resource_phase_dispatch",
       "Selects phase-specific resource state, publishes the result, and returns through the caller continuation.")
+label(0x00039a90, "geometry_geometry_batch_initializer",
+      "Initializes a framed 0x884000 batch, programs 0x800010/0x804000, and submits the related geometry records.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -985,6 +987,7 @@ ensure_function(0x00039490, "geometry_object_service_motion_update", 0x00039850)
 ensure_function(0x00039850, "geometry_object_service_motion_variant_g", 0x00039910)
 ensure_function(0x00039910, "geometry_object_resource_remainder_continuation", 0x00039980)
 ensure_function(0x00039980, "geometry_object_resource_phase_dispatch", 0x00039a90)
+ensure_function(0x00039a90, "geometry_geometry_batch_initializer", 0x00039da0)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

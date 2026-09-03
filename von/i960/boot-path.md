@@ -1903,6 +1903,13 @@ the associated service/result slots, and returns through `g1` at `0x39a68` or
 `0x39a88` (`ret` at `0x39a8c`).  The next framed packet-emission routine begins
 at `0x39a90`.
 
+`0x39a90` is a framed geometry-batch initializer.  It emits the `5,18`
+batch prefix and fixed-point constants through `0x884000`, programs the
+`0x800010` command selector and `0x804000` tuple window, then submits related
+records sourced through the tables at `0x51ace8` and `0x51acf0`.  Its stack
+frame is restored and the routine returns at `0x39d94`; `0x39da0` begins a
+separate floating-point/packet path.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
