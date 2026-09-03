@@ -2744,6 +2744,14 @@ selects the floating-point thresholds `0.4`, `0.55`, `0.9375`, or `1.0`,
 updates motion state, and publishes the resulting value through
 `0x804008`/`0x80400c`; it returns at `0x6e6e0`.
 
+The motion math dispatch cluster follows at `0x6e6f0`, `0x6e7f0`,
+`0x6e8f0`, `0x6e940`, and `0x6ea40`.  These floating-point dispatchers select
+phase-dependent constants and return through supplied callbacks at
+`0x6e7e4`, `0x6e8e4`, `0x6e93c`, `0x6ea34`, and `0x6eb34`.  The minimal bridge
+at `0x6eb40–0x6eb54` completes the callback path.  Their repeated constant
+selection and callback structure identifies them as motion math helpers,
+while the exact higher-level operation remains unresolved.
+
 The parallel bounds evaluator at `0x68550` repeats the extent clamp,
 object-offset, axis-flag, and derived-ratio sequence, returning through its
 saved callback at `0x6876c`.  The separate phase/selection controller at

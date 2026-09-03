@@ -1017,6 +1017,18 @@ label(0x0006e0b0, "geometry_command_packet_writer_variant_b",
       "Structured geometry command packet writer that emits object coordinates, dimensions, and mode words to the 0x884000 FIFO.")
 label(0x0006e630, "geometry_motion_threshold_service",
       "Motion threshold service that gates phase states 10/11, selects fixed floating-point thresholds, updates motion state, and publishes the result through 0x804008/0x80400c.")
+label(0x0006e6f0, "geometry_motion_math_dispatch_variant_a",
+      "Floating-point motion math dispatcher that selects a phase-dependent constant and returns through the supplied callback.")
+label(0x0006e7f0, "geometry_motion_math_dispatch_variant_b",
+      "Floating-point motion math dispatcher variant that selects a phase-dependent constant and returns through the supplied callback.")
+label(0x0006e8f0, "geometry_motion_math_dispatch_variant_c",
+      "Compact floating-point motion math dispatcher for the phase-3 path, returning through the supplied callback.")
+label(0x0006e940, "geometry_motion_math_dispatch_variant_d",
+      "Floating-point motion math dispatcher variant that selects a phase-dependent constant and returns through the supplied callback.")
+label(0x0006ea40, "geometry_motion_math_dispatch_variant_e",
+      "Floating-point motion math dispatcher variant that selects a phase-dependent constant and returns through the supplied callback.")
+label(0x0006eb40, "geometry_motion_math_callback_bridge",
+      "Minimal callback bridge for the motion math dispatch cluster.")
 label(0x00068550, "geometry_object_profile_geometry_bounds_flags_update_variant_f",
       "Third parallel geometry bounds evaluator that clamps extents, applies object-record offsets, updates axis collision flags, and computes derived ratios.")
 label(0x00068770, "geometry_object_profile_phase_selection_controller_variant_b",
@@ -1952,6 +1964,12 @@ ensure_function(0x0006d390, "geometry_command_packet_writer_variant_a", 0x0006dc
 ensure_function(0x0006ddb0, "geometry_object_profile_phase_state_controller", 0x0006e0a4)
 ensure_function(0x0006e0b0, "geometry_command_packet_writer_variant_b", 0x0006e62c)
 ensure_function(0x0006e630, "geometry_motion_threshold_service", 0x0006e6e0)
+ensure_function(0x0006e6f0, "geometry_motion_math_dispatch_variant_a", 0x0006e7e4)
+ensure_function(0x0006e7f0, "geometry_motion_math_dispatch_variant_b", 0x0006e8e4)
+ensure_function(0x0006e8f0, "geometry_motion_math_dispatch_variant_c", 0x0006e93c)
+ensure_function(0x0006e940, "geometry_motion_math_dispatch_variant_d", 0x0006ea34)
+ensure_function(0x0006ea40, "geometry_motion_math_dispatch_variant_e", 0x0006eb34)
+ensure_function(0x0006eb40, "geometry_motion_math_callback_bridge", 0x0006eb54)
 ensure_function(0x00068550, "geometry_object_profile_geometry_bounds_flags_update_variant_f", 0x0006876c)
 ensure_function(0x00068770, "geometry_object_profile_phase_selection_controller_variant_b", 0x00068a3c)
 ensure_function(0x00068a40, "geometry_command_packet_writer_variant_c", 0x00069040)
