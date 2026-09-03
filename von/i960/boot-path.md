@@ -2367,6 +2367,19 @@ coordinates and advance phase `0x17a`; the first has internal exits at
 at `0x5554c`.  The sibling’s threshold/event arms run through `0x5578c`,
 `0x55794`, and `0x55804`, ending at `0x55808`.
 
+The next top-level boundary at `0x55930` is a per-frame object kinematics
+service rather than another profile-table selector.  It clamps the three
+position fields at `0x1ec`/`0x1ea`/`0x1ee` against the active record, derives
+collision flags at `0x1dd`/`0x1de`/`0x1df`, and computes normalized extents at
+`0x1e2`/`0x1e4`/`0x1e6` using fixed-point division.  It returns through the
+saved link at `0x55c88`.
+
+The `0x55c90` controller consumes phase/state `0x17c` and selects the
+`0x475e0`/`0x475e8`/`0x475f0` records for progression, reset, and cursor
+publication.  Its internal arms end at `0x55e9c`.  The following `0x55ea0`
+variant uses `0x47600` indexed records and carries the same transition protocol
+through its aligned return at `0x560c8`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
