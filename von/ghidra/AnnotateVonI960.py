@@ -2150,6 +2150,12 @@ ensure_function(0x00072ea0, "match_state_result_service", 0x00073490)
 ensure_function(0x00073498, "match_result_counter_service", 0x00073500)
 ensure_function(0x00073508, "geometry_range_classify", 0x000735d0)
 ensure_function(0x000735d0, "match_result_state_dispatch", 0x00073618)
+ensure_function(0x000736a0, "geometry_profile_handler_0", 0x000737c8)
+ensure_function(0x000737c8, "geometry_profile_handler_1", 0x00073900)
+ensure_function(0x00073900, "geometry_profile_handler_2", 0x00073a34)
+ensure_function(0x00073a34, "geometry_profile_handler_3", 0x00073b68)
+ensure_function(0x00073b68, "geometry_profile_handler_4", 0x00073c98)
+ensure_function(0x00073c98, "geometry_profile_handler_5", 0x00073dcc)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2335,6 +2341,18 @@ label(0x00073498, "match_result_counter_service",
       "Updates the shared result pair and counter state, then returns through the continuation saved in g6.")
 label(0x000735d0, "match_result_state_dispatch",
       "Dispatches result-state handling through the mode/count table at 0x73618 after selecting the object-side context.")
+label(0x000736a0, "geometry_profile_handler_0",
+      "Profile-table handler 0: scans nine geometry records, emits selector 29/30 packets, classifies residuals, and branches to the shared continuation.")
+label(0x000737c8, "geometry_profile_handler_1",
+      "Profile-table handler 1: scans nine geometry records with its profile-specific packet bit and branches to the shared continuation.")
+label(0x00073900, "geometry_profile_handler_2",
+      "Profile-table handler 2: scans nine geometry records with its profile-specific packet bit and branches to the shared continuation.")
+label(0x00073a34, "geometry_profile_handler_3",
+      "Profile-table handler 3: scans nine geometry records with its profile-specific packet bit and branches to the shared continuation.")
+label(0x00073b68, "geometry_profile_handler_4",
+      "Profile-table handler 4: scans nine geometry records with its profile-specific packet bit and branches to the shared continuation.")
+label(0x00073c98, "geometry_profile_handler_5",
+      "Profile-table handler 5: scans nine geometry records with its profile-specific packet bit and branches to the shared continuation.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",
