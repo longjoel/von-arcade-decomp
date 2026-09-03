@@ -361,6 +361,10 @@ label(0x000388f0, "geometry_object_resource_motion_variant_e",
       "Advances the primary resource phase, applies the profile timing envelope, and clears the transient result on completion.")
 label(0x000389f0, "geometry_object_resource_motion_variant_f",
       "Updates the secondary fixed-point coordinate with bounded motion deltas and advances the object phase.")
+label(0x00038b30, "geometry_object_pair_packet_update",
+      "Emits a paired 0x884000 geometry packet and advances the object coordinate fields at offsets 0x36 and 0x38.")
+label(0x00038db0, "geometry_object_service_counter_loop",
+      "Processes the object service counter table, dispatches geometry payloads, and advances the service state.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -956,6 +960,8 @@ ensure_function(0x000385f0, "geometry_object_resource_motion_variant_c", 0x00038
 ensure_function(0x000386c0, "geometry_object_resource_motion_variant_d", 0x000388f0)
 ensure_function(0x000388f0, "geometry_object_resource_motion_variant_e", 0x000389f0)
 ensure_function(0x000389f0, "geometry_object_resource_motion_variant_f", 0x00038b30)
+ensure_function(0x00038b30, "geometry_object_pair_packet_update", 0x00038db0)
+ensure_function(0x00038db0, "geometry_object_service_counter_loop", 0x00038ef0)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

@@ -1852,6 +1852,18 @@ against the observed `0x40`/`0x3f` bounds, and advances phase field `0x178`.
 Its terminal returns are at `0x38b00`, `0x38b24`, and `0x38b2c`; the next
 distinct geometry packet path begins at `0x38b30`.
 
+`0x38b30` is a separate paired-packet updater.  When the service mode at
+`0x51acac` permits it, the routine emits two related records through `0x884000`,
+derives a fixed-point difference from the object and its paired record, clamps
+the motion delta, and updates object fields `0x36` and `0x38`.  Its terminal
+returns converge at `0x38d30` or `0x38da0`; the next entry begins at `0x38db0`.
+
+`0x38db0` walks the service counters at `0x51acc0`/`0x51acd0`, handling the
+three counter states, dispatching payloads through the geometry producers at
+`0xbbcf0`/`0xbb640`, and advancing the associated table cursor.  The loop
+returns at `0x38ee0`.  A larger packet-builder routine begins at `0x38ef0` and
+is left as the next boundary to sieve.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
