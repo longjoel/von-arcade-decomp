@@ -1522,6 +1522,20 @@ using the alternate record buffer and returns at `0xe5d2c`. The compact
 dispatcher at `0xe5d30` gates on the board byte at `0x1d00026`, selects among
 the state-0/1/2/3/4 handlers, and returns from each selected call path.
 
+The transition gateway at `0xe5da0` reduces the service timer modulo `0x870`
+and handles the early transition values before joining its common continuation
+at `0xe60d0`; its visible return is at `0xe61bc`. The parallel gateway at
+`0xe61c0` performs the corresponding alternate rendering path and joins at
+`0xe6410`, returning at `0xe64fc`.
+
+The profile renderer entry at `0xe6500` bounds its selector to eight cases and
+dispatches through the local table at `0xe651c`. The selected arms join the
+profile rendering loop at `0xe6578`, which emits the geometry/status fields and
+returns at `0xe6640`; `0xe6648`–`0xe665c` are literal fallback dot strings.
+The larger frame builder at `0xe6660` constructs the 8-by-13 status grid,
+renders the active columns through `0xe6500`, updates the video-state words,
+and returns at `0xe6d3c`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

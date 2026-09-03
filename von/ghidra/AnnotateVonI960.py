@@ -412,6 +412,18 @@ label(0x000e5bb4, "status_record_list_render_variant_b",
       "Third record-list renderer using the alternate runtime record buffer and blank-row fallback.")
 label(0x000e5d30, "status_service_state_dispatch",
       "Checks hardware enable state and dispatches the current status counter to a state-specific handler.")
+label(0x000e5da0, "status_transition_render_gateway",
+      "Dispatches timer-derived status transitions and joins the common renderer continuation.")
+label(0x000e61c0, "status_transition_render_variant",
+      "Alternate timer-derived transition renderer joining the common e6410 continuation.")
+label(0x000e6500, "status_profile_selector_dispatch",
+      "Maps a bounded selector through the local table at 0xe651c before the profile renderer loop.")
+label(0x000e651c, "status_profile_selector_table",
+      "Eight-entry local dispatch table for the status profile renderer.")
+label(0x000e6648, "status_blank_dot_strings",
+      "Fallback dot strings used by the status profile renderer for empty entries.")
+label(0x000e6660, "status_record_grid_frame_build",
+      "Builds the eight-by-thirteen status record grid, renders its columns, and updates video state.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -469,6 +481,10 @@ ensure_function(0x000e56e0, "status_record_list_render", 0x000e5a8c)
 ensure_function(0x000e5a90, "status_record_list_render_alt", 0x000e5bb4)
 ensure_function(0x000e5bb4, "status_record_list_render_variant_b", 0x000e5d30)
 ensure_function(0x000e5d30, "status_service_state_dispatch", 0x000e5d80)
+ensure_function(0x000e5da0, "status_transition_render_gateway", 0x000e61c0)
+ensure_function(0x000e61c0, "status_transition_render_variant", 0x000e6500)
+ensure_function(0x000e6500, "status_profile_selector_dispatch", 0x000e6644)
+ensure_function(0x000e6660, "status_record_grid_frame_build", 0x000e6d40)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
