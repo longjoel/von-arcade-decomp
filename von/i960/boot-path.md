@@ -1881,6 +1881,14 @@ the paired counter table, then returns through the supplied continuation in
 `g2` at `0x3947c` (`ret` at `0x39480`).  The longer state/update path begins at
 `0x39490` and remains separate pending its full branch-connected boundary.
 
+The branch-connected `0x39490` routine is a three-state service-motion
+updater.  Its state-0, state-1, and state-2 arms emit paired records through
+`0x884000`, use the object fields at `0x184`/`0x36` plus service constants at
+`0x51ab30`/`0x51ab40`/`0x51ab3c`/`0x51ab54`, clamp the fixed-point deltas, and
+advance the associated service state.  The internal terminal returns at
+`0x39558`, `0x39674`, and `0x39730` are all within this one function; the next
+distinct entry begins at `0x39740`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
