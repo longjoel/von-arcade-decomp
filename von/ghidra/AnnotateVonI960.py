@@ -432,6 +432,8 @@ ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
 label(0x0051bb20, "geometry_profile_word_0")
 label(0x0051bb24, "geometry_profile_word_pair")
 label(0x0051bb28, "geometry_profile_word_2")
+label(0x0006eb60, "geometry_profile_record_table",
+      "Sixteen 0x18-byte ROM records consumed by the profile table loaders.")
 label(0x00142e94, "text_asset_pointer_table_bank_a")
 label(0x00142f34, "text_asset_pointer_table_bank_b")
 ensure_function(0x000423a8, "startup_record_table_clear", 0x00042460)

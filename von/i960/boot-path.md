@@ -298,6 +298,14 @@ record tables with bounds `0x33c` and `0x508`, using `0xffff` sentinels, while
 helpers are setup primitives shared by the profile arms, not per-profile
 state machines.
 
+The source table at `0x6eb60` contains sixteen records of `0x18` bytes. The
+loaders use record offsets `0x0`/`0x4` as a 64-bit pair, offset `0xc` as the
+record’s profile word, and offset `0x14` as a halfword/status value. The
+selected pair is published into `0x51bb24` and `0x51bb28`, while the profile
+word is published at `0x51bb20`; the halfword is also forwarded into the
+geometry FIFO path. This gives the runtime profile state a precise ROM source
+and layout without assigning units or object semantics to the values.
+
 The shared transform service at `0x27550` is now bounded from `0x27550` to
 the return at `0x27c4c`. It initializes the object record at `g0`: offsets
 `0`, `0x2`, `0x4`, `0x64`, `0x68`, `0x6c`, and `0x74` receive the incoming
