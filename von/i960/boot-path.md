@@ -1824,6 +1824,11 @@ The following table-style entries are bounded independently as well:
 `0x70fc0–0x7107c` emits the compact fixed-constant variant. Their separate
 return sites leave the prologue at `0x71080` available as the next routine
 boundary.
+The prologue-backed routine at `0x71080–0x72044` is now bounded as
+`geometry_object_match_update`. Its direct callers pass object records; the
+routine validates match state, derives transformed frame values, emits the
+associated geometry packets, stores generated response fields back into the
+record, and updates shared timing counters before its epilogue.
 
 The motion/update family continues through `0x2f360–0x30220`.  The aligned
 entries at `0x2f360`, `0x2f460`, `0x2f580`, `0x2f930`, `0x2fb20`, `0x2fe30`,
