@@ -781,6 +781,12 @@ label(0x0005a5e0, "geometry_object_profile_phase_transition_variant_j",
       "Compact profile phase transition using the 0x47ef0 record, advancing or resetting phase state and publishing the shared cursor values.")
 label(0x0005a680, "geometry_object_profile_phase_transition_variant_k",
       "Compact profile phase transition using the 0x47f00 record, advancing or resetting phase state and publishing the shared cursor values.")
+label(0x0005a780, "geometry_object_profile_phase_transition_variant_l",
+      "Multi-state profile transition using geometry-derived timing, phase counters, status flags, and terminal record selection.")
+label(0x0005aac0, "geometry_object_profile_indexed_transition_variant_l",
+      "Indexed profile transition using the paired 0x47f10/0x47f14 records, shared cursor publication, and phase completion updates.")
+label(0x0005acc0, "geometry_object_profile_indexed_transition_variant_m",
+      "Indexed profile transition using the paired 0x47f70/0x47f74 records, shared cursor publication, phase/status updates, and reset completion.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1572,6 +1578,9 @@ ensure_function(0x0005a440, "geometry_object_profile_phase_transition_variant_h"
 ensure_function(0x0005a4e0, "geometry_object_profile_phase_transition_variant_i", 0x0005a5dc)
 ensure_function(0x0005a5e0, "geometry_object_profile_phase_transition_variant_j", 0x0005a67c)
 ensure_function(0x0005a680, "geometry_object_profile_phase_transition_variant_k", 0x0005a77c)
+ensure_function(0x0005a780, "geometry_object_profile_phase_transition_variant_l", 0x0005aabc)
+ensure_function(0x0005aac0, "geometry_object_profile_indexed_transition_variant_l", 0x0005acb8)
+ensure_function(0x0005acc0, "geometry_object_profile_indexed_transition_variant_m", 0x0005af00)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

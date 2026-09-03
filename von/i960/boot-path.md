@@ -2475,6 +2475,12 @@ record, ending at `0x5a67c`, and at `0x5a680` with the `0x47f00` record,
 ending at `0x5a77c`.  Both preserve the shared cursor publication pattern while
 advancing or resetting the profile phase counter.
 
+The next multi-state transition at `0x5a780` incorporates geometry-derived
+timing and ends at `0x5aabc`.  Two indexed siblings follow: `0x5aac0` consumes
+the paired `0x47f10`/`0x47f14` records and ends at `0x5acb8`, while `0x5acc0`
+consumes `0x47f70`/`0x47f74` and ends at `0x5af00`.  All three continue the
+shared cursor publication and phase/status completion pattern.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
