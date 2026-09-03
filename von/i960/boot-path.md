@@ -1811,6 +1811,11 @@ the same command-window protocol but a different coordinate arrangement. The
 short fixed-constant writer at `0x700e0–0x70194` is separately bounded as a
 third variant; its following aligned code at `0x701a0` is therefore not
 accidentally absorbed into the packet writer.
+The heavily reused routine at `0x701a0–0x70968` is now bounded as
+`geometry_clip_packet_builder`: it compares the signed coordinate pairs to
+choose among four ordering arms, emits the matching packet, and converges on
+the internal tail at `0x70950` before returning. This target is called from
+both startup geometry setup and the active object/update paths.
 
 The motion/update family continues through `0x2f360–0x30220`.  The aligned
 entries at `0x2f360`, `0x2f460`, `0x2f580`, `0x2f930`, `0x2fb20`, `0x2fe30`,
