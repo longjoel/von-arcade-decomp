@@ -463,6 +463,14 @@ label(0x00041340, "geometry_object_motion_packet_variant_b",
       "Emits the standard command-5 geometry packet after coordinate accumulation, using the profile payload table at 0x2be159c.")
 label(0x000414b0, "geometry_object_motion_packet_variant_c",
       "Parallel command-5 geometry packet path using the payload table at 0x2be171c and the shared selector comparison.")
+label(0x00041620, "geometry_object_motion_packet_variant_d",
+      "State-sensitive command-5/18/19/21 emitter that adjusts object motion fields, selects payloads from the 0x2be2xxx tables, and returns after the shared packet tail.")
+label(0x00041800, "geometry_object_motion_packet_variant_e",
+      "Parallel command-5 emitter using the alternate selector comparison and the payload table at 0x2be04f8.")
+label(0x000419c0, "geometry_object_motion_packet_variant_f",
+      "Framed command-5/18/19/21 emitter with fixed-point interpolation and the shared 0x804000 submission sequence.")
+label(0x00041c50, "geometry_object_packet_dispatch_table",
+      "Indirect dispatch table selecting the recovered object packet and motion variants for the active record state.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1106,6 +1114,9 @@ ensure_function(0x00040f50, "geometry_object_packet_variant_f", 0x00041090)
 ensure_function(0x00041090, "geometry_object_motion_packet_variant_a", 0x00041340)
 ensure_function(0x00041340, "geometry_object_motion_packet_variant_b", 0x000414b0)
 ensure_function(0x000414b0, "geometry_object_motion_packet_variant_c", 0x00041620)
+ensure_function(0x00041620, "geometry_object_motion_packet_variant_d", 0x00041800)
+ensure_function(0x00041800, "geometry_object_motion_packet_variant_e", 0x000419c0)
+ensure_function(0x000419c0, "geometry_object_motion_packet_variant_f", 0x00041c50)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

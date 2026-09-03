@@ -2020,6 +2020,15 @@ records.  Their payload tables (`0x2be14dc`, `0x2be159c`, and `0x2be171c`)
 remain distinct, and the exact returns at `0x41330`, `0x414ac`, and `0x4161c`
 confirm three separate routines.
 
+The dispatch table at `0x41c50` adds three more entries in this family:
+`0x41620`, `0x41800`, and `0x419c0`.  The `0x41620` handler is state-sensitive
+and performs fixed-point motion interpolation before emitting the shared
+command-5/18/19/21 tail; `0x41800` is an alternate profile comparison and
+payload route; and `0x419c0` is the framed interpolation variant.  Their
+returns at `0x417f0` and `0x419b0`, followed by the `0x419c0` entry, confirm
+that the table is an indirect selector over distinct handlers rather than a
+single linear routine.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
