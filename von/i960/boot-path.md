@@ -1791,6 +1791,13 @@ runtime record family.
 coordinates, emits the corresponding geometry command words through
 `0x884000`, and supplies the transformed value stored in object field `0x154`.
 
+The motion/update family continues through `0x2f360–0x30220`.  The aligned
+entries at `0x2f360`, `0x2f460`, `0x2f580`, `0x2f930`, `0x2fb20`, `0x2fe30`,
+`0x2ff80`, and `0x300c0` are phase-specific object state/callback handlers.
+`0x2fa20–0x2fb10` and `0x2fd50–0x2fe28` are continuation trampolines: they
+save the shared geometry result, clear the transient callback state, and
+return through a caller-supplied address rather than ending with `ret`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

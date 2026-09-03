@@ -224,6 +224,26 @@ label(0x0002f010, "geometry_object_motion_variant_a",
       "Advances an object motion state, updates frame fields, and returns through a supplied continuation.")
 label(0x0002f260, "geometry_object_motion_variant_b",
       "Parallel object motion/update variant using the shared geometry callback skeleton.")
+label(0x0002f360, "geometry_object_motion_variant_c",
+      "Advances the shared object timer/state and emits the common geometry callback result.")
+label(0x0002f460, "geometry_object_motion_variant_d",
+      "Updates object position/state and selects the next device callback by motion phase.")
+label(0x0002f580, "geometry_object_motion_variant_e",
+      "Updates motion phase, interpolated geometry coordinates, and the shared callback state.")
+label(0x0002f930, "geometry_object_motion_variant_f",
+      "Runs the motion completion callback and derives the next object phase/geometry mode.")
+label(0x0002fa20, "geometry_object_motion_continuation_a",
+      "Continuation trampoline for motion geometry output; returns through the supplied callback address.")
+label(0x0002fb20, "geometry_object_motion_variant_g",
+      "Dispatches phase-specific motion callbacks and selects the corresponding geometry result.")
+label(0x0002fd50, "geometry_object_motion_continuation_b",
+      "Continuation trampoline for the second motion geometry output path.")
+label(0x0002fe30, "geometry_object_motion_variant_h",
+      "Updates object phase and geometry coordinates, then selects the active callback result.")
+label(0x0002ff80, "geometry_object_motion_variant_i",
+      "Advances object motion and phase fields while updating the shared geometry output window.")
+label(0x000300c0, "geometry_object_motion_variant_j",
+      "Dispatches the next motion phase and publishes the resulting geometry callback state.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -764,6 +784,16 @@ ensure_function(0x0002ece0, "geometry_object_update_variant_h", 0x0002ef80)
 ensure_function(0x0002ef90, "geometry_object_callback_state_dispatch", 0x0002f010)
 ensure_function(0x0002f010, "geometry_object_motion_variant_a", 0x0002f260)
 ensure_function(0x0002f260, "geometry_object_motion_variant_b", 0x0002f360)
+ensure_function(0x0002f360, "geometry_object_motion_variant_c", 0x0002f460)
+ensure_function(0x0002f460, "geometry_object_motion_variant_d", 0x0002f580)
+ensure_function(0x0002f580, "geometry_object_motion_variant_e", 0x0002f930)
+ensure_function(0x0002f930, "geometry_object_motion_variant_f", 0x0002fa20)
+ensure_function(0x0002fa20, "geometry_object_motion_continuation_a", 0x0002fb20)
+ensure_function(0x0002fb20, "geometry_object_motion_variant_g", 0x0002fd50)
+ensure_function(0x0002fd50, "geometry_object_motion_continuation_b", 0x0002fe30)
+ensure_function(0x0002fe30, "geometry_object_motion_variant_h", 0x0002ff80)
+ensure_function(0x0002ff80, "geometry_object_motion_variant_i", 0x000300c0)
+ensure_function(0x000300c0, "geometry_object_motion_variant_j", 0x00030230)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
