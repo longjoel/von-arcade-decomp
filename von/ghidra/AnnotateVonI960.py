@@ -879,6 +879,18 @@ label(0x0005fcf0, "geometry_object_profile_phase_transition_variant_ah",
       "Profile phase transition using the 0x486d8 record pair, advancing the phase and selecting the terminal state by mode.")
 label(0x0005fdb0, "geometry_object_profile_indexed_phase_controller_variant_b",
       "Large callback-returning indexed phase controller using the paired 0x48510/0x48514 records, object geometry correction, phase/status gates, and terminal reset handling.")
+label(0x00060050, "geometry_object_profile_indexed_phase_controller_variant_c",
+      "Large indexed phase controller using the paired 0x48540/0x48544 records, object geometry correction, phase/status gates, and terminal reset handling.")
+label(0x00060370, "geometry_object_profile_phase_controller_variant_l",
+      "Callback-returning profile phase controller using generated asset addresses, short phase thresholds, and terminal state progression.")
+label(0x00060580, "geometry_object_profile_phase_controller_variant_m",
+      "Callback-returning profile phase controller using generated asset addresses, phase thresholds, and terminal cursor progression.")
+label(0x00060a30, "geometry_object_profile_indexed_transition_variant_x",
+      "Indexed profile transition using the paired 0x48570/0x48574 records, advancing the phase and entering the next object state.")
+label(0x00060c60, "geometry_object_profile_indexed_transition_variant_y",
+      "Indexed profile transition using the 0x485d0/0x485d4 records, phase threshold handling, cursor publication, and terminal object-state reset.")
+label(0x000611d0, "geometry_object_profile_geometry_bounds_flags_update_variant_c",
+      "Geometry bounds and axis-flag evaluator that clamps the three object extents, tests collision-side conditions, computes derived ratios, and returns through a saved callback.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1719,6 +1731,12 @@ ensure_function(0x0005fb80, "geometry_object_profile_phase_controller_variant_k"
 ensure_function(0x0005fc30, "geometry_object_profile_phase_transition_variant_ag", 0x0005fcec)
 ensure_function(0x0005fcf0, "geometry_object_profile_phase_transition_variant_ah", 0x0005fdac)
 ensure_function(0x0005fdb0, "geometry_object_profile_indexed_phase_controller_variant_b", 0x0006004c)
+ensure_function(0x00060050, "geometry_object_profile_indexed_phase_controller_variant_c", 0x0006036c)
+ensure_function(0x00060370, "geometry_object_profile_phase_controller_variant_l", 0x0006057c)
+ensure_function(0x00060580, "geometry_object_profile_phase_controller_variant_m", 0x000607fc)
+ensure_function(0x00060a30, "geometry_object_profile_indexed_transition_variant_x", 0x00060ac0)
+ensure_function(0x00060c60, "geometry_object_profile_indexed_transition_variant_y", 0x00060e78)
+ensure_function(0x000611d0, "geometry_object_profile_geometry_bounds_flags_update_variant_c", 0x000615e8)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

@@ -2588,6 +2588,22 @@ The larger indexed controller at `0x5fdb0` uses the paired `0x48510`/`0x48514`
 records, applies phase/status gates and geometry correction, then returns
 through its callback at `0x6004c`.
 
+The indexed controller at `0x60050` uses the paired `0x48540`/`0x48544`
+records and ends at `0x6036c`.  The callback-returning controller at
+`0x60370` uses generated asset addresses and ends at `0x6057c`; its sibling
+at `0x60580` continues the generated-asset phase progression through
+`0x607fc`.
+
+The indexed transitions at `0x60a30` and `0x60c60` use the
+`0x48570`/`0x48574` and `0x485d0`/`0x485d4` records respectively, publishing
+cursor pairs and applying state changes at their thresholds.  Their linked
+boundaries are `0x60ac0` and `0x60e78`.
+
+At `0x611d0` the code changes role: it decrements and clamps the three
+object extents, updates the `0x1dd`/`0x1de`/`0x1df` axis flags from geometry
+and collision tests, computes derived ratios at `0x1e4`, and returns through
+the saved callback at `0x615e8`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
