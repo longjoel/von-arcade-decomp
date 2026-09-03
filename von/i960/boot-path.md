@@ -1675,6 +1675,12 @@ pattern and returns at `0xf1d40`. Its formatter helper at `0xf1db0` computes
 and prints credit arithmetic through `0xf1ebc`; the coin-chute status renderer
 at `0xf1f20` reads the live coin/status bytes and returns at `0xf20a4`.
 
+The bookkeeping service at `0xf2e20` maintains three diagnostic state fields,
+selects from the paired handler tables at `0xf2de0` and `0xf2e00`, and calls
+the active accounting sub-handler before returning at `0xf2ee4`. The nearby
+format strings identify this family as bookkeeping, coin-chute, credit, and
+game-time reporting.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

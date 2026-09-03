@@ -604,6 +604,12 @@ label(0x000f1db0, "diagnostic_credit_math_formatter",
       "Formats credit arithmetic and comparison results for the coin diagnostic display.")
 label(0x000f1f20, "diagnostic_coin_chute_status_render",
       "Renders coin-chute type and credit status using the live input/status bytes.")
+label(0x000f2de0, "diagnostic_bookkeeping_handler_table_a",
+      "Primary bookkeeping diagnostic handler table selected by the service state.")
+label(0x000f2e00, "diagnostic_bookkeeping_handler_table_b",
+      "Alternate bookkeeping diagnostic handler table selected by the service state.")
+label(0x000f2e20, "diagnostic_bookkeeping_service",
+      "Advances bookkeeping diagnostic state and dispatches the active accounting sub-handler.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -741,6 +747,7 @@ ensure_function(0x000f0980, "diagnostic_match_time_test_service", 0x000f0b3c)
 ensure_function(0x000f1c90, "diagnostic_coin_credit_service", 0x000f1d50)
 ensure_function(0x000f1db0, "diagnostic_credit_math_formatter", 0x000f1ec0)
 ensure_function(0x000f1f20, "diagnostic_coin_chute_status_render", 0x000f20b0)
+ensure_function(0x000f2e20, "diagnostic_bookkeeping_service", 0x000f2ef0)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
