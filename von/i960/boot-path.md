@@ -1885,9 +1885,18 @@ The branch-connected `0x39490` routine is a three-state service-motion
 updater.  Its state-0, state-1, and state-2 arms emit paired records through
 `0x884000`, use the object fields at `0x184`/`0x36` plus service constants at
 `0x51ab30`/`0x51ab40`/`0x51ab3c`/`0x51ab54`, clamp the fixed-point deltas, and
-advance the associated service state.  The internal terminal returns at
-`0x39558`, `0x39674`, and `0x39730` are all within this one function; the next
-distinct entry begins at `0x39740`.
+advance the associated service state.  The state-3 arm falls through at
+`0x39740`, and its terminal return is at `0x39848`; the internal returns at
+`0x39558`, `0x39674`, and `0x39730` are all within this one function.  The next
+distinct entry begins at `0x39850`.
+
+`0x39850` is a phase-gated resource-motion variant.  It selects alternating
+resource records, dispatches the corresponding geometry payload through
+`0xbabc0`, advances phase field `0x178`, and returns at `0x39908`.
+`0x39910` is a short remainder-based continuation: it reduces the current
+phase against the resource constant at `0x2adc158`, publishes the selected
+resource/result pair, and returns through `g1` at `0x3996c` (`ret` at
+`0x39970`).
 
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
