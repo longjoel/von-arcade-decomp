@@ -2039,6 +2039,15 @@ larger `0x51b070` pool, and emits active command-5/7/9 records; it returns at
 `0x42394`, selecting between `0x51b5b0` and `0x51b850` and writing seven
 caller-provided words into the indexed 16-byte record.
 
+The next profile-transition family is table-backed.  `0x42460` and `0x42760`
+are separate seven-word descriptor tables; their handlers begin at `0x42480`,
+`0x42670`, `0x42780`, and `0x428e0`.  Each advances the shared profile cursor
+fields at `0x51ab08`/`0x51ab0c`/`0x51ab10`/`0x51ab12`, applies phase-dependent
+thresholds, and publishes bounded object state at offsets `0xc2` and `0xc8`.
+The first pair returns through `0x42660`/`0x4274c`, while the alternate pair
+returns through `0x428d0`/`0x429bc`; the padding and continuation pointers
+confirm four distinct handlers.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

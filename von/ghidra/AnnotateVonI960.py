@@ -477,6 +477,18 @@ label(0x00041f20, "geometry_runtime_packet_dispatch",
       "Dispatches the 23-entry runtime record pool through the 0x41c50 handler table, then scans the larger pool and emits active command-5/7/9 records.")
 label(0x00042320, "geometry_runtime_buffer_record_store",
       "Selects one of the two runtime output buffers, computes its 16-byte record index, and stores the seven caller words.")
+label(0x00042460, "geometry_profile_state_table_a",
+      "Seven-word profile-state descriptor table consumed by the first state-transition handler family.")
+label(0x00042480, "geometry_object_profile_state_variant_a",
+      "Updates profile cursor and phase state from the 0x42460 descriptor table, clamps the derived state window, and publishes offsets 0xc2/0xc8.")
+label(0x00042670, "geometry_object_profile_state_variant_b",
+      "Continuation-style profile state update using the alternate descriptor entry and shared cursor/phase fields.")
+label(0x00042760, "geometry_profile_state_table_b",
+      "Alternate seven-word profile-state descriptor table for the second transition family.")
+label(0x00042780, "geometry_object_profile_state_variant_c",
+      "Updates the object profile cursor and phase from the 0x42760 descriptor table and publishes the bounded state window.")
+label(0x000428e0, "geometry_object_profile_state_variant_d",
+      "Continuation-style alternate profile state update using the 0x42760 descriptor table and phase thresholds.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1126,6 +1138,10 @@ ensure_function(0x000419c0, "geometry_object_motion_packet_variant_f", 0x00041c5
 ensure_function(0x00041cb0, "geometry_object_packet_batch_emit", 0x00041f20)
 ensure_function(0x00041f20, "geometry_runtime_packet_dispatch", 0x00042320)
 ensure_function(0x00042320, "geometry_runtime_buffer_record_store", 0x000423a0)
+ensure_function(0x00042480, "geometry_object_profile_state_variant_a", 0x00042670)
+ensure_function(0x00042670, "geometry_object_profile_state_variant_b", 0x00042760)
+ensure_function(0x00042780, "geometry_object_profile_state_variant_c", 0x000428e0)
+ensure_function(0x000428e0, "geometry_object_profile_state_variant_d", 0x000429c0)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
