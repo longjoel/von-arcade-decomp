@@ -827,6 +827,10 @@ label(0x0005cd90, "geometry_object_profile_indexed_transition_variant_s",
       "Large profile transition using the 0x481b0/0x481b8 records, cursor progression, object-state setup, and geometry correction.")
 label(0x0005cff0, "geometry_object_profile_phase_transition_variant_w",
       "Parallel profile phase transition using the 0x481d0/0x481d8 records, cursor progression, object-state setup, and geometry correction.")
+label(0x0005d1c0, "geometry_object_profile_phase_transition_variant_x",
+      "Large profile phase transition using the 0x481f0/0x481f8/0x48200 records, cursor progression, object-state setup, and geometry correction.")
+label(0x0005d3d0, "geometry_object_profile_geometry_bounds_flags_update_variant_b",
+      "Geometry bounds and collision-flag evaluator sibling that clamps profile coordinates, updates axis flags, and publishes derived geometry ratios.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1641,6 +1645,8 @@ ensure_function(0x0005c9f0, "geometry_object_profile_indexed_transition_variant_
 ensure_function(0x0005cd1c, "geometry_object_profile_transition_reset_helper_variant_c", 0x0005cd88)
 ensure_function(0x0005cd90, "geometry_object_profile_indexed_transition_variant_s", 0x0005cfe8)
 ensure_function(0x0005cff0, "geometry_object_profile_phase_transition_variant_w", 0x0005d1b8)
+ensure_function(0x0005d1c0, "geometry_object_profile_phase_transition_variant_x", 0x0005d3cc)
+ensure_function(0x0005d3d0, "geometry_object_profile_geometry_bounds_flags_update_variant_b", 0x0005d72c)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

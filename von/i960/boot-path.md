@@ -2528,6 +2528,12 @@ transition at `0x5cd90` uses `0x481b0`/`0x481b8`, performs cursor and object-sta
 updates plus geometry correction, and ends at `0x5cfe8`.  Its parallel sibling
 starts at `0x5cff0`, uses `0x481d0`/`0x481d8`, and ends at `0x5d1b8`.
 
+The next phase-transition handler at `0x5d1c0` uses the
+`0x481f0`/`0x481f8`/`0x48200` records and converges at `0x5d3cc`.  Its
+geometry evaluator sibling begins at `0x5d3d0`, performs the same bounds,
+axis-flag, and derived-ratio work as the earlier evaluator, and is linked
+through `0x5d72c`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
