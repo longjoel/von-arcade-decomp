@@ -1800,6 +1800,10 @@ return through a caller-supplied address rather than ending with `ret`.
 The same structure continues at `0x30230`, `0x30c20`, and `0x30d40`; the
 phase-reset helpers at `0x303e0`/`0x30420` and motion handlers through
 `0x30e40` form the next profile-selection cluster.
+The following entries through `0x31910` continue the same generated family:
+`0x30ff0`, `0x31210`, and `0x313e0` select indexed profiles, while
+`0x315a0`, `0x316d0`, `0x317f0`, and `0x31910` emit geometry packets and
+advance the object/frame phase state through their callback tables.
 
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics

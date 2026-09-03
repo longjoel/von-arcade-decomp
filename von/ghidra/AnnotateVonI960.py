@@ -262,6 +262,20 @@ label(0x00030d40, "geometry_object_motion_continuation_e",
       "Continuation trampoline for the alternate geometry profile table and phase update path.")
 label(0x00030e40, "geometry_object_motion_variant_n",
       "Initializes a motion phase from the selected geometry profile and publishes callback state.")
+label(0x00030ff0, "geometry_object_motion_variant_o",
+      "Advances motion state, selects a profile by phase, and updates the object's callback result.")
+label(0x00031210, "geometry_object_motion_variant_p",
+      "Initializes motion from a combined profile/phase table and publishes the next callback state.")
+label(0x000313e0, "geometry_object_motion_variant_q",
+      "Selects an indexed geometry profile and advances the object through its callback phase.")
+label(0x000315a0, "geometry_object_motion_variant_r",
+      "Emits the shared geometry packet and advances the startup/motion phase state.")
+label(0x000316d0, "geometry_object_motion_variant_s",
+      "Parallel geometry packet emitter using the alternate callback table entry.")
+label(0x000317f0, "geometry_object_motion_variant_t",
+      "Parallel geometry packet emitter using the shared phase and callback state path.")
+label(0x00031910, "geometry_object_motion_variant_u",
+      "Selects indexed geometry profiles and updates the object frame/result state.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -821,6 +835,13 @@ ensure_function(0x00030660, "geometry_object_motion_variant_m", 0x00030c20)
 ensure_function(0x00030c20, "geometry_object_motion_continuation_d", 0x00030d40)
 ensure_function(0x00030d40, "geometry_object_motion_continuation_e", 0x00030e40)
 ensure_function(0x00030e40, "geometry_object_motion_variant_n", 0x00030ff0)
+ensure_function(0x00030ff0, "geometry_object_motion_variant_o", 0x00031210)
+ensure_function(0x00031210, "geometry_object_motion_variant_p", 0x000313e0)
+ensure_function(0x000313e0, "geometry_object_motion_variant_q", 0x000315a0)
+ensure_function(0x000315a0, "geometry_object_motion_variant_r", 0x000316d0)
+ensure_function(0x000316d0, "geometry_object_motion_variant_s", 0x000317f0)
+ensure_function(0x000317f0, "geometry_object_motion_variant_t", 0x00031910)
+ensure_function(0x00031910, "geometry_object_motion_variant_u", 0x00031ab0)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
