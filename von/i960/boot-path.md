@@ -1910,6 +1910,14 @@ records sourced through the tables at `0x51ace8` and `0x51acf0`.  Its stack
 frame is restored and the routine returns at `0x39d94`; `0x39da0` begins a
 separate floating-point/packet path.
 
+`0x39da0` is the next framed selector packet builder.  It converts the input
+selector with i960 floating-point operations, emits the `5,18` packet prefix
+and selector-dependent coordinate/constants through `0x884000`, and reuses
+the `0x800010`/`0x804000` tuple-window setup.  Its internal branch target at
+`0x3a054` remains part of the same routine; the frame is restored at
+`0x3a138` and the terminal `ret` is at `0x3a13c`.  The next distinct entry is
+`0x3a140`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
