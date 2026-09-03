@@ -2681,6 +2681,17 @@ the terminal phase reset; their boundaries are `0x6562c` and `0x6577c`.
 The `0x65660` block is an internal continuation of the latter handler, not a
 separate table entry.
 
+The indexed transition at `0x65780` uses the paired `0x48880`/`0x48884`
+records, publishes both cursor pairs, and handles the phase-limit transition,
+ending at `0x65974`.  The indexed phase controller at `0x65980` uses the
+`0x488e0`/`0x488e4` records, returns through its saved callback, and ends at
+`0x65bc0`.
+
+The larger object-state controller at `0x65bd0` uses the `0x48940`/
+`0x48948`/`0x48950` records.  It aligns the phase cursor, gates on status
+bytes at `0x1db`/`0x1dc`, publishes the active record pair, and initializes
+the next object state before returning at `0x65ef4`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

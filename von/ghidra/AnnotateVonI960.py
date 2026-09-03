@@ -963,6 +963,12 @@ label(0x000654c0, "geometry_object_profile_object_state_controller_variant_k",
       "Object-state controller that recenters the object coordinate, selects the 0x48850/0x48854 records, and applies the terminal phase reset.")
 label(0x00065630, "geometry_object_profile_object_state_controller_variant_l",
       "Parallel recentering object-state controller using the 0x48850/0x48854 records, cursor progression, and terminal state reset.")
+label(0x00065780, "geometry_object_profile_indexed_transition_variant_ae",
+      "Indexed profile transition using the paired 0x48880/0x48884 records, dual cursor publication, and terminal phase handling.")
+label(0x00065980, "geometry_object_profile_indexed_phase_controller_variant_f",
+      "Indexed profile phase controller using the paired 0x488e0/0x488e4 records, callback-returning cursor progression, and phase-limit handling.")
+label(0x00065bd0, "geometry_object_profile_object_state_controller_variant_m",
+      "Object-state controller using the 0x48940/0x48948/0x48950 records, phase alignment, status gating, and terminal object initialization.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1845,6 +1851,9 @@ ensure_function(0x00065360, "geometry_object_profile_object_state_controller_var
 ensure_function(0x00065400, "geometry_object_profile_object_state_controller_variant_j", 0x000654b8)
 ensure_function(0x000654c0, "geometry_object_profile_object_state_controller_variant_k", 0x0006562c)
 ensure_function(0x00065630, "geometry_object_profile_object_state_controller_variant_l", 0x0006577c)
+ensure_function(0x00065780, "geometry_object_profile_indexed_transition_variant_ae", 0x00065974)
+ensure_function(0x00065980, "geometry_object_profile_indexed_phase_controller_variant_f", 0x00065bc0)
+ensure_function(0x00065bd0, "geometry_object_profile_object_state_controller_variant_m", 0x00065ef4)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
