@@ -2156,6 +2156,11 @@ ensure_function(0x00073900, "geometry_profile_handler_2", 0x00073a34)
 ensure_function(0x00073a34, "geometry_profile_handler_3", 0x00073b68)
 ensure_function(0x00073b68, "geometry_profile_handler_4", 0x00073c98)
 ensure_function(0x00073c98, "geometry_profile_handler_5", 0x00073dcc)
+ensure_function(0x00073dcc, "match_state_handler_6", 0x00073fdc)
+ensure_function(0x00073fdc, "match_state_handler_7", 0x00073ffc)
+ensure_function(0x00073ffc, "match_state_handler_8", 0x0007402c)
+ensure_function(0x0007402c, "match_state_handler_9", 0x0007408c)
+ensure_function(0x0007408c, "match_state_handler_10", 0x000740ec)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2353,6 +2358,16 @@ label(0x00073b68, "geometry_profile_handler_4",
       "Profile-table handler 4: scans nine geometry records with its profile-specific packet bit and branches to the shared continuation.")
 label(0x00073c98, "geometry_profile_handler_5",
       "Profile-table handler 5: scans nine geometry records with its profile-specific packet bit and branches to the shared continuation.")
+label(0x00073dcc, "match_state_handler_6",
+      "State-table handler 6: applies the mode/status gate, updates the shared packet selector, and branches or returns through the common result path.")
+label(0x00073fdc, "match_state_handler_7",
+      "State-table handler 7: derives a mode-indexed status value and updates the shared result selector, with local early-return arms.")
+label(0x00073ffc, "match_state_handler_8",
+      "State-table handler 8: selects a mode-indexed parameter, publishes selector 5, and stores the resulting status value.")
+label(0x0007402c, "match_state_handler_9",
+      "State-table handler 9: applies the object-state gate and publishes status selector 10 or the default bit-10 marker.")
+label(0x0007408c, "match_state_handler_10",
+      "State-table handler 10: mirrors the neighboring object-state gate and publishes status selector 4 or the default bit-2 marker.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",
