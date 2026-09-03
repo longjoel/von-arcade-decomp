@@ -271,6 +271,22 @@ workspace path; `0xe3ab0` updates the device-dependent status state; and
 are now labeled as indirect targets, with semantics deferred until their
 trace PCs and complete slices are correlated.
 
+The four selected profile handlers share a strong geometry-setup skeleton.
+Each preserves the incoming record registers, calls `0x27550` twice with
+different profile-table bases/float operands, clears the paired record words
+at `0x5040d2` and `0x503ad2`, selects status mode `13` through `0x577590`,
+invokes the common geometry/text services, resets the transient workspace at
+`0x5771d0` and `0x5771e0–0x5771ea`, runs the coordinate helpers at
+`0x24f98`/`0x23ca8`, advances `0x503a00`, and restores the incoming registers.
+
+The profile-specific constants are now explicit: handler 0 uses table entry
+`0x19360` with float `0xc2c80000` followed by `0x42c80000`; handler 1 uses
+`0x1936c`, `0xc2c80000`, `0x41200000`, and `0x42c80000`; handler 2 uses
+`0x19360`, `0xc2480000`, `0x41200000`, `0x428c0000`, and `0x42c80000`;
+handler 3 uses `0x19360`, `0xc2700000`, `0x428c0000`, and `0x43160000`.
+The differing operands are evidence of four profile geometry variants, not
+four unrelated routines.
+
 The geometry arms at `0x2dc50` and `0x2dd30` form an initialization/build
 pair. `0x2dc50` clears the video context, initializes service pointers through
 `0x296d0`, seeds `0x51aaf8/0x51aafc` to `1`, clears geometry/status fields at

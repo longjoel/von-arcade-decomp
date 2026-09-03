@@ -380,6 +380,14 @@ label(0x000d2560, "startup_status_arm_profile_dispatch",
       "Initializes the profile and dispatches the selected status submode.")
 label(0x000d25b0, "startup_status_arm_profile_service",
       "Dispatches the selected status submode without reinitializing the profile.")
+label(0x000d0820, "startup_profile_handler_0_geometry_setup",
+      "Builds the profile-0 geometry records and resets its status workspace.")
+label(0x000d0d10, "startup_profile_handler_1_geometry_setup",
+      "Builds the profile-1 geometry records and resets its status workspace.")
+label(0x000d1280, "startup_profile_handler_2_geometry_setup",
+      "Builds the profile-2 geometry records and resets its status workspace.")
+label(0x000d1ab0, "startup_profile_handler_3_geometry_setup",
+      "Builds the profile-3 geometry records and resets its status workspace.")
 ensure_function(0x0002b500, "startup_status_arm_video_reset", 0x0002b54c)
 ensure_function(0x0002b550, "startup_status_arm_geometry_workspace", 0x0002b65c)
 ensure_function(0x0002b660, "startup_status_arm_geometry_service", 0x0002b6f4)
@@ -394,6 +402,10 @@ ensure_function(0x000e3ab0, "startup_status_arm_device_state_cycle", 0x000e3b2c)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
+ensure_function(0x000d0820, "startup_profile_handler_0_geometry_setup", 0x000d0964)
+ensure_function(0x000d0d10, "startup_profile_handler_1_geometry_setup", 0x000d0e5c)
+ensure_function(0x000d1280, "startup_profile_handler_2_geometry_setup", 0x000d13ac)
+ensure_function(0x000d1ab0, "startup_profile_handler_3_geometry_setup", 0x000d1bd8)
 
 # Trace-confirmed call sites inside the system-setup helper.
 label(0x00018960, "startup_call_io_self_test")
