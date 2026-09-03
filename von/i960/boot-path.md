@@ -298,6 +298,23 @@ record tables with bounds `0x33c` and `0x508`, using `0xffff` sentinels, while
 helpers are setup primitives shared by the profile arms, not per-profile
 state machines.
 
+The shared transform service at `0x27550` is now bounded from `0x27550` to
+the return at `0x27c4c`. It initializes the object record at `g0`: offsets
+`0`, `0x2`, `0x4`, `0x64`, `0x68`, `0x6c`, and `0x74` receive the incoming
+record/control values, while transform fields `0x170`, `0x172`, `0x174`,
+`0x176`, `0x178`, `0x17a`, `0x17c`, and `0x17e` are reset. The routine chooses
+one of several local profile assets based on the mode argument, stores a
+selected pointer at offset `4`, and calls `0x6f600` after publishing the
+position fields at offsets `8` and `0x10`.
+
+It then clears the record’s command/derived fields, computes the timing field
+at `0x1d0/0x1d8` from the selected table value, and routes the profile through
+`0xe2120`. Finally it copies the record’s transform/status halfwords into the
+shared snapshot fields at `0x5033ec–0x503400` and uses `0xf5d40` to copy the
+associated `0x200`-byte asset. This is a concrete object-record constructor
+and transform staging routine; the record fields’ game semantics remain
+unassigned.
+
 The geometry arms at `0x2dc50` and `0x2dd30` form an initialization/build
 pair. `0x2dc50` clears the video context, initializes service pointers through
 `0x296d0`, seeds `0x51aaf8/0x51aafc` to `1`, clears geometry/status fields at

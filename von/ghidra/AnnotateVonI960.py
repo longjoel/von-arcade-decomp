@@ -199,6 +199,7 @@ label(0x0002e1c8, "geometry_status_render_route")
 label(0x0002e1e8, "geometry_status_render_route_alt")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
+ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
 label(0x000281f0, "texture_profile_dispatch_table")
 label(0x000284b8, "geometry_command_window_clear_route")
 
