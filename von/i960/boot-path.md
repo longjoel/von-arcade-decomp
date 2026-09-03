@@ -2725,6 +2725,11 @@ The packed-record controllers at `0x67c90`, `0x67e40`, and `0x68040` use the
 phase cursor, publish the active record pair, and handle terminal transitions;
 their boundaries are `0x67e38`, `0x68034`, and `0x68228`.
 
+The parallel geometry bounds evaluator at `0x68230` repeats the extent clamp,
+object-offset, axis-flag, and derived-ratio sequence from `0x645a0`; it
+returns through its saved callback at `0x68548`.  The `0x68500` arithmetic is
+the final ratio tail within this function.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

@@ -1005,6 +1005,8 @@ label(0x00067e40, "geometry_object_profile_phase_controller_variant_r",
       "Profile phase controller using the packed 0x48b70 record pair, cursor progression, and terminal phase handling.")
 label(0x00068040, "geometry_object_profile_phase_controller_variant_s",
       "Profile phase controller using the packed 0x48b90 record pair, cursor progression, and terminal phase handling.")
+label(0x00068230, "geometry_object_profile_geometry_bounds_flags_update_variant_e",
+      "Parallel geometry bounds evaluator that clamps the three extents, applies object-record offsets, updates axis collision flags, and computes derived ratios.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1908,6 +1910,7 @@ ensure_function(0x00067a30, "geometry_object_profile_indexed_phase_controller_va
 ensure_function(0x00067c90, "geometry_object_profile_phase_controller_variant_q", 0x00067e38)
 ensure_function(0x00067e40, "geometry_object_profile_phase_controller_variant_r", 0x00068034)
 ensure_function(0x00068040, "geometry_object_profile_phase_controller_variant_s", 0x00068228)
+ensure_function(0x00068230, "geometry_object_profile_geometry_bounds_flags_update_variant_e", 0x00068548)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
