@@ -315,6 +315,21 @@ associated `0x200`-byte asset. This is a concrete object-record constructor
 and transform staging routine; the record fields’ game semantics remain
 unassigned.
 
+The downstream producer at `0x6f600` is now bounded to its return at
+`0x6f6ec`. It adds the two incoming values, truncates them, shifts each by
+one, and masks with `0xfffffe00`. If either result has the rejected low-bit
+pattern it returns the fixed value `0x47c34f80`; otherwise it emits selector
+`0x41`, packs the shifted coordinates, indexes the four-word profile table at
+`0x51bb24`, and writes the resulting record words through `0x884000`. This
+is the concrete producer called by `0x27550`, with no C-level math/library
+assumption involved.
+
+The asset helper at `0xe2120` is a short selector wrapper: it indexes the
+pointer table at `0x142e94` using the incoming asset index and calls
+`0xe2040`. The latter is the three-plane byte expander; `0xe2120` itself
+does not perform decompression or geometry work. This cleanly separates the
+profile record path from the text/video asset path in the call graph.
+
 The geometry arms at `0x2dc50` and `0x2dd30` form an initialization/build
 pair. `0x2dc50` clears the video context, initializes service pointers through
 `0x296d0`, seeds `0x51aaf8/0x51aafc` to `1`, clears geometry/status fields at
