@@ -148,6 +148,7 @@ python3 von/tools/compare_tile_trace.py --original <trace> --prototype <trace> #
 ./scripts/trace-geometry-first-match.sh # capture and export the deterministic first match scene
 ./scripts/trace-geometry-material-twin.sh # capture first-match geometry and indexed materials
 ./scripts/test-twin.sh # configure roles, then run deterministic link/start diagnostic
+./scripts/capture-single-player-original.sh # original-ROM title/select/takeoff/intro evidence matrix
 ./scripts/e2e.sh       # test and run one headless second
 ./scripts/deploy.sh    # test and create a ROM-free tarball
 ```
@@ -298,10 +299,17 @@ class for the next SHARC/geometry-buffer recovery pass; it does not yet expose
 the upstream entity or transform packet format.
 
 The single-cabinet capture script uses `bin/von` directly and defaults to SDL's
-dummy video backend, so it also works on headless build hosts. A single cabinet
-can remain at the Model 2 boot screen while waiting for the twin communication
-link; that is expected for this game and is why player-select extraction uses
-the linked harness below.
+dummy video backend, so it also works on headless build hosts. It waits 600
+frames (about 10 seconds) for the initial Model 2 screen, starts tracing at that
+boundary, and then performs the coin insertion sequence. This timing gate is
+intentional: the tilemap may remain static even though the coin input is the
+next useful experiment. Override the startup boundary with
+`VON_CAPTURE_START_TRACE_FRAME` when the board or link setup needs different
+timing.
+
+A single cabinet can remain at the Model 2 boot screen while waiting for the
+twin communication link; that is expected for this game and is why player-select
+extraction uses the linked harness below.
 
 For a reproducible linked capture that drives both cabinets through coin/start
 and exports the first 40-object player-select frames, run:

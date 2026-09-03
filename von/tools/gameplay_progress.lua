@@ -25,6 +25,7 @@
 
 local SECONDS = tonumber(os.getenv("VON_PROGRESS_SECONDS") or "150")
 local TARGET_FRAMES = SECONDS * 60
+local CAPTURE_START_FRAME = tonumber(os.getenv("VON_PROGRESS_CAPTURE_START_FRAME") or "0")
 local LOG_PATH = os.getenv("VON_PROGRESS_LOG") or "vonj-progress-lua.log"
 local GEOMETRY_STATE_LOG_PATH = os.getenv("VON_PROGRESS_GEOMETRY_STATE_LOG")
 
@@ -214,16 +215,18 @@ local function tile_checksum()
     return hash
 end
 
--- Boot inputs. Coin at ~frame 900 opens MACHINE SELECT; start at ~frame 1500
--- confirms the highlighted machine and launches the battle.
+-- Boot inputs. Defaults preserve the confirmed flow; delayed captures can hold
+-- the attract screen until a requested frame before injecting coin/start.
 local SELECT_STEPS = tonumber(os.getenv("VON_PROGRESS_SELECT_STEPS") or "0")
 local AUTO_START = os.getenv("VON_PROGRESS_AUTO_START") ~= "0"
-local schedule = { { frame = 900, key = "coin" } }
+local COIN_FRAME = tonumber(os.getenv("VON_PROGRESS_COIN_FRAME") or "900")
+local START_FRAME = tonumber(os.getenv("VON_PROGRESS_START_FRAME") or "1500")
+local schedule = { { frame = COIN_FRAME, key = "coin" } }
 for step = 1, SELECT_STEPS do
-    schedule[#schedule + 1] = { frame = 1080 + step * 45, key = "right" }
+    schedule[#schedule + 1] = { frame = START_FRAME - 420 + step * 45, key = "right" }
 end
 if AUTO_START then
-    schedule[#schedule + 1] = { frame = 1500 + SELECT_STEPS * 45, key = "start" }
+    schedule[#schedule + 1] = { frame = START_FRAME + SELECT_STEPS * 45, key = "start" }
 end
 local schedule_index = 1
 
@@ -255,6 +258,13 @@ emu.register_periodic(function()
         end
         press(step.key, frame + 8)
         schedule_index = schedule_index + 1
+    end
+
+    -- Input may establish the requested checkpoint before evidence begins.
+    -- This lets a run press START on machine select and capture only the
+    -- resulting takeoff/intro/match transition.
+    if frame < CAPTURE_START_FRAME then
+        return
     end
 
     if COMBAT_ENABLED and frame >= COMBAT_START and frame <= COMBAT_END then
