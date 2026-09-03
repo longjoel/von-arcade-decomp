@@ -276,6 +276,18 @@ label(0x000317f0, "geometry_object_motion_variant_t",
       "Parallel geometry packet emitter using the shared phase and callback state path.")
 label(0x00031910, "geometry_object_motion_variant_u",
       "Selects indexed geometry profiles and updates the object frame/result state.")
+label(0x00031ab0, "geometry_object_motion_variant_v",
+      "Selects a four-way geometry profile, updates motion timing, and advances the object phase.")
+label(0x00031d20, "geometry_object_motion_variant_w",
+      "Runs the paired geometry-profile timing path and transitions the object to the next phase.")
+label(0x00032120, "geometry_object_motion_variant_x",
+      "Updates profile-dependent motion state and performs the associated phase reset/transition.")
+label(0x00032330, "geometry_object_motion_variant_y",
+      "Selects the next geometry profile, updates frame timing, and publishes the object result state.")
+label(0x000324e0, "geometry_object_motion_phase_helper_a",
+      "Invokes the phase callback and derives the per-object animation timing value.")
+label(0x00032540, "geometry_object_motion_phase_helper_b",
+      "Invokes the alternate phase callback and clears the transient geometry result state.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -842,6 +854,12 @@ ensure_function(0x000315a0, "geometry_object_motion_variant_r", 0x000316d0)
 ensure_function(0x000316d0, "geometry_object_motion_variant_s", 0x000317f0)
 ensure_function(0x000317f0, "geometry_object_motion_variant_t", 0x00031910)
 ensure_function(0x00031910, "geometry_object_motion_variant_u", 0x00031ab0)
+ensure_function(0x00031ab0, "geometry_object_motion_variant_v", 0x00031d20)
+ensure_function(0x00031d20, "geometry_object_motion_variant_w", 0x00032120)
+ensure_function(0x00032120, "geometry_object_motion_variant_x", 0x00032330)
+ensure_function(0x00032330, "geometry_object_motion_variant_y", 0x000324e0)
+ensure_function(0x000324e0, "geometry_object_motion_phase_helper_a", 0x00032540)
+ensure_function(0x00032540, "geometry_object_motion_phase_helper_b", 0x00032560)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

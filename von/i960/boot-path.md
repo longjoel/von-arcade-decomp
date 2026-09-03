@@ -1804,6 +1804,10 @@ The following entries through `0x31910` continue the same generated family:
 `0x30ff0`, `0x31210`, and `0x313e0` select indexed profiles, while
 `0x315a0`, `0x316d0`, `0x317f0`, and `0x31910` emit geometry packets and
 advance the object/frame phase state through their callback tables.
+The dispatch data immediately following this code confirms the next six
+entries: `0x31ab0`, `0x31d20`, `0x32120`, `0x32330`, `0x324e0`, and `0x32540`.
+They cover the remaining profile/timing transitions and two small phase
+callback helpers, ending at the object-motion table beginning at `0x32560`.
 
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
