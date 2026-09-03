@@ -429,6 +429,20 @@ label(0x0003f6e0, "geometry_runtime_record_seed_command17_alt",
       "Alternate free-record initializer using command 17 and an explicit selector word at record offset zero.")
 label(0x0003f7d0, "geometry_runtime_record_seed_command17_bounded",
       "Finds a free record in the 0x508-byte pool, marks it active, and copies the command 17 payload into its 0x30-byte record area.")
+label(0x0003f8d0, "geometry_profile_command5_emit_a",
+      "Updates the object coordinates, checks the selector-derived profile value, and submits the first command-5 profile payload through 0x804000.")
+label(0x0003fa90, "geometry_profile_command5_emit_b",
+      "Parallel command-5 geometry emitter using the second profile payload table at 0x2be02b8.")
+label(0x0003fc50, "geometry_profile_command5_emit_c",
+      "Parallel command-5 geometry emitter using the third profile payload table at 0x2be04f8.")
+label(0x0003fdc0, "geometry_profile_command5_emit_d",
+      "Command-5 geometry emitter using the compact three-word profile table at 0x2be04ec and the alternate object register layout.")
+label(0x0003ff80, "geometry_profile_command5_emit_e",
+      "Parallel command-5 geometry emitter using the profile payload table at 0x2be0738.")
+label(0x000400f0, "geometry_profile_command5_emit_f",
+      "Parallel command-5 geometry emitter for the next profile payload table and object variant.")
+label(0x00040310, "geometry_profile_command5_emit_g",
+      "Command-5 geometry emitter with a stack frame, shared profile comparison, and the payload table at 0x2be41d8.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1055,6 +1069,13 @@ ensure_function(0x0003f550, "geometry_runtime_record_table_seed_pair", 0x0003f5e
 ensure_function(0x0003f5f0, "geometry_runtime_record_seed_command17", 0x0003f6e0)
 ensure_function(0x0003f6e0, "geometry_runtime_record_seed_command17_alt", 0x0003f7d0)
 ensure_function(0x0003f7d0, "geometry_runtime_record_seed_command17_bounded", 0x0003f8d0)
+ensure_function(0x0003f8d0, "geometry_profile_command5_emit_a", 0x0003fa90)
+ensure_function(0x0003fa90, "geometry_profile_command5_emit_b", 0x0003fc50)
+ensure_function(0x0003fc50, "geometry_profile_command5_emit_c", 0x0003fdc0)
+ensure_function(0x0003fdc0, "geometry_profile_command5_emit_d", 0x0003ff80)
+ensure_function(0x0003ff80, "geometry_profile_command5_emit_e", 0x000400f0)
+ensure_function(0x000400f0, "geometry_profile_command5_emit_f", 0x00040310)
+ensure_function(0x00040310, "geometry_profile_command5_emit_g", 0x000406cc)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

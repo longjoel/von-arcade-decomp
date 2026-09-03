@@ -1989,6 +1989,15 @@ with state `2`, and copies the command payload into its 0x30-byte record
 area.  Each has a continuation pointer in `g14` and returns via `bx (g2)`;
 their terminal `ret` instructions are separate continuation targets.
 
+The following block is a repeated command-5 profile-emitter family.  Entries
+begin at `0x3f8d0`, `0x3fa90`, `0x3fc50`, `0x3fdc0`, `0x3ff80`, `0x400f0`, and
+`0x40310`; each updates the three object coordinate fields, compares the
+selector-derived value from `0x3eca0`, optionally reports diagnostic codes
+`0x1101`/`0x1102` (with variant-specific alternatives), and submits a
+profile-specific payload through `0x804000`.  The variants share the same
+record contract but use different ROM payload tables, so they are retained as
+separate functions rather than merged into one generalized C routine.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
