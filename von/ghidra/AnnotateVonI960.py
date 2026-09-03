@@ -557,6 +557,12 @@ label(0x00046480, "geometry_profile_timing_hardware_emit_variant_f",
       "Sixth timing emitter variant combining profile cursor fields with object-local timing inputs before emitting the 0x884000 command sequence.")
 label(0x000466b0, "geometry_profile_timing_dual_buffer_emit",
       "Final profile timing emitter variant; derives scaled timing from the active object and writes paired values through the 0x804000 geometry buffer path.")
+label(0x0004a420, "geometry_object_profile_threshold_update",
+      "Updates object profile threshold flags and derives the normalized 0x1e2/0x1e4/0x1e6 fields from the active profile record.")
+label(0x0004a780, "geometry_object_profile_phase_advance",
+      "Advances the object profile phase through the descriptor data at 0x46930, resets phase state when bounded, and publishes shared cursor globals.")
+label(0x0004a990, "geometry_object_profile_phase_advance_alt",
+      "Alternate profile phase advance using the adjacent descriptor records and the shared cursor/phase state.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1236,6 +1242,9 @@ ensure_function(0x00045c30, "geometry_profile_timing_hardware_emit_variant_d", 0
 ensure_function(0x00045f50, "geometry_profile_timing_hardware_emit_variant_e", 0x0004647c)
 ensure_function(0x00046480, "geometry_profile_timing_hardware_emit_variant_f", 0x000466a4)
 ensure_function(0x000466b0, "geometry_profile_timing_dual_buffer_emit", 0x00046930)
+ensure_function(0x0004a420, "geometry_object_profile_threshold_update", 0x0004a774)
+ensure_function(0x0004a780, "geometry_object_profile_phase_advance", 0x0004a990)
+ensure_function(0x0004a990, "geometry_object_profile_phase_advance_alt", 0x0004abbc)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

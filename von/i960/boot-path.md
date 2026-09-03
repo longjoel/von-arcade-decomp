@@ -2122,6 +2122,15 @@ deriving its values from the shared profile state.  Their returns at `0x46474`,
 `0x466a0`, and `0x4692c` confirm the final two standalone variants and the
 boundary before the next subsystem.
 
+The next callable cluster begins at `0x4a420`.  It derives profile-relative
+thresholds from the active record, sets the per-object flags at `0x1dd`/`0x1de`/
+`0x1df`, and stores normalized values at `0x1e2`/`0x1e4`/`0x1e6`, returning at
+`0x4a770`.  The phase advance at `0x4a780` then consumes descriptor records from
+the large data region beginning at `0x46930`, updates `0x178`/`0x17c` and the
+shared cursor globals, and returns at `0x4a98c`.  Its alternate at `0x4a990`
+uses adjacent descriptor records and returns at `0x4abb8`; these are distinct
+phase handlers, not code embedded in the descriptor table.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
