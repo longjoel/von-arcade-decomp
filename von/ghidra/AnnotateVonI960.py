@@ -424,6 +424,8 @@ label(0x000e6648, "status_blank_dot_strings",
       "Fallback dot strings used by the status profile renderer for empty entries.")
 label(0x000e6660, "status_record_grid_frame_build",
       "Builds the eight-by-thirteen status record grid, renders its columns, and updates video state.")
+label(0x000e6d40, "status_record_word_copy_continuation",
+      "Copies a 0x200-word status buffer and returns through the caller-supplied continuation.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -485,6 +487,7 @@ ensure_function(0x000e5da0, "status_transition_render_gateway", 0x000e61c0)
 ensure_function(0x000e61c0, "status_transition_render_variant", 0x000e6500)
 ensure_function(0x000e6500, "status_profile_selector_dispatch", 0x000e6644)
 ensure_function(0x000e6660, "status_record_grid_frame_build", 0x000e6d40)
+ensure_function(0x000e6d40, "status_record_word_copy_continuation", 0x000e6d7c)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)

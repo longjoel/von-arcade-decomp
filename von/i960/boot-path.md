@@ -1536,6 +1536,10 @@ The larger frame builder at `0xe6660` constructs the 8-by-13 status grid,
 renders the active columns through `0xe6500`, updates the video-state words,
 and returns at `0xe6d3c`.
 
+The short helper at `0xe6d40` copies 0x200 16-bit words from the caller's
+source to destination, preserving the caller's continuation in `g2`; its
+indirect branch is at `0xe6d74` and its local return stub is at `0xe6d78`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
