@@ -2523,6 +2523,11 @@ The following indexed transition at `0x5c9f0` uses the paired
 `0x48150`/`0x48154` records and the object arrays; its forward arms converge at
 `0x5cd04` and end at `0x5cd18`.
 
+The reset helper at `0x5cd1c` ends at `0x5cd88`.  The following larger
+transition at `0x5cd90` uses `0x481b0`/`0x481b8`, performs cursor and object-state
+updates plus geometry correction, and ends at `0x5cfe8`.  Its parallel sibling
+starts at `0x5cff0`, uses `0x481d0`/`0x481d8`, and ends at `0x5d1b8`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
