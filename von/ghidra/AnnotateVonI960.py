@@ -534,6 +534,28 @@ label(0x000ec820, "geometry_event_lookup_table_build",
       "Expands the geometry-event lookup records into the command lookup table.")
 label(0x000ec8f0, "runtime_alt_record_pipeline_dispatch",
       "Runs the alternate record pipeline and advances the runtime service counter.")
+label(0x000ec920, "runtime_event_counter_step",
+      "Runs the shared event service and advances the runtime service counter.")
+label(0x000ec940, "runtime_event_mode_flag_set",
+      "Sets the event-mode workspace flag and returns through the caller continuation.")
+label(0x000ec970, "runtime_record_checksum_4stride",
+      "Accumulates the packed record bytes at four-byte stride and returns through a continuation.")
+label(0x000ec9d0, "runtime_record_checksum_3stride",
+      "Accumulates the alternate packed record bytes at three-byte offset and returns through a continuation.")
+label(0x000eca30, "runtime_event_result_publish_a",
+      "Computes and publishes the first event result into the runtime workspace.")
+label(0x000eca60, "runtime_event_result_publish_b",
+      "Computes and publishes the alternate event result into the runtime workspace.")
+label(0x000eca90, "runtime_event_result_publish_c",
+      "Publishes the fixed event-source result into the runtime workspace.")
+label(0x000ecac0, "runtime_event_result_publish_d",
+      "Publishes the alternate fixed event-source result into the runtime workspace.")
+label(0x000ecaf0, "runtime_event_result_publish_e",
+      "Computes and publishes the flag-derived event result.")
+label(0x000ecb20, "runtime_event_result_publish_f",
+      "Computes and publishes the alternate flag-derived event result.")
+label(0x000ecb50, "runtime_event_handler_table",
+      "Literal event-handler dispatch table for the runtime menu/service states.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -646,6 +668,16 @@ ensure_function(0x000ec6a0, "runtime_alt_packed_record_scan_g", 0x000ec760)
 ensure_function(0x000ec760, "runtime_alt_record_table_init_g", 0x000ec820)
 ensure_function(0x000ec820, "geometry_event_lookup_table_build", 0x000ec8e8)
 ensure_function(0x000ec8f0, "runtime_alt_record_pipeline_dispatch", 0x000ec920)
+ensure_function(0x000ec920, "runtime_event_counter_step", 0x000ec940)
+ensure_function(0x000ec940, "runtime_event_mode_flag_set", 0x000ec970)
+ensure_function(0x000ec970, "runtime_record_checksum_4stride", 0x000ec9c4)
+ensure_function(0x000ec9d0, "runtime_record_checksum_3stride", 0x000eca2c)
+ensure_function(0x000eca30, "runtime_event_result_publish_a", 0x000eca60)
+ensure_function(0x000eca60, "runtime_event_result_publish_b", 0x000eca90)
+ensure_function(0x000eca90, "runtime_event_result_publish_c", 0x000ecac0)
+ensure_function(0x000ecac0, "runtime_event_result_publish_d", 0x000ecaf0)
+ensure_function(0x000ecaf0, "runtime_event_result_publish_e", 0x000ecb20)
+ensure_function(0x000ecb20, "runtime_event_result_publish_f", 0x000ecb50)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)

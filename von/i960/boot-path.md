@@ -1618,6 +1618,13 @@ ROM base; and `0xec630` copies the selected table. The builder at `0xec820`
 expands the literal records from `0xead20` into the command lookup table, and
 `0xec8f0` orchestrates the pipeline before returning at `0xec91c`.
 
+The following event helpers are bounded individually. `0xec920` advances the
+service counter, `0xec940` sets the event-mode flag, and `0xec970`/`0xec9d0`
+accumulate packed-record bytes using their distinct stride patterns. The six
+publishers from `0xeca30` through `0xecb20` store the derived event results in
+the separate `0x578530–0x578544` workspace fields. The literal handler table
+at `0xecb50` follows these wrappers.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
