@@ -591,6 +591,14 @@ label(0x0004c610, "geometry_object_profile_runtime_update_variant_b",
       "Alternate runtime profile update variant using the next descriptor range and the shared cursor/event protocol.")
 label(0x0004c8f0, "geometry_object_profile_runtime_update_variant_c",
       "Third runtime profile update variant using the adjacent descriptor range and the shared phase/event state.")
+label(0x0004ca40, "geometry_object_profile_runtime_update_variant_d",
+      "Fourth runtime profile update variant; advances phase state from the shared descriptor records and applies reset/event handling.")
+label(0x0004cb70, "geometry_object_profile_runtime_update_variant_e",
+      "Fifth runtime profile update variant using the 0x46d90 descriptor range and shared cursor/event state.")
+label(0x0004cc20, "geometry_object_profile_runtime_update_variant_f",
+      "Sixth runtime profile update variant with bounded cursor advance and profile reset paths.")
+label(0x0004cd00, "geometry_object_profile_runtime_update_variant_g",
+      "Seventh runtime profile update variant using the 0x46bb0 descriptor range and the shared status/event protocol.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1287,6 +1295,10 @@ ensure_function(0x0004bce0, "geometry_object_profile_state_finalize", 0x0004c048
 ensure_function(0x0004c050, "geometry_object_profile_runtime_update_variant_a", 0x0004c60c)
 ensure_function(0x0004c610, "geometry_object_profile_runtime_update_variant_b", 0x0004c8ec)
 ensure_function(0x0004c8f0, "geometry_object_profile_runtime_update_variant_c", 0x0004ca40)
+ensure_function(0x0004ca40, "geometry_object_profile_runtime_update_variant_d", 0x0004cb6c)
+ensure_function(0x0004cb70, "geometry_object_profile_runtime_update_variant_e", 0x0004cc1c)
+ensure_function(0x0004cc20, "geometry_object_profile_runtime_update_variant_f", 0x0004cd00)
+ensure_function(0x0004cd00, "geometry_object_profile_runtime_update_variant_g", 0x0004d044)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

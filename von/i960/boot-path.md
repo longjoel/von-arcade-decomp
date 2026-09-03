@@ -2166,6 +2166,12 @@ apply the same event/status mapping, and refresh the associated profile record.
 Their returns at `0x4c604`, `0x4c8e8`, and `0x4ca3c` establish three separate
 handlers before the following state cluster.
 
+The next update siblings are `0x4ca40`, `0x4cb70`, `0x4cc20`, and `0x4cd00`.
+They continue the descriptor-driven profile/event protocol, with distinct
+phase ranges and reset behavior; the last uses the `0x46bb0` descriptor range.
+The exact returns at `0x4cb68`, `0x4cc18`, `0x4ccfc`, and `0x4d040` separate
+four more handlers from the following state cluster.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
