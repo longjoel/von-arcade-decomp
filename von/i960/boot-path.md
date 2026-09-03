@@ -1603,6 +1603,14 @@ the active table and invokes the reset/copy helper. The orchestrator at
 scanner at `0xeb8a0` then copies the packed records and records four masked
 match locations at `0x578560–0x57856c`.
 
+The parallel packed-record family begins at `0xebba0` and repeats the
+scan/init pattern for additional ROM layouts.
+The bounded entries through `0xec1e0` use the alternate workspace slots at
+`0x578570`, `0x578574`, `0x578578`, `0x57857c`, `0x578580`, `0x578584`,
+`0x578588`, and `0x578590`; each initializer selects a different packed-ROM
+base before invoking its scanner. This establishes a second data-family
+pipeline without conflating its record widths with the first family.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

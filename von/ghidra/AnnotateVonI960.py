@@ -498,6 +498,24 @@ label(0x000eb830, "runtime_rom_bank_load_all",
       "Runs the runtime ROM-bank loaders, normalizes match markers, and advances the status counter.")
 label(0x000eb8a0, "runtime_packed_record_match_scan",
       "Copies packed records into the active workspace and records four masked match locations.")
+label(0x000ebba0, "runtime_alt_packed_record_scan",
+      "Scans the alternate packed-record format and records two masked match locations.")
+label(0x000ebc60, "runtime_alt_record_table_init",
+      "Initializes the alternate packed-record workspace and rebuilds its match markers.")
+label(0x000ebd20, "runtime_alt_packed_record_scan_b",
+      "Scans the second alternate packed-record format and records two masked matches.")
+label(0x000ebe20, "runtime_alt_record_table_init_b",
+      "Initializes the second alternate packed-record workspace and its match markers.")
+label(0x000ebf10, "runtime_alt_packed_record_scan_c",
+      "Scans the third packed-record format and records its two masked matches.")
+label(0x000ebfd0, "runtime_alt_record_table_init_c",
+      "Initializes the third alternate packed-record workspace and match markers.")
+label(0x000ec090, "runtime_alt_packed_record_scan_d",
+      "Scans the fourth packed-record format and records its masked match location.")
+label(0x000ec140, "runtime_alt_record_table_init_d",
+      "Initializes the fourth alternate packed-record workspace and match marker.")
+label(0x000ec1e0, "runtime_alt_packed_record_scan_e",
+      "Scans the fifth packed-record format and records its masked match location.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -592,6 +610,15 @@ ensure_function(0x000eb790, "runtime_rom_bank_loader_52", 0x000eb7e0)
 ensure_function(0x000eb7e0, "runtime_rom_bank_loader_50", 0x000eb830)
 ensure_function(0x000eb830, "runtime_rom_bank_load_all", 0x000eb89c)
 ensure_function(0x000eb8a0, "runtime_packed_record_match_scan", 0x000ebaa8)
+ensure_function(0x000ebba0, "runtime_alt_packed_record_scan", 0x000ebc60)
+ensure_function(0x000ebc60, "runtime_alt_record_table_init", 0x000ebd20)
+ensure_function(0x000ebd20, "runtime_alt_packed_record_scan_b", 0x000ebe20)
+ensure_function(0x000ebe20, "runtime_alt_record_table_init_b", 0x000ebf10)
+ensure_function(0x000ebf10, "runtime_alt_packed_record_scan_c", 0x000ebfd0)
+ensure_function(0x000ebfd0, "runtime_alt_record_table_init_c", 0x000ec090)
+ensure_function(0x000ec090, "runtime_alt_packed_record_scan_d", 0x000ec140)
+ensure_function(0x000ec140, "runtime_alt_record_table_init_d", 0x000ec1e0)
+ensure_function(0x000ec1e0, "runtime_alt_packed_record_scan_e", 0x000ec290)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
