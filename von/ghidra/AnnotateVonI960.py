@@ -959,6 +959,10 @@ label(0x00065360, "geometry_object_profile_object_state_controller_variant_i",
       "Compact object-state controller using the 0x48820 record, cursor advancement, and terminal state update through its saved callback.")
 label(0x00065400, "geometry_object_profile_object_state_controller_variant_j",
       "Object-state controller using the selector-indexed 0x48830/0x48834 records, cursor progression, and terminal state update through its callback.")
+label(0x000654c0, "geometry_object_profile_object_state_controller_variant_k",
+      "Object-state controller that recenters the object coordinate, selects the 0x48850/0x48854 records, and applies the terminal phase reset.")
+label(0x00065630, "geometry_object_profile_object_state_controller_variant_l",
+      "Parallel recentering object-state controller using the 0x48850/0x48854 records, cursor progression, and terminal state reset.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1839,6 +1843,8 @@ ensure_function(0x000651a0, "geometry_object_profile_object_state_controller_var
 ensure_function(0x00065270, "geometry_object_profile_object_state_controller_variant_h", 0x00065358)
 ensure_function(0x00065360, "geometry_object_profile_object_state_controller_variant_i", 0x000653f8)
 ensure_function(0x00065400, "geometry_object_profile_object_state_controller_variant_j", 0x000654b8)
+ensure_function(0x000654c0, "geometry_object_profile_object_state_controller_variant_k", 0x0006562c)
+ensure_function(0x00065630, "geometry_object_profile_object_state_controller_variant_l", 0x0006577c)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

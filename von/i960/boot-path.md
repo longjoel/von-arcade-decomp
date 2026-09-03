@@ -2674,6 +2674,13 @@ The compact handlers at `0x65360` and `0x65400` continue the same cursor and
 phase protocol with `0x48820` and selector-indexed `0x48830`/`0x48834` records;
 they end at `0x653f8` and `0x654b8`, respectively.
 
+The recentering handlers at `0x654c0` and `0x65630` share the `0x48850`/
+`0x48854` record pair.  Both first recenter the object coordinate from the
+`0x34`/`0x184`/`0x2e` fields, then publish the active cursor pair and apply
+the terminal phase reset; their boundaries are `0x6562c` and `0x6577c`.
+The `0x65660` block is an internal continuation of the latter handler, not a
+separate table entry.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
