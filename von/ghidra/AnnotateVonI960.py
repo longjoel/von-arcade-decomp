@@ -708,30 +708,43 @@ ensure_function(0x000e2ea0, "video_dispatch_arm26", 0x000e2eec)
 ensure_function(0x000e2eec, "video_dispatch_arm27", 0x000e2f20)
 label(0x000e3004, "video_dispatch_arm28",
       "Emits tiles 1,3,5,7 with bank-dependent sources and exits through 0xe33f4.")
+ensure_function(0x000e3004, "video_dispatch_arm28", 0x000e3090)
 label(0x000e3090, "video_dispatch_arm29",
       "Emits tiles 1,3 with bank-dependent sources and exits through 0xe33f4.")
+ensure_function(0x000e3090, "video_dispatch_arm29", 0x000e30dc)
 label(0x000e30dc, "video_dispatch_arm30",
       "Reads five words from 0x577598 through 0x5775a8 for tiles 21,23,25,27,29.")
+ensure_function(0x000e30dc, "video_dispatch_arm30", 0x000e3130)
 label(0x000e3130, "video_dispatch_arm32",
       "Emits one tile 3 from 0x2fb7d50; the following mov 7 is unreachable after the immediate branch.")
+ensure_function(0x000e3130, "video_dispatch_arm32", 0x000e314c)
 label(0x000e314c, "video_dispatch_arm31",
       "Emits five tiles 21,23,25,27,29 through helper 0xe1fb0 from sources 0x2fb3d90, 0x142dd4, 0x2fa5ad0, 0x2fabb90, 0x2fb1c50.")
+ensure_function(0x000e314c, "video_dispatch_arm31", 0x000e319c)
 label(0x000e3248, "video_dispatch_arm33",
       "Emits eight tiles 1,3,5,7,21,25,27,29 with helper 0xe1fb0 and exits through 0xe33f4.")
+ensure_function(0x000e319c, "video_dispatch_arm34", 0x000e3248)
+ensure_function(0x000e3248, "video_dispatch_arm33", 0x000e3314)
 label(0x000e319c, "video_dispatch_arm34",
       "Uses table 0x142f34 with selector shift 2, special selector 5, helper 0xe1fb0, and exits through 0xe33f4.")
 label(0x000e3314, "video_dispatch_arm35",
       "Uses bank-A table 0x142e94 or bank-B table 0x142f34, fixed sources 0x143704/0x1437c4/0x2fb8590, and helper 0xe2040.")
+ensure_function(0x000e3314, "video_dispatch_arm35", 0x000e33f4)
 label(0x000e33f4, "video_dispatch_sentinel_gate",
       "Compares sentinel against 0x200 and continues at 0xe3444 or 0xe35a0.")
+ensure_function(0x000e33f4, "video_dispatch_sentinel_gate", 0x000e3444)
 label(0x000e3444, "video_dispatch_post_sentinel_gate",
       "Post-sentinel path uses helper 0xe2040; arm 40 scales its sentinel by 4 from bases 0x129e28/0x129ea8, arm 37 handles sentinel 0x21f, and indexed arm 38 scales from bases 0x2bfd544/0x2bfd5c4.")
+ensure_function(0x000e3444, "video_dispatch_post_sentinel_gate", 0x000e349c)
 label(0x000e349c, "video_dispatch_sentinel_21f",
       "Uses sources 0x2fb5a10/0x2fb5ad0 and bank-selected tiles 5,7 or 1,3; continues at 0xe35a0.")
+ensure_function(0x000e349c, "video_dispatch_sentinel_21f", 0x000e34e4)
 label(0x000e34e4, "video_dispatch_sentinel_indexed_pair",
       "Uses source bases 0x2bfd544/0x2bfd5c4 with sentinel*4 offset and bank-selected tiles 5,7 or 1,3.")
+ensure_function(0x000e34e4, "video_dispatch_sentinel_indexed_pair", 0x000e353c)
 label(0x000e353c, "video_dispatch_sentinel_indexed_pair_high",
       "Uses source bases 0x2bfd5c4/0x2bfd644 with sentinel*4 offset, helper 0xe2040, and continuation 0xe35a0.")
+ensure_function(0x000e353c, "video_dispatch_sentinel_indexed_pair_high", 0x000e35a0)
 label(0x000e35a0, "video_dispatch_terminal_reset",
       "Terminal side effect returns 0xff; post-route ranges begin at 0x200, 0x400, and 0x420 with bounds 29, 30, and 31, plus exact sentinel 0x21f.")
 label(0x0001f680, "status_code_record_table",
