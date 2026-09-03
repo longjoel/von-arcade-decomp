@@ -2275,6 +2275,12 @@ and advances through descriptor bases `0x47260`, `0x47268`, and `0x47270`.
 Its short and completion exits at `0x52858` and `0x52874` delimit it from the
 separate table target at `0x52880`.
 
+The paired `0x52880` target repeats this threshold-event protocol for the next
+profile range.  It tests the same normalized flag, emits the `0x1208`/`0x1230`
+message, updates `0x1a6`, and consumes records at `0x47280`/`0x47284` while
+advancing object phase `0x178`.  Its progress and completion returns at
+`0x52adc` and `0x52af4` delimit the sibling before the next `0x52b00` handler.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
