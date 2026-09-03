@@ -2289,6 +2289,15 @@ fields, and reset or advance phase `0x178` at their range boundaries.  The
 state.  Their returns at `0x52b9c`, `0x52c9c`, and `0x52d2c` delimit the trio
 from the following `0x52d30` handler.
 
+The `0xa978` table target at `0x52e30` is a parent phase-state dispatcher.  It
+updates object field `0x2e` from the current offset and `0x184`, then selects
+internal transition arms at `0x52e84`, `0x52f30`, and `0x52fac`.  Those arms
+consume the large data ranges rooted at `0x22749d8`, `0x22770e8`, and
+`0x22749e0`, publish the shared cursor fields, and emit mode-specific status
+messages on completion.  The internal returns at `0x52f2c`, `0x52fa8`,
+`0x53020`, and `0x53040` are contained within the parent, which ends at the
+aligned `0x53044` boundary.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
