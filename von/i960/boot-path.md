@@ -1697,6 +1697,12 @@ coin fields from the selected configuration and returns through its caller
 continuation at `0xf1aa4`. The arithmetic helper at `0xf23e0` then builds a
 nine-entry coin/credit matrix using those bytes, returning at `0xf264c`.
 
+The adjacent site/status probe at `0xf1ac0` reads the two hardware status
+windows, stores the resulting site byte at `0x1d00028`, and returns at
+`0xf1bb8`; its fallback arm at `0xf1bc0` returns at `0xf1bdc`. The paired
+target/index records at `0xf1be0` feed the coin diagnostic’s indexed display
+dispatch.
+
 The statistics renderer at `0xf33a0` reads the `0x1d00040–0x1d000a0`
 accounting fields and formats game-time/bookkeeping results, returning at
 `0xf3a64`. The EEPROM confirmation service at `0xf3ab0` displays the clear /
