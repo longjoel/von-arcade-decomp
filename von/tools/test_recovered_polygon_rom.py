@@ -51,5 +51,22 @@ def main():
             print(f"PASS: live match OBA decoder oracle ({len(obas)} objects, {sum(decoded)} polygons)")
         else:
             print("SKIP: live match trace is not present")
+        select_trace = ROOT / "von/build/disasm/vonj-geometry-select-45s-drone0.trace"
+        if select_trace.is_file():
+            obas = set()
+            opcodes = set()
+            for line in select_trace.read_text(errors="replace").splitlines():
+                match = re.search(
+                    r"vonj_geometry_object: time=([0-9.]+).*?oba=([0-9a-f]+).*?"
+                    r"source=polygon-rom opcode=([0-9a-f]+)", line)
+                if match:
+                    obas.add(int(match.group(2), 16))
+                    opcodes.add(match.group(3))
+            if len(obas) != 684 or opcodes != {"00800101"}:
+                raise SystemExit("unexpected machine-select OBA/opcode set")
+            decoded = [len(decode(fn, data, oba)) for oba in sorted(obas)]
+            if min(decoded) < 1 or max(decoded) != 781:
+                raise SystemExit("machine-select OBA decoder range mismatch")
+            print(f"PASS: machine-select OBA decoder oracle ({len(obas)} objects, {sum(decoded)} polygons)")
     print("PASS: C polygon-ROM decoder and arena floor")
 if __name__ == "__main__": main()

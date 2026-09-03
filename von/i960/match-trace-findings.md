@@ -43,6 +43,13 @@ latest value is not sufficient evidence for the complete match transform
 sequence. The polygon decoder oracle is therefore promoted; the `0x6f6f0`
 numeric transform contract remains conservative.
 
+The retained `drone0` 45-second geometry trace is a separate machine-select
+capture: its Lua log contains the coin event but no START event. It still adds
+a useful C boundary check, with 684 unique polygon-ROM objects, all using
+`0x00800101`, decoding to 33,874 polygons in total with a 1–781 range. It is
+recorded as select-screen evidence and is not conflated with the verified
+post-start match trace.
+
 Two reproducibility probes with the expanded-hook binary were intentionally
 not promoted: both original-ROM runs reached the scheduled coin/start events
 but remained at the pre-match `Downloading COPRO/GEO/Texture` screen and
