@@ -330,6 +330,21 @@ pointer table at `0x142e94` using the incoming asset index and calls
 does not perform decompression or geometry work. This cleanly separates the
 profile record path from the text/video asset path in the call graph.
 
+The geometry producer’s table state is populated by two tiny loaders. The
+loader at `0x6f900` treats `0x6eb60` as records with an `0x18`-byte stride,
+selects the indexed record, copies its 64-bit pair and two additional words
+into `0x51bb20`, `0x51bb24`, and `0x51bb28`, and emits the associated attribute
+bit to `0x884000`. The sibling at `0x6f970` has the same layout and uses the
+alternate continuation stub. These routines explain why `0x51bb24` is RAM
+state rather than a ROM table: the producer reads the current profile words
+after these loaders have filled them.
+
+The asset table at `0x142e94` is a 32-entry pointer table with 4-byte stride;
+its entries run from `0x2fb3d90` through `0x2fb5290` in `0xc0`-byte steps.
+`0x142f34` is the parallel bank used by the broader status initializer. The
+table contents are pointers to expanded asset blocks, so the selector wrapper
+does not need to know the asset format itself.
+
 The geometry arms at `0x2dc50` and `0x2dd30` form an initialization/build
 pair. `0x2dc50` clears the video context, initializes service pointers through
 `0x296d0`, seeds `0x51aaf8/0x51aafc` to `1`, clears geometry/status fields at

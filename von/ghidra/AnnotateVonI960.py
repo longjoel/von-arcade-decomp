@@ -393,6 +393,10 @@ label(0x000de670, "startup_geometry_status_workspace_init",
       "Initializes status/geometry workspace fields and emits setup packets.")
 label(0x0006f600, "geometry_fixed_point_record_producer",
       "Converts two geometry inputs to fixed-point coordinates and emits the associated FIFO record.")
+label(0x0006f900, "geometry_profile_table_loader_a",
+      "Loads one profile record from the ROM table at 0x6eb60 into the shared geometry profile words.")
+label(0x0006f970, "geometry_profile_table_loader_b",
+      "Loads the alternate profile record into the shared geometry profile words.")
 label(0x000e2120, "text_asset_selector_upload",
       "Selects an asset through 0x142e94 and delegates expansion to the three-plane uploader.")
 label(0x000423a8, "startup_record_table_clear",
@@ -421,7 +425,15 @@ ensure_function(0x000d1280, "startup_profile_handler_2_geometry_setup", 0x000d13
 ensure_function(0x000d1ab0, "startup_profile_handler_3_geometry_setup", 0x000d1bd8)
 ensure_function(0x000de670, "startup_geometry_status_workspace_init", 0x000de988)
 ensure_function(0x0006f600, "geometry_fixed_point_record_producer", 0x0006f6f0)
+ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
+ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
+
+label(0x0051bb20, "geometry_profile_word_0")
+label(0x0051bb24, "geometry_profile_word_pair")
+label(0x0051bb28, "geometry_profile_word_2")
+label(0x00142e94, "text_asset_pointer_table_bank_a")
+label(0x00142f34, "text_asset_pointer_table_bank_b")
 ensure_function(0x000423a8, "startup_record_table_clear", 0x00042460)
 ensure_function(0x0009b498, "startup_geometry_record_pool_clear", 0x0009b4c0)
 ensure_function(0x000c55a8, "startup_device_table_clear", 0x000c55fc)
