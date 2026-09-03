@@ -2215,6 +2215,13 @@ returns through the supplied link at `0x4e5e8`/`0x4e5ec`.  The distinct
 `0x4e3e0` entry confirms this is a sibling dispatcher rather than a fall-through
 continuation of threshold normalization.
 
+The phase-dispatch family continues at `0x4e5f0`, `0x4e820`, and `0x4e920`.
+These are separately delimited siblings: `0x4e5f0` uses the `0x46dc0` record
+set, `0x4e820` selects a descriptor base in the `0x2572744` data region, and
+`0x4e920` reads paired records at `0x46e20`/`0x46e24`.  All three publish the
+shared cursor fields and use caller-link returns at `0x4e814`, `0x4e918`, and
+`0x4ea30`, with profile reset/status transitions on their completion paths.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

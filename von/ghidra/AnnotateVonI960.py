@@ -615,6 +615,12 @@ label(0x0004e080, "geometry_object_profile_threshold_update_variant_b",
       "Alternate profile threshold update that clamps three timing fields, sets threshold flags, and recomputes normalized 0x1e2/0x1e4/0x1e6 values.")
 label(0x0004e3e0, "geometry_object_profile_phase_dispatch_variant_b",
       "Alternate profile phase dispatcher using the object phase field and returning through a caller-supplied link after the selected transition path.")
+label(0x0004e5f0, "geometry_object_profile_phase_dispatch_variant_c",
+      "Profile phase dispatcher sibling using the 0x46dc0 records, updating phase/cursor state and resetting the object profile at range completion.")
+label(0x0004e820, "geometry_object_profile_phase_dispatch_variant_d",
+      "Profile phase dispatcher sibling using the 0x2572744-backed descriptor range and the shared cursor/status transition protocol.")
+label(0x0004e920, "geometry_object_profile_phase_dispatch_variant_e",
+      "Profile phase dispatcher sibling using paired 0x46e20/0x46e24 records and publishing the resulting cursor transition through the caller link.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1323,6 +1329,9 @@ ensure_function(0x0004dce0, "geometry_object_profile_cursor_transition_variant_g
 ensure_function(0x0004def0, "geometry_object_profile_cursor_transition_variant_h", 0x0004e074)
 ensure_function(0x0004e080, "geometry_object_profile_threshold_update_variant_b", 0x0004e3d4)
 ensure_function(0x0004e3e0, "geometry_object_profile_phase_dispatch_variant_b", 0x0004e5f0)
+ensure_function(0x0004e5f0, "geometry_object_profile_phase_dispatch_variant_c", 0x0004e81c)
+ensure_function(0x0004e820, "geometry_object_profile_phase_dispatch_variant_d", 0x0004e920)
+ensure_function(0x0004e920, "geometry_object_profile_phase_dispatch_variant_e", 0x0004ea34)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
