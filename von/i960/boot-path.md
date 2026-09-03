@@ -1797,6 +1797,9 @@ entries at `0x2f360`, `0x2f460`, `0x2f580`, `0x2f930`, `0x2fb20`, `0x2fe30`,
 `0x2fa20–0x2fb10` and `0x2fd50–0x2fe28` are continuation trampolines: they
 save the shared geometry result, clear the transient callback state, and
 return through a caller-supplied address rather than ending with `ret`.
+The same structure continues at `0x30230`, `0x30c20`, and `0x30d40`; the
+phase-reset helpers at `0x303e0`/`0x30420` and motion handlers through
+`0x30e40` form the next profile-selection cluster.
 
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
