@@ -1946,6 +1946,25 @@ flags, resets the object service fields, and selects the active profile-table
 roots at `0x51ace8`–`0x51acf4`.  It returns at `0x3d728`; `0x3d730` begins
 the next object-record initialization path.
 
+The `0x3d730` object-record path is a complete update routine ending at
+`0x3e5d8`.  Its caller supplies an active object record; the routine emits the
+initial `0x884000` setup, derives the profile/service selector, advances the
+shared service counter, and runs several profile-dependent fixed-point motion
+and clamp paths.  It publishes derived coordinates at record offsets `0x2e`,
+`0x154`, `0x1c8`, and `0x1cc`, updates phase/state fields around `0x170`–`0x18c`,
+and returns through four branch-linked exits at `0x3e484`, `0x3e53c`,
+`0x3e5ac`, and `0x3e5d8`.  The repeated calls to `0x3d540` are the shared
+fixed-point clamp service, not separate object routines.
+
+The adjacent `0x3e5e0` entry is a distinct profile/state initializer ending
+at `0x3ec90`.  It consumes the shared service cursor at `0x51ab20`, selects
+profile-specific floating-point constants for the cursor range, writes the
+profile record at offsets `0xc`, `0x10`, and `0x34`, and then advances or
+rewinds the cursor while driving the object phase/timer state.  The direct
+callers at `0x274ac` and `0x27540` therefore select separate geometry update
+families: `0x3e5e0` performs profile-state initialization, while `0x3d730`
+performs the full object-record motion/update path.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

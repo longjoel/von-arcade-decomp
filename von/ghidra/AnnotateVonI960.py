@@ -395,6 +395,10 @@ label(0x0003d540, "geometry_fixed_point_clamp_helper",
       "Clamps a floating-point input and writes the corresponding fixed-point limit through the supplied object pointer.")
 label(0x0003d5d0, "geometry_service_state_initialize",
       "Clears and initializes the shared 0x51abxx geometry service state and selects the active profile tables.")
+label(0x0003d730, "geometry_object_record_update",
+      "Updates one active object record: emits the 0x884000 geometry setup, advances profile/service state, applies fixed-point motion and clamp paths, and publishes the resulting coordinate fields.")
+label(0x0003e5e0, "geometry_object_profile_state_initialize",
+      "Initializes the selected object profile from the shared service cursor, applies profile-specific fixed-point timing/state transitions, and publishes the object phase/result fields.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1005,6 +1009,8 @@ ensure_function(0x0003a140, "geometry_selector_geometry_emitter", 0x0003a510)
 ensure_function(0x0003a510, "geometry_scene_update_dispatch", 0x0003d520)
 ensure_function(0x0003d540, "geometry_fixed_point_clamp_helper", 0x0003d5d0)
 ensure_function(0x0003d5d0, "geometry_service_state_initialize", 0x0003d730)
+ensure_function(0x0003d730, "geometry_object_record_update", 0x0003e5e0)
+ensure_function(0x0003e5e0, "geometry_object_profile_state_initialize", 0x0003ec94)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
