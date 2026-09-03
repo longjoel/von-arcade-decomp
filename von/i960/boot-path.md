@@ -2348,6 +2348,18 @@ from the `0x47440` and `0x47470` record families.  They publish paired cursor
 values, advance phase `0x17a`, and feed the common status transition protocol;
 their aligned ends are `0x54a54` and `0x54db0`.
 
+The following `0x54e00` handler repeats the runtime geometry/status update
+pattern with records derived from `0x22740d0`.  It advances phase `0x178`,
+publishes the shared cursor fields, and applies the same object-`0x150`
+correction before returning at `0x54f48`.  Its compact companion at `0x54f50`
+publishes the next cursor range and returns through the saved link at
+`0x550ac`, with the aligned function end at `0x550b4`.
+
+The `0x550c0` entry begins the next indexed geometry updater.  It selects
+paired records from the `0x474a0` family according to the two object phase
+indices, publishes both cursor coordinates, and contains the status reset and
+message path before its return at `0x552f4`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
