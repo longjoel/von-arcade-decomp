@@ -2752,6 +2752,11 @@ at `0x6eb40–0x6eb54` completes the callback path.  Their repeated constant
 selection and callback structure identifies them as motion math helpers,
 while the exact higher-level operation remains unresolved.
 
+The late callback table also points at instruction site `0x6ef70`, inside the
+larger renderer beginning at `0x6efd0`.  This site emits the assembled
+vertex/attribute packet to the `0x884000` FIFO; it is intentionally recorded
+as an internal target, not as a separate function entry.
+
 The parallel bounds evaluator at `0x68550` repeats the extent clamp,
 object-offset, axis-flag, and derived-ratio sequence, returning through its
 saved callback at `0x6876c`.  The separate phase/selection controller at

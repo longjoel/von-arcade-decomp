@@ -1029,6 +1029,8 @@ label(0x0006ea40, "geometry_motion_math_dispatch_variant_e",
       "Floating-point motion math dispatcher variant that selects a phase-dependent constant and returns through the supplied callback.")
 label(0x0006eb40, "geometry_motion_math_callback_bridge",
       "Minimal callback bridge for the motion math dispatch cluster.")
+label(0x0006ef70, "geometry_command_packet_emit_site_variant_a",
+      "Instruction-site target inside the larger geometry renderer; emits the assembled vertex/attribute packet to the 0x884000 FIFO and is referenced by the late geometry callback table.")
 label(0x00068550, "geometry_object_profile_geometry_bounds_flags_update_variant_f",
       "Third parallel geometry bounds evaluator that clamps extents, applies object-record offsets, updates axis collision flags, and computes derived ratios.")
 label(0x00068770, "geometry_object_profile_phase_selection_controller_variant_b",
