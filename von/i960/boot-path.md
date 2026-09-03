@@ -1924,6 +1924,19 @@ corresponding constants through `0x884000`, and has internal packet-layout
 arms at `0x3a1b0` and `0x3a360`.  The routine returns at `0x3a504`; the next
 framed status/geometry routine begins at `0x3a510`.
 
+`0x3a510` is that larger framed scene/object update routine.  It manages the
+scene resource cursor at `0x51acb4`, emits repeated profile and object packets
+through `0x884000`/`0x804000`, applies the fixed-point and floating-point
+geometry transforms, updates object fields including `0x18c`, `0x198`, and
+`0x1af`, and dispatches the associated effect callbacks.  Its frame restore is
+at `0x3d508`/`0x3d50c`, with `ret` at `0x3d510`.
+
+The following table at `0x3d520` contains eight phase routes back into the
+recovered resource handlers: `0x37f50`, `0x38340`, `0x38490`, `0x385f0`,
+`0x386c0`, `0x388f0`, `0x39980`, and `0x39910`.  This confirms that those
+handlers are consumers of the central scene update dispatch rather than an
+unrelated linear code island.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
