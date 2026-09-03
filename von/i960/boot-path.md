@@ -2131,6 +2131,13 @@ shared cursor globals, and returns at `0x4a98c`.  Its alternate at `0x4a990`
 uses adjacent descriptor records and returns at `0x4abb8`; these are distinct
 phase handlers, not code embedded in the descriptor table.
 
+The following phase-transition siblings begin at `0x4abc0`, `0x4ad50`,
+`0x4ae70`, `0x4af20`, and `0x4aff0`.  Each consumes a different descriptor pair
+from the large profile data region, advances `0x178`/`0x17c`, publishes the
+shared cursor globals, and has a mode-specific reset path.  Their returns at
+`0x4ad48`, `0x4ae60`, `0x4af1c`, `0x4afec`, and `0x4b088` establish five more
+standalone handlers in this family.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
