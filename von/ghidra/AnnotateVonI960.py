@@ -464,6 +464,10 @@ label(0x000eaed0, "runtime_format_value_adjusted",
       "Formats an adjusted runtime value and selects the board-specific output path.")
 label(0x000eaf20, "runtime_render_value_string",
       "Renders the supplied runtime value through the alternate printable-string path.")
+label(0x000eaf40, "diagnostic_menu_strings",
+      "Literal diagnostic-menu strings used by the runtime test/status screen.")
+label(0x000eb060, "diagnostic_menu_render",
+      "Renders the diagnostic menu strings and updates the selected test-menu tile state.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -542,6 +546,7 @@ ensure_function(0x000eae60, "runtime_byte_copy_continuation", 0x000eaea8)
 ensure_function(0x000eaeb0, "runtime_format_value", 0x000eaec4)
 ensure_function(0x000eaed0, "runtime_format_value_adjusted", 0x000eaf20)
 ensure_function(0x000eaf20, "runtime_render_value_string", 0x000eaf34)
+ensure_function(0x000eb060, "diagnostic_menu_render", 0x000eb1b8)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)

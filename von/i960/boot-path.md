@@ -1580,6 +1580,12 @@ boolean results through caller continuations; `0xeae60` copies a byte span;
 and `0xeaeb0`, `0xeaed0`, and `0xeaf20` wrap the shared numeric/text rendering
 helpers, including the board-specific adjustment path.
 
+The literal block at `0xeaf40–0xeb054` contains the diagnostic menu labels
+(`TEST MENU`, memory/input/output/sound tests, assignment and backup prompts).
+The renderer at `0xeb060` lays those strings into the status tile plane and
+updates the selected-menu marker, returning through either `0xeb19c` or
+`0xeb1b4`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
