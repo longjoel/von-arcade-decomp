@@ -1875,6 +1875,12 @@ offset against fixed-point thresholds, writes the resulting class to field
 advances phase field `0x178`; its terminal paths return at `0x393fc` or
 `0x39404`.  The next continuation-style service begins at `0x39410`.
 
+`0x39410` is a short service-state continuation.  It checks the four-word
+state at `0x51acd0`, updates the active entries in `0x51acd0`/`0x51acd8` and
+the paired counter table, then returns through the supplied continuation in
+`g2` at `0x3947c` (`ret` at `0x39480`).  The longer state/update path begins at
+`0x39490` and remains separate pending its full branch-connected boundary.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
