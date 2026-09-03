@@ -457,6 +457,12 @@ label(0x00040e10, "geometry_object_packet_variant_e",
       "Parallel command-5/18/19 object packet path using payloads from 0x2be135c.")
 label(0x00040f50, "geometry_object_packet_variant_f",
       "Emits the command-5/18/19/30/21 object packet sequence and selects the payload table at 0x2be17dc.")
+label(0x00041090, "geometry_object_motion_packet_variant_a",
+      "Updates the active object motion fields with fixed-point interpolation, then emits the command-5/18/19/21 packet sequence from 0x2be14dc.")
+label(0x00041340, "geometry_object_motion_packet_variant_b",
+      "Emits the standard command-5 geometry packet after coordinate accumulation, using the profile payload table at 0x2be159c.")
+label(0x000414b0, "geometry_object_motion_packet_variant_c",
+      "Parallel command-5 geometry packet path using the payload table at 0x2be171c and the shared selector comparison.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1097,6 +1103,9 @@ ensure_function(0x00040bc0, "geometry_object_packet_variant_c", 0x00040d00)
 ensure_function(0x00040d00, "geometry_object_packet_variant_d", 0x00040e10)
 ensure_function(0x00040e10, "geometry_object_packet_variant_e", 0x00040f50)
 ensure_function(0x00040f50, "geometry_object_packet_variant_f", 0x00041090)
+ensure_function(0x00041090, "geometry_object_motion_packet_variant_a", 0x00041340)
+ensure_function(0x00041340, "geometry_object_motion_packet_variant_b", 0x000414b0)
+ensure_function(0x000414b0, "geometry_object_motion_packet_variant_c", 0x00041620)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

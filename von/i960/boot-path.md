@@ -2013,6 +2013,13 @@ Their payload tables are distinct (`0x2be0ef4`, `0x2be129c`, `0x2be0f9c`,
 variants sharing a protocol skeleton rather than one function with an
 accidental linear split.
 
+The subsequent motion-aware variants begin at `0x41090`, `0x41340`, and
+`0x414b0`.  They accumulate object motion fields before submitting the same
+command-5 geometry protocol, with the first also emitting command 18/19/21
+records.  Their payload tables (`0x2be14dc`, `0x2be159c`, and `0x2be171c`)
+remain distinct, and the exact returns at `0x41330`, `0x414ac`, and `0x4161c`
+confirm three separate routines.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
