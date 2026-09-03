@@ -2262,6 +2262,12 @@ then calls the service at `0xbf120` before recomputing normalized
 handler extends across the internal completion paths and ends at the aligned
 `0x520dc` boundary before the next state family.
 
+The following phase-state dispatch siblings begin at `0x520e0` and `0x52360`.
+The first switches among descriptor bases `0x47200`, `0x47208`, `0x47210`, and
+`0x47218`, while the second uses the `0x47220`-series records.  Both branch on
+phase state `0x17c`, publish the shared cursor fields, and contain mode-specific
+reset/status arms before returning at `0x5235c` and `0x52640`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
