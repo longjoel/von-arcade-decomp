@@ -564,6 +564,14 @@ label(0x000ecc40, "diagnostic_result_format_compare",
       "Formats a diagnostic result with an expected-value comparison.")
 label(0x000ecd80, "diagnostic_result_menu_render",
       "Renders the diagnostic IC result menu and its accumulated runtime results.")
+label(0x000ed0d0, "runtime_record_workspace_reset",
+      "Clears the packed-record match/result workspace and returns through a continuation.")
+label(0x000ed1e0, "diagnostic_wait_prompt_strings",
+      "Literal diagnostic prompts for the test-button and wait states.")
+label(0x000ed220, "diagnostic_result_service",
+      "Initializes diagnostic result state, renders the result menu, and dispatches the next handler.")
+label(0x000ed2e4, "diagnostic_result_service_fallback",
+      "Handles the diagnostic result fallback and advances the service state.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -689,6 +697,9 @@ ensure_function(0x000ecb20, "runtime_event_result_publish_f", 0x000ecb50)
 ensure_function(0x000ecbe0, "diagnostic_result_format", 0x000ecc38)
 ensure_function(0x000ecc40, "diagnostic_result_format_compare", 0x000ecc98)
 ensure_function(0x000ecd80, "diagnostic_result_menu_render", 0x000ed0c8)
+ensure_function(0x000ed0d0, "runtime_record_workspace_reset", 0x000ed1d0)
+ensure_function(0x000ed220, "diagnostic_result_service", 0x000ed2e0)
+ensure_function(0x000ed2e4, "diagnostic_result_service_fallback", 0x000ed304)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)

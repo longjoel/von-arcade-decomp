@@ -1629,8 +1629,15 @@ The table is followed by diagnostic formatting support: `0xecbb8–0xecd78`
 holds the result format, GOOD/BAD text, and IC-number labels; `0xecbe0` and
 `0xecc40` are the basic and expected-value comparison formatters. The result
 menu renderer at `0xecd80` lays out the IC results and accumulated status
-values, returning at `0xecd c4` (the listing address is `0xecd c4` with the
 values, returning at `0xed0c4`.
+
+The workspace reset at `0xed0d0` clears the primary and alternate
+match/result slots before returning through its continuation at `0xed1cc`.
+The following `0xed1e0–0xed218` block is literal test-button and wait-prompt
+text. The service at `0xed220` initializes the diagnostic result state,
+renders through `0xecd80`, then dispatches the next handler via `0xecb50` and
+returns at `0xed2e0`; its fallback path begins at `0xed2e4` and returns at
+`0xed300`.
 
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
