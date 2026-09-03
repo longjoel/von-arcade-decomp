@@ -795,6 +795,14 @@ label(0x0005b4b0, "geometry_object_profile_phase_transition_variant_o",
       "Profile phase transition using the 0x48008 record, shared cursor progression, terminal state reset, and fixed-point object geometry setup.")
 label(0x0005b610, "geometry_object_profile_phase_transition_variant_p",
       "Parallel profile phase transition using the 0x48010 record, shared cursor progression, terminal state reset, and fixed-point object geometry setup.")
+label(0x0005b770, "geometry_object_profile_phase_transition_variant_q",
+      "Compact profile phase transition using the 0x48020 record, advancing the phase counter and resetting terminal object state.")
+label(0x0005b830, "geometry_object_profile_phase_transition_variant_r",
+      "Compact profile phase transition using the 0x48018 record, advancing the phase counter and resetting terminal object state.")
+label(0x0005b8f0, "geometry_object_profile_phase_transition_variant_s",
+      "Compact profile phase transition using the 0x48230 record, advancing a short frame counter and setting the next phase state.")
+label(0x0005b9a0, "geometry_object_profile_phase_transition_variant_t",
+      "Compact profile phase transition using the 0x48238 record, advancing a short frame counter and setting the next phase state.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1593,6 +1601,10 @@ ensure_function(0x0005af10, "geometry_object_profile_phase_transition_variant_m"
 ensure_function(0x0005b1e0, "geometry_object_profile_phase_transition_variant_n", 0x0005b4ac)
 ensure_function(0x0005b4b0, "geometry_object_profile_phase_transition_variant_o", 0x0005b600)
 ensure_function(0x0005b610, "geometry_object_profile_phase_transition_variant_p", 0x0005b764)
+ensure_function(0x0005b770, "geometry_object_profile_phase_transition_variant_q", 0x0005b82c)
+ensure_function(0x0005b830, "geometry_object_profile_phase_transition_variant_r", 0x0005b8ec)
+ensure_function(0x0005b8f0, "geometry_object_profile_phase_transition_variant_s", 0x0005b994)
+ensure_function(0x0005b9a0, "geometry_object_profile_phase_transition_variant_t", 0x0005ba44)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

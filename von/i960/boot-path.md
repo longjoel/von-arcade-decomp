@@ -2493,6 +2493,12 @@ parallel `0x48010` record and ends at `0x5b764`.  Both publish cursor progress,
 reset terminal state, and perform the fixed-point object-geometry setup before
 returning through their controller links.
 
+Four compact handlers follow: `0x5b770` uses `0x48020` and ends at `0x5b82c`,
+while `0x5b830` uses `0x48018` and ends at `0x5b8ec`.  The short-counter pair
+at `0x5b8f0` and `0x5b9a0` uses `0x48230` and `0x48238`, ending at `0x5b994`
+and `0x5ba44` respectively.  These handlers advance phase/frame counters and
+reset or publish the next object state through their linked return paths.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
