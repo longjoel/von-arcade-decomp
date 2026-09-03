@@ -1554,6 +1554,13 @@ scale words through `0x884000`. Its alternate branches at `0xe7560` and
 submission or the queued `0x804000` path. All paths restore the saved context
 and return at `0xe79e0`.
 
+The caller-facing scene service at `0xe79f0` renders the active status scene
+from the record bytes at `0x5783c0`/`0x5784e4`, repeatedly invoking the object
+packet dispatcher above for the scene's geometry groups. It uses the mode word
+at `0x5783c4` and the six-entry arm table at `0xe8920` for the final scene
+variant; the complete service returns at `0xe9138`. The next entry at
+`0xe9140` begins a separate command/setup path.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
