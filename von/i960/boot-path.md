@@ -2281,6 +2281,14 @@ message, updates `0x1a6`, and consumes records at `0x47280`/`0x47284` while
 advancing object phase `0x178`.  Its progress and completion returns at
 `0x52adc` and `0x52af4` delimit the sibling before the next `0x52b00` handler.
 
+The next compact transition trio is exposed by the `0xa968`-range table:
+`0x52b00`, `0x52ba0`, and `0x52ca0`.  They consume descriptor bases
+`0x472b0`, `0x472c0`, and `0x472d0`, respectively, publish the shared cursor
+fields, and reset or advance phase `0x178` at their range boundaries.  The
+`0x52ca0` variant additionally sets phase flag bit 19 before entering its reset
+state.  Their returns at `0x52b9c`, `0x52c9c`, and `0x52d2c` delimit the trio
+from the following `0x52d30` handler.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
