@@ -1681,6 +1681,12 @@ the active accounting sub-handler before returning at `0xf2ee4`. The nearby
 format strings identify this family as bookkeeping, coin-chute, credit, and
 game-time reporting.
 
+The paired tables dispatch nine bounded arms: record validation at `0xf2940`,
+credit/coin updates at `0xf2a60–0xf2bc0`, input-byte updates at `0xf2c20` and
+`0xf2c90`, and coin-chute counter updates at `0xf2d00` and `0xf2d70`. Each arm
+returns before the next table/data boundary, making these indirect paths
+available for per-state tracing.
+
 The statistics renderer at `0xf33a0` reads the `0x1d00040–0x1d000a0`
 accounting fields and formats game-time/bookkeeping results, returning at
 `0xf3a64`. The EEPROM confirmation service at `0xf3ab0` displays the clear /

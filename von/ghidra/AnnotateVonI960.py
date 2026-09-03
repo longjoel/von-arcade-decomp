@@ -616,6 +616,24 @@ label(0x000f3ab0, "diagnostic_eeprom_write_confirmation",
       "Runs the EEPROM write-frequency warning and YES/NO confirmation state service.")
 label(0x000f3c50, "diagnostic_test_mode_exit_reset",
       "Resets test-mode video/input state and advances the diagnostic mode counter.")
+label(0x000f2940, "diagnostic_bookkeeping_arm_validate",
+      "Validates the active bookkeeping record and updates the associated credit/runtime state.")
+label(0x000f2a60, "diagnostic_bookkeeping_arm_credit_a",
+      "Processes the first bookkeeping credit-counter update and publishes the result.")
+label(0x000f2ae0, "diagnostic_bookkeeping_arm_credit_b",
+      "Processes the alternate bookkeeping credit-counter update and publishes the result.")
+label(0x000f2b60, "diagnostic_bookkeeping_arm_coin",
+      "Processes the coin-count bookkeeping update and publishes the result.")
+label(0x000f2bc0, "diagnostic_bookkeeping_arm_credit_reset",
+      "Processes the credit reset/update arm and synchronizes the bookkeeping state.")
+label(0x000f2c20, "diagnostic_bookkeeping_arm_input_a",
+      "Updates the first diagnostic input byte at 0x1d00035 and publishes the state.")
+label(0x000f2c90, "diagnostic_bookkeeping_arm_input_b",
+      "Updates the second diagnostic input byte at 0x1d00036 and publishes the state.")
+label(0x000f2d00, "diagnostic_bookkeeping_arm_coin_chute_a",
+      "Updates the first coin-chute bookkeeping counter at 0x1d00030.")
+label(0x000f2d70, "diagnostic_bookkeeping_arm_coin_chute_b",
+      "Updates the second coin-chute bookkeeping counter at 0x1d00032.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -757,6 +775,15 @@ ensure_function(0x000f2e20, "diagnostic_bookkeeping_service", 0x000f2ef0)
 ensure_function(0x000f33a0, "diagnostic_game_time_statistics_render", 0x000f3a80)
 ensure_function(0x000f3ab0, "diagnostic_eeprom_write_confirmation", 0x000f3c10)
 ensure_function(0x000f3c50, "diagnostic_test_mode_exit_reset", 0x000f3ca0)
+ensure_function(0x000f2940, "diagnostic_bookkeeping_arm_validate", 0x000f2a60)
+ensure_function(0x000f2a60, "diagnostic_bookkeeping_arm_credit_a", 0x000f2ae0)
+ensure_function(0x000f2ae0, "diagnostic_bookkeeping_arm_credit_b", 0x000f2b60)
+ensure_function(0x000f2b60, "diagnostic_bookkeeping_arm_coin", 0x000f2bc0)
+ensure_function(0x000f2bc0, "diagnostic_bookkeeping_arm_credit_reset", 0x000f2c20)
+ensure_function(0x000f2c20, "diagnostic_bookkeeping_arm_input_a", 0x000f2c90)
+ensure_function(0x000f2c90, "diagnostic_bookkeeping_arm_input_b", 0x000f2d00)
+ensure_function(0x000f2d00, "diagnostic_bookkeeping_arm_coin_chute_a", 0x000f2d70)
+ensure_function(0x000f2d70, "diagnostic_bookkeeping_arm_coin_chute_b", 0x000f2de0)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
