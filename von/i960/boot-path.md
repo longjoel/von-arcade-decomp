@@ -166,7 +166,7 @@ the `0x2d9xx` region.
 
 The subsequent trace comparison adds six boundary labels. `0x2d9a0` routes
 geometry transforms back through the profile uploader; `0x2e1c8` and
-`0x2e1e8` are paired status-render routes; `0x27550` is a repeated geometry
+`0x2e1e8` are paired status continuation trampolines; `0x27550` is a repeated geometry
 record-transform service; `0x281f0` selects texture-profile entries through a
 dispatch table; and `0x284b8` is the geometry command-window clear route.
 

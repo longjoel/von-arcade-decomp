@@ -196,8 +196,10 @@ label(0x0002be30, "geometry_frame_service_initialize",
       "Post-start original-ROM capture reaches this frame-service path before sustained match geometry; initialization emits the 8/16 FIFO prefix and dispatches the twelve frame-service arms.")
 label(0x0002d9a0, "geometry_transform_dispatch",
       "Emits the transformed geometry packet and stores the derived frame fields at 0x51aad0–0x51aae4.")
-label(0x0002e1c8, "geometry_status_render_route")
-label(0x0002e1e8, "geometry_status_render_route_alt")
+label(0x0002e1c8, "geometry_status_continuation_trampoline",
+      "Continuation trampoline that clears g14 and branches through the caller-supplied continuation.")
+label(0x0002e1e8, "geometry_status_continuation_trampoline_alt",
+      "Alternate continuation trampoline with the same g14 indirect-return sequence.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -724,6 +726,8 @@ ensure_function(0x0002b770, "startup_status_arm_subcounter_decrement", 0x0002b7b
 ensure_function(0x0002b940, "startup_status_arm_continuation_trampoline", 0x0002b960)
 ensure_function(0x0002bdd0, "startup_geometry_status_dispatch", 0x0002be30)
 ensure_function(0x0002d9a0, "geometry_transform_dispatch", 0x0002dc50)
+ensure_function(0x0002e1c8, "geometry_status_continuation_trampoline", 0x0002e1e0)
+ensure_function(0x0002e1e8, "geometry_status_continuation_trampoline_alt", 0x0002e200)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
