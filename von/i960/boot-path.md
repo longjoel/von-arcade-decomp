@@ -1645,6 +1645,11 @@ direction, shot, dash, start, coin-chute, service, and test-button states.
 The renderer at `0xed5c0` lays those rows into the tile plane, checks the
 input/status flags, and returns at `0xed968`.
 
+The next diagnostic block, `0xed970–0xeda28`, contains the Versus City
+billboard and winner-lamp/7-segment/start-lamp labels. The renderer at
+`0xeda30` advances its test state, emits the corresponding lamp and segment
+patterns through the shared test-pattern helper, and returns at `0xedcf8`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

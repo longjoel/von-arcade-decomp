@@ -578,6 +578,10 @@ label(0x000ed440, "diagnostic_input_status_strings",
       "Literal input-test status strings for directional, shot, dash, start, and coin inputs.")
 label(0x000ed5c0, "diagnostic_input_status_render",
       "Renders the input-test status rows and transitions the diagnostic service state.")
+label(0x000ed970, "diagnostic_billboard_test_strings",
+      "Literal Versus City billboard, winner-lamp, 7-segment, and start-lamp test strings.")
+label(0x000eda30, "diagnostic_billboard_test_render",
+      "Runs the billboard and lamp-test state machine, rendering test patterns and advancing its state.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -708,6 +712,7 @@ ensure_function(0x000ed220, "diagnostic_result_service", 0x000ed2e0)
 ensure_function(0x000ed2e4, "diagnostic_result_service_fallback", 0x000ed304)
 ensure_function(0x000ed320, "diagnostic_input_test_service", 0x000ed43c)
 ensure_function(0x000ed5c0, "diagnostic_input_status_render", 0x000ed970)
+ensure_function(0x000eda30, "diagnostic_billboard_test_render", 0x000edcfc)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
