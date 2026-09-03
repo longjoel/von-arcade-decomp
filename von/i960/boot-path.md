@@ -1468,6 +1468,15 @@ used while rendering repeated rows of UI/status text.
 `0xe3a00` wraps the glyph-table matcher at `0x1d880` for status/result label
 rendering.
 
+The data immediately following the video dispatch terminal at `0xe35a0` is
+structured rather than executable: `0xe35b0` holds ten 8-byte MSB/source
+descriptors, `0xe3600` holds ten 12-byte alternate descriptors, and
+`0xe3680`, `0xe36c0`, and `0xe3700` hold the ordinal/suffix string tables.
+The copy helpers at `0xe3740`, `0xe37b0`, and `0xe37f0` transfer those tables
+into runtime buffers before the status render helpers use them. `0xe3a30`
+renders the WINS/LOSSES row, while `0xe3a70` consumes exactly a three-byte
+status token and routes each byte through the glyph-block writer.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

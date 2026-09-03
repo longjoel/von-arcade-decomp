@@ -545,6 +545,15 @@ label(0x000df070, "geometry_object_transform_update")
 label(0x000e37f0, "startup_device_table_copy")
 label(0x000e2120, "text_asset_plane_upload")
 label(0x000e3a70, "text_render_three_byte_token")
+ensure_function(0x000e39c0, "text_indexed_status_label", 0x000e39ec)
+ensure_function(0x000e39f0, "text_status_string_render", 0x000e39f8)
+ensure_function(0x000e3a00, "text_status_glyph_match", 0x000e3a08)
+ensure_function(0x000e3a10, "text_render_two_digit_value", 0x000e3a18)
+label(0x000e3a30, "status_render_win_loss_row")
+ensure_function(0x000e3a30, "status_render_win_loss_row", 0x000e3a60)
+label(0x000e3a60, "status_render_count_wrapper")
+ensure_function(0x000e3a60, "status_render_count_wrapper", 0x000e3a68)
+ensure_function(0x000e3a70, "text_render_three_byte_token", 0x000e3aa8)
 label(0x000e39c0, "text_indexed_status_label")
 label(0x000e39f0, "text_status_string_render")
 label(0x000e3a00, "text_status_glyph_match")
@@ -748,6 +757,30 @@ ensure_function(0x000e353c, "video_dispatch_sentinel_indexed_pair_high", 0x000e3
 label(0x000e35a0, "video_dispatch_terminal_reset",
       "Terminal side effect returns 0xff; post-route ranges begin at 0x200, 0x400, and 0x420 with bounds 29, 30, and 31, plus exact sentinel 0x21f.")
 ensure_function(0x000e35a0, "video_dispatch_terminal_reset", 0x000e35ac)
+label(0x000e35b0, "status_asset_descriptor_table",
+      "Ten 8-byte descriptor records containing the repeated MSB tag and source value 0x464d0.")
+label(0x000e3600, "status_asset_descriptor_table_alt",
+      "Ten 12-byte alternate descriptor records containing the MSB tag, value 5, and a zero field.")
+label(0x000e3680, "status_ordinal_suffix_table",
+      "Ten fixed-width ordinal strings: 1ST through 9TH and 10.")
+label(0x000e36c0, "status_ordinal_number_table",
+      "Ten fixed-width numeric strings: 1 through 10.")
+label(0x000e3700, "status_ordinal_word_table",
+      "Ten fixed-width suffix strings: ST, ND, RD, then TH variants.")
+label(0x000e3a18, "status_win_loss_strings",
+      "Two fixed-width status strings: WINS and LOSSES.")
+label(0x000e3740, "status_asset_tables_initialize")
+ensure_function(0x000e3740, "status_asset_tables_initialize", 0x000e37ac)
+label(0x000e37b0, "status_asset_tables_reset")
+ensure_function(0x000e37b0, "status_asset_tables_reset", 0x000e37ec)
+label(0x000e37f0, "startup_device_table_copy")
+ensure_function(0x000e37f0, "startup_device_table_copy", 0x000e3824)
+label(0x000e3830, "status_render_small_value")
+ensure_function(0x000e3830, "status_render_small_value", 0x000e387c)
+label(0x000e3880, "status_render_percentage")
+ensure_function(0x000e3880, "status_render_percentage", 0x000e391c)
+label(0x000e3920, "status_render_count")
+ensure_function(0x000e3920, "status_render_count", 0x000e39bc)
 label(0x0001f680, "status_code_record_table",
       "Contains 9 records with 16-byte stride; index 8 is blank and invalid indices return zero. Text-position fields are column 8 and row 14.")
 label(0x0001f710, "status_code_dispatch",
