@@ -1703,6 +1703,12 @@ windows, stores the resulting site byte at `0x1d00028`, and returns at
 target/index records at `0xf1be0` feed the coin diagnostic’s indexed display
 dispatch.
 
+That table’s remaining 18 arms are now bounded individually: five
+configuration toggles cover `0x1d00016–0x1a`, and the subsequent arms update
+the diagnostic fields at `0x1d0001b–0x1f`, `0x1d00020–0x24`, `0x1d00026–0x28`,
+and `0x1d00027`. Their short returns make each selector/index pair directly
+traceable in Ghidra.
+
 The statistics renderer at `0xf33a0` reads the `0x1d00040–0x1d000a0`
 accounting fields and formats game-time/bookkeeping results, returning at
 `0xf3a64`. The EEPROM confirmation service at `0xf3ab0` displays the clear /
