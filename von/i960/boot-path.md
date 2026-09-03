@@ -1897,6 +1897,11 @@ resource records, dispatches the corresponding geometry payload through
 phase against the resource constant at `0x2adc158`, publishes the selected
 resource/result pair, and returns through `g1` at `0x3996c` (`ret` at
 `0x39970`).
+`0x39980` is the next phase-specific resource dispatcher.  It handles the
+special phase values observed at `10`, `13`, `19`, `0x3f`, and `0x42`, updates
+the associated service/result slots, and returns through `g1` at `0x39a68` or
+`0x39a88` (`ret` at `0x39a8c`).  The next framed packet-emission routine begins
+at `0x39a90`.
 
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
