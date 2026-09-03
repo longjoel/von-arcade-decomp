@@ -2182,6 +2182,7 @@ ensure_function(0x00074fa0, "match_transition_handler_5", 0x00074fc8)
 ensure_function(0x00074fc8, "match_transition_handler_6", 0x00075048)
 ensure_function(0x00075048, "match_transition_handler_7", 0x0007510c)
 ensure_function(0x0007510c, "match_transition_counter_clamp", 0x00075134)
+ensure_function(0x00075134, "match_transition_common_update", 0x00075200)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2431,6 +2432,8 @@ label(0x00075048, "match_transition_handler_7",
       "Transition-table handler 7: applies the high-counter threshold, selects state 3 or 6, and updates auxiliary fields.")
 label(0x0007510c, "match_transition_counter_clamp",
       "Out-of-range transition clamp: converts the shared counter threshold to a boolean, selects state 3, and joins the common continuation.")
+label(0x00075134, "match_transition_common_update",
+      "Common transition update: advances the shared counter, schedules the next service, applies the floating timing gate, and returns through its local epilogues.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",
