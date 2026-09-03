@@ -7,6 +7,8 @@
  * processors themselves.
  */
 
+#include "recovered_geometry_pipeline.h"
+
 typedef unsigned long u32;
 typedef unsigned short u16;
 
@@ -16,7 +18,6 @@ u32 recovered_io_self_test(void);
 void recovered_io_failure_prepare(void);
 void recovered_io_input_initialize(void);
 void recovered_host_queue_initialize(void);
-void recovered_geometry_pipeline_startup(u32 mode);
 void recovered_audio_initialize_scsp(void);
 void recovered_audio_service_pending(void);
 

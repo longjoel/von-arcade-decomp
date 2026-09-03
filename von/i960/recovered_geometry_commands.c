@@ -1,5 +1,7 @@
 /* Recovered from the command-window setup at i960 addresses 0x284b0-0x28534. */
 
+#include "recovered_geometry_pipeline.h"
+
 typedef unsigned long u32;
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -17,17 +19,6 @@ typedef unsigned short u16;
 #define GEO_FIXED_REGISTER ((volatile u32 *)0x10000000)
 #define GEOMETRY_STATE_A   ((volatile u32 *)0x005039f4)
 #define GEOMETRY_STATE_B   ((volatile u32 *)0x00503a00)
-
-void recovered_geometry_frame_submission(void);
-void recovered_geometry_buffer_prepare(volatile u32 *output);
-void recovered_geometry_profile_setup(void);
-void recovered_sharc_bootstrap_upload(void);
-void recovered_geometry_program_upload(void);
-void recovered_texture_initializer(void);
-int recovered_texture_loader_profile_setup(void);
-void recovered_geometry_initial_handshake(void);
-void recovered_geometry_register_clear(void);
-void recovered_geometry_auxiliary_submit_select(void);
 
 /* The first loop clears the +4 and +8 fields of 64 sixteen-byte slots. */
 void recovered_geometry_command_window_clear(void)
