@@ -2146,7 +2146,10 @@ ensure_function(0x00070c80, "geometry_command_packet_builder_variant_d", 0x00070
 ensure_function(0x00070fc0, "geometry_command_packet_builder_variant_e", 0x00071080)
 ensure_function(0x00071080, "geometry_object_match_update", 0x00072050)
 ensure_function(0x00072c00, "match_object_state_service", 0x00072ea0)
-ensure_function(0x00072ea0, "match_state_result_service", 0x00073484)
+ensure_function(0x00072ea0, "match_state_result_service", 0x00073490)
+ensure_function(0x00073498, "match_result_counter_service", 0x00073500)
+ensure_function(0x00073508, "geometry_range_classify", 0x000735d0)
+ensure_function(0x000735d0, "match_result_state_dispatch", 0x00073618)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2328,6 +2331,10 @@ label(0x00072c00, "match_object_state_service",
       "State-gated object service: checks match mode and object fields, dispatches object-side services, updates shared result/status fields, and returns through its frame epilogue.")
 label(0x00072ea0, "match_state_result_service",
       "Match-state/result service: selects mode-dependent parameters, updates shared result fields and object state, and emits the resulting command data.")
+label(0x00073498, "match_result_counter_service",
+      "Updates the shared result pair and counter state, then returns through the continuation saved in g6.")
+label(0x000735d0, "match_result_state_dispatch",
+      "Dispatches result-state handling through the mode/count table at 0x73618 after selecting the object-side context.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",
