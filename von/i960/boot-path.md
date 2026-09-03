@@ -2499,6 +2499,11 @@ at `0x5b8f0` and `0x5b9a0` uses `0x48230` and `0x48238`, ending at `0x5b994`
 and `0x5ba44` respectively.  These handlers advance phase/frame counters and
 reset or publish the next object state through their linked return paths.
 
+The next frame-transition pair begins at `0x5ba50` and `0x5bb60`, using the
+`0x48210` and `0x48220` records and ending at `0x5bb54` and `0x5bc64`.
+`0x5bc70` then expands this into a larger indexed transition using the paired
+`0x48030`/`0x48034` records; its linked completion boundary is `0x5bfe0`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
