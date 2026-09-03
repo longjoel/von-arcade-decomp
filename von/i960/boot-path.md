@@ -1670,6 +1670,11 @@ The match/time diagnostic at `0xf0980` renders play-time, match/death-match,
 pending/start-state, and network-link fields, builds the associated test
 structures, and returns at `0xf0b38`.
 
+The coin/credit diagnostic entry at `0xf1c90` advances its indexed display
+pattern and returns at `0xf1d40`. Its formatter helper at `0xf1db0` computes
+and prints credit arithmetic through `0xf1ebc`; the coin-chute status renderer
+at `0xf1f20` reads the live coin/status bytes and returns at `0xf20a4`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

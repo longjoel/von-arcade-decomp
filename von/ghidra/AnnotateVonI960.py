@@ -598,6 +598,12 @@ label(0x000f08c0, "diagnostic_crt_pattern_buffer_fill",
       "Fills the CRT diagnostic pattern buffer with the indexed bit-plane test layout.")
 label(0x000f0980, "diagnostic_match_time_test_service",
       "Renders the match/time diagnostic and builds its associated test video structures.")
+label(0x000f1c90, "diagnostic_coin_credit_service",
+      "Runs the coin/credit diagnostic state service and dispatches its indexed display pattern.")
+label(0x000f1db0, "diagnostic_credit_math_formatter",
+      "Formats credit arithmetic and comparison results for the coin diagnostic display.")
+label(0x000f1f20, "diagnostic_coin_chute_status_render",
+      "Renders coin-chute type and credit status using the live input/status bytes.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -732,6 +738,9 @@ ensure_function(0x000eda30, "diagnostic_billboard_test_render", 0x000edcfc)
 ensure_function(0x000f04d0, "diagnostic_crt_test_service", 0x000f08c0)
 ensure_function(0x000f08c0, "diagnostic_crt_pattern_buffer_fill", 0x000f0940)
 ensure_function(0x000f0980, "diagnostic_match_time_test_service", 0x000f0b3c)
+ensure_function(0x000f1c90, "diagnostic_coin_credit_service", 0x000f1d50)
+ensure_function(0x000f1db0, "diagnostic_credit_math_formatter", 0x000f1ec0)
+ensure_function(0x000f1f20, "diagnostic_coin_chute_status_render", 0x000f20b0)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
