@@ -2109,6 +2109,12 @@ the command words through `0x884000`, updates `0x51bb00`/`0x51bb04`/`0x51bb08`,
 and returns at `0x45078`.  This isolates the hardware conversion tail from the
 larger mode-selection routine.
 
+The same dispatcher selects additional hardware timing emitters at `0x45080`,
+`0x45380`, `0x45680`, `0x45c30`, and `0x45f50`.  These are separate routines,
+not shared fall-through code: each has its own scaling constants and returns at
+`0x45378`, `0x4567c`, `0x45c28`, `0x45f48`, and `0x46474`, while retaining the
+common `0x884000` command stream and `0x51bb00`-series profile outputs.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
