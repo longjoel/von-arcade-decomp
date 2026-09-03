@@ -2154,6 +2154,12 @@ range completion, and emits the corresponding status events.  It returns at
 using descriptor records at `0x46a90` and `0x46af0`; their returns at
 `0x4bb00` and `0x4bcd8` delimit the paired handlers.
 
+The dispatch-table target at `0x4bce0` is the profile-state finalizer.  It
+resets the object phase fields, emits the associated state words through
+`0x884000`, updates the shared profile/event state, and applies the status
+identifier selected by the object mode.  Its return at `0x4c044` marks the
+boundary before the next runtime state routine.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

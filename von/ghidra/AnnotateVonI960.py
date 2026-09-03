@@ -583,6 +583,8 @@ label(0x0004b940, "geometry_object_profile_cursor_transition_variant_a",
       "Cursor transition variant using the 0x46a90 descriptor records and returning through a caller-supplied link.")
 label(0x0004bb10, "geometry_object_profile_cursor_transition_variant_b",
       "Alternate cursor transition variant using the adjacent 0x46af0 descriptor records and returning through a caller-supplied link.")
+label(0x0004bce0, "geometry_object_profile_state_finalize",
+      "Finalizes an object profile transition: resets phase fields, emits the associated 0x884000 state packet, and applies the mapped status event.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1275,6 +1277,7 @@ ensure_function(0x0004b150, "geometry_object_profile_state_event_update", 0x0004
 ensure_function(0x0004b600, "geometry_object_profile_event_progress_update", 0x0004b938)
 ensure_function(0x0004b940, "geometry_object_profile_cursor_transition_variant_a", 0x0004bb00)
 ensure_function(0x0004bb10, "geometry_object_profile_cursor_transition_variant_b", 0x0004bcdc)
+ensure_function(0x0004bce0, "geometry_object_profile_state_finalize", 0x0004c048)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
