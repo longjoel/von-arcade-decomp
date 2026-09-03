@@ -30,6 +30,9 @@ static callers and services:
 | `0x2be30` | `geometry_frame_service_initialize` | Initializes the frame service and enters the twelve-arm frame dispatch. |
 | `0x27550` | `geometry_record_transform_service` | Stores record transform fields and calls the geometry producer at `0x6f600`. |
 | `0x6f6f0` | `geometry_float_transform_helper` | Converts the caller's transform inputs through the recovered float path. |
+| `0x3403c` | `geometry_object_profile_projection_emitter` | Emits the shared tagged object prefix, then the profile XZ-length request and response-dependent scalar request. |
+| `0x346f0`/`0x34b00` | `geometry_object_state_transform_emitter`/`geometry_object_late_response_continuation` | Emits the state setup and two later transformed state-tail readbacks modeled by the recovered object-packet C contract. |
+| `0x34de8` | `geometry_object_state_response_emitter` | Uses the shared tagged prefix and standalone `0x20` state-tail readback copied into the local object record. |
 
 These labels identify the recovery path; the trace does not yet prove a
 one-to-one semantic name for each OBA or transform pointer.

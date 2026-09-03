@@ -671,6 +671,14 @@ label(0x00024cc8, "geometry_mode_zero_clip_sequence",
       "Emits a 15-word FIFO prefix at 0x884000, initializes frame offsets 0xb0/0xbc, and issues four fixed clip calls through 0x701a0 before publishing the frame.")
 label(0x00024540, "geometry_object_clip_sequence",
       "Issues four command-6 clip calls through 0x701a0 using frame offsets 0x50/0x54, FIFO 0x884000, and geometry base 0x400028, then publishes at 0x804000/04.")
+label(0x0003403c, "geometry_object_profile_projection_emitter",
+      "Observed object-packet emitter: follows the shared 0x2f/0x16/0x15/0x14 prefix with 0x3a, then issues the 0x1f XZ-length request and forwards its response into the 0x0a scalar request.")
+label(0x000346f0, "geometry_object_state_transform_emitter",
+      "Observed object-packet emitter: follows the shared tagged prefix with 0x3a and enters the 0x10/0x12 state setup before the later 0x2f/0x20 response copies modeled in recovered_geometry_object_packet.c.")
+label(0x00034de8, "geometry_object_state_response_emitter",
+      "Observed object-packet emitter: follows the shared tagged prefix with a standalone 0x20 readback; the returned state-tail words are copied into the local object record.")
+label(0x00034b00, "geometry_object_late_response_continuation",
+      "Observed continuation of the 0x346f0 path: emits the second 0x2f/0x20 groups and stores response triplets at record offsets 0x158..0x160 and 0x164..0x16c.")
 label(0x00070000, "geometry_command_packet_variant",
       "Builds an 18-word packet with paired coordinates around g3, header 0x01540601/0x7f000000/0x3f800000, and a zero trailer; g6 is unused by this variant.")
 label(0x00079d20, "secondary_transition_selector",
