@@ -2487,6 +2487,12 @@ The next large phase transitions are `0x5af10` through `0x5b1dc`, using the
 records.  Both handlers converge their threshold arms into terminal reset
 logic rather than representing separate functions at each internal return.
 
+The following pair continues the same long-transition structure: `0x5b4b0`
+uses the `0x48008` record and ends at `0x5b600`, while `0x5b610` uses the
+parallel `0x48010` record and ends at `0x5b764`.  Both publish cursor progress,
+reset terminal state, and perform the fixed-point object-geometry setup before
+returning through their controller links.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
