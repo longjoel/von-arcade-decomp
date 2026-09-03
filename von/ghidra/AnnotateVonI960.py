@@ -393,7 +393,7 @@ label(0x0001f060, "ui_asset_tile_load")
 label(0x00003120, "crc16_buffer_update")
 label(0x000e3a10, "text_render_two_digit_value")
 label(0x0006f6f0, "geometry_float_transform_helper",
-      "Match-phase object transforms feed this fixed-point/float helper; preserve the raw IEEE-754 conversions until a numeric post-start oracle distinguishes the caller arms.")
+      "Match-phase object transforms feed this fixed-point/float helper; preserve the raw IEEE-754 conversions until a numeric post-start oracle distinguishes the caller arms. The current bounded capture saturates its matrix hook, so repeated-object transforms are not promoted from the latest observed matrix alone.")
 label(0x000237ac, "geometry_object_branch_dispatch",
       "Object flag is masked with 0xff; wrapped windows add 0x17ff and 0x1ff and compare against 0x2ffe and 0x3fe; signed response lower bounds are -0xdff and -0xbff.")
 label(0x0002381c, "geometry_object_transform_update",

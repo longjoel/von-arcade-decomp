@@ -34,6 +34,15 @@ static callers and services:
 These labels identify the recovery path; the trace does not yet prove a
 one-to-one semantic name for each OBA or transform pointer.
 
+The transform distinction is now checked by
+`von/tools/analyze_match_trace_geometry.py`. For the current capture, the
+post-start window contains 34,256 object submissions and 109 distinct
+polygon-ROM addresses, while the bounded matrix hook reaches its 65,536-event
+limit. Every object has a latest matrix available for bookkeeping, but that
+latest value is not sufficient evidence for the complete match transform
+sequence. The polygon decoder oracle is therefore promoted; the `0x6f6f0`
+numeric transform contract remains conservative.
+
 ## C pipeline consequence
 
 `recovered_polygon_rom_decode()` already models the observed OBA convention:
