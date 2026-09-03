@@ -2692,6 +2692,18 @@ The larger object-state controller at `0x65bd0` uses the `0x48940`/
 bytes at `0x1db`/`0x1dc`, publishes the active record pair, and initializes
 the next object state before returning at `0x65ef4`.
 
+The next controller family covers six table entries.  `0x65f00` uses the
+`0x48960`/`0x48968` records and ends at `0x66210`; `0x66220` uses the packed
+`0x489b0` pair and ends at `0x66414`; and `0x66420` uses the packed `0x48990`
+pair and ends at `0x665f8`.  Each gates on the status bytes at `0x1db`/`0x1dc`
+while advancing and aligning the phase cursor.
+
+The parallel handlers at `0x66600` and `0x66840` use the packed `0x48980`
+and `0x489a0` pairs, respectively, and end at `0x66830` and `0x66a70`.
+The compact callback-returning handler at `0x66a80` uses `0x489c0` and ends
+at `0x66b48`; all three perform the same terminal object initialization
+protocol with variant-specific phase thresholds.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
