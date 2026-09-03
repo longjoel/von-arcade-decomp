@@ -175,6 +175,12 @@ tuple table at `0x2bf0518`, programs `0x800010`, emits the tuple through
 `0x804000`, and returns at `0x2e3c0`; the next continuation stub begins at
 `0x2e3d0`.
 
+The following object-state region contains eight bounded geometry variants at
+`0x2e450`, `0x2e590`, `0x2e6f0`, `0x2e860`, `0x2e990`, `0x2eaa0`, `0x2ebb0`,
+and `0x2ece0`. Each follows the same object-field and `0x884000` packet
+skeleton, selects a distinct callback slot, and returns before the next
+variant; the final variant returns at `0x2ef80`.
+
 The transform route at `0x2d9a0` is now bounded through its return at
 `0x2dc40`. It emits the `0x884000` packet and stores derived frame values in
 `0x51aad0–0x51aae4`; the following initializer begins at `0x2dc50`.

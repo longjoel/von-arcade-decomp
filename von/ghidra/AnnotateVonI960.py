@@ -202,6 +202,22 @@ label(0x0002e1e8, "geometry_status_continuation_trampoline_alt",
       "Alternate continuation trampoline with the same g14 indirect-return sequence.")
 label(0x0002e320, "geometry_frame_packet_emit",
       "Normalizes a geometry selector, loads its packet tuple, and emits the 0x804000 command record.")
+label(0x0002e450, "geometry_object_update_variant_a",
+      "Updates one object-state variant, emits its geometry record, and invokes the selected device callback.")
+label(0x0002e590, "geometry_object_update_variant_b",
+      "Updates a second object-state variant using the shared geometry record skeleton.")
+label(0x0002e6f0, "geometry_object_update_variant_c",
+      "Updates a third object-state variant using the shared geometry record skeleton.")
+label(0x0002e860, "geometry_object_update_variant_d",
+      "Updates a fourth object-state variant using the shared geometry record skeleton.")
+label(0x0002e990, "geometry_object_update_variant_e",
+      "Updates a fifth object-state variant using the shared geometry record skeleton.")
+label(0x0002eaa0, "geometry_object_update_variant_f",
+      "Updates a sixth object-state variant using the shared geometry record skeleton.")
+label(0x0002ebb0, "geometry_object_update_variant_g",
+      "Updates a seventh object-state variant using the shared geometry record skeleton.")
+label(0x0002ece0, "geometry_object_update_variant_h",
+      "Updates an eighth object-state variant and joins the shared object callback path.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -731,6 +747,14 @@ ensure_function(0x0002d9a0, "geometry_transform_dispatch", 0x0002dc50)
 ensure_function(0x0002e1c8, "geometry_status_continuation_trampoline", 0x0002e1e0)
 ensure_function(0x0002e1e8, "geometry_status_continuation_trampoline_alt", 0x0002e200)
 ensure_function(0x0002e320, "geometry_frame_packet_emit", 0x0002e3d0)
+ensure_function(0x0002e450, "geometry_object_update_variant_a", 0x0002e590)
+ensure_function(0x0002e590, "geometry_object_update_variant_b", 0x0002e6f0)
+ensure_function(0x0002e6f0, "geometry_object_update_variant_c", 0x0002e860)
+ensure_function(0x0002e860, "geometry_object_update_variant_d", 0x0002e990)
+ensure_function(0x0002e990, "geometry_object_update_variant_e", 0x0002eaa0)
+ensure_function(0x0002eaa0, "geometry_object_update_variant_f", 0x0002ebb0)
+ensure_function(0x0002ebb0, "geometry_object_update_variant_g", 0x0002ece0)
+ensure_function(0x0002ece0, "geometry_object_update_variant_h", 0x0002ef80)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
