@@ -1547,6 +1547,13 @@ through `0x884000`. Their returns are at `0xe6ee8`, `0xe7054`, `0xe71c4`,
 and `0xe7330` respectively. The small dispatcher at `0xe7340` selects among
 these four variants from `0x5783dc` and returns after the selected call.
 
+The object-packet dispatcher at `0xe7390` consumes the active object fields
+at `0x5784e0`, selects the status/geometry mode, and emits the coordinate and
+scale words through `0x884000`. Its alternate branches at `0xe7560` and
+`0xe76d0` remain part of the same frame and choose either direct packet
+submission or the queued `0x804000` path. All paths restore the saved context
+and return at `0xe79e0`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

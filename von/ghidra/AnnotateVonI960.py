@@ -436,6 +436,8 @@ label(0x000e71d0, "geometry_status_emit_variant_d",
       "Fourth fixed-point status-to-geometry packet emitter used by the status-state dispatcher.")
 label(0x000e7340, "geometry_status_emit_dispatch",
       "Selects one of the four status-to-geometry emitters from the shared mode word.")
+label(0x000e7390, "geometry_object_packet_dispatch",
+      "Builds and submits an object geometry packet, selecting direct or queued hardware paths by mode.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -503,6 +505,7 @@ ensure_function(0x000e6ef0, "geometry_status_emit_variant_b", 0x000e7060)
 ensure_function(0x000e7060, "geometry_status_emit_variant_c", 0x000e71d0)
 ensure_function(0x000e71d0, "geometry_status_emit_variant_d", 0x000e7334)
 ensure_function(0x000e7340, "geometry_status_emit_dispatch", 0x000e738c)
+ensure_function(0x000e7390, "geometry_object_packet_dispatch", 0x000e79e4)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
