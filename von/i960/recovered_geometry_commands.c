@@ -9,6 +9,7 @@ typedef unsigned short u16;
 #define GEO_COMMAND_WINDOW ((volatile u32 *)0x00800000)
 #define GEO_COMMAND_TABLE  ((volatile const u8 *)0x00028470)
 #define GEO_PROGRAM_PORT   ((volatile u32 *)0x00804000)
+#define GEO_DISPLAY_BUFFER ((volatile u32 *)0x00900000)
 #define GEO_CONTROL        ((volatile u32 *)0x00980008)
 #define GEO_FRAME_STATUS   ((volatile u32 *)0x0098000c)
 #define GEO_WRITE_START    ((volatile u32 *)0x00801008)
@@ -206,4 +207,39 @@ void recovered_geometry_frame_submission(void)
     phase = (phase + 1U) & 1U;
     *GEO_PHASE = phase;
     *GEO_WRITE_START = phase ? 0x00010000U : 0;
+}
+
+/* First captured match display-list prefix at the 0x2b430 -> geometry
+ * command boundary.  This is deliberately a small, exact prefix: it carries
+ * the mode/focal state and first captured matrix before the first captured
+ * polygon-ROM object.  The remaining record dispatcher can append objects to
+ * the same display-list format. */
+void recovered_geometry_match_object_seed(void)
+{
+    static const u32 matrix_packet[12] = {
+        0x3f7f6825U, 0x3bca931eU, 0x3d8ac0b8U,
+        0x3b45f807U, 0x3f7da8a8U, 0xbe0a226cU,
+        0xbd8b311cU, 0x3e0a0622U, 0x3f7d10fcU,
+        0xbff1e819U, 0xc176f7b2U, 0x42aff0faU
+    };
+    static const u32 object_packet[4] = {
+        0x0009b7e4U, 0x0009b9dcU, 0x009e410dU, 6U
+    };
+    u32 index;
+    u32 write_index = 0x10000U / 4U;
+
+    /* vonjdev maps the geometry buffer as ordinary host RAM.  Populate the
+     * published page directly so the development renderer sees the same
+     * display-list words the hardware FIFO would have committed. */
+    GEO_DISPLAY_BUFFER[write_index++] = 0x03800000U;
+    GEO_DISPLAY_BUFFER[write_index++] = 3U;
+    GEO_DISPLAY_BUFFER[write_index++] = 0x04800000U;
+    GEO_DISPLAY_BUFFER[write_index++] = 600U;
+    GEO_DISPLAY_BUFFER[write_index++] = 600U;
+    GEO_DISPLAY_BUFFER[write_index++] = 0x05800000U;
+    for (index = 0U; index < 12U; ++index)
+        GEO_DISPLAY_BUFFER[write_index++] = matrix_packet[index];
+    GEO_DISPLAY_BUFFER[write_index++] = 0x00800101U;
+    for (index = 0U; index < 4U; ++index)
+        GEO_DISPLAY_BUFFER[write_index++] = object_packet[index];
 }

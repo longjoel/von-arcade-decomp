@@ -141,10 +141,12 @@ void i960_reconstructed_main(void)
             recovered_render_phase(TEXT_MATCH_ENTRY);
             state[9] = 4U;
         }
-        if (state[9] == 4U && (state[5] & 0x3ffU) == 0U) {
+        if (state[9] == 4U && state[10] == 0U && (state[5] & 0x3ffU) == 0U) {
             /* Match-entry's first confirmed recurring host operation is the
              * geometry frame/phase handoff. Keep it on the reconstructed
              * device path while object-record production is integrated. */
+            recovered_geometry_frame_submission();
+            recovered_geometry_match_object_seed();
             recovered_geometry_frame_submission();
             state[10] = state[10] + 1U;
         }

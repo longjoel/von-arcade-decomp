@@ -5,6 +5,7 @@
 typedef unsigned long recovered_geometry_u32;
 
 void recovered_geometry_frame_submission(void);
+void recovered_geometry_match_object_seed(void);
 void recovered_geometry_buffer_prepare(volatile recovered_geometry_u32 *output);
 void recovered_geometry_profile_setup(void);
 void recovered_sharc_bootstrap_upload(void);
