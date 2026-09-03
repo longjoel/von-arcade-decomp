@@ -751,6 +751,12 @@ label(0x00058340, "geometry_object_profile_indexed_geometry_update_variant_h",
       "Large indexed profile geometry update using the paired 0x47850/0x47854 records, shared cursor publication, phase progression, and status completion.")
 label(0x00058690, "geometry_object_profile_indexed_geometry_update_variant_i",
       "Indexed profile geometry update sibling using the paired 0x47880/0x47884 records, shared cursor publication, phase progression, and status completion.")
+label(0x00058930, "geometry_object_profile_indexed_transition_variant_h",
+      "Compact indexed profile transition using the 0x478b0/0x478b8/0x478c0 records, shared cursor publication, phase advancement, and reset completion.")
+label(0x00058af0, "geometry_object_profile_runtime_geometry_status_update_variant_c",
+      "Runtime profile geometry/status update using the 0x2560bc8-derived records, object-field correction, phase progression, and status completion.")
+label(0x00058c40, "geometry_object_profile_indexed_transition_variant_i",
+      "Indexed profile transition using the 0x478d0/0x478d8 records, collision/status gating, shared cursor publication, and multi-arm completion.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1527,6 +1533,9 @@ ensure_function(0x00058120, "geometry_object_profile_indexed_transition_variant_
 ensure_function(0x00058230, "geometry_object_profile_indexed_transition_variant_g", 0x00058338)
 ensure_function(0x00058340, "geometry_object_profile_indexed_geometry_update_variant_h", 0x00058688)
 ensure_function(0x00058690, "geometry_object_profile_indexed_geometry_update_variant_i", 0x0005892c)
+ensure_function(0x00058930, "geometry_object_profile_indexed_transition_variant_h", 0x00058ae4)
+ensure_function(0x00058af0, "geometry_object_profile_runtime_geometry_status_update_variant_c", 0x00058c3c)
+ensure_function(0x00058c40, "geometry_object_profile_indexed_transition_variant_i", 0x00058ea4)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

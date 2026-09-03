@@ -2439,6 +2439,13 @@ paired cursor values, advance phase `0x17a`, and contain multiple status and
 reset arms within one top-level function; their aligned ends are `0x58688`
 and `0x5892c`.
 
+The next compact indexed transition at `0x58930` consumes the
+`0x478b0`/`0x478b8`/`0x478c0` records and ends at `0x58ae4`.  The `0x58af0`
+handler then returns to the runtime geometry/status pattern, using records
+derived from `0x2560bc8`, correcting object position, and ending at `0x58c3c`.
+The larger `0x58c40` sibling uses `0x478d0`/`0x478d8`, adds collision/status
+gating, and ends at `0x58ea4` after its multi-arm completion paths.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
