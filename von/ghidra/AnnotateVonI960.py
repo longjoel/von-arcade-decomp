@@ -947,6 +947,18 @@ label(0x000648d0, "geometry_object_profile_object_state_controller_variant_c",
       "Object-state controller using the 0x486f0/0x486f8 callback records, movement flags, and state transitions through the saved callback.")
 label(0x00064b00, "geometry_object_profile_object_state_controller_variant_d",
       "Object-state controller using the indexed 0x48710 record table and object selector at 0x188, with movement flags and callback return.")
+label(0x00064d40, "geometry_object_profile_object_state_controller_variant_e",
+      "Object-state controller using the 0x48770/0x48778 records, cursor progression, and terminal state changes for the selected object phase.")
+label(0x00064f60, "geometry_object_profile_object_state_controller_variant_f",
+      "Object-state controller using the indexed 0x48790 records, cursor progression, and terminal state changes for the selected object phase.")
+label(0x000651a0, "geometry_object_profile_object_state_controller_variant_g",
+      "Compact object-state controller using the 0x487f0 record and the phase-16 terminal transition.")
+label(0x00065270, "geometry_object_profile_object_state_controller_variant_h",
+      "Object-state controller using the object selector at 0x188 and paired records at 0x48800/0x48804, with phase-16 completion handling.")
+label(0x00065360, "geometry_object_profile_object_state_controller_variant_i",
+      "Compact object-state controller using the 0x48820 record, cursor advancement, and terminal state update through its saved callback.")
+label(0x00065400, "geometry_object_profile_object_state_controller_variant_j",
+      "Object-state controller using the selector-indexed 0x48830/0x48834 records, cursor progression, and terminal state update through its callback.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1821,6 +1833,12 @@ ensure_function(0x00064310, "geometry_object_profile_phase_controller_variant_o"
 ensure_function(0x000645a0, "geometry_object_profile_geometry_bounds_flags_update_variant_d", 0x000648c4)
 ensure_function(0x000648d0, "geometry_object_profile_object_state_controller_variant_c", 0x00064af0)
 ensure_function(0x00064b00, "geometry_object_profile_object_state_controller_variant_d", 0x00064d3c)
+ensure_function(0x00064d40, "geometry_object_profile_object_state_controller_variant_e", 0x00064f50)
+ensure_function(0x00064f60, "geometry_object_profile_object_state_controller_variant_f", 0x00065190)
+ensure_function(0x000651a0, "geometry_object_profile_object_state_controller_variant_g", 0x00065268)
+ensure_function(0x00065270, "geometry_object_profile_object_state_controller_variant_h", 0x00065358)
+ensure_function(0x00065360, "geometry_object_profile_object_state_controller_variant_i", 0x000653f8)
+ensure_function(0x00065400, "geometry_object_profile_object_state_controller_variant_j", 0x000654b8)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

@@ -2664,6 +2664,16 @@ callback-driven handlers.  The first uses `0x486f0`/`0x486f8` records and
 movement flags, ending at `0x64af0`; the second indexes the `0x48710` table
 using the object selector at `0x188`, ending at `0x64d3c`.
 
+The following object-state family is table-backed as well: `0x64d40` uses
+the `0x48770`/`0x48778` records and ends at `0x64f50`; `0x64f60` uses the
+indexed `0x48790` records and ends at `0x65190`; `0x651a0` uses `0x487f0` and
+ends at `0x65268`; and `0x65270` selects paired `0x48800`/`0x48804` records
+using the object selector at `0x188`, ending at `0x65358`.
+
+The compact handlers at `0x65360` and `0x65400` continue the same cursor and
+phase protocol with `0x48820` and selector-indexed `0x48830`/`0x48834` records;
+they end at `0x653f8` and `0x654b8`, respectively.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
