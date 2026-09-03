@@ -287,6 +287,22 @@ the geometry pipeline and text/status service helpers. This is a recovered
 pipeline contract from the original listing, not a reconstructed C
 replacement.
 
+The three device/status arms in the `0xd24b0` family are now bounded. The
+initializer at `0xd24b0` selects status text mode `13`, clears the video
+context, writes command `1`, seeds delay constants `0x73` and `0x258`, resets
+the eight-word status workspace at `0x577270–0x57727e`, clears `0x503a7c` and
+`0x503a20`, and advances `0x503a00`. The profile dispatcher at `0xd2560`
+calls `0xc8fa0`; if initialization succeeds, it selects one of four handlers
+from the state byte at `0x577280` (`0xd0820`, `0xd0d10`, `0xd1280`, or
+`0xd1ab0`) and then calls `0x20460`. The service wrapper at `0xd25b0` uses
+the same four-way selection without the profile initialization and returns
+directly from the selected handler.
+
+This separates one-time status/video setup from recurring profile service and
+also identifies `0x577280` as a four-state selector. The individual handlers
+remain the next useful sieve boundary; their table-like structure is now
+explicit rather than hidden behind the second-level indirect call.
+
 The `0x2ded0` arm is the frame-service continuation for that workspace. It
 advances the bounded counter at `0x51ab04` while comparing the frame/timing
 fields at `0x503ca0` and `0x5042a0`; when the counter expires it calls

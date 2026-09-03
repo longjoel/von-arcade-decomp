@@ -374,6 +374,12 @@ label(0x0002ded0, "startup_status_arm_geometry_frame_service",
       "Advances geometry frame/service state, submits both record workspaces, and refreshes the text/status plane.")
 label(0x000e3ab0, "startup_status_arm_device_state_cycle")
 label(0x000e3d00, "startup_status_arm_score_render")
+label(0x000d24b0, "startup_status_arm_text_status_init",
+      "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
+label(0x000d2560, "startup_status_arm_profile_dispatch",
+      "Initializes the profile and dispatches the selected status submode.")
+label(0x000d25b0, "startup_status_arm_profile_service",
+      "Dispatches the selected status submode without reinitializing the profile.")
 ensure_function(0x0002b500, "startup_status_arm_video_reset", 0x0002b54c)
 ensure_function(0x0002b550, "startup_status_arm_geometry_workspace", 0x0002b65c)
 ensure_function(0x0002b660, "startup_status_arm_geometry_service", 0x0002b6f4)
@@ -385,6 +391,9 @@ ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
 ensure_function(0x000e3ab0, "startup_status_arm_device_state_cycle", 0x000e3b2c)
+ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
+ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
+ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
 
 # Trace-confirmed call sites inside the system-setup helper.
 label(0x00018960, "startup_call_io_self_test")
