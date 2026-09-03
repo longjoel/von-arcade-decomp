@@ -2161,6 +2161,15 @@ ensure_function(0x00073fdc, "match_state_handler_7", 0x00073ffc)
 ensure_function(0x00073ffc, "match_state_handler_8", 0x0007402c)
 ensure_function(0x0007402c, "match_state_handler_9", 0x0007408c)
 ensure_function(0x0007408c, "match_state_handler_10", 0x000740ec)
+ensure_function(0x000745bc, "match_state_handler_11", 0x000745e4)
+ensure_function(0x000745e4, "match_state_handler_12", 0x0007460c)
+ensure_function(0x0007460c, "match_state_handler_13", 0x00074634)
+ensure_function(0x00074634, "match_state_handler_14", 0x00074674)
+ensure_function(0x00074674, "match_state_handler_15", 0x000746f4)
+ensure_function(0x000746f4, "match_state_handler_16", 0x00074754)
+ensure_function(0x00074754, "match_state_handler_17", 0x0007479c)
+ensure_function(0x0007479c, "match_state_handler_18", 0x000747e4)
+ensure_function(0x000747e4, "match_state_handler_19", 0x00074848)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2368,6 +2377,24 @@ label(0x0007402c, "match_state_handler_9",
       "State-table handler 9: applies the object-state gate and publishes status selector 10 or the default bit-10 marker.")
 label(0x0007408c, "match_state_handler_10",
       "State-table handler 10: mirrors the neighboring object-state gate and publishes status selector 4 or the default bit-2 marker.")
+label(0x000745bc, "match_state_handler_11",
+      "Status-table handler 11: adjusts the shared status selector from the signed result counter and returns or branches to the common path.")
+label(0x000745e4, "match_state_handler_12",
+      "Status-table handler 12: publishes the bit-10 marker and conditionally updates the shared result selector.")
+label(0x0007460c, "match_state_handler_13",
+      "Status-table handler 13: publishes selector 4 and conditionally updates the shared result selector.")
+label(0x00074634, "match_state_handler_14",
+      "Status-table handler 14: gates on object state and counter phase before publishing selector 0x206.")
+label(0x00074674, "match_state_handler_15",
+      "Status-table handler 15: gates on object substate, updates the counter and selector, and returns through the shared path.")
+label(0x000746f4, "match_state_handler_16",
+      "Status-table handler 16: applies the neighboring counter/substate gate and publishes its state selector.")
+label(0x00074754, "match_state_handler_17",
+      "Status-table handler 17: evaluates the result counter and object substate before writing the status selector.")
+label(0x0007479c, "match_state_handler_18",
+      "Status-table handler 18: handles the alternate counter/substate arm and publishes its status value.")
+label(0x000747e4, "match_state_handler_19",
+      "Status-table handler 19: final compact status arm before the shared 0x74848 continuation.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",
