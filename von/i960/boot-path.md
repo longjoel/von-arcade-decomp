@@ -2704,6 +2704,16 @@ The compact callback-returning handler at `0x66a80` uses `0x489c0` and ends
 at `0x66b48`; all three perform the same terminal object initialization
 protocol with variant-specific phase thresholds.
 
+The compact controllers at `0x66b50`, `0x66c10`, and `0x66cc0` continue the
+same protocol with the `0x489c8`, `0x48bd0`, and `0x48bd8` records; they end at
+`0x66c0c`, `0x66cb8`, and `0x66d68`.  The larger phase controller at `0x66d70`
+uses the packed `0x48bb0` pair and ends at `0x66f84`.
+
+The indexed phase controllers at `0x66f90` and `0x672c0` use the `0x489d0`
+and `0x48a00` record tables respectively.  Both publish paired cursor data,
+apply status/phase gates, and perform terminal object-state transitions; their
+boundaries are `0x672b8` and `0x675f8`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
