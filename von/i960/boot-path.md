@@ -338,6 +338,15 @@ pointer table at `0x142e94` using the incoming asset index and calls
 does not perform decompression or geometry work. This cleanly separates the
 profile record path from the text/video asset path in the call graph.
 
+The common expander at `0xe2040` is now bounded through `0xe20d4`. It selects
+one of three destination planes from `g0 << 9`, rooted at `0x1810000`,
+`0x1814000`, and `0x1818000`. For each of 64 iterations it consumes three
+bytes from source pointer `g1`, masks each byte to `0xff`, translates it
+through the halfword glyph table at `0x5775b0`, and writes the three results
+to the plane pair at offsets `0` and `0x100`. The source advances by three
+bytes per iteration and each destination advances by two bytes. This is a
+fixed 64-triplet expansion; there is no terminator or variable-length scan.
+
 The geometry producer’s table state is populated by two tiny loaders. The
 loader at `0x6f900` treats `0x6eb60` as records with an `0x18`-byte stride,
 selects the indexed record, copies its 64-bit pair and two additional words

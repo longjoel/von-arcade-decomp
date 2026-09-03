@@ -399,6 +399,7 @@ label(0x0006f970, "geometry_profile_table_loader_b",
       "Loads the alternate profile record into the shared geometry profile words.")
 label(0x000e2120, "text_asset_selector_upload",
       "Selects an asset through 0x142e94 and delegates expansion to the three-plane uploader.")
+ensure_function(0x000e2040, "text_byte_to_three_tile_planes", 0x000e20d8)
 label(0x000423a8, "startup_record_table_clear",
       "Clears the two startup record tables and seeds record sentinels.")
 label(0x0009b498, "startup_geometry_record_pool_clear",
