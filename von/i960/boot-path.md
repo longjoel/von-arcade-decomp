@@ -1484,6 +1484,12 @@ associated literals include `TODAY'S BEST PILOTS`, `TODAY'S TOP WINS`, and
 `FAVORITE MACHINES`, with compact formatting tables immediately preceding the
 render code.
 
+The third handler at `0xe3f30` is the most data-heavy of the three: its first
+loop accumulates eight device scores from the `0x1d00000` table, and its second
+loop resolves those scores into an eight-entry work array before rendering
+machine names and counts. It returns at `0xe4188`, after advancing the shared
+status counter.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
