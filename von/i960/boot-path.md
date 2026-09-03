@@ -271,6 +271,22 @@ workspace path; `0xe3ab0` updates the device-dependent status state; and
 are now labeled as indirect targets, with semantics deferred until their
 trace PCs and complete slices are correlated.
 
+The geometry arms at `0x2dc50` and `0x2dd30` form an initialization/build
+pair. `0x2dc50` clears the video context, initializes service pointers through
+`0x296d0`, seeds `0x51aaf8/0x51aafc` to `1`, clears geometry/status fields at
+`0x503a64/0x503a68`, derives three low-bit values from the shared PRNG, and
+advances `0x503a00`. `0x2dd30` preserves four incoming registers, calls the
+profile initializer at `0xc8fa0`, and selects one of two geometry-record paths
+based on `0x503a08`. Both paths transform records through `0x27550` and commit
+the resulting workspace through `0x77e20`.
+
+The build arm seeds command/frame state from `0x51aaf8`, `0x51aafc`,
+`0x503a98`, and `0x503a9c`, uses float bits `0xc2a00000` and `0x42a00000`,
+clears paired record words at `0x5040d2/0x503ad2`, and finishes by invoking
+the geometry pipeline and text/status service helpers. This is a recovered
+pipeline contract from the original listing, not a reconstructed C
+replacement.
+
 Three of those arms are now bounded from the original listing. `0x2b500`
 resets the video/text context, writes the high-bit text command, increments
 the status counter, invokes two geometry-side helpers, and clears the pending
