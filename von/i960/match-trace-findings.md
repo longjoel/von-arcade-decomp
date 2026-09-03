@@ -43,6 +43,14 @@ latest value is not sufficient evidence for the complete match transform
 sequence. The polygon decoder oracle is therefore promoted; the `0x6f6f0`
 numeric transform contract remains conservative.
 
+Two reproducibility probes with the expanded-hook binary were intentionally
+not promoted: both original-ROM runs reached the scheduled coin/start events
+but remained at the pre-match `Downloading COPRO/GEO/Texture` screen and
+emitted zero geometry-object or matrix events. One run used the interpreter
+default and one used `VON_SHARC_DRC=1`; both had matching ROM hashes and no
+stale `drone0` MAME process. These are runtime-transition diagnostics, not
+counterevidence against the verified post-start trace above.
+
 ## C pipeline consequence
 
 `recovered_polygon_rom_decode()` already models the observed OBA convention:
