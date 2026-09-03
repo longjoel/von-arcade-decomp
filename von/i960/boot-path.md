@@ -1662,7 +1662,13 @@ as lookup data rather than i960 instructions.
 
 The CRT/test-pattern service at `0xf04d0` initializes the diagnostic state,
 renders the CRT labels, and cycles indexed pattern data through its six-entry
-arm table at `0xf0674`; its final return is at `0xf0938`.
+arm table at `0xf0674`; its arm returns finish at `0xf0884`. The separate
+buffer filler at `0xf08c0` writes the indexed bit-plane layout and returns at
+`0xf0938`.
+
+The match/time diagnostic at `0xf0980` renders play-time, match/death-match,
+pending/start-state, and network-link fields, builds the associated test
+structures, and returns at `0xf0b38`.
 
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
