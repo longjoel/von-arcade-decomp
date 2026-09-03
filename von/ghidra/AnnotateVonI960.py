@@ -635,6 +635,10 @@ label(0x0004f020, "geometry_object_profile_phase_transition_variant_g",
       "Profile phase transition using the 0x46ea0/0x46ea4 descriptor records, publishing paired cursor values and resetting bounded state.")
 label(0x0004f1f0, "geometry_object_profile_phase_transition_variant_h",
       "Alternate profile phase transition using the 0x46f00/0x46f04 descriptor records and the shared cursor/status protocol.")
+label(0x00051440, "geometry_object_profile_runtime_state_update_variant_a",
+      "Extended profile runtime-state update using mode-indexed records at 0x470b0/0x470b4, status transitions, and shared cursor publication.")
+label(0x000517f0, "geometry_object_profile_runtime_state_update_variant_b",
+      "Alternate extended profile runtime-state update using the 0x47110/0x47114 records and the shared phase/status reset protocol.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1353,6 +1357,8 @@ ensure_function(0x0004ec60, "geometry_object_profile_phase_dispatch_variant_i", 
 ensure_function(0x0004ed20, "geometry_object_profile_phase_state_dispatch", 0x0004f01c)
 ensure_function(0x0004f020, "geometry_object_profile_phase_transition_variant_g", 0x0004f1e8)
 ensure_function(0x0004f1f0, "geometry_object_profile_phase_transition_variant_h", 0x0004f3d4)
+ensure_function(0x00051440, "geometry_object_profile_runtime_state_update_variant_a", 0x000517f0)
+ensure_function(0x000517f0, "geometry_object_profile_runtime_state_update_variant_b", 0x00051a78)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

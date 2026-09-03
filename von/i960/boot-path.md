@@ -2247,6 +2247,14 @@ and take a bounded reset path when their descriptor range completes.  Their
 caller-link returns at `0x4f1e0`/`0x4f1e4` and `0x4f3cc`/`0x4f3d0` delimit the
 helpers from the following subsystem entries.
 
+The later dispatch table resumes with two extended runtime-state handlers at
+`0x51440` and `0x517f0`.  The first selects indexed records at
+`0x470b0`/`0x470b4` across several timing ranges, while the second uses the
+corresponding `0x47110`/`0x47114` records.  Both publish the shared cursor
+fields, advance phase `0x17a`, and enter the common status/reset path when a
+range completes.  Their return boundaries are `0x517ec` and `0x51a74`, just
+before the following `0x51a80` table target.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
