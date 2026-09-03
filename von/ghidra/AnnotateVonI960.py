@@ -747,6 +747,7 @@ label(0x000e353c, "video_dispatch_sentinel_indexed_pair_high",
 ensure_function(0x000e353c, "video_dispatch_sentinel_indexed_pair_high", 0x000e35a0)
 label(0x000e35a0, "video_dispatch_terminal_reset",
       "Terminal side effect returns 0xff; post-route ranges begin at 0x200, 0x400, and 0x420 with bounds 29, 30, and 31, plus exact sentinel 0x21f.")
+ensure_function(0x000e35a0, "video_dispatch_terminal_reset", 0x000e35ac)
 label(0x0001f680, "status_code_record_table",
       "Contains 9 records with 16-byte stride; index 8 is blank and invalid indices return zero. Text-position fields are column 8 and row 14.")
 label(0x0001f710, "status_code_dispatch",
