@@ -67,6 +67,14 @@ default and one used `VON_SHARC_DRC=1`; both had matching ROM hashes and no
 stale `drone0` MAME process. These are runtime-transition diagnostics, not
 counterevidence against the verified post-start trace above.
 
+The runtime comparison also exposes source drift in the capture harness. The
+retained successful 45-second trace reports 203.15% average speed and reaches
+geometry, whereas the current geometry-profile rebuild reports 67.08% and
+stays on the download screen under the same scripted flow. The local pinned
+MAME checkout contains substantial uncommitted diagnostic/SHARC changes, so
+this difference is treated as a harness-reproduction issue until a clean-base
+geometry build is tested; it is not attributed to the recovered i960 C.
+
 ## C pipeline consequence
 
 `recovered_polygon_rom_decode()` already models the observed OBA convention:
