@@ -2103,6 +2103,12 @@ corresponding geometry/state update through the eight arms at `0x44948`–
 derived hardware timing words before returning at `0x44ac0`; this is the
 profile-mode coordinator rather than another packet-emission variant.
 
+The mode-7/default hardware path calls `0x44ad0`, a separate timing emitter.
+It derives scaled values from the selected profile and object record, writes
+the command words through `0x884000`, updates `0x51bb00`/`0x51bb04`/`0x51bb08`,
+and returns at `0x45078`.  This isolates the hardware conversion tail from the
+larger mode-selection routine.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

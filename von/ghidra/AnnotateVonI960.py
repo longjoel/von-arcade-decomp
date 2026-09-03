@@ -541,6 +541,8 @@ label(0x00044390, "geometry_profile_timing_state_update",
       "Updates the active profile timing fields at offsets 0x172/0x17a, handles mode-specific transition thresholds, and routes affected objects through the phase dispatcher.")
 label(0x000445a0, "geometry_profile_runtime_mode_update",
       "Selects the active runtime profile mode, dispatches its geometry/state update, and publishes the resulting profile cursor and hardware timing fields.")
+label(0x00044ad0, "geometry_profile_timing_hardware_emit",
+      "Converts the selected profile timing state into hardware-scaled values and emits the associated command sequence through 0x884000.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1212,6 +1214,7 @@ ensure_function(0x00043ee0, "geometry_profile_runtime_pool_clear", 0x00043fa0)
 ensure_function(0x00043fa0, "geometry_profile_phase_dispatch", 0x0004438c)
 ensure_function(0x00044390, "geometry_profile_timing_state_update", 0x00044594)
 ensure_function(0x000445a0, "geometry_profile_runtime_mode_update", 0x00044ac4)
+ensure_function(0x00044ad0, "geometry_profile_timing_hardware_emit", 0x0004507c)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
