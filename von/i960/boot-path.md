@@ -2380,6 +2380,15 @@ publication.  Its internal arms end at `0x55e9c`.  The following `0x55ea0`
 variant uses `0x47600` indexed records and carries the same transition protocol
 through its aligned return at `0x560c8`.
 
+The following compact transition cluster runs from `0x560d0` through
+`0x56638`.  `0x560d0` uses the `0x2572744`-derived records, while the indexed
+siblings at `0x561f0`, `0x56320`, and `0x563f0` consume the
+`0x47660`/`0x47664`, `0x47680`, and `0x47690`/`0x47694` families.  The final
+two compact handlers use `0x476b0` and `0x476c0`; all six publish the shared
+cursor fields and either advance phase or enter the common reset state.  Their
+aligned ends are `0x561e8`, `0x5631c`, `0x563ec`, `0x564dc`, `0x5657c`, and
+`0x5663c`, respectively.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
