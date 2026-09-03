@@ -1504,6 +1504,13 @@ object records through indirect callbacks and transform helpers, then advances
 the status/geometry state. The visible `ret` at `0xe5430` provides the
 boundary; the following `0xe5440` region is literal data.
 
+The `0xe5440` literal block is a fixed-width three-byte token table. The
+consumer at `0xe54a0` scans it against the active bytes at `0x5784e8–0x5784ea`,
+applies the PRNG-based normalization case when needed, and publishes the
+result into the selected `0x578410`/`0x578460` record. The following dispatcher
+at `0xe5650` routes status state values to the next renderer and returns at
+`0xe5698`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
