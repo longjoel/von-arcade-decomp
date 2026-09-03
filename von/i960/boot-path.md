@@ -357,9 +357,11 @@ state rather than a ROM table: the producer reads the current profile words
 after these loaders have filled them.
 
 The asset table at `0x142e94` is a 32-entry pointer table with 4-byte stride;
-its entries run from `0x2fb3d90` through `0x2fb5290` in `0xc0`-byte steps.
-`0x142f34` is the parallel bank used by the broader status initializer. The
-table contents are pointers to expanded asset blocks, so the selector wrapper
+its entries run from `0x2fb3d90` through `0x2fb54d0` in `0xc0`-byte steps.
+Thus each selected source record is exactly 192 bytes, or 64 three-byte
+triplets—the complete input consumed by one expansion call. The parallel
+table at `0x142f34` begins with the same sequence and then diverges for the
+status-specific entries later in the table. The selector wrapper therefore
 does not need to know the asset format itself.
 
 The geometry arms at `0x2dc50` and `0x2dd30` form an initialization/build
