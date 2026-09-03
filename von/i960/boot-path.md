@@ -2739,6 +2739,11 @@ returning at `0x6e0a4`.  Its companion writer at `0x6e0b0` emits structured
 object coordinates, dimensions, and mode words to the same FIFO, ending at
 `0x6e62c`.
 
+The motion threshold service at `0x6e630` gates phase states 10 and 11,
+selects the floating-point thresholds `0.4`, `0.55`, `0.9375`, or `1.0`,
+updates motion state, and publishes the resulting value through
+`0x804008`/`0x80400c`; it returns at `0x6e6e0`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
