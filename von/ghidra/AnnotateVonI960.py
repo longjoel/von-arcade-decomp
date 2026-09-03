@@ -360,7 +360,7 @@ label(0x000795a8, "object_state_terminal_classifier")
 label(0x000795c4, "object_state_common_remap_tail")
 label(0x0001c618, "video_plane_state_initialize")
 label(0x0001c220, "ascii_font_video_bootstrap",
-      "Calls 0x1c730 with source 0x02e60bb8, destination 0x01080000, 0x80 blocks, and color mode 1, then clears tile/video state through 0x1c618.")
+      "Computes source 0x02ea0bb8 from 0x01040000 + 0x01e60bb8, then calls 0x1c730 with destination 0x01080000, 0x80 blocks, and color mode 1; clears tile/video state through 0x1c618.")
 label(0x0001c730, "ascii_font_lane_expand")
 label(0x0001ccf8, "video_command_byte_write")
 label(0x0001d310, "text_glyph_render_core")

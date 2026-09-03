@@ -472,8 +472,9 @@ void recovered_text_expand_video_blocks(volatile u32 *destination,
 
 /*
  * 0x1c220 -> 0x1c730: initialize the ASCII tile font used by the plain
- * status-string writer.  The bootstrap loads the source pointer at
- * 0x02e60bb8, passes destination 0x01080000, block count 0x80, and color 1.
+ * status-string writer.  The bootstrap computes source 0x02ea0bb8 from
+ * 0x01040000 + 0x01e60bb8, then passes destination 0x01080000, block count
+ * 0x80, and color 1.
  * 0x1c730 consumes eight packed bytes per block and emits eight u32 values,
  * so this fills the first 0x1000 bytes of character RAM (256 8x8 glyphs).
  */
@@ -481,7 +482,7 @@ void recovered_text_ascii_font_initialize(void)
 {
     recovered_text_expand_video_blocks(
         (volatile u32 *)(unsigned long)0x01080000U,
-        (volatile const u8 *)(unsigned long)0x02e60bb8U,
+        (volatile const u8 *)(unsigned long)0x02ea0bb8U,
         0x80U, 1U);
 }
 
