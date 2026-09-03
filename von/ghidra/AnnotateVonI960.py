@@ -340,7 +340,8 @@ label(0x0002a458, "command_queue_space_check")
 label(0x0002a4a8, "command_queue_byte_push")
 label(0x0002a5f0, "command_mode_validator_alt")
 label(0x0002a990, "geometry_command_packet_submit")
-label(0x00079050, "randomized_record_state_dispatch")
+label(0x00079050, "randomized_record_state_dispatch",
+      "The first original-ROM diagnostic observes object 0x5040d0, related 0x503ad0 via object + 0x74, object state 0, and common-tail transition 7; the reconstructed runtime adapter is bounded to this capture-derived tick until pool rotation is traced.")
 label(0x00079d60, "randomized_record_state_dispatch_alt")
 label(0x000790a4, "object_state_zero_classifier",
       "Recovered state-0 classifier; recognizes role values 1 through 6 and tests mode bit 1.")

@@ -8,6 +8,7 @@
  */
 
 #include "recovered_geometry_pipeline.h"
+#include "recovered_object_state_pipeline.h"
 
 typedef unsigned long u32;
 typedef unsigned short u16;
@@ -37,6 +38,7 @@ void i960_reconstructed_main(void)
 
     recovered_geometry_pipeline_startup(0);
     recovered_audio_initialize_scsp();
+    state[7] = recovered_object_state_runtime_tick();
     state[3] = 0x47454f30UL; /* GEO0 */
     state[6] = 0;
     state[4] = 0x494e4954UL; /* INIT */

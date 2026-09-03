@@ -1,19 +1,7 @@
 /* Unified behavioral dispatcher for i960 0x79050-0x79630. */
-typedef unsigned int u32;
+#include "recovered_object_state_pipeline.h"
 
-struct recovered_object_state_context
-{
-    u32 state;
-    u32 timer_bits;
-    u32 mode_bits;          /* 0x504e30 */
-    u32 role_d94;           /* 0x504d94 */
-    u32 object_d68;         /* 0x504d68 */
-    u32 related_state;      /* caller/related object +0x64 */
-    u32 related_tag;        /* caller/related object +0x172 */
-    u32 global_state;       /* 0x504d9c */
-    u32 global_substate;    /* 0x504e4c */
-    u32 caller_state;       /* remi 10 of the incoming state */
-};
+typedef unsigned int u32;
 
 u32 recovered_object_state_zero_route(u32, u32, u32, u32, u32 *);
 u32 recovered_object_state_one_route(u32, u32, u32, u32, u32 *);
