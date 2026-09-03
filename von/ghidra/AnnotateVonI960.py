@@ -1021,6 +1021,22 @@ label(0x00068550, "geometry_object_profile_geometry_bounds_flags_update_variant_
       "Third parallel geometry bounds evaluator that clamps extents, applies object-record offsets, updates axis collision flags, and computes derived ratios.")
 label(0x00068770, "geometry_object_profile_phase_selection_controller_variant_b",
       "Phase/selection controller that dispatches on state byte 0x1ae, advances object phase fields, and returns through its saved callback.")
+label(0x00068a40, "geometry_command_packet_writer_variant_c",
+      "Geometry command packet writer that serializes object data and transform fields to the 0x884000 FIFO.")
+label(0x00069050, "geometry_object_profile_phase_selection_controller_variant_c",
+      "State-byte phase/selection controller that dispatches on 0x1ae and advances object phase fields through its callback tail.")
+label(0x00069560, "geometry_command_packet_writer_variant_d",
+      "Geometry command packet writer variant that emits object data and transform fields to the 0x884000 FIFO.")
+label(0x00069c60, "geometry_object_profile_phase_selection_controller_variant_d",
+      "State-byte phase/selection controller variant that dispatches on 0x1ae and advances object phase fields through its callback tail.")
+label(0x00069f30, "geometry_object_profile_match_phase_controller",
+      "Larger match-phase controller that gates phase 27, updates object status and transforms, and performs terminal state transitions.")
+label(0x0006a6a0, "geometry_object_profile_phase_selection_controller_variant_e",
+      "State-byte phase/selection controller variant that dispatches on 0x1ae and advances object phase fields through its callback tail.")
+label(0x0006aa60, "geometry_command_packet_writer_variant_e",
+      "Geometry command packet writer variant that emits object data and transform fields to the 0x884000 FIFO.")
+label(0x0006ae80, "geometry_object_profile_phase_selection_controller_variant_f",
+      "State-byte phase/selection controller variant that dispatches through the 0x1ae jump table and advances object phase fields.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1932,6 +1948,14 @@ ensure_function(0x0006e0b0, "geometry_command_packet_writer_variant_b", 0x0006e6
 ensure_function(0x0006e630, "geometry_motion_threshold_service", 0x0006e6e0)
 ensure_function(0x00068550, "geometry_object_profile_geometry_bounds_flags_update_variant_f", 0x0006876c)
 ensure_function(0x00068770, "geometry_object_profile_phase_selection_controller_variant_b", 0x00068a3c)
+ensure_function(0x00068a40, "geometry_command_packet_writer_variant_c", 0x00069040)
+ensure_function(0x00069050, "geometry_object_profile_phase_selection_controller_variant_c", 0x00069460)
+ensure_function(0x00069560, "geometry_command_packet_writer_variant_d", 0x00069c54)
+ensure_function(0x00069c60, "geometry_object_profile_phase_selection_controller_variant_d", 0x00069f20)
+ensure_function(0x00069f30, "geometry_object_profile_match_phase_controller", 0x0006a694)
+ensure_function(0x0006a6a0, "geometry_object_profile_phase_selection_controller_variant_e", 0x0006aa5c)
+ensure_function(0x0006aa60, "geometry_command_packet_writer_variant_e", 0x0006ae78)
+ensure_function(0x0006ae80, "geometry_object_profile_phase_selection_controller_variant_f", 0x0006b3c8)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

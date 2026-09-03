@@ -2751,6 +2751,17 @@ saved callback at `0x6876c`.  The separate phase/selection controller at
 and returns at `0x68a3c`; its `0x687b0` and `0x687e8` blocks are internal arms
 of that controller.
 
+The next command/state family alternates FIFO writers and state dispatchers.
+The packet writers at `0x68a40`, `0x69560`, and `0x6aa60` serialize geometry
+data to `0x884000`, ending at `0x69040`, `0x69c54`, and `0x6ae78`.
+The state-byte controllers at `0x69050`, `0x69c60`, `0x6a6a0`, and `0x6ae80`
+dispatch on `0x1ae` and advance the object phase fields, ending at `0x69460`,
+`0x69f20`, `0x6aa5c`, and `0x6b3c8`.
+
+The larger controller at `0x69f30` handles match phase 27, updates object
+status and transform fields, and performs terminal match-state transitions
+before returning at `0x6a694`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
