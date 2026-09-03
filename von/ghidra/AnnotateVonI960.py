@@ -837,6 +837,10 @@ label(0x0005d970, "geometry_object_profile_indexed_phase_controller_variant_a",
       "Indexed profile phase controller using the 0x48260 records, object-state transitions, cursor publication, and terminal reset handling.")
 label(0x0005dc90, "geometry_object_profile_phase_transition_variant_y",
       "Table-driven profile phase transition selecting the 0x482c0/0x482c8/0x482d0/0x482d8 records by threshold and publishing the next counter state.")
+label(0x0005de50, "geometry_object_profile_phase_transition_variant_z",
+      "Profile phase transition using the 0x482e0 records, cursor progression, terminal status changes, and object-state reset handling.")
+label(0x0005e040, "geometry_object_profile_phase_transition_variant_aa",
+      "Compact profile phase transition using the 0x48360 record, advancing the object phase counter and resetting terminal state.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1656,6 +1660,8 @@ ensure_function(0x0005d3d0, "geometry_object_profile_geometry_bounds_flags_updat
 ensure_function(0x0005d730, "geometry_object_profile_phase_controller_variant_d", 0x0005d964)
 ensure_function(0x0005d970, "geometry_object_profile_indexed_phase_controller_variant_a", 0x0005dc80)
 ensure_function(0x0005dc90, "geometry_object_profile_phase_transition_variant_y", 0x0005de4c)
+ensure_function(0x0005de50, "geometry_object_profile_phase_transition_variant_z", 0x0005e034)
+ensure_function(0x0005e040, "geometry_object_profile_phase_transition_variant_aa", 0x0005e104)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

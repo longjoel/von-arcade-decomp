@@ -2543,6 +2543,12 @@ The compact table-driven transition at `0x5dc90` selects among the
 `0x482c0`/`0x482c8`/`0x482d0`/`0x482d8` records according to phase thresholds
 and returns at `0x5de4c` after publishing the next counter state.
 
+The following transition at `0x5de50` uses the `0x482e0` records, advances the
+cursor through its threshold arms, and ends at `0x5e034` after terminal
+status/object-state handling.  The compact sibling at `0x5e040` uses the
+`0x48360` record and ends at `0x5e104` after advancing or resetting the object
+phase counter.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
