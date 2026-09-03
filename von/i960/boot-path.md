@@ -254,6 +254,23 @@ helper at `0x3ba0`; when it returns zero, it resets the service counter,
 advances `0x5039f4`, and returns. This bounds slot 1 as a state/service
 dispatcher; it does not assign the meaning of the individual 32 sub-handlers.
 
+The second-level table at `0x2b960` is also bounded exactly. Its populated
+entries are `0:0x2b500`, `1:0x2b7b0`, `2:0x2b7e0`, `3:0x2b810`,
+`4:0x2b870`, `5:0x2dc50`, `6:0x2dd30`, `7:0x2ded0`, `8:0x2b550`,
+`9:0x2b660`, `10:0xd24b0`, `11:0xd2560`, `12:0xd25b0`,
+`13:0xe3ab0`, `14:0xe3d00`, `29:0x2b700`, `30:0x2b770`, and
+`31:0x2b940`. Slots `15–28` contain zero pointers and follow the same
+null-result fallback in the caller. The gaps are intentional/default service
+slots, not undecoded instructions.
+
+Several entries are already structurally identifiable from their boundaries:
+`0x2b500` performs a video/status setup and advances the mode;
+`0x2b550` initializes a geometry-record workspace; `0x2b660` continues that
+workspace path; `0xe3ab0` updates the device-dependent status state; and
+`0xe3d00` is its associated status/score route. The remaining populated arms
+are now labeled as indirect targets, with semantics deferred until their
+trace PCs and complete slices are correlated.
+
 ### Geometry arithmetic and packet constants
 
 The next compact slices expose additional values without requiring a guessed
