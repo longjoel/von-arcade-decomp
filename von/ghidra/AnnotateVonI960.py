@@ -442,6 +442,10 @@ label(0x000e79f0, "geometry_status_scene_dispatch",
       "Renders the status scene's object groups and dispatches the final scene mode through the local arm table.")
 label(0x000e8920, "geometry_status_scene_arm_table",
       "Six-entry local dispatch table for the status scene's final geometry arms.")
+label(0x000e9140, "geometry_runtime_event_dispatch",
+      "Updates the rolling geometry-event fields, computes pair deltas, and dispatches the next event arm.")
+label(0x000e91f0, "geometry_runtime_event_arm_table",
+      "Twelve-entry event-arm table selected from the rolling event counter.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",

@@ -1561,6 +1561,13 @@ at `0x5783c4` and the six-entry arm table at `0xe8920` for the final scene
 variant; the complete service returns at `0xe9138`. The next entry at
 `0xe9140` begins a separate command/setup path.
 
+That separate path is the runtime event dispatcher at `0xe9140`. It updates
+the rolling event fields at `0x5783e4–0x578400`, derives pairwise geometry
+deltas from the active records, and selects the next event arm using
+`0x5783fc % 12` and the table at `0xe91f0`. The arm targets are distributed
+through the later `0xea...` region, so this entry and its table are labeled
+without imposing an unverified end boundary.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
