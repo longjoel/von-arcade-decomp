@@ -25,6 +25,8 @@ void recovered_text_video_initialize(void);
 void recovered_text_font_asset_initialize(void);
 void recovered_text_ascii_font_initialize(void);
 void recovered_text_palette_initialize(void);
+void recovered_texture_initializer(void);
+int recovered_texture_loader_profile_setup(void);
 void recovered_text_set_position(u32 column, u32 row);
 void recovered_text_write_string(volatile const unsigned char *text);
 
@@ -54,6 +56,8 @@ void i960_reconstructed_main(void)
      * this development image so the attract-state adapter can run. */
     state[7] = recovered_object_state_runtime_tick();
     recovered_text_palette_initialize();
+    recovered_texture_initializer();
+    state[8] = (u32)recovered_texture_loader_profile_setup();
     state[3] = 0x47454f30UL; /* GEO0 */
     state[6] = 0;
     state[4] = 0x494e4954UL; /* INIT */
