@@ -426,6 +426,16 @@ label(0x000e6660, "status_record_grid_frame_build",
       "Builds the eight-by-thirteen status record grid, renders its columns, and updates video state.")
 label(0x000e6d40, "status_record_word_copy_continuation",
       "Copies a 0x200-word status buffer and returns through the caller-supplied continuation.")
+label(0x000e6d80, "geometry_status_emit_variant_a",
+      "Converts the shared status phase into fixed-point values and emits a geometry command packet.")
+label(0x000e6ef0, "geometry_status_emit_variant_b",
+      "Alternate fixed-point status-to-geometry packet emitter with the same phase source.")
+label(0x000e7060, "geometry_status_emit_variant_c",
+      "Third fixed-point status-to-geometry packet emitter for the adjacent profile path.")
+label(0x000e71d0, "geometry_status_emit_variant_d",
+      "Fourth fixed-point status-to-geometry packet emitter used by the status-state dispatcher.")
+label(0x000e7340, "geometry_status_emit_dispatch",
+      "Selects one of the four status-to-geometry emitters from the shared mode word.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -488,6 +498,11 @@ ensure_function(0x000e61c0, "status_transition_render_variant", 0x000e6500)
 ensure_function(0x000e6500, "status_profile_selector_dispatch", 0x000e6644)
 ensure_function(0x000e6660, "status_record_grid_frame_build", 0x000e6d40)
 ensure_function(0x000e6d40, "status_record_word_copy_continuation", 0x000e6d7c)
+ensure_function(0x000e6d80, "geometry_status_emit_variant_a", 0x000e6ef0)
+ensure_function(0x000e6ef0, "geometry_status_emit_variant_b", 0x000e7060)
+ensure_function(0x000e7060, "geometry_status_emit_variant_c", 0x000e71d0)
+ensure_function(0x000e71d0, "geometry_status_emit_variant_d", 0x000e7334)
+ensure_function(0x000e7340, "geometry_status_emit_dispatch", 0x000e738c)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)

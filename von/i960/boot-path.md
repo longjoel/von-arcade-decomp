@@ -1540,6 +1540,13 @@ The short helper at `0xe6d40` copies 0x200 16-bit words from the caller's
 source to destination, preserving the caller's continuation in `g2`; its
 indirect branch is at `0xe6d74` and its local return stub is at `0xe6d78`.
 
+The four adjacent emitters at `0xe6d80`, `0xe6ef0`, `0xe7060`, and `0xe71d0`
+share a fixed-point conversion pattern: they quantize the phase in
+`0x5783d8`, form the paired coordinates, and emit the geometry command words
+through `0x884000`. Their returns are at `0xe6ee8`, `0xe7054`, `0xe71c4`,
+and `0xe7330` respectively. The small dispatcher at `0xe7340` selects among
+these four variants from `0x5783dc` and returns after the selected call.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
