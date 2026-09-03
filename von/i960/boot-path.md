@@ -1844,6 +1844,14 @@ resource and fixed-point result through `0x51acfc`/`0x51ad00`.  Their exact
 returns are `0x38484`, `0x385e0`, `0x386b4`, and `0x388e4`, after which the
 next distinct entry begins at `0x388f0`.
 
+`0x388f0` is the fifth sibling: it advances the primary resource phase and
+uses the same profile timing envelope before clearing the transient result at
+return `0x389e0`.  `0x389f0` begins a sixth sibling, which updates the
+secondary fixed-point coordinate at field `0x36`, clamps the per-frame delta
+against the observed `0x40`/`0x3f` bounds, and advances phase field `0x178`.
+Its terminal returns are at `0x38b00`, `0x38b24`, and `0x38b2c`; the next
+distinct geometry packet path begins at `0x38b30`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

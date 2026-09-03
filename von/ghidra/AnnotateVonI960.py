@@ -184,6 +184,29 @@ label(0x00029ae8, "audio_service_table_reset")
 label(0x00029b20, "audio_device_table_upload")
 label(0x00029c08, "audio_command_value_clamp")
 label(0x00029ca0, "audio_device_buffer_copy")
+label(0x0002a430, "audio_scsp_settle_delay",
+      "Short volatile delay between SCSP control writes; recovered as four countdown iterations.")
+label(0x0002a458, "audio_scsp_fifo_send_u16",
+      "Host-side SCSP command producer. Queues 0xae, high byte, low byte; 0xff is a one-byte special command.")
+label(0x0002a4e0, "audio_scsp_fifo_enqueue")
+label(0x0002a5f0, "audio_scsp_fifo_send_u16_idle_gate",
+      "Sibling command producer with the mode-1/board-status-zero suppression gate.")
+label(0x0002a690, "audio_scsp_send_level",
+      "Clamps signed level to 1..127 and emits the 0xa0, selector-1, level frame.")
+label(0x0002a870, "audio_scsp_send_selector_zero",
+      "Emits the 0xa0, selector-0, low-byte frame.")
+label(0x0002a8a0, "audio_scsp_initialize",
+      "Initializes the 64-byte host FIFO and writes the recovered SCSP control sequence 0,0,0,0x40,0x4e,0x37 before queuing 0xff.")
+label(0x00001348, "audio_scsp_service_request",
+      "Raises interrupt-control bit 10 in the host mirror and MMIO register to request SCSP FIFO service.")
+label(0x000016dc, "audio_scsp_fifo_consumer",
+      "Interrupt route 0x400: consumes one queued byte only when the FIFO is nonempty and SCSP status bit 0 is set, then writes it to SCSP command port 0x009c0000.")
+label(0x00501cd0, "audio_interrupt_control_mirror")
+label(0x0051aa70, "audio_fifo_read_index")
+label(0x0051aa74, "audio_fifo_write_index")
+label(0x0051aa80, "audio_fifo_bytes_64")
+label(0x009c0000, "scsp_command_port")
+label(0x009c0004, "scsp_status_control_port")
 label(0x000292d8, "geometry_command_stream_upload")
 label(0x000295d0, "geometry_profile_upload_variant")
 label(0x000296d0, "geometry_service_state_initialize")
@@ -334,6 +357,10 @@ label(0x000385f0, "geometry_object_resource_motion_variant_c",
       "Resource-profile motion path that resets the object phase on completion and returns through a continuation.")
 label(0x000386c0, "geometry_object_resource_motion_variant_d",
       "Advances the secondary object motion coordinate and applies the corresponding result resource.")
+label(0x000388f0, "geometry_object_resource_motion_variant_e",
+      "Advances the primary resource phase, applies the profile timing envelope, and clears the transient result on completion.")
+label(0x000389f0, "geometry_object_resource_motion_variant_f",
+      "Updates the secondary fixed-point coordinate with bounded motion deltas and advances the object phase.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -927,6 +954,8 @@ ensure_function(0x00038340, "geometry_object_resource_motion_variant_a", 0x00038
 ensure_function(0x00038490, "geometry_object_resource_motion_variant_b", 0x000385f0)
 ensure_function(0x000385f0, "geometry_object_resource_motion_variant_c", 0x000386c0)
 ensure_function(0x000386c0, "geometry_object_resource_motion_variant_d", 0x000388f0)
+ensure_function(0x000388f0, "geometry_object_resource_motion_variant_e", 0x000389f0)
+ensure_function(0x000389f0, "geometry_object_resource_motion_variant_f", 0x00038b30)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
