@@ -927,6 +927,14 @@ label(0x00063290, "geometry_object_profile_phase_transition_variant_ao",
       "Profile phase transition using the 0x47e00 record pair, advancing the cursor and resetting the object state at completion.")
 label(0x00063370, "geometry_object_profile_indexed_phase_controller_variant_d",
       "Large indexed profile phase controller using the paired 0x47c30/0x47c34 records, status gating, cursor publication, and terminal reset handling.")
+label(0x000636c0, "geometry_object_profile_indexed_phase_controller_variant_e",
+      "Large indexed profile phase controller using the paired 0x47c90/0x47c94 records, status gating, cursor publication, and terminal reset handling.")
+label(0x00063a90, "geometry_object_profile_phase_transition_variant_ap",
+      "Profile phase transition using the 0x47cc0/0x47cc8/0x47cd0 records, cursor progression, timing thresholds, and movement-state correction.")
+label(0x00063c00, "geometry_object_profile_phase_transition_variant_aq",
+      "Profile phase transition using the 0x47ce0/0x47ce8/0x47cf0 records, cursor progression, timing thresholds, and movement-state correction.")
+label(0x00063d60, "geometry_object_profile_generated_asset_controller_variant_a",
+      "Generated-asset profile controller using the 0x47d00/0x47d08/0x47d10 records, fixed-point cursor scaling, state flags, and terminal callback return.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1791,6 +1799,10 @@ ensure_function(0x00063120, "geometry_object_profile_phase_transition_variant_an
 ensure_function(0x000631e0, "geometry_object_profile_phase_controller_variant_n", 0x00063284)
 ensure_function(0x00063290, "geometry_object_profile_phase_transition_variant_ao", 0x0006336c)
 ensure_function(0x00063370, "geometry_object_profile_indexed_phase_controller_variant_d", 0x000636b0)
+ensure_function(0x000636c0, "geometry_object_profile_indexed_phase_controller_variant_e", 0x00063a88)
+ensure_function(0x00063a90, "geometry_object_profile_phase_transition_variant_ap", 0x00063bf0)
+ensure_function(0x00063c00, "geometry_object_profile_phase_transition_variant_aq", 0x00063d50)
+ensure_function(0x00063d60, "geometry_object_profile_generated_asset_controller_variant_a", 0x00063f24)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

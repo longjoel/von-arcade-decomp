@@ -2634,6 +2634,16 @@ and the `0x47c20` pair (`0x63120–0x631dc`), followed by the short
 `0x63290–0x6336c`.  The larger indexed controller at `0x63370` uses the
 `0x47c30`/`0x47c34` records with status gating and ends at `0x636b0`.
 
+The large indexed controller at `0x636c0` uses the `0x47c90`/`0x47c94`
+records and ends at `0x63a88`.  The following transitions use the
+`0x47cc0`/`0x47cc8`/`0x47cd0` records (`0x63a90–0x63bf0`) and the
+`0x47ce0`/`0x47ce8`/`0x47cf0` records (`0x63c00–0x63d50`), including cursor
+progression, timing thresholds, and movement-state correction.
+
+The generated-asset controller at `0x63d60` uses the
+`0x47d00`/`0x47d08`/`0x47d10` records, scales the cursor in fixed point,
+updates state flags, and returns through its callback at `0x63f24`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
