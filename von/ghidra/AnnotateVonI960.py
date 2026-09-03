@@ -599,6 +599,12 @@ label(0x0004cc20, "geometry_object_profile_runtime_update_variant_f",
       "Sixth runtime profile update variant with bounded cursor advance and profile reset paths.")
 label(0x0004cd00, "geometry_object_profile_runtime_update_variant_g",
       "Seventh runtime profile update variant using the 0x46bb0 descriptor range and the shared status/event protocol.")
+label(0x0004d540, "geometry_object_profile_cursor_transition_variant_c",
+      "Cursor transition variant using mode-specific descriptor/scalar ranges, publishing shared cursor state and advancing the active object phase.")
+label(0x0004d720, "geometry_object_profile_cursor_transition_variant_d",
+      "Alternate cursor transition variant using the 0x46c40/0x46c48/0x46c50 descriptor ranges and the shared cursor/event protocol.")
+label(0x0004d880, "geometry_object_profile_cursor_transition_variant_e",
+      "Profile cursor transition variant using the 0x46c60-series descriptor ranges, status messages, and the shared timing/phase protocol.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1299,6 +1305,9 @@ ensure_function(0x0004ca40, "geometry_object_profile_runtime_update_variant_d", 
 ensure_function(0x0004cb70, "geometry_object_profile_runtime_update_variant_e", 0x0004cc1c)
 ensure_function(0x0004cc20, "geometry_object_profile_runtime_update_variant_f", 0x0004cd00)
 ensure_function(0x0004cd00, "geometry_object_profile_runtime_update_variant_g", 0x0004d044)
+ensure_function(0x0004d540, "geometry_object_profile_cursor_transition_variant_c", 0x0004d714)
+ensure_function(0x0004d720, "geometry_object_profile_cursor_transition_variant_d", 0x0004d874)
+ensure_function(0x0004d880, "geometry_object_profile_cursor_transition_variant_e", 0x0004da7c)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

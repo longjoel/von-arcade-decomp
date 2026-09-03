@@ -2172,6 +2172,21 @@ phase ranges and reset behavior; the last uses the `0x46bb0` descriptor range.
 The exact returns at `0x4cb68`, `0x4cc18`, `0x4ccfc`, and `0x4d040` separate
 four more handlers from the following state cluster.
 
+Three additional cursor-transition targets follow in the dispatch table at
+`0x4d540`, `0x4d720`, and `0x4d880`.  The first selects among the
+`0x207641c`, `0x2077504`, and `0x20785ec` descriptor/scalar ranges; the second
+uses the compact descriptor records at `0x46c40`, `0x46c48`, and `0x46c50`.
+Both publish `0x51ab08`/`0x51ab0c` and the paired cursor values at
+`0x51ab10`/`0x51ab12`, advance object phase `0x178`, and apply the shared
+`0x150` timing correction before returning at `0x4d710` and `0x4d870`.
+
+The third target at `0x4d880` is a related but richer transition handler.  It
+uses the `0x46c60`-series records, raises mode-specific status flags, selects
+message identifiers through the text/status service at `0x2a4e0`, and handles
+the later phase ranges through `0x46c68` and `0x46c70`.  Its final timing
+correction and state publication return at `0x4da78`, cleanly delimiting the
+handler from the following table-backed routine.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
