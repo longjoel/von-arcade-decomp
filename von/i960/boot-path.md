@@ -1586,6 +1586,14 @@ The renderer at `0xeb060` lays those strings into the status tile plane and
 updates the selected-menu marker, returning through either `0xeb19c` or
 `0xeb1b4`.
 
+The runtime-table helpers following it are now bounded individually:
+`0xeb1c0` scans packed records and stores matching pointers at
+`0x578548–0x578550`; `0xeb2c0` initializes and rebuilds that workspace;
+`0xeb3b0` selects the active base address from the match markers; and
+`0xeb450` performs the alternate-table scan. The reset/copy helper at
+`0xeb510` restores the table defaults and copies the selected words into the
+active workspace, returning at `0xeb5a8`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

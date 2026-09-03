@@ -468,6 +468,16 @@ label(0x000eaf40, "diagnostic_menu_strings",
       "Literal diagnostic-menu strings used by the runtime test/status screen.")
 label(0x000eb060, "diagnostic_menu_render",
       "Renders the diagnostic menu strings and updates the selected test-menu tile state.")
+label(0x000eb1c0, "runtime_packed_record_scan",
+      "Scans packed runtime records and records matching entry pointers in the shared workspace.")
+label(0x000eb2c0, "runtime_record_table_init",
+      "Initializes the packed-record workspace, rebuilds its match markers, and advances the status counter.")
+label(0x000eb3b0, "runtime_record_base_select",
+      "Selects the runtime record base address from the accumulated match markers.")
+label(0x000eb450, "runtime_record_match_scan_alt",
+      "Scans the alternate packed-record table and records matching entry pointers.")
+label(0x000eb510, "runtime_record_table_reset_copy",
+      "Resets the packed-record table and copies the selected record words into the active workspace.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -547,6 +557,11 @@ ensure_function(0x000eaeb0, "runtime_format_value", 0x000eaec4)
 ensure_function(0x000eaed0, "runtime_format_value_adjusted", 0x000eaf20)
 ensure_function(0x000eaf20, "runtime_render_value_string", 0x000eaf34)
 ensure_function(0x000eb060, "diagnostic_menu_render", 0x000eb1b8)
+ensure_function(0x000eb1c0, "runtime_packed_record_scan", 0x000eb2c0)
+ensure_function(0x000eb2c0, "runtime_record_table_init", 0x000eb3a8)
+ensure_function(0x000eb3b0, "runtime_record_base_select", 0x000eb450)
+ensure_function(0x000eb450, "runtime_record_match_scan_alt", 0x000eb50c)
+ensure_function(0x000eb510, "runtime_record_table_reset_copy", 0x000eb5ac)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
