@@ -2762,6 +2762,14 @@ The larger controller at `0x69f30` handles match phase 27, updates object
 status and transform fields, and performs terminal match-state transitions
 before returning at `0x6a694`.
 
+The following geometry bridge contains three independently referenced
+services.  The transform/motion controller at `0x6b3d0` computes fixed-point
+coordinates and phase-dependent offsets before emitting geometry commands to
+`0x884000`, ending at `0x6c768`.  Its state-byte dispatch counterpart at
+`0x6c770` routes through the `0x1ae` jump table and ends at `0x6cc1c`.
+The packet writer at `0x6cc20` serializes object transform data and mode words
+to the same FIFO, ending at `0x6d07c`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
