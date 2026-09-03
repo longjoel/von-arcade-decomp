@@ -1809,6 +1809,13 @@ entries: `0x31ab0`, `0x31d20`, `0x32120`, `0x32330`, `0x324e0`, and `0x32540`.
 They cover the remaining profile/timing transitions and two small phase
 callback helpers, ending at the object-motion table beginning at `0x32560`.
 
+`0x32810` is the next large object-state machine.  Its prologue saves the
+caller frame, the internal table at `0x32968` selects fourteen state arms from
+field `0x1b2`, and the machine eventually restores the frame and returns at
+`0x360bc`.  The state arms combine fixed-point motion, geometry FIFO packets,
+profile projection, and scene/object callback updates; entries after
+`0x360c0` are kept separate until their independent callers are established.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
