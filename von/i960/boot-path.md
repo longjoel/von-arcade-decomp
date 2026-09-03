@@ -170,6 +170,11 @@ geometry transforms back through the profile uploader; `0x2e1c8` and
 record-transform service; `0x281f0` selects texture-profile entries through a
 dispatch table; and `0x284b8` is the geometry command-window clear route.
 
+The standalone emitter at `0x2e320` normalizes its selector, reads the packet
+tuple table at `0x2bf0518`, programs `0x800010`, emits the tuple through
+`0x804000`, and returns at `0x2e3c0`; the next continuation stub begins at
+`0x2e3d0`.
+
 The transform route at `0x2d9a0` is now bounded through its return at
 `0x2dc40`. It emits the `0x884000` packet and stores derived frame values in
 `0x51aad0–0x51aae4`; the following initializer begins at `0x2dc50`.
