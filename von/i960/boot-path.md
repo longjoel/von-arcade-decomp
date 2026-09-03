@@ -1639,6 +1639,12 @@ renders through `0xecd80`, then dispatches the next handler via `0xecb50` and
 returns at `0xed2e0`; its fallback path begins at `0xed2e4` and returns at
 `0xed300`.
 
+The input-test service at `0xed320` handles the input-state transition and
+returns at `0xed438`. Its literal status rows at `0xed440–0xed5b4` cover
+direction, shot, dash, start, coin-chute, service, and test-button states.
+The renderer at `0xed5c0` lays those rows into the tile plane, checks the
+input/status flags, and returns at `0xed968`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
