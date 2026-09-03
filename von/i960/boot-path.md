@@ -2730,6 +2730,15 @@ object-offset, axis-flag, and derived-ratio sequence from `0x645a0`; it
 returns through its saved callback at `0x68548`.  The `0x68500` arithmetic is
 the final ratio tail within this function.
 
+The later geometry layer links those state machines to video command output.
+The phase/selection controller at `0x6d130` updates active object phase and
+cursor fields through `0x6d38c`; `0x6d390` then serializes geometry state and
+transform data to the `0x884000` FIFO, ending at `0x6dce0`.  The phase-state
+controller at `0x6ddb0` advances selectors and mode-dependent counters before
+returning at `0x6e0a4`.  Its companion writer at `0x6e0b0` emits structured
+object coordinates, dimensions, and mode words to the same FIFO, ending at
+`0x6e62c`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

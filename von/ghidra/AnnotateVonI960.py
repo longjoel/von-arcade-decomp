@@ -1007,6 +1007,14 @@ label(0x00068040, "geometry_object_profile_phase_controller_variant_s",
       "Profile phase controller using the packed 0x48b90 record pair, cursor progression, and terminal phase handling.")
 label(0x00068230, "geometry_object_profile_geometry_bounds_flags_update_variant_e",
       "Parallel geometry bounds evaluator that clamps the three extents, applies object-record offsets, updates axis collision flags, and computes derived ratios.")
+label(0x0006d130, "geometry_object_profile_phase_selection_controller",
+      "Geometry phase/selection controller that updates the active object phase, cursor fields, and terminal state flags before returning through its callback.")
+label(0x0006d390, "geometry_command_packet_writer_variant_a",
+      "Geometry command packet writer that serializes object state and transform fields to the 0x884000 FIFO, with auxiliary setup calls.")
+label(0x0006ddb0, "geometry_object_profile_phase_state_controller",
+      "Geometry phase-state controller that advances object selectors and phase counters, applies mode-dependent transitions, and returns through its callback.")
+label(0x0006e0b0, "geometry_command_packet_writer_variant_b",
+      "Structured geometry command packet writer that emits object coordinates, dimensions, and mode words to the 0x884000 FIFO.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1911,6 +1919,10 @@ ensure_function(0x00067c90, "geometry_object_profile_phase_controller_variant_q"
 ensure_function(0x00067e40, "geometry_object_profile_phase_controller_variant_r", 0x00068034)
 ensure_function(0x00068040, "geometry_object_profile_phase_controller_variant_s", 0x00068228)
 ensure_function(0x00068230, "geometry_object_profile_geometry_bounds_flags_update_variant_e", 0x00068548)
+ensure_function(0x0006d130, "geometry_object_profile_phase_selection_controller", 0x0006d38c)
+ensure_function(0x0006d390, "geometry_command_packet_writer_variant_a", 0x0006dce0)
+ensure_function(0x0006ddb0, "geometry_object_profile_phase_state_controller", 0x0006e0a4)
+ensure_function(0x0006e0b0, "geometry_command_packet_writer_variant_b", 0x0006e62c)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
