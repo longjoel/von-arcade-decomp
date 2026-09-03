@@ -2240,6 +2240,13 @@ progress arm at `0x4edf8`/`0x4ee18`, and the later arms at `0x4eefc`,
 `0x4efa0`, and `0x4f018`, with the aligned `0x4f01c` boundary ending the
 parent handler.
 
+Two further phase-transition helpers begin at `0x4f020` and `0x4f1f0`.
+The first uses paired records at `0x46ea0`/`0x46ea4`, while the second uses
+`0x46f00`/`0x46f04`; both advance `0x17a`, publish the shared cursor fields,
+and take a bounded reset path when their descriptor range completes.  Their
+caller-link returns at `0x4f1e0`/`0x4f1e4` and `0x4f3cc`/`0x4f3d0` delimit the
+helpers from the following subsystem entries.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
