@@ -1681,6 +1681,13 @@ the active accounting sub-handler before returning at `0xf2ee4`. The nearby
 format strings identify this family as bookkeeping, coin-chute, credit, and
 game-time reporting.
 
+The statistics renderer at `0xf33a0` reads the `0x1d00040–0x1d000a0`
+accounting fields and formats game-time/bookkeeping results, returning at
+`0xf3a64`. The EEPROM confirmation service at `0xf3ab0` displays the clear /
+cancel choices and completion state, with a return at `0xf3c0c`. The compact
+test-mode exit/reset handler at `0xf3c50` clears the test video/input state and
+returns at `0xf3c9c`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
