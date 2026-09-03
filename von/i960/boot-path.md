@@ -1594,6 +1594,15 @@ The runtime-table helpers following it are now bounded individually:
 `0xeb510` restores the table defaults and copies the selected words into the
 active workspace, returning at `0xeb5a8`.
 
+The ROM-bank loaders at `0xeb5b0`, `0xeb600`, `0xeb650`, `0xeb6a0`,
+`0xeb6f0`, `0xeb740`, `0xeb790`, and `0xeb7e0` select banks at
+`0x5e0000`, `0x5c0000`, `0x5a0000`, `0x580000`, `0x560000`, `0x540000`,
+`0x520000`, and `0x502000` respectively. Each copies the packed words into
+the active table and invokes the reset/copy helper. The orchestrator at
+`0xeb830` runs the bank sequence and normalizes the match markers. The
+scanner at `0xeb8a0` then copies the packed records and records four masked
+match locations at `0x578560–0x57856c`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

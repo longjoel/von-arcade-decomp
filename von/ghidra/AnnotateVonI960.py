@@ -478,6 +478,26 @@ label(0x000eb450, "runtime_record_match_scan_alt",
       "Scans the alternate packed-record table and records matching entry pointers.")
 label(0x000eb510, "runtime_record_table_reset_copy",
       "Resets the packed-record table and copies the selected record words into the active workspace.")
+label(0x000eb5b0, "runtime_rom_bank_loader_5e",
+      "Loads the packed runtime table from ROM bank 0x5e0000 and refreshes the active matches.")
+label(0x000eb600, "runtime_rom_bank_loader_5c",
+      "Loads the packed runtime table from ROM bank 0x5c0000 and refreshes the active matches.")
+label(0x000eb650, "runtime_rom_bank_loader_5a",
+      "Loads the packed runtime table from ROM bank 0x5a0000 and refreshes the active matches.")
+label(0x000eb6a0, "runtime_rom_bank_loader_58",
+      "Loads the packed runtime table from ROM bank 0x580000 and refreshes the active matches.")
+label(0x000eb6f0, "runtime_rom_bank_loader_56",
+      "Loads the packed runtime table from ROM bank 0x560000 and refreshes the active matches.")
+label(0x000eb740, "runtime_rom_bank_loader_54",
+      "Loads the packed runtime table from ROM bank 0x540000 and refreshes the active matches.")
+label(0x000eb790, "runtime_rom_bank_loader_52",
+      "Loads the packed runtime table from ROM bank 0x520000 and refreshes the active matches.")
+label(0x000eb7e0, "runtime_rom_bank_loader_50",
+      "Loads the packed runtime table from ROM bank 0x502000 and refreshes the active matches.")
+label(0x000eb830, "runtime_rom_bank_load_all",
+      "Runs the runtime ROM-bank loaders, normalizes match markers, and advances the status counter.")
+label(0x000eb8a0, "runtime_packed_record_match_scan",
+      "Copies packed records into the active workspace and records four masked match locations.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -562,6 +582,16 @@ ensure_function(0x000eb2c0, "runtime_record_table_init", 0x000eb3a8)
 ensure_function(0x000eb3b0, "runtime_record_base_select", 0x000eb450)
 ensure_function(0x000eb450, "runtime_record_match_scan_alt", 0x000eb50c)
 ensure_function(0x000eb510, "runtime_record_table_reset_copy", 0x000eb5ac)
+ensure_function(0x000eb5b0, "runtime_rom_bank_loader_5e", 0x000eb600)
+ensure_function(0x000eb600, "runtime_rom_bank_loader_5c", 0x000eb650)
+ensure_function(0x000eb650, "runtime_rom_bank_loader_5a", 0x000eb6a0)
+ensure_function(0x000eb6a0, "runtime_rom_bank_loader_58", 0x000eb6f0)
+ensure_function(0x000eb6f0, "runtime_rom_bank_loader_56", 0x000eb740)
+ensure_function(0x000eb740, "runtime_rom_bank_loader_54", 0x000eb790)
+ensure_function(0x000eb790, "runtime_rom_bank_loader_52", 0x000eb7e0)
+ensure_function(0x000eb7e0, "runtime_rom_bank_loader_50", 0x000eb830)
+ensure_function(0x000eb830, "runtime_rom_bank_load_all", 0x000eb89c)
+ensure_function(0x000eb8a0, "runtime_packed_record_match_scan", 0x000ebaa8)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
