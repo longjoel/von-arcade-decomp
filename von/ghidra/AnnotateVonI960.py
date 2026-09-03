@@ -489,6 +489,12 @@ label(0x00042780, "geometry_object_profile_state_variant_c",
       "Updates the object profile cursor and phase from the 0x42760 descriptor table and publishes the bounded state window.")
 label(0x000428e0, "geometry_object_profile_state_variant_d",
       "Continuation-style alternate profile state update using the 0x42760 descriptor table and phase thresholds.")
+label(0x000429d0, "geometry_profile_state_table_c",
+      "Six-word profile-state descriptor table consumed by the full profile transition handler.")
+label(0x000429f0, "geometry_object_profile_state_transition",
+      "Full framed profile transition handler: advances object phase, emits paired command-5/18/19/21 state packets, updates timing fields, and publishes bounded state at offsets 0xc2/c8.")
+label(0x000430d0, "geometry_object_profile_state_transition_alt",
+      "Continuation-style alternate profile transition using the 0x429e0 descriptor values and the shared phase/timing state.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1142,6 +1148,8 @@ ensure_function(0x00042480, "geometry_object_profile_state_variant_a", 0x0004267
 ensure_function(0x00042670, "geometry_object_profile_state_variant_b", 0x00042760)
 ensure_function(0x00042780, "geometry_object_profile_state_variant_c", 0x000428e0)
 ensure_function(0x000428e0, "geometry_object_profile_state_variant_d", 0x000429c0)
+ensure_function(0x000429f0, "geometry_object_profile_state_transition", 0x000430d0)
+ensure_function(0x000430d0, "geometry_object_profile_state_transition_alt", 0x00043198)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

@@ -2048,6 +2048,14 @@ The first pair returns through `0x42660`/`0x4274c`, while the alternate pair
 returns through `0x428d0`/`0x429bc`; the padding and continuation pointers
 confirm four distinct handlers.
 
+The following profile-transition pair is rooted at the six-word descriptor table
+`0x429d0`.  The framed handler at `0x429f0` advances phase/timing state, emits
+paired command-5/18/19/21 records, and publishes the bounded state fields at
+`0xc2`/`0xc8` before returning at `0x430cc`.  The continuation-style alternate
+at `0x430d0` uses the adjacent descriptor values and returns through
+`0x43194`/`0x43198`.  This is the next layer above the smaller cursor-state
+variants, not a fall-through extension of `0x428e0`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
