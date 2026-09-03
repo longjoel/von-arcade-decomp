@@ -2534,6 +2534,11 @@ geometry evaluator sibling begins at `0x5d3d0`, performs the same bounds,
 axis-flag, and derived-ratio work as the earlier evaluator, and is linked
 through `0x5d72c`.
 
+The next phase controller at `0x5d730` dispatches through the
+`0x48240`/`0x48248`/`0x48250` records and ends at `0x5d964`.  The indexed
+controller at `0x5d970` then uses the `0x48260` records for object-state and
+cursor progression, with its linked completion boundary at `0x5dc80`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
