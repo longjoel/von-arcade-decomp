@@ -399,6 +399,30 @@ label(0x0003d730, "geometry_object_record_update",
       "Updates one active object record: emits the 0x884000 geometry setup, advances profile/service state, applies fixed-point motion and clamp paths, and publishes the resulting coordinate fields.")
 label(0x0003e5e0, "geometry_object_profile_state_initialize",
       "Initializes the selected object profile from the shared service cursor, applies profile-specific fixed-point timing/state transitions, and publishes the object phase/result fields.")
+label(0x0003eca0, "geometry_record_profile_value_table",
+      "Packed halfword profile values indexed by the low 16 bits of a runtime record selector.")
+label(0x0003ecd0, "geometry_runtime_record_allocate",
+      "Scans the 23-entry runtime record pool for a free slot, initializes its fields, and derives its profile value from the packed selector table.")
+label(0x0003ed60, "geometry_runtime_record_allocate_alt",
+      "Alternate runtime record allocator using the same 23-entry pool and selector-value table with a different register arrangement.")
+label(0x0003edd0, "geometry_runtime_record_update",
+      "Finds a free runtime record and writes the caller geometry fields, normalized coordinates, and selector-derived profile value.")
+label(0x0003eeb0, "geometry_runtime_record_reset",
+      "Finds a free runtime record, emits the reset packet prefix, and clears its payload and profile fields.")
+label(0x0003ef50, "geometry_runtime_record_motion_emit",
+      "Scans active runtime records, converts packed input components into fixed-point motion values, and emits selectors 8, 13, 29, and 30.")
+label(0x0003f120, "geometry_runtime_record_motion_emit_alt",
+      "Parallel runtime-record motion emitter using caller-supplied offsets and the same fixed-point conversion and packet format.")
+label(0x0003f2b0, "geometry_runtime_record_packet_initialize",
+      "Initializes the first available runtime record with the caller geometry tuple and fixed profile constants.")
+label(0x0003f380, "geometry_runtime_record_packet_initialize_alt",
+      "Initializes the first available runtime record with the alternate profile constants and fixed-point scale.")
+label(0x0003f470, "geometry_runtime_record_table_clear",
+      "Clears the bounded 0x33c-byte runtime record table and returns through its caller continuation.")
+label(0x0003f4e0, "geometry_runtime_record_seed_selector10",
+      "Clears the bounded runtime record table, seeds the first slot with selector 10, and returns through its caller continuation.")
+label(0x0003f550, "geometry_runtime_record_table_seed_pair",
+      "Walks the runtime record table, fills available slots with the requested selector pair, and returns after the bounded scan.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1011,6 +1035,17 @@ ensure_function(0x0003d540, "geometry_fixed_point_clamp_helper", 0x0003d5d0)
 ensure_function(0x0003d5d0, "geometry_service_state_initialize", 0x0003d730)
 ensure_function(0x0003d730, "geometry_object_record_update", 0x0003e5e0)
 ensure_function(0x0003e5e0, "geometry_object_profile_state_initialize", 0x0003ec94)
+ensure_function(0x0003ecd0, "geometry_runtime_record_allocate", 0x0003ed60)
+ensure_function(0x0003ed60, "geometry_runtime_record_allocate_alt", 0x0003edd0)
+ensure_function(0x0003edd0, "geometry_runtime_record_update", 0x0003eeb0)
+ensure_function(0x0003eeb0, "geometry_runtime_record_reset", 0x0003ef50)
+ensure_function(0x0003ef50, "geometry_runtime_record_motion_emit", 0x0003f120)
+ensure_function(0x0003f120, "geometry_runtime_record_motion_emit_alt", 0x0003f2b0)
+ensure_function(0x0003f2b0, "geometry_runtime_record_packet_initialize", 0x0003f380)
+ensure_function(0x0003f380, "geometry_runtime_record_packet_initialize_alt", 0x0003f470)
+ensure_function(0x0003f470, "geometry_runtime_record_table_clear", 0x0003f4e0)
+ensure_function(0x0003f4e0, "geometry_runtime_record_seed_selector10", 0x0003f550)
+ensure_function(0x0003f550, "geometry_runtime_record_table_seed_pair", 0x0003f5e8)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

@@ -1965,6 +1965,21 @@ callers at `0x274ac` and `0x27540` therefore select separate geometry update
 families: `0x3e5e0` performs profile-state initialization, while `0x3d730`
 performs the full object-record motion/update path.
 
+The following record-pool island is now split at its padding boundaries.  The
+packed table at `0x3eca0` holds selector-derived halfwords.  `0x3ecd0` and
+`0x3ed60` scan 23 records rooted at `0x51ad10` with a `0x24`-byte stride and
+initialize the first free slot; `0x3edd0` updates a free slot from caller
+geometry values, and `0x3eeb0` seeds a reset record.  The emitters at
+`0x3ef50` and `0x3f120` convert packed input components to fixed-point values
+and emit the shared selectors 8/13/29/30.  `0x3f2b0` and `0x3f380` are the
+corresponding packet constructors with alternate profile constants.
+
+The continuation-style table services at `0x3f470` and `0x3f4e0` clear the
+bounded 0x33c-byte pool, with the latter seeding selector 10; `0x3f550` is a
+separate bounded scan that fills available slots with the requested selector
+pair and returns at `0x3f5e4`.  These are record-pool management services
+called by the geometry paths, not additional object-motion variants.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
