@@ -28,7 +28,8 @@
         ["python3", "von/tools/test_evidence_manifest.py"],
         ["python3", "von/tools/test_patchset_manifest.py"],
         ["python3", "von/tools/test_project_status.py"],
-        ["python3", "von/tools/test_mame_von_subtarget.py"]
+        ["python3", "von/tools/test_mame_von_subtarget.py"],
+        ["python3", "von/tools/test_analyze_match_trace_geometry.py"]
       ]
     },
     "trace": {
