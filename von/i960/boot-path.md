@@ -1477,6 +1477,13 @@ into runtime buffers before the status render helpers use them. `0xe3a30`
 renders the WINS/LOSSES row, while `0xe3a70` consumes exactly a three-byte
 status token and routes each byte through the glyph-block writer.
 
+The following service arm at `0xe3ab0` selects one of three status screens
+through the counter at `0x5783b4`; its handlers are `0xe3b70`, `0xe3dc0`, and
+`0xe3f30`. The first two are now bounded through their visible returns. Their
+associated literals include `TODAY'S BEST PILOTS`, `TODAY'S TOP WINS`, and
+`FAVORITE MACHINES`, with compact formatting tables immediately preceding the
+render code.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
