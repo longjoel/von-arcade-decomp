@@ -645,6 +645,8 @@ label(0x000520e0, "geometry_object_profile_phase_state_dispatch_variant_b",
       "Profile phase-state dispatcher sibling using descriptor bases at 0x47200/0x47208/0x47210/0x47218 and mode-specific reset transitions.")
 label(0x00052360, "geometry_object_profile_phase_state_dispatch_variant_c",
       "Profile phase-state dispatcher sibling using the 0x47220-series records and the shared cursor/status transition protocol.")
+label(0x00052650, "geometry_object_profile_threshold_event_update",
+      "Threshold-event handler that emits the mapped status message, updates object flag 0x1a6, and advances through the 0x47260-series profile records.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1368,6 +1370,7 @@ ensure_function(0x000517f0, "geometry_object_profile_runtime_state_update_varian
 ensure_function(0x00051a80, "geometry_object_profile_threshold_update_variant_c", 0x000520dc)
 ensure_function(0x000520e0, "geometry_object_profile_phase_state_dispatch_variant_b", 0x00052360)
 ensure_function(0x00052360, "geometry_object_profile_phase_state_dispatch_variant_c", 0x00052644)
+ensure_function(0x00052650, "geometry_object_profile_threshold_event_update", 0x00052878)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

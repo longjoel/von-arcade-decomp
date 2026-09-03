@@ -2268,6 +2268,13 @@ The first switches among descriptor bases `0x47200`, `0x47208`, `0x47210`, and
 phase state `0x17c`, publish the shared cursor fields, and contain mode-specific
 reset/status arms before returning at `0x5235c` and `0x52640`.
 
+The data table at `0xa960` then exposes `0x52650` as a separate threshold-event
+handler.  It tests the normalized threshold flag at `0x1dd`, emits the
+`0x1208`/`0x1230` status message through `0x2a4e0`, updates object flag `0x1a6`,
+and advances through descriptor bases `0x47260`, `0x47268`, and `0x47270`.
+Its short and completion exits at `0x52858` and `0x52874` delimit it from the
+separate table target at `0x52880`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
