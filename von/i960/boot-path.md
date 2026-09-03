@@ -216,6 +216,29 @@ clears `0x503a00`. The device path writes byte `4` to `0x01400000`, writes
 device word at `0x5024f4` satisfy the completion condition. This is a
 dispatcher/device handshake, not evidence of the coin-state transition.
 
+The indirect table at `0x18680` resolves as follows (the index is the low
+nibble of `0x5039f4`):
+
+| Slot | Target | Listing-supported role |
+| ---: | ---: | --- |
+| 0 | `0x003c40` | renders/advances the startup text or status phase and updates `0x503a04` |
+| 1 | `0x02b9e0` | handler not yet bounded in this pass |
+| 2 | `0x018650` | writes a text/video command, clears the service counter, and increments the mode |
+| 3 | `0x0190d0` | initializes a startup phase, clears phase state, and increments the mode |
+| 4 | `0x019180` | submits setup words through `0x884000` and advances startup state |
+| 5 | `0x0f3f00` | sets the startup flag, clears the video/device state, initializes counters, and advances the mode |
+| 6 | `0x0f3fe0` | services the startup counter and selects a sub-handler from its own table |
+| 7 | `0x0f3d30` | initializes the text/video phase and selects one of the startup messages |
+| 8 | `0x018620` | clears `0x5039f4`/`0x503a00` and returns through the video byte writer |
+| 9–14 | `0` | null entry; the dispatcher repairs the mode to `1` before `callx` |
+| 15 | `0x018620` | same handler as slot 8 |
+
+The attract trace’s slot-9 observation is therefore useful: it does not
+identify a missing handler; it proves the null-entry recovery branch at
+`0x1881c–0x1883c`, after which the next iteration runs slot 1. Slots 0, 5,
+and 8 are now explicitly seeded as indirect-call targets in the annotation
+script. Their higher-level UI meanings remain intentionally unresolved.
+
 ### Geometry arithmetic and packet constants
 
 The next compact slices expose additional values without requiring a guessed
