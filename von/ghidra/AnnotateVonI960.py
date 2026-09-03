@@ -2171,6 +2171,7 @@ ensure_function(0x00074754, "match_state_handler_17", 0x0007479c)
 ensure_function(0x0007479c, "match_state_handler_18", 0x000747e4)
 ensure_function(0x000747e4, "match_state_handler_19", 0x00074848)
 ensure_function(0x00074848, "match_state_default_reject", 0x00074860)
+ensure_function(0x00074860, "match_status_transition_update", 0x00074e60)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2398,6 +2399,8 @@ label(0x000747e4, "match_state_handler_19",
       "Status-table handler 19: final compact status arm before the shared 0x74848 continuation.")
 label(0x00074848, "match_state_default_reject",
       "Shared status-table reject path: writes 0xffff to the caller status field and returns immediately.")
+label(0x00074860, "match_status_transition_update",
+      "Computes shared status/result command fields from mode, counter, object flags, and alignment state before returning at 0x74e50.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",
