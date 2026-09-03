@@ -553,6 +553,10 @@ label(0x00045c30, "geometry_profile_timing_hardware_emit_variant_d",
       "Fourth hardware timing emitter variant for an alternate profile range, retaining the shared 0x884000 output protocol.")
 label(0x00045f50, "geometry_profile_timing_hardware_emit_variant_e",
       "Fifth hardware timing emitter variant with its own profile scaling constants and shared cursor output fields.")
+label(0x00046480, "geometry_profile_timing_hardware_emit_variant_f",
+      "Sixth timing emitter variant combining profile cursor fields with object-local timing inputs before emitting the 0x884000 command sequence.")
+label(0x000466b0, "geometry_profile_timing_dual_buffer_emit",
+      "Final profile timing emitter variant; derives scaled timing from the active object and writes paired values through the 0x804000 geometry buffer path.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1230,6 +1234,8 @@ ensure_function(0x00045380, "geometry_profile_timing_hardware_emit_variant_b", 0
 ensure_function(0x00045680, "geometry_profile_timing_hardware_emit_variant_c", 0x00045c2c)
 ensure_function(0x00045c30, "geometry_profile_timing_hardware_emit_variant_d", 0x00045f4c)
 ensure_function(0x00045f50, "geometry_profile_timing_hardware_emit_variant_e", 0x0004647c)
+ensure_function(0x00046480, "geometry_profile_timing_hardware_emit_variant_f", 0x000466a4)
+ensure_function(0x000466b0, "geometry_profile_timing_dual_buffer_emit", 0x00046930)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

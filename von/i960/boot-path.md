@@ -2115,6 +2115,13 @@ not shared fall-through code: each has its own scaling constants and returns at
 `0x45378`, `0x4567c`, `0x45c28`, `0x45f48`, and `0x46474`, while retaining the
 common `0x884000` command stream and `0x51bb00`-series profile outputs.
 
+The remaining two mode targets are `0x46480` and `0x466b0`.  The former is a
+sixth `0x884000` timing emitter that incorporates object-local timing inputs;
+the latter switches to the paired `0x804000` geometry-buffer path while still
+deriving its values from the shared profile state.  Their returns at `0x46474`,
+`0x466a0`, and `0x4692c` confirm the final two standalone variants and the
+boundary before the next subsystem.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
