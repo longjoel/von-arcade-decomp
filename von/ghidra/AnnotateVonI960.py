@@ -471,6 +471,12 @@ label(0x000419c0, "geometry_object_motion_packet_variant_f",
       "Framed command-5/18/19/21 emitter with fixed-point interpolation and the shared 0x804000 submission sequence.")
 label(0x00041c50, "geometry_object_packet_dispatch_table",
       "Indirect dispatch table selecting the recovered object packet and motion variants for the active record state.")
+label(0x00041cb0, "geometry_object_packet_batch_emit",
+      "Walks the active object packet inputs, applies fixed-point interpolation, emits command 0x202/0x804000 geometry records, and copies the final transformed fields.")
+label(0x00041f20, "geometry_runtime_packet_dispatch",
+      "Dispatches the 23-entry runtime record pool through the 0x41c50 handler table, then scans the larger pool and emits active command-5/7/9 records.")
+label(0x00042320, "geometry_runtime_buffer_record_store",
+      "Selects one of the two runtime output buffers, computes its 16-byte record index, and stores the seven caller words.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1117,6 +1123,9 @@ ensure_function(0x000414b0, "geometry_object_motion_packet_variant_c", 0x0004162
 ensure_function(0x00041620, "geometry_object_motion_packet_variant_d", 0x00041800)
 ensure_function(0x00041800, "geometry_object_motion_packet_variant_e", 0x000419c0)
 ensure_function(0x000419c0, "geometry_object_motion_packet_variant_f", 0x00041c50)
+ensure_function(0x00041cb0, "geometry_object_packet_batch_emit", 0x00041f20)
+ensure_function(0x00041f20, "geometry_runtime_packet_dispatch", 0x00042320)
+ensure_function(0x00042320, "geometry_runtime_buffer_record_store", 0x000423a0)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

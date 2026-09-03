@@ -2029,6 +2029,16 @@ returns at `0x417f0` and `0x419b0`, followed by the `0x419c0` entry, confirm
 that the table is an indirect selector over distinct handlers rather than a
 single linear routine.
 
+The table’s shared execution path begins at `0x41cb0`.  This batch emitter
+walks seven object inputs, performs fixed-point interpolation, emits the
+`0x202`/`0x804000` geometry records, and copies the transformed tail back into
+the caller object before returning at `0x41f1c`.  The framed dispatcher at
+`0x41f20` then walks the 23-entry `0x51ad10` pool through `0x41c50`, scans the
+larger `0x51b070` pool, and emits active command-5/7/9 records; it returns at
+`0x42310`.  `0x42320` is a separate two-buffer output-record store ending at
+`0x42394`, selecting between `0x51b5b0` and `0x51b850` and writing seven
+caller-provided words into the indexed 16-byte record.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
