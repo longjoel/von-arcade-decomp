@@ -16,6 +16,8 @@ typedef unsigned char u8;
 #define TILE_RAM          ((volatile u16 *)0x01000000)
 #define TILE_CONTROL      (*(volatile u32 *)0x01800000)
 #define VIDEO_STATE       ((volatile u16 *)0x00504d24)
+#define PALETTE_RAM       ((volatile u16 *)0x01800000U)
+#define COLORXLAT_RAM     ((volatile u16 *)0x01810000U)
 
 static const u32 VIDEO_CLEAR_ADDRESSES[4] = {
     0x01000000U, 0x0100c000U, 0x01008000U, 0x0100a000U
@@ -238,6 +240,32 @@ void recovered_text_font_asset_initialize(void)
         (volatile u16 *)0x01081000U,
         (volatile const u16 *)0x02e21a74U,
         0x18800U);
+}
+
+/* Initial palette words observed at the start of the original-ROM trace.
+ * The repeated 16-word block is the text/bootstrap palette used by the
+ * first visible attract diagnostics. */
+void recovered_text_palette_initialize(void)
+{
+    static const u16 bootstrap_palette[16] = {
+        0x0000U, 0x0100U, 0x11e0U, 0x22e0U,
+        0x37e0U, 0x0089U, 0x0150U, 0x0237U,
+        0x031fU, 0x7fffU, 0x7fffU, 0x7fffU,
+        0x7fffU, 0x7fffU, 0x7fffU, 0x7fffU,
+    };
+    u32 plane;
+    u32 value;
+
+    for (plane = 1U; plane <= 3U; ++plane)
+        for (value = 0U; value < 16U; ++value)
+            PALETTE_RAM[plane * 16U + value] = bootstrap_palette[value];
+
+    /* The trace's color-translation tables are monotonic lookup tables. Use
+     * their recovered 5-bit input domain to seed the bootstrap colors. */
+    for (plane = 0U; plane < 3U; ++plane)
+        for (value = 0U; value < 32U; ++value)
+            COLORXLAT_RAM[(plane * 0x2000U / 2U) + 0x40U + value * 0x100U]
+                = (u16)(value * 8U);
 }
 
 /*
