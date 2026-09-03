@@ -326,6 +326,14 @@ label(0x000371e0, "geometry_object_runtime_update",
       "Advances one runtime object through fixed-point motion, phase predicates, and callback/state transitions.")
 label(0x00037f50, "geometry_object_runtime_motion_continuation",
       "Continuation-style motion handler; clamps the signed fixed-point coordinate and publishes the selected geometry result.")
+label(0x00038340, "geometry_object_resource_motion_variant_a",
+      "Consumes the first resource-profile table entry and publishes the object result/phase update.")
+label(0x00038490, "geometry_object_resource_motion_variant_b",
+      "Parallel resource-profile motion path using the second table entry and timing window.")
+label(0x000385f0, "geometry_object_resource_motion_variant_c",
+      "Resource-profile motion path that resets the object phase on completion and returns through a continuation.")
+label(0x000386c0, "geometry_object_resource_motion_variant_d",
+      "Advances the secondary object motion coordinate and applies the corresponding result resource.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -915,6 +923,10 @@ ensure_function(0x00036f90, "geometry_object_profile_transition_variant_c", 0x00
 ensure_function(0x00037060, "geometry_object_profile_transition_variant_d", 0x00037130)
 ensure_function(0x000371e0, "geometry_object_runtime_update", 0x00037f50)
 ensure_function(0x00037f50, "geometry_object_runtime_motion_continuation", 0x000382e0)
+ensure_function(0x00038340, "geometry_object_resource_motion_variant_a", 0x00038490)
+ensure_function(0x00038490, "geometry_object_resource_motion_variant_b", 0x000385f0)
+ensure_function(0x000385f0, "geometry_object_resource_motion_variant_c", 0x000386c0)
+ensure_function(0x000386c0, "geometry_object_resource_motion_variant_d", 0x000388f0)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

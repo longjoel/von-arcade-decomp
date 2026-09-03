@@ -1836,6 +1836,14 @@ resource pointer/value through `0x51acfc`/`0x51ad00`.  Its branches return via
 the caller-supplied address in `g2` at `0x380c8`, `0x381b4`, `0x38218`,
 `0x3826c`, and `0x382dc`, followed by the routine boundary at `0x382e0`.
 
+The table at `0x382f0` is a resource-profile table indexed by object field
+`0x188`; its first four executable consumers are bounded at `0x38340`,
+`0x38490`, `0x385f0`, and `0x386c0`.  These siblings load profile-dependent
+timing values, advance phase fields `0x17a`/`0x17e`, and publish the selected
+resource and fixed-point result through `0x51acfc`/`0x51ad00`.  Their exact
+returns are `0x38484`, `0x385e0`, `0x386b4`, and `0x388e4`, after which the
+next distinct entry begins at `0x388f0`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
