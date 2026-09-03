@@ -43,6 +43,12 @@ latest value is not sufficient evidence for the complete match transform
 sequence. The polygon decoder oracle is therefore promoted; the `0x6f6f0`
 numeric transform contract remains conservative.
 
+The same report correlates object identity without assigning semantic model
+names: all 109 post-start OBAs have exactly one stable `tpa`/`tha` pair, and
+the busiest OBA is submitted 1,785 times. This supports treating the three
+trace pointers as a stable object-record submission tuple at the
+`0x2b430` boundary; it does not by itself identify the record's game role.
+
 The retained `drone0` 45-second geometry trace is a separate machine-select
 capture: its Lua log contains the coin event but no START event. It still adds
 a useful C boundary check, with 684 unique polygon-ROM objects, all using

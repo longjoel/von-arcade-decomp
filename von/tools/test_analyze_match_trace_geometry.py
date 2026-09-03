@@ -21,6 +21,9 @@ with tempfile.TemporaryDirectory(prefix="von-match-trace-") as directory:
 
 assert result["post_start_objects"] == 2
 assert result["post_start_unique_oba"] == 2
+assert result["oba_with_stable_tpa_tha"] == 2
+assert result["oba_with_multiple_tpa_tha"] == 0
+assert result["maximum_submissions_per_oba"] == 1
 assert result["post_start_matrices"] == 1
 assert result["post_start_objects_with_latest_matrix"] == 2
 assert result["matrix_stream_saturated"] is True

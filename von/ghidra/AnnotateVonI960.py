@@ -163,7 +163,7 @@ label(0x00029738, "geometry_pointer_table_initialize")
 label(0x00029778, "geometry_pointer_table_initialize_alt")
 label(0x00029d50, "geometry_tile_buffer_transform")
 label(0x0002b430, "geometry_object_record_dispatch",
-      "Match capture confirms repeated polygon-ROM object submission through the 0x00800101 command class; this routine indexes the 0x51c5b0 record table, dispatches each record, and increments its per-slot count.")
+      "Match capture confirms repeated polygon-ROM object submission through the 0x00800101 command class; this routine indexes the 0x51c5b0 record table, dispatches each record, and increments its per-slot count. In the verified post-start window, all 109 observed OBAs retain one stable tpa/tha pair; this supports a stable submission tuple without assigning semantic model names.")
 label(0x0002be30, "geometry_frame_service_initialize",
       "Post-start original-ROM capture reaches this frame-service path before sustained match geometry; initialization emits the 8/16 FIFO prefix and dispatches the twelve frame-service arms.")
 label(0x0002d9a0, "geometry_transform_dispatch")

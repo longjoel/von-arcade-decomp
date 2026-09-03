@@ -20,6 +20,8 @@ def summarize(trace: Path, start_time: float, matrix_limit: int | None) -> dict[
     opcodes: Counter[str] = Counter()
     timestamps: Counter[str] = Counter()
     obas: set[str] = set()
+    identity_pairs: dict[str, set[tuple[str, str]]] = {}
+    submissions: Counter[str] = Counter()
     matrices: set[tuple[float, ...]] = set()
     first_time = last_time = None
     for line in trace.read_text().splitlines():
@@ -42,12 +44,18 @@ def summarize(trace: Path, start_time: float, matrix_limit: int | None) -> dict[
         opcodes[match[8] or "<absent>"] += 1
         timestamps[f"{time:.6f}"] += 1
         obas.add(match[4])
+        identity_pairs.setdefault(match[4], set()).add((match[2], match[3]))
+        submissions[match[4]] += 1
+    multi_identity_obas = sum(len(pairs) > 1 for pairs in identity_pairs.values())
     return {
         "trace": str(trace),
         "start_time": start_time,
         "post_start_time_range": [first_time, last_time],
         "post_start_objects": object_count,
         "post_start_unique_oba": len(obas),
+        "oba_with_stable_tpa_tha": sum(len(pairs) == 1 for pairs in identity_pairs.values()),
+        "oba_with_multiple_tpa_tha": multi_identity_obas,
+        "maximum_submissions_per_oba": max(submissions.values(), default=0),
         "post_start_objects_with_latest_matrix": attached,
         "post_start_matrices": len(matrices),
         "total_matrix_events": matrix_count,
