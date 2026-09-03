@@ -2240,6 +2240,14 @@ progress arm at `0x4edf8`/`0x4ee18`, and the later arms at `0x4eefc`,
 `0x4efa0`, and `0x4f018`, with the aligned `0x4f01c` boundary ending the
 parent handler.
 
+The next data-table entries are `0x53050` and `0x53280`.  The former uses the
+paired `0x472f0`/`0x472f4` records and finishes its profile/status transition at
+`0x53278`.  The latter is a caller-link phase dispatcher over
+`0x47350`/`0x47354`; it publishes the shared cursor fields, applies the phase
+completion flag checks, and returns at `0x534bc`/`0x534c0`.  The aligned
+`0x5327c` and `0x534c4` boundaries keep these handlers separate from the next
+state-transition routines.
+
 Two further phase-transition helpers begin at `0x4f020` and `0x4f1f0`.
 The first uses paired records at `0x46ea0`/`0x46ea4`, while the second uses
 `0x46f00`/`0x46f04`; both advance `0x17a`, publish the shared cursor fields,
