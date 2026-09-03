@@ -370,6 +370,8 @@ label(0x0002b810, "startup_status_arm_text_asset_reset")
 label(0x0002b870, "startup_status_arm_progress_text")
 label(0x0002dc50, "startup_status_arm_geometry_init")
 label(0x0002dd30, "startup_status_arm_geometry_build")
+label(0x0002ded0, "startup_status_arm_geometry_frame_service",
+      "Advances geometry frame/service state, submits both record workspaces, and refreshes the text/status plane.")
 label(0x000e3ab0, "startup_status_arm_device_state_cycle")
 label(0x000e3d00, "startup_status_arm_score_render")
 ensure_function(0x0002b500, "startup_status_arm_video_reset", 0x0002b54c)
@@ -381,6 +383,7 @@ ensure_function(0x0002b810, "startup_status_arm_text_asset_reset", 0x0002b864)
 ensure_function(0x0002b870, "startup_status_arm_progress_text", 0x0002b934)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
+ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
 ensure_function(0x000e3ab0, "startup_status_arm_device_state_cycle", 0x000e3b2c)
 
 # Trace-confirmed call sites inside the system-setup helper.

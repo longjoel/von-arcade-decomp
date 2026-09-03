@@ -287,6 +287,23 @@ the geometry pipeline and text/status service helpers. This is a recovered
 pipeline contract from the original listing, not a reconstructed C
 replacement.
 
+The `0x2ded0` arm is the frame-service continuation for that workspace. It
+advances the bounded counter at `0x51ab04` while comparing the frame/timing
+fields at `0x503ca0` and `0x5042a0`; when the counter expires it calls
+`0x2a870` and advances `0x503a00`. It then advances `0x51aaec`, invokes the
+frame-service initializer at `0x2be30`, submits two command records through
+`0x6fec0`, and runs the object/transform services at `0x9b308`, `0x9c050`,
+`0xde990`, `0xdf070`, and `0x41f20`.
+
+The tail conditionally commits the paired workspaces through `0x77de0` and
+`0x77e20`, updates the second record at `0x5040d0`, and checks the device
+status byte at `0x1d00026`. It masks `0x51aaec` by `0x870` and compares the
+result with `0x437`; the accepted path scans six `0x5024f4`-relative words,
+then selects patterned or cleared text through `0x1ef70`. The routine ends
+by passing the service counter to `0xe5d30`. This bounds the arm as a
+geometry/frame-service phase with a text-status tail, rather than a simple
+counter increment.
+
 Three of those arms are now bounded from the original listing. `0x2b500`
 resets the video/text context, writes the high-bit text command, increments
 the status counter, invokes two geometry-side helpers, and clears the pending
