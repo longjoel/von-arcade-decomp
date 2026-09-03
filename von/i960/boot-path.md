@@ -1687,6 +1687,11 @@ credit/coin updates at `0xf2a60–0xf2bc0`, input-byte updates at `0xf2c20` and
 returns before the next table/data boundary, making these indirect paths
 available for per-state tracing.
 
+Two shared renderers feed those arms: `0xf2170` formats coin-chute type and
+credit/manual settings through its return at `0xf22e0`, while `0xf2770`
+formats the live coin/input matrix and multipliers through its return at
+`0xf2930`.
+
 The statistics renderer at `0xf33a0` reads the `0x1d00040–0x1d000a0`
 accounting fields and formats game-time/bookkeeping results, returning at
 `0xf3a64`. The EEPROM confirmation service at `0xf3ab0` displays the clear /

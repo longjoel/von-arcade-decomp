@@ -634,6 +634,10 @@ label(0x000f2d00, "diagnostic_bookkeeping_arm_coin_chute_a",
       "Updates the first coin-chute bookkeeping counter at 0x1d00030.")
 label(0x000f2d70, "diagnostic_bookkeeping_arm_coin_chute_b",
       "Updates the second coin-chute bookkeeping counter at 0x1d00032.")
+label(0x000f2170, "diagnostic_coin_settings_render",
+      "Renders the coin-chute type, credit-to-start, and manual coin/credit settings.")
+label(0x000f2770, "diagnostic_coin_input_matrix_render",
+      "Renders the coin/input matrix and multiplier values from the live diagnostic input bytes.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -784,6 +788,8 @@ ensure_function(0x000f2c20, "diagnostic_bookkeeping_arm_input_a", 0x000f2c90)
 ensure_function(0x000f2c90, "diagnostic_bookkeeping_arm_input_b", 0x000f2d00)
 ensure_function(0x000f2d00, "diagnostic_bookkeeping_arm_coin_chute_a", 0x000f2d70)
 ensure_function(0x000f2d70, "diagnostic_bookkeeping_arm_coin_chute_b", 0x000f2de0)
+ensure_function(0x000f2170, "diagnostic_coin_settings_render", 0x000f22f0)
+ensure_function(0x000f2770, "diagnostic_coin_input_matrix_render", 0x000f2940)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
