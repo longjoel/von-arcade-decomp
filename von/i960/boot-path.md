@@ -2146,6 +2146,14 @@ mode-dependent status identifiers through the existing text/status service.
 Its normal and alternate exits at `0x4b560` and `0x4b5f0` delimit it from the
 following runtime state routine.
 
+The runtime event-progress routine at `0x4b600` mirrors the preceding event
+handler for the alternate profile range: it advances phase progress, selects
+descriptor records, updates the shared cursor fields, resets object state at
+range completion, and emits the corresponding status events.  It returns at
+`0x4b934`.  Two cursor-transition siblings follow at `0x4b940` and `0x4bb10`,
+using descriptor records at `0x46a90` and `0x46af0`; their returns at
+`0x4bb00` and `0x4bcd8` delimit the paired handlers.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
