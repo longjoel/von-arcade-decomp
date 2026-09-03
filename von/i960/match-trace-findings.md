@@ -75,6 +75,20 @@ MAME checkout contains substantial uncommitted diagnostic/SHARC changes, so
 this difference is treated as a harness-reproduction issue until a clean-base
 geometry build is tested; it is not attributed to the recovered i960 C.
 
+That clean-base control has now been run. A detached worktree at the pinned
+MAME commit `569c5e9d4534cb244ff67ebbdb5f9fe69a465318`, with the geometry
+patches plus their SHARC-tracing dependency, reaches the pre-match scene with
+the same original ROMs and scheduled inputs. Its trace is
+`von/build/disasm/vonj-clean-base-45s.trace` (SHA-256
+`cbe5e9ba1707052c3b39ab7dcc78ca5a83f3b88bfb641cbb291ef22a92d1d5f8`). The
+post-start two-second analysis window contains 11,611 polygon-ROM object
+submissions, 8,762 matrix events, and all `0x00800101` opcodes; the matrix
+stream is not saturated. This confirms the earlier stall is caused by the
+dirty MAME runtime source/patch state, while also showing that object
+populations and pointer-pair stability can vary with the exact capture build
+and window. The clean trace is a control, not a replacement for the verified
+45-second match capture.
+
 ## C pipeline consequence
 
 `recovered_polygon_rom_decode()` already models the observed OBA convention:
