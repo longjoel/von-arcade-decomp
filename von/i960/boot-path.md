@@ -271,6 +271,24 @@ workspace path; `0xe3ab0` updates the device-dependent status state; and
 are now labeled as indirect targets, with semantics deferred until their
 trace PCs and complete slices are correlated.
 
+Three of those arms are now bounded from the original listing. `0x2b500`
+resets the video/text context, writes the high-bit text command, increments
+the status counter, invokes two geometry-side helpers, and clears the pending
+workspace fields at `0x51aac4` and `0x503aac`. `0x2b550` saves its register
+context, clears the video state, initializes a record at `0x51c5b0 +
+index*0x54` from ROM constants at `0x2aa80`, advances `0x503a00`, and queues
+the associated status strings. `0x2b660` drains the pending workspace through
+`0x6fb90`, emits selector `16` to `0x884000`, and calls the object/service
+dispatcher at `0x2b430`.
+
+The device-state arm at `0xe3ab0` is a three-state cycle. If device byte
+`0x1d00026` is zero it advances `0x503a00` by `2`; otherwise it wraps the
+state at `0x5783b4` into `0..2`, dispatches to `0xe3dc0`, `0xe3f30`, or
+`0xe3b70`, then increments the stored state. The state-0 path clears the
+status tile region, seeds the text asset at `0x578410`, and emits the fixed
+status strings visible in the listing. These are concrete service effects;
+the user-facing state names remain unresolved.
+
 ### Geometry arithmetic and packet constants
 
 The next compact slices expose additional values without requiring a guessed

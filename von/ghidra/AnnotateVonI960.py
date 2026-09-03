@@ -361,6 +361,16 @@ label(0x0002b9d4, "startup_status_dispatch_arm_29")
 label(0x0002b9d8, "startup_status_dispatch_arm_30")
 label(0x0002b9dc, "startup_status_dispatch_arm_31")
 
+label(0x0002b500, "startup_status_arm_video_reset")
+label(0x0002b550, "startup_status_arm_geometry_workspace")
+label(0x0002b660, "startup_status_arm_geometry_service")
+label(0x000e3ab0, "startup_status_arm_device_state_cycle")
+label(0x000e3d00, "startup_status_arm_score_render")
+ensure_function(0x0002b500, "startup_status_arm_video_reset", 0x0002b54c)
+ensure_function(0x0002b550, "startup_status_arm_geometry_workspace", 0x0002b65c)
+ensure_function(0x0002b660, "startup_status_arm_geometry_service", 0x0002b6f4)
+ensure_function(0x000e3ab0, "startup_status_arm_device_state_cycle", 0x000e3b2c)
+
 # Trace-confirmed call sites inside the system-setup helper.
 label(0x00018960, "startup_call_io_self_test")
 label(0x00018968, "startup_call_video_bootstrap")
