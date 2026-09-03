@@ -18,6 +18,11 @@ static const unsigned char TEXT_GEO_STATUS[] = "Downloading GEO prog   ... Done"
 static const unsigned char TEXT_TEXTURE_STATUS[] = "Loading Texture  Bank0 ... Done";
 static const unsigned char TEXT_BANK1_STATUS[] = "Loading Texture  Bank1 ... Done";
 static const unsigned char TEXT_INSERT_COIN[] = "INSERT COIN(S)";
+static const unsigned char TEXT_MACHINE_SELECT[] = "MACHINE SELECT";
+static const unsigned char TEXT_MECH_NAME[] = "VR.TEMJIN";
+static const unsigned char TEXT_WEAPON_RIFLE[] = "BEAM RIFLE";
+static const unsigned char TEXT_WEAPON_BOMB[] = "BOMB";
+static const unsigned char TEXT_WEAPON_SWORD[] = "BEAM SWORD";
 
 #define WORKRAM ((volatile u32 *)0x00500000)
 
@@ -36,6 +41,21 @@ void recovered_texture_initializer(void);
 int recovered_texture_loader_profile_setup(void);
 void recovered_text_set_position(u32 column, u32 row);
 void recovered_text_write_string(volatile const unsigned char *text);
+
+static void recovered_render_mech_select(void)
+{
+    recovered_text_video_initialize();
+    recovered_text_set_position(16U, 30U);
+    recovered_text_write_string(TEXT_MACHINE_SELECT);
+    recovered_text_set_position(8U, 16U);
+    recovered_text_write_string(TEXT_MECH_NAME);
+    recovered_text_set_position(8U, 20U);
+    recovered_text_write_string(TEXT_WEAPON_RIFLE);
+    recovered_text_set_position(8U, 21U);
+    recovered_text_write_string(TEXT_WEAPON_BOMB);
+    recovered_text_set_position(8U, 22U);
+    recovered_text_write_string(TEXT_WEAPON_SWORD);
+}
 
 void i960_reconstructed_main(void)
 {
@@ -85,10 +105,19 @@ void i960_reconstructed_main(void)
     state[3] = 0x47454f30UL; /* GEO0 */
     state[6] = 0;
     state[4] = 0x494e4954UL; /* INIT */
+    state[9] = 0U; /* timed attract presentation has not yet fired */
 
     for (;;) {
         recovered_io_service();
         recovered_audio_service_pending();
         state[5] = state[5] + 1;
+        /* The reconstructed host has no vblank callback in this development
+         * image. The captured loader loop advances at roughly 400 iterations
+         * per frame, so use a bounded heartbeat threshold to expose the next
+         * recovered attract boundary without depending on coin polarity. */
+        if (state[9] == 0U && state[5] >= 360000U) {
+            recovered_render_mech_select();
+            state[9] = 1U;
+        }
     }
 }
