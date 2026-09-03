@@ -17,6 +17,7 @@ static const unsigned char TEXT_COPRO_STATUS[] = "Downloading COPRO prog ... Don
 static const unsigned char TEXT_GEO_STATUS[] = "Downloading GEO prog   ... Done";
 static const unsigned char TEXT_TEXTURE_STATUS[] = "Loading Texture  Bank0 ... Done";
 static const unsigned char TEXT_BANK1_STATUS[] = "Loading Texture  Bank1 ... Done";
+static const unsigned char TEXT_INSERT_COIN[] = "INSERT COIN(S)";
 
 #define WORKRAM ((volatile u32 *)0x00500000)
 
@@ -76,6 +77,11 @@ void i960_reconstructed_main(void)
     recovered_text_write_string(TEXT_TEXTURE_STATUS);
     recovered_text_set_position(8U, 15U);
     recovered_text_write_string(TEXT_BANK1_STATUS);
+    /* The recovered 0x1f470 attract arm selects this message after the
+     * startup loader handoff. Keep the known text path live while the full
+     * menu/object scheduler is integrated. */
+    recovered_text_set_position(24U, 31U);
+    recovered_text_write_string(TEXT_INSERT_COIN);
     state[3] = 0x47454f30UL; /* GEO0 */
     state[6] = 0;
     state[4] = 0x494e4954UL; /* INIT */
