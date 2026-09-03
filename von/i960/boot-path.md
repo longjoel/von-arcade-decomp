@@ -1649,6 +1649,10 @@ The next diagnostic block, `0xed970–0xeda28`, contains the Versus City
 billboard and winner-lamp/7-segment/start-lamp labels. The renderer at
 `0xeda30` advances its test state, emits the corresponding lamp and segment
 patterns through the shared test-pattern helper, and returns at `0xedcf8`.
+The following data is diagnostic naming metadata: indexed `SDE_*` event-name
+records begin at `0xedd20`, while the `SDB_*` record family begins at
+`0xeff60`. Their indexed prefix and terminated ASCII names should be treated
+as lookup data rather than i960 instructions.
 
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through

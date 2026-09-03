@@ -582,6 +582,10 @@ label(0x000ed970, "diagnostic_billboard_test_strings",
       "Literal Versus City billboard, winner-lamp, 7-segment, and start-lamp test strings.")
 label(0x000eda30, "diagnostic_billboard_test_render",
       "Runs the billboard and lamp-test state machine, rendering test patterns and advancing its state.")
+label(0x000edd20, "diagnostic_sde_name_records",
+      "Indexed SDE diagnostic event-name records used by the runtime trace/debug services.")
+label(0x000eff60, "diagnostic_sdb_name_records",
+      "Indexed SDB diagnostic event-name records used by the runtime trace/debug services.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
