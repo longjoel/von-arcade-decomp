@@ -181,6 +181,11 @@ and `0x2ece0`. Each follows the same object-field and `0x884000` packet
 skeleton, selects a distinct callback slot, and returns before the next
 variant; the final variant returns at `0x2ef80`.
 
+The following state dispatcher at `0x2ef90` selects one of four callbacks
+from the object field at offset `0x174` and returns before `0x2f010`. Motion
+variant `0x2f010` updates the object/frame fields and returns through its
+continuation at `0x2f258`; parallel variant `0x2f260` returns at `0x2f35c`.
+
 The transform route at `0x2d9a0` is now bounded through its return at
 `0x2dc40`. It emits the `0x884000` packet and stores derived frame values in
 `0x51aad0–0x51aae4`; the following initializer begins at `0x2dc50`.
