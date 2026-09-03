@@ -289,6 +289,21 @@ status tile region, seeds the text asset at `0x578410`, and emits the fixed
 status strings visible in the listing. These are concrete service effects;
 the user-facing state names remain unresolved.
 
+The next two compact arms are timing wrappers. `0x2b7b0` adds `2` to
+`0x503a00`, then branches through its local return stub at `0x2b7d8`.
+`0x2b7e0` does the same with an increment of `1`, returning through
+`0x2b808`. These are genuine handlers, not table padding; their local
+`lda`/`bx` shape is the compiler’s indirect continuation idiom.
+
+The adjacent `0x2b810` arm increments the service counter, clears the video
+context, emits command `0x7fff`, sets the text-plane attribute bits, copies a
+fixed asset through `0x1f060`, clears `0x503a04`, and returns. `0x2b870`
+converts the progress counter at `0x503a04` into a text-plane coordinate at
+`0x504d28`, selects status messages through `0x2a5f0`, and advances the main
+service counter when the progress reaches the terminal boundary. This gives
+us the first direct bridge from the status subtable to the visible startup
+text path.
+
 ### Geometry arithmetic and packet constants
 
 The next compact slices expose additional values without requiring a guessed
