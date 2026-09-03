@@ -1937,6 +1937,15 @@ recovered resource handlers: `0x37f50`, `0x38340`, `0x38490`, `0x385f0`,
 handlers are consumers of the central scene update dispatch rather than an
 unrelated linear code island.
 
+Immediately after the table, `0x3d540` is a shared fixed-point clamp helper.
+Its branch at `0x3d558` enters the second half of the same routine; all
+bounded exits are the returns at `0x3d570`, `0x3d5a8`, and `0x3d5c8`.
+The following `0x3d5d0` routine initializes the shared geometry service state:
+it clears the `0x51ab3c`/`0x51ab40` counters, the `0x51acxx` cursors and
+flags, resets the object service fields, and selects the active profile-table
+roots at `0x51ace8`–`0x51acf4`.  It returns at `0x3d728`; `0x3d730` begins
+the next object-record initialization path.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
