@@ -626,6 +626,9 @@ label(0x00077e60, "action_jump_dispatch",
       "Uses a 44-entry jump table at 0x77e7c; selectors at or above 44 fall back to 0x78084, with table targets spanning 0x77f2c through 0x7807c.")
 label(0x000e2330, "video_dispatch_prefix",
       "Treats dispatch state 0xff as no-op, values above 0x81 as default, and other values as table indices; bank-A special case uses geometry mode 0 or mode 2/palette 1/gate 0/equal board and palette values.")
+ensure_function(0x000e2330, "video_dispatch_prefix", 0x000e23b4)
+label(0x000e23b4, "video_dispatch_table",
+      "Dispatch targets indexed by the normalized status value in g4; entries route into the asset expansion arms below.")
 label(0x000e25bc, "video_dispatch_arm0",
       "Emits four entries: tiles 11,21,23,25 from sources 0x2fb75d0, 0x2fb5b90, 0x2fb5c50, 0x2fb5d10.")
 label(0x000e2600, "video_dispatch_arm1",
