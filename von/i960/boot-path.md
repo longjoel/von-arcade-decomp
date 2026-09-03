@@ -1490,6 +1490,14 @@ loop resolves those scores into an eight-entry work array before rendering
 machine names and counts. It returns at `0xe4188`, after advancing the shared
 status counter.
 
+The next startup preparation pair begins at `0xe4250` and `0xe4720`.
+Both paths build compact runtime records from the machine/status data at
+`0x578410`/`0x578460`, initialize the shared workspace and queue state, and
+return the saved register context. Their short early exits at `0xe4700` and
+`0xe4abc` only set service state `26`. The four adjacent alphabet tables at
+`0xe4190`, `0xe41c0`, `0xe41f0`, and `0xe4220` are literal machine-name
+character maps used by this status subsystem.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
