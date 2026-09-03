@@ -2577,6 +2577,17 @@ they end at `0x5ef94` and `0x5f24c`.  Two parallel record-backed transitions
 follow at `0x5f250` (`0x484f0`, ending `0x5f584`) and `0x5f590` (`0x484c0`,
 ending `0x5f750`).
 
+The callback-based family continues with `0x5f930` and `0x5f9f0`, using the
+`0x48500` and `0x48508` record pairs and returning at `0x5f9ec` and `0x5fac0`.
+The short phase controllers at `0x5fad0` and `0x5fb80` use `0x486e0` and
+`0x486e8`, ending at `0x5fb78` and `0x5fc24`.  Their neighboring transitions
+at `0x5fc30` and `0x5fcf0` use `0x486d0` and `0x486d8`, ending at `0x5fcec`
+and `0x5fdac`.
+
+The larger indexed controller at `0x5fdb0` uses the paired `0x48510`/`0x48514`
+records, applies phase/status gates and geometry correction, then returns
+through its callback at `0x6004c`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

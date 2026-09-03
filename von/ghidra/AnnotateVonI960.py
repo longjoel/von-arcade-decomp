@@ -865,6 +865,20 @@ label(0x0005f250, "geometry_object_profile_phase_transition_variant_ae",
       "Profile phase transition using the 0x484f0 record pair, shared cursor publication, object-state reset, and geometry setup at the terminal phase.")
 label(0x0005f590, "geometry_object_profile_phase_transition_variant_af",
       "Profile phase transition using the 0x484c0 record pair, shared cursor publication, phase/status handling, and terminal geometry setup.")
+label(0x0005f930, "geometry_object_profile_phase_controller_variant_h",
+      "Callback-returning profile phase controller using the 0x48500 record pair, phase transition thresholds, and terminal object-state setup.")
+label(0x0005f9f0, "geometry_object_profile_phase_controller_variant_i",
+      "Callback-returning profile phase controller using the 0x48508 record pair and the short phase-to-state transition path.")
+label(0x0005fad0, "geometry_object_profile_phase_controller_variant_j",
+      "Callback-returning profile phase controller using the 0x486e0 record pair, advancing the phase and entering the next object state.")
+label(0x0005fb80, "geometry_object_profile_phase_controller_variant_k",
+      "Callback-returning profile phase controller using the 0x486e8 record pair, with the short threshold and next-state reset path.")
+label(0x0005fc30, "geometry_object_profile_phase_transition_variant_ag",
+      "Profile phase transition using the 0x486d0 record pair, advancing the phase and selecting the terminal state by mode.")
+label(0x0005fcf0, "geometry_object_profile_phase_transition_variant_ah",
+      "Profile phase transition using the 0x486d8 record pair, advancing the phase and selecting the terminal state by mode.")
+label(0x0005fdb0, "geometry_object_profile_indexed_phase_controller_variant_b",
+      "Large callback-returning indexed phase controller using the paired 0x48510/0x48514 records, object geometry correction, phase/status gates, and terminal reset handling.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1698,6 +1712,13 @@ ensure_function(0x0005ecc0, "geometry_object_profile_phase_transition_variant_ac
 ensure_function(0x0005efa0, "geometry_object_profile_phase_transition_variant_ad", 0x0005f24c)
 ensure_function(0x0005f250, "geometry_object_profile_phase_transition_variant_ae", 0x0005f584)
 ensure_function(0x0005f590, "geometry_object_profile_phase_transition_variant_af", 0x0005f750)
+ensure_function(0x0005f930, "geometry_object_profile_phase_controller_variant_h", 0x0005f9ec)
+ensure_function(0x0005f9f0, "geometry_object_profile_phase_controller_variant_i", 0x0005fac0)
+ensure_function(0x0005fad0, "geometry_object_profile_phase_controller_variant_j", 0x0005fb78)
+ensure_function(0x0005fb80, "geometry_object_profile_phase_controller_variant_k", 0x0005fc24)
+ensure_function(0x0005fc30, "geometry_object_profile_phase_transition_variant_ag", 0x0005fcec)
+ensure_function(0x0005fcf0, "geometry_object_profile_phase_transition_variant_ah", 0x0005fdac)
+ensure_function(0x0005fdb0, "geometry_object_profile_indexed_phase_controller_variant_b", 0x0006004c)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
