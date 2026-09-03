@@ -2446,6 +2446,18 @@ derived from `0x2560bc8`, correcting object position, and ending at `0x58c3c`.
 The larger `0x58c40` sibling uses `0x478d0`/`0x478d8`, adds collision/status
 gating, and ends at `0x58ea4` after its multi-arm completion paths.
 
+The following indexed handlers continue the same profile-transition family:
+`0x58eb0` uses `0x478f0` and ends at `0x590b8`, while `0x590c0` uses the
+paired `0x47950`/`0x47954` tables and ends at `0x5936c`.  The larger driver at
+`0x59370` spans several threshold arms and ends at `0x59630`.  Its arms publish
+the same shared cursor records while moving profile state and resetting object
+status fields.
+
+At `0x59640`, the code evaluates three geometry bounds, sets per-axis collision
+flags, clamps the profile coordinates, and computes derived ratios through
+`0x59990`.  The next controller at `0x599a0` dispatches profile phases 0--3
+through the `0x47e20`/`0x47e28`/`0x47e30`/`0x47e38` records and ends at `0x59c34`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
