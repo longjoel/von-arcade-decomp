@@ -1017,6 +1017,10 @@ label(0x0006e0b0, "geometry_command_packet_writer_variant_b",
       "Structured geometry command packet writer that emits object coordinates, dimensions, and mode words to the 0x884000 FIFO.")
 label(0x0006e630, "geometry_motion_threshold_service",
       "Motion threshold service that gates phase states 10/11, selects fixed floating-point thresholds, updates motion state, and publishes the result through 0x804008/0x80400c.")
+label(0x00068550, "geometry_object_profile_geometry_bounds_flags_update_variant_f",
+      "Third parallel geometry bounds evaluator that clamps extents, applies object-record offsets, updates axis collision flags, and computes derived ratios.")
+label(0x00068770, "geometry_object_profile_phase_selection_controller_variant_b",
+      "Phase/selection controller that dispatches on state byte 0x1ae, advances object phase fields, and returns through its saved callback.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1926,6 +1930,8 @@ ensure_function(0x0006d390, "geometry_command_packet_writer_variant_a", 0x0006dc
 ensure_function(0x0006ddb0, "geometry_object_profile_phase_state_controller", 0x0006e0a4)
 ensure_function(0x0006e0b0, "geometry_command_packet_writer_variant_b", 0x0006e62c)
 ensure_function(0x0006e630, "geometry_motion_threshold_service", 0x0006e6e0)
+ensure_function(0x00068550, "geometry_object_profile_geometry_bounds_flags_update_variant_f", 0x0006876c)
+ensure_function(0x00068770, "geometry_object_profile_phase_selection_controller_variant_b", 0x00068a3c)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

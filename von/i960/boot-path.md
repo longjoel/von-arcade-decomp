@@ -2744,6 +2744,13 @@ selects the floating-point thresholds `0.4`, `0.55`, `0.9375`, or `1.0`,
 updates motion state, and publishes the resulting value through
 `0x804008`/`0x80400c`; it returns at `0x6e6e0`.
 
+The parallel bounds evaluator at `0x68550` repeats the extent clamp,
+object-offset, axis-flag, and derived-ratio sequence, returning through its
+saved callback at `0x6876c`.  The separate phase/selection controller at
+`0x68770` dispatches on state byte `0x1ae`, advances the object phase fields,
+and returns at `0x68a3c`; its `0x687b0` and `0x687e8` blocks are internal arms
+of that controller.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
