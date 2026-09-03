@@ -1791,6 +1791,17 @@ runtime record family.
 coordinates, emits the corresponding geometry command words through
 `0x884000`, and supplies the transformed value stored in object field `0x154`.
 
+The callable record services in the same cluster are now bounded separately.
+`0x6fb90–0x6fd4c` allocates and initializes a 0x54-byte geometry record from a
+template at `0x51c854`, clears its transient fields, installs association
+indices or sentinel `999`, and advances the allocation head. `0x6fd50–0x6fe6c`
+releases the two association links, redirecting to side tables when the
+record is already shared, then decrements the corresponding reference count.
+`0x6fec0–0x6ff1c` is the short device-command initializer called throughout
+the recovered object/update code: it rejects selectors outside its accepted
+range, while valid selectors program `0x800030` and the `0x804000` command
+window.
+
 The motion/update family continues through `0x2f360–0x30220`.  The aligned
 entries at `0x2f360`, `0x2f460`, `0x2f580`, `0x2f930`, `0x2fb20`, `0x2fe30`,
 `0x2ff80`, and `0x300c0` are phase-specific object state/callback handlers.
