@@ -629,6 +629,8 @@ label(0x0004ebc0, "geometry_object_profile_phase_dispatch_variant_h",
       "Compact profile phase transition using the 0x46e70 descriptor range and resetting the object phase state on completion.")
 label(0x0004ec60, "geometry_object_profile_phase_dispatch_variant_i",
       "Profile phase transition sibling using the 0x46e80/0x46e84 records and the shared cursor/status state.")
+label(0x0004ed20, "geometry_object_profile_phase_state_dispatch",
+      "Dispatches profile phase-state arms after updating the derived object coordinate, selecting mode-specific record ranges and status transitions.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1344,6 +1346,7 @@ ensure_function(0x0004ea40, "geometry_object_profile_phase_dispatch_variant_f", 
 ensure_function(0x0004eaf0, "geometry_object_profile_phase_dispatch_variant_g", 0x0004ebc0)
 ensure_function(0x0004ebc0, "geometry_object_profile_phase_dispatch_variant_h", 0x0004ec5c)
 ensure_function(0x0004ec60, "geometry_object_profile_phase_dispatch_variant_i", 0x0004ed1c)
+ensure_function(0x0004ed20, "geometry_object_profile_phase_state_dispatch", 0x0004f01c)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

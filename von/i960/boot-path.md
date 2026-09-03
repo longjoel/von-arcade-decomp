@@ -2230,6 +2230,16 @@ advances the object phase, and either returns through its caller link or resets
 the phase fields at range completion.  Their clean boundaries are the
 following aligned entries at `0x4eaec`, `0x4ebbc`, `0x4ec58`, and `0x4ed18`.
 
+The table target at `0x4ed20` is the parent phase-state dispatcher for the
+next group.  It first updates object field `0x2e` from the current offset and
+`0x184`, then switches on phase state `0x17c`.  The arms at `0x4ed80`,
+`0x4ee1c`, `0x4ef00`, and `0x4efa4` select different profile record bases and
+status transitions; they are internal paths of the same routine, not separate
+dispatch entries.  The short arms return at `0x4ed70`/`0x4ed7c`, the normal
+progress arm at `0x4edf8`/`0x4ee18`, and the later arms at `0x4eefc`,
+`0x4efa0`, and `0x4f018`, with the aligned `0x4f01c` boundary ending the
+parent handler.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
