@@ -239,6 +239,21 @@ identify a missing handler; it proves the null-entry recovery branch at
 and 8 are now explicitly seeded as indirect-call targets in the annotation
 script. Their higher-level UI meanings remain intentionally unresolved.
 
+Slot 1 (`0x2b9e0`) is a real status/service dispatcher. It first checks the
+hardware mode byte at `0x503a08` and controller/status bytes at
+`0x1d00034`, `0x5023f2`, and `0x1d00038`. One guarded path loads `29` into
+`0x503a00`; the normal path emits byte `16` to `0x5032f4`. It then masks the
+counter to five bits and dispatches through the 32-entry table at `0x2b960`.
+A null table result normally advances the counter to `1`, except for the
+special mode-2 handler at `0xe3ab0`.
+
+The mode-2 tail scans device/status data relative to `0x1a14002`, writes a
+selected byte into `0x5024f0`, and decrements through candidate entries until
+the `0xffff`-masked test succeeds. The non-mode-2 tail calls the timing/status
+helper at `0x3ba0`; when it returns zero, it resets the service counter,
+advances `0x5039f4`, and returns. This bounds slot 1 as a state/service
+dispatcher; it does not assign the meaning of the individual 32 sub-handlers.
+
 ### Geometry arithmetic and packet constants
 
 The next compact slices expose additional values without requiring a guessed

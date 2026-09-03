@@ -311,7 +311,8 @@ label(0x00018898, "startup_device_wait_or_retry")
 # entries are explicitly seeded as functions rather than left as indirect
 # call targets for Ghidra's analyzer to guess.
 label(0x00003c40, "startup_mode_handler_0")
-label(0x0002b9e0, "startup_mode_handler_1")
+label(0x0002b9e0, "startup_mode_handler_1_status_dispatch",
+      "Checks hardware/status mode, updates the startup counter, then dispatches a 32-entry service table.")
 label(0x00018650, "startup_mode_handler_2")
 label(0x000190d0, "startup_mode_handler_3")
 label(0x00019180, "startup_mode_handler_4")
@@ -320,6 +321,7 @@ label(0x000f3fe0, "startup_mode_handler_6")
 label(0x000f3d30, "startup_mode_handler_7")
 label(0x00018620, "startup_mode_handler_8_and_15")
 ensure_function(0x00003c40, "startup_mode_handler_0", 0x00003d64)
+ensure_function(0x0002b9e0, "startup_mode_handler_1_status_dispatch", 0x0002bb5c)
 ensure_function(0x00018620, "startup_mode_handler_8_and_15", 0x00018648)
 ensure_function(0x00018650, "startup_mode_handler_2", 0x00018678)
 ensure_function(0x000f3f00, "startup_mode_handler_5", 0x000f3fbc)
