@@ -2604,6 +2604,18 @@ object extents, updates the `0x1dd`/`0x1de`/`0x1df` axis flags from geometry
 and collision tests, computes derived ratios at `0x1e4`, and returns through
 the saved callback at `0x615e8`.
 
+The next multi-state controller at `0x615f0` selects from the
+`0x47a40`/`0x47a48`/`0x47a50` records, advances phase and object-state fields,
+and returns at `0x6182c`.  The indexed sibling at `0x61830` uses the
+`0x47a60` records and the object selector at `0x188`, ending at `0x61aa4`.
+
+The following transitions use the nearby record tables: `0x61ab0` uses
+`0x47ab0`/`0x47ab8`/`0x47ac0` and ends at `0x61c38`; `0x61c40` uses the
+`0x47a90`/`0x47a94` pair and ends at `0x61d50`; `0x61d60` uses `0x47ac8` and
+ends at `0x61e0c`; `0x61e10` uses `0x47ad0`/`0x47ad4` and ends at `0x61edc`;
+`0x61ee0` uses `0x47af0` and ends at `0x61f78`; and `0x61f80` uses
+`0x47b00`/`0x47b04` and ends at `0x62038`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

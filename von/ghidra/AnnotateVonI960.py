@@ -891,6 +891,22 @@ label(0x00060c60, "geometry_object_profile_indexed_transition_variant_y",
       "Indexed profile transition using the 0x485d0/0x485d4 records, phase threshold handling, cursor publication, and terminal object-state reset.")
 label(0x000611d0, "geometry_object_profile_geometry_bounds_flags_update_variant_c",
       "Geometry bounds and axis-flag evaluator that clamps the three object extents, tests collision-side conditions, computes derived ratios, and returns through a saved callback.")
+label(0x000615f0, "geometry_object_profile_state_controller_variant_a",
+      "Multi-state profile controller using the 0x47a40/0x47a48/0x47a50 records, phase and object-state transitions, and callback-based cursor publication.")
+label(0x00061830, "geometry_object_profile_state_controller_variant_b",
+      "Indexed profile state controller using the 0x47a60 records and object selector at 0x188, with phase progression and terminal state transitions.")
+label(0x00061ab0, "geometry_object_profile_phase_transition_variant_ai",
+      "Profile phase transition using the 0x47ab0/0x47ab8/0x47ac0 records, shared cursor publication, and terminal state reset handling.")
+label(0x00061c40, "geometry_object_profile_indexed_transition_variant_z",
+      "Indexed profile transition using the 0x47a90/0x47a94 records selected by object selector state, with phase progression and terminal reset handling.")
+label(0x00061d60, "geometry_object_profile_phase_transition_variant_aj",
+      "Profile phase transition using the 0x47ac8 record pair, advancing the cursor and entering the next object state at its threshold.")
+label(0x00061e10, "geometry_object_profile_indexed_transition_late_variant_a",
+      "Indexed profile transition using the 0x47ad0/0x47ad4 records selected by object state, with phase progression and terminal reset handling.")
+label(0x00061ee0, "geometry_object_profile_phase_transition_variant_ak",
+      "Profile phase transition using the 0x47af0 record pair, advancing the cursor and resetting the object phase at completion.")
+label(0x00061f80, "geometry_object_profile_indexed_transition_late_variant_b",
+      "Indexed profile transition using the 0x47b00/0x47b04 records selected by object state, with phase progression and terminal reset handling.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1737,6 +1753,14 @@ ensure_function(0x00060580, "geometry_object_profile_phase_controller_variant_m"
 ensure_function(0x00060a30, "geometry_object_profile_indexed_transition_variant_x", 0x00060ac0)
 ensure_function(0x00060c60, "geometry_object_profile_indexed_transition_variant_y", 0x00060e78)
 ensure_function(0x000611d0, "geometry_object_profile_geometry_bounds_flags_update_variant_c", 0x000615e8)
+ensure_function(0x000615f0, "geometry_object_profile_state_controller_variant_a", 0x0006182c)
+ensure_function(0x00061830, "geometry_object_profile_state_controller_variant_b", 0x00061aa4)
+ensure_function(0x00061ab0, "geometry_object_profile_phase_transition_variant_ai", 0x00061c38)
+ensure_function(0x00061c40, "geometry_object_profile_indexed_transition_variant_z", 0x00061d50)
+ensure_function(0x00061d60, "geometry_object_profile_phase_transition_variant_aj", 0x00061e0c)
+ensure_function(0x00061e10, "geometry_object_profile_indexed_transition_late_variant_a", 0x00061edc)
+ensure_function(0x00061ee0, "geometry_object_profile_phase_transition_variant_ak", 0x00061f78)
+ensure_function(0x00061f80, "geometry_object_profile_indexed_transition_late_variant_b", 0x00062038)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
