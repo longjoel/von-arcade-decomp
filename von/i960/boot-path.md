@@ -2433,6 +2433,12 @@ publish the paired cursor values, and emit the same status message on phase
 completion.  Their aligned ends are `0x58068`, `0x58118`, `0x58228`, and
 `0x58338`.
 
+The larger indexed pair at `0x58340` and `0x58690` uses the
+`0x47850`/`0x47854` and `0x47880`/`0x47884` record families.  Both publish
+paired cursor values, advance phase `0x17a`, and contain multiple status and
+reset arms within one top-level function; their aligned ends are `0x58688`
+and `0x5892c`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

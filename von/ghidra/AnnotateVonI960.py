@@ -747,6 +747,10 @@ label(0x00058120, "geometry_object_profile_indexed_transition_variant_f",
       "Indexed profile transition using qword record data at 0x47a10, shared cursor publication, and status-message completion.")
 label(0x00058230, "geometry_object_profile_indexed_transition_variant_g",
       "Indexed profile transition sibling using qword record data at 0x47a20, shared cursor publication, and status-message completion.")
+label(0x00058340, "geometry_object_profile_indexed_geometry_update_variant_h",
+      "Large indexed profile geometry update using the paired 0x47850/0x47854 records, shared cursor publication, phase progression, and status completion.")
+label(0x00058690, "geometry_object_profile_indexed_geometry_update_variant_i",
+      "Indexed profile geometry update sibling using the paired 0x47880/0x47884 records, shared cursor publication, phase progression, and status completion.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1521,6 +1525,8 @@ ensure_function(0x00057fc0, "geometry_object_profile_compact_transition_variant_
 ensure_function(0x00058070, "geometry_object_profile_compact_transition_variant_h", 0x00058118)
 ensure_function(0x00058120, "geometry_object_profile_indexed_transition_variant_f", 0x00058228)
 ensure_function(0x00058230, "geometry_object_profile_indexed_transition_variant_g", 0x00058338)
+ensure_function(0x00058340, "geometry_object_profile_indexed_geometry_update_variant_h", 0x00058688)
+ensure_function(0x00058690, "geometry_object_profile_indexed_geometry_update_variant_i", 0x0005892c)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
