@@ -222,7 +222,7 @@ nibble of `0x5039f4`):
 | Slot | Target | Listing-supported role |
 | ---: | ---: | --- |
 | 0 | `0x003c40` | renders/advances the startup text or status phase and updates `0x503a04` |
-| 1 | `0x02b9e0` | handler not yet bounded in this pass |
+| 1 | `0x02b9e0` | status/service dispatcher with mode-2 device tail and 32-entry subtable |
 | 2 | `0x018650` | writes a text/video command, clears the service counter, and increments the mode |
 | 3 | `0x0190d0` | initializes a startup phase, clears phase state, and increments the mode |
 | 4 | `0x019180` | submits setup words through `0x884000` and advances startup state |
@@ -259,6 +259,8 @@ the `0xffff`-masked test succeeds. The non-mode-2 tail calls the timing/status
 helper at `0x3ba0`; when it returns zero, it resets the service counter,
 advances `0x5039f4`, and returns. This bounds slot 1 as a state/service
 dispatcher; it does not assign the meaning of the individual 32 sub-handlers.
+The listing has a clean return at `0x2bb58`; `0x2bb60` begins the following
+literal weapon/status names.
 
 The second-level table at `0x2b960` is also bounded exactly. Its populated
 entries are `0:0x2b500`, `1:0x2b7b0`, `2:0x2b7e0`, `3:0x2b810`,

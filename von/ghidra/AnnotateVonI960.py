@@ -333,6 +333,8 @@ ensure_function(0x000f3d30, "startup_mode_handler_7", 0x000f3ec0)
 
 # Second-level status/service dispatch table selected by the low five bits of
 # 0x503a00 from startup_mode_handler_1_status_dispatch.
+label(0x0002b960, "startup_status_dispatch_table",
+      "32-entry status/service target table selected by the low five bits of 0x503a00.")
 label(0x0002b960, "startup_status_dispatch_arm_0")
 label(0x0002b964, "startup_status_dispatch_arm_1")
 label(0x0002b968, "startup_status_dispatch_arm_2")
