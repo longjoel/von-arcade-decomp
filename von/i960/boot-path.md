@@ -2549,6 +2549,12 @@ status/object-state handling.  The compact sibling at `0x5e040` uses the
 `0x48360` record and ends at `0x5e104` after advancing or resetting the object
 phase counter.
 
+The next compact table-driven trio consists of `0x5e110` through `0x5e1f4`
+using `0x48370`/`0x48374`, `0x5e200` through `0x5e298` using `0x48390`, and
+`0x5e2a0` through `0x5e358` using `0x483a0`/`0x483a4`.  They publish cursor
+progress and apply the corresponding object-phase reset paths at their
+thresholds.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

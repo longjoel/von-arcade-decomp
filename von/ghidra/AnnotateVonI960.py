@@ -841,6 +841,12 @@ label(0x0005de50, "geometry_object_profile_phase_transition_variant_z",
       "Profile phase transition using the 0x482e0 records, cursor progression, terminal status changes, and object-state reset handling.")
 label(0x0005e040, "geometry_object_profile_phase_transition_variant_aa",
       "Compact profile phase transition using the 0x48360 record, advancing the object phase counter and resetting terminal state.")
+label(0x0005e110, "geometry_object_profile_indexed_transition_variant_t",
+      "Indexed profile transition using the paired 0x48370/0x48374 records, cursor publication, and object phase reset handling.")
+label(0x0005e200, "geometry_object_profile_phase_transition_variant_ab",
+      "Compact profile phase transition using the 0x48390 record, advancing the shared counter and resetting terminal state.")
+label(0x0005e2a0, "geometry_object_profile_indexed_transition_variant_u",
+      "Indexed profile transition using the paired 0x483a0/0x483a4 records, threshold comparison, and terminal phase reset.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1662,6 +1668,9 @@ ensure_function(0x0005d970, "geometry_object_profile_indexed_phase_controller_va
 ensure_function(0x0005dc90, "geometry_object_profile_phase_transition_variant_y", 0x0005de4c)
 ensure_function(0x0005de50, "geometry_object_profile_phase_transition_variant_z", 0x0005e034)
 ensure_function(0x0005e040, "geometry_object_profile_phase_transition_variant_aa", 0x0005e104)
+ensure_function(0x0005e110, "geometry_object_profile_indexed_transition_variant_t", 0x0005e1f4)
+ensure_function(0x0005e200, "geometry_object_profile_phase_transition_variant_ab", 0x0005e298)
+ensure_function(0x0005e2a0, "geometry_object_profile_indexed_transition_variant_u", 0x0005e358)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
