@@ -1864,6 +1864,17 @@ three counter states, dispatching payloads through the geometry producers at
 returns at `0x38ee0`.  A larger packet-builder routine begins at `0x38ef0` and
 is left as the next boundary to sieve.
 
+`0x38ef0` is the larger profile packet builder.  It indexes records rooted at
+`0x51ab60`, emits multiple coordinate tuples through `0x884000`, derives the
+relative position from object fields `0x84`/`0x184`, and clamps both resulting
+axes before updating the selected record.  Its loop returns at `0x392ac`.
+
+`0x392b0` begins a separate displacement classifier.  It compares the object
+offset against fixed-point thresholds, writes the resulting class to field
+`0x17c`, selects a profile record through the same `0x51ab60` table, and
+advances phase field `0x178`; its terminal paths return at `0x393fc` or
+`0x39404`.  The next continuation-style service begins at `0x39410`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
