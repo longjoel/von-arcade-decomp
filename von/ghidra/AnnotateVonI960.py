@@ -402,6 +402,12 @@ label(0x000e54a0, "status_token_normalize_and_publish",
       "Scans the token table, normalizes the active three-byte token, and publishes it into the selected status buffers.")
 label(0x000e5650, "status_runtime_state_dispatch",
       "Dispatches the current runtime status state to its renderer or advances the state machine.")
+label(0x000e56a0, "status_blank_row_string",
+      "Space-filled fallback row used when a status record is inactive.")
+label(0x000e56e0, "status_record_list_render",
+      "Renders the active status record list, including ordinal/count fields and blank inactive rows.")
+label(0x000e5a90, "status_record_list_render_alt",
+      "Alternate status record-list renderer using the same ordinal and token helpers.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -455,6 +461,8 @@ ensure_function(0x000e4abc, "startup_runtime_status_prepare_alt_early_exit", 0x0
 ensure_function(0x000e4ae0, "startup_runtime_match_service", 0x000e5434)
 ensure_function(0x000e54a0, "status_token_normalize_and_publish", 0x000e564c)
 ensure_function(0x000e5650, "status_runtime_state_dispatch", 0x000e569c)
+ensure_function(0x000e56e0, "status_record_list_render", 0x000e5a8c)
+ensure_function(0x000e5a90, "status_record_list_render_alt", 0x000e5bb4)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)

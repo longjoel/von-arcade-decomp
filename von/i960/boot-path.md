@@ -1511,6 +1511,12 @@ result into the selected `0x578410`/`0x578460` record. The following dispatcher
 at `0xe5650` routes status state values to the next renderer and returns at
 `0xe5698`.
 
+The main list renderer at `0xe56e0` returns at `0xe5a88`; its branch at
+`0xe587c` handles the populated-record case and otherwise uses the
+space-filled fallback at `0xe56a0`. The alternate renderer at `0xe5a90`
+returns at `0xe5bb0` and shares the ordinal/count/token helpers, but sources
+its records from the alternate runtime buffer.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
