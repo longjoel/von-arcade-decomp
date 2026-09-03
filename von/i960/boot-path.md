@@ -2255,6 +2255,13 @@ fields, advance phase `0x17a`, and enter the common status/reset path when a
 range completes.  Their return boundaries are `0x517ec` and `0x51a74`, just
 before the following `0x51a80` table target.
 
+The `0x51a80` target is the object-pair form of threshold normalization.  It
+clamps `0x1ec`/`0x1ea`/`0x1ee`, applies the profile-dependent flag updates, and
+then calls the service at `0xbf120` before recomputing normalized
+`0x1e2`/`0x1e4`/`0x1e6` values.  Its final return at `0x520d8` confirms the
+handler extends across the internal completion paths and ends at the aligned
+`0x520dc` boundary before the next state family.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
