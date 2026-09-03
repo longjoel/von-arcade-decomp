@@ -2222,6 +2222,14 @@ set, `0x4e820` selects a descriptor base in the `0x2572744` data region, and
 shared cursor fields and use caller-link returns at `0x4e814`, `0x4e918`, and
 `0x4ea30`, with profile reset/status transitions on their completion paths.
 
+The compact phase-transition table at `0x7f98` adds four more siblings:
+`0x4ea40`, `0x4eaf0`, `0x4ebc0`, and `0x4ec60`.  They consume descriptor
+ranges at `0x46e40`, `0x46e50`/`0x46e54`, `0x46e70`, and
+`0x46e80`/`0x46e84`, respectively.  Each publishes `0x51ab08`/`0x51ab0c`,
+advances the object phase, and either returns through its caller link or resets
+the phase fields at range completion.  Their clean boundaries are the
+following aligned entries at `0x4eaec`, `0x4ebbc`, `0x4ec58`, and `0x4ed18`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
