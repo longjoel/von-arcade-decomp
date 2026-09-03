@@ -276,6 +276,11 @@ command/video transition and returns at `0x2b76c`; `0x2b770` decrements the
 status subcounter and returns through `0x2b7a4`; and `0x2b940` is a small
 continuation trampoline ending at `0x2b954`.
 
+The adjacent geometry/status dispatch at `0x2bdd0` selects one of the three
+arms in the table at `0x2bdc0` using the low two bits of `0x503a00`. Its
+fallback advances `0x5039f4`; the dispatcher returns at `0x2be24`, immediately
+before the frame-service initializer at `0x2be30`.
+
 Several entries are already structurally identifiable from their boundaries:
 `0x2b500` performs a video/status setup and advances the mode;
 `0x2b550` initializes a geometry-record workspace; `0x2b660` continues that

@@ -381,6 +381,10 @@ label(0x0002b770, "startup_status_arm_subcounter_decrement",
       "Decrements the status subcounter and resets the startup mode when it expires.")
 label(0x0002b940, "startup_status_arm_continuation_trampoline",
       "Indirect continuation trampoline used by the status dispatcher tail.")
+label(0x0002bdc0, "startup_geometry_status_dispatch_table",
+      "Three-entry geometry/status arm table selected by the low two bits of 0x503a00.")
+label(0x0002bdd0, "startup_geometry_status_dispatch",
+      "Dispatches the selected geometry/status arm and advances the startup counter on fallback.")
 label(0x0002dc50, "startup_status_arm_geometry_init")
 label(0x0002dd30, "startup_status_arm_geometry_build")
 label(0x0002ded0, "startup_status_arm_geometry_frame_service",
@@ -715,6 +719,7 @@ ensure_function(0x0002b870, "startup_status_arm_progress_text", 0x0002b934)
 ensure_function(0x0002b700, "startup_status_arm_post_test_transition", 0x0002b770)
 ensure_function(0x0002b770, "startup_status_arm_subcounter_decrement", 0x0002b7b0)
 ensure_function(0x0002b940, "startup_status_arm_continuation_trampoline", 0x0002b960)
+ensure_function(0x0002bdd0, "startup_geometry_status_dispatch", 0x0002be30)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
