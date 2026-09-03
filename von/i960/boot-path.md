@@ -2096,6 +2096,13 @@ for both the object and its associated state record; the early and late returns
 at `0x44498`, `0x44518`, and `0x44590` are internal exits of this one routine,
 whose next aligned code begins at `0x445a0`.
 
+The routine at `0x445a0` selects the active runtime profile mode from hardware
+and startup state, stores the selected mode at `0x51bb18`, and dispatches the
+corresponding geometry/state update through the eight arms at `0x44948`–
+`0x449b8`.  It then publishes the selected cursor/timing values and writes the
+derived hardware timing words before returning at `0x44ac0`; this is the
+profile-mode coordinator rather than another packet-emission variant.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
