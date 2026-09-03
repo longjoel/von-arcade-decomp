@@ -2458,6 +2458,12 @@ flags, clamps the profile coordinates, and computes derived ratios through
 `0x59990`.  The next controller at `0x599a0` dispatches profile phases 0--3
 through the `0x47e20`/`0x47e28`/`0x47e30`/`0x47e38` records and ends at `0x59c34`.
 
+The sibling controller at `0x59c40` covers the same four profile states with
+the `0x47e40`/`0x47e44`/`0x47e48`/`0x47e4c` records and ends at `0x59f3c`.
+`0x59f40` then handles the next phase-transition stage, using the `0x47e80`
+and `0x47e88` records to advance frame counters and reset phase status; its
+aligned end is `0x5a194`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
