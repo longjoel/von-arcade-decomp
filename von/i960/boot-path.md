@@ -2064,6 +2064,14 @@ and publish bounded object fields, including the `0xd2`/`0xd4` and `0xc2`/`0xc8`
 windows.  Their exact returns at `0x43410`, `0x43500`, `0x43678`, and `0x43770`
 separate four handlers from the descriptor/data regions.
 
+The following table-backed siblings are `0x437ac`, `0x438e0`, and `0x439e0`,
+fed by descriptor tables at `0x43780` and `0x439c0`.  They retain the same
+cursor/timing update convention but target different object phase windows;
+the first publishes `0xbc`/`0xc0`/`0xc4`, while the later pair uses the shared
+bounded state and phase latch.  The returns at `0x438d0`, `0x439bc`, and the
+two internal exits of `0x439e0` establish the boundaries; `0x43ac4` is a
+branch target inside the last handler, not a separate function.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
