@@ -2187,6 +2187,21 @@ the later phase ranges through `0x46c68` and `0x46c70`.  Its final timing
 correction and state publication return at `0x4da78`, cleanly delimiting the
 handler from the following table-backed routine.
 
+The next three dispatch targets continue the same family at `0x4da80`,
+`0x4dce0`, and `0x4def0`.  The first two are near-identical indexed-record
+variants over `0x46c80` and `0x46ce0`; each advances object phase `0x17a`,
+publishes the paired shared cursor values, and enters a status-reset path when
+its range completes.  Their multiple case exits at `0x4dc7c`, `0x4dca0`, and
+`0x4dcdc`, followed by `0x4ded0`/`0x4dee4`, are internal arms of those two
+handlers rather than new table entries.
+
+The `0x4def0` target uses the smaller `0x46d40` record range and a different
+phase scale.  It still publishes `0x51ab08`/`0x51ab0c` and the paired cursor
+fields, but its completion arm also raises the mode-specific status flag and
+selects a text/status message.  The handler returns at `0x4df68` on the short
+path and `0x4e070` after the reset path; the following `0x4e080` entry is a
+separate routine.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
