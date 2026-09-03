@@ -2202,6 +2202,19 @@ selects a text/status message.  The handler returns at `0x4df68` on the short
 path and `0x4e070` after the reset path; the following `0x4e080` entry is a
 separate routine.
 
+The `0x4e080` target is a second threshold-normalization handler.  It clamps
+the three object timing fields at `0x1ec`/`0x1ea`/`0x1ee`, derives the
+corresponding threshold flags at `0x1de`/`0x1dd`/`0x1df`, and recomputes the
+normalized values at `0x1e4`/`0x1e2`/`0x1e6` from the active hardware profile.
+Its caller-link return at `0x4e3cc`/`0x4e3d0` separates it from the next
+phase-dispatch variant.
+
+That phase dispatcher begins at `0x4e3e0`.  It consumes the object phase and
+shared timing state, selects the appropriate profile transition path, and
+returns through the supplied link at `0x4e5e8`/`0x4e5ec`.  The distinct
+`0x4e3e0` entry confirms this is a sibling dispatcher rather than a fall-through
+continuation of threshold normalization.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

@@ -611,6 +611,10 @@ label(0x0004dce0, "geometry_object_profile_cursor_transition_variant_g",
       "Alternate cursor transition variant using indexed records at 0x46ce0 and the shared cursor/status reset protocol.")
 label(0x0004def0, "geometry_object_profile_cursor_transition_variant_h",
       "Cursor transition variant using the compact 0x46d40 record range, publishing shared cursor values and mode-specific status transitions.")
+label(0x0004e080, "geometry_object_profile_threshold_update_variant_b",
+      "Alternate profile threshold update that clamps three timing fields, sets threshold flags, and recomputes normalized 0x1e2/0x1e4/0x1e6 values.")
+label(0x0004e3e0, "geometry_object_profile_phase_dispatch_variant_b",
+      "Alternate profile phase dispatcher using the object phase field and returning through a caller-supplied link after the selected transition path.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1317,6 +1321,8 @@ ensure_function(0x0004d880, "geometry_object_profile_cursor_transition_variant_e
 ensure_function(0x0004da80, "geometry_object_profile_cursor_transition_variant_f", 0x0004dce0)
 ensure_function(0x0004dce0, "geometry_object_profile_cursor_transition_variant_g", 0x0004def0)
 ensure_function(0x0004def0, "geometry_object_profile_cursor_transition_variant_h", 0x0004e074)
+ensure_function(0x0004e080, "geometry_object_profile_threshold_update_variant_b", 0x0004e3d4)
+ensure_function(0x0004e3e0, "geometry_object_profile_phase_dispatch_variant_b", 0x0004e5f0)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
