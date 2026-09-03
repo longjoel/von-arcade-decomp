@@ -136,7 +136,9 @@ void recovered_geometry_pipeline_startup(u32 mode)
     recovered_geometry_initial_handshake();
 
     if (mode == 0) {
-        (void)recovered_texture_loader_profile_setup();
+        /* vonjdev has no mapped backing for the recovered texture streams.
+         * The loader remains available as a standalone recovered routine;
+         * this development startup proceeds to the host-side command chain. */
         recovered_geometry_auxiliary_submit_select();
     }
 
