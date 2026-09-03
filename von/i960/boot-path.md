@@ -2331,6 +2331,23 @@ same shared cursor fields, reset phase/status state at their low range, and
 return through saved completion links.  Their direct returns at `0x5409c` and
 `0x5415c` keep these arms separate from the larger `0x54160` dispatcher.
 
+The `0x54160` table target is the next parent phase-state dispatcher.  It
+consumes the `0x47410`/`0x47418`/`0x47428` records, advances object phase
+`0x178`, publishes the shared cursor fields, and applies the derived geometry
+correction to object field `0x150` before completing at `0x54334`.
+
+Two compact saved-return siblings follow at `0x54340` and `0x543f0`; they use
+the `0x475d0` and `0x475d8` descriptors and reset the same phase/status fields.
+The `0x544a0` and `0x545f0` entries are paired threshold-event handlers using
+`0x475c0` and `0x475c8`.  Each has a primary and range-reset terminal arm
+within the same function, so the alternate returns at `0x545ec` are not new
+top-level entries.
+
+The next pair, `0x54760` and `0x54a60`, performs indexed geometry selection
+from the `0x47440` and `0x47470` record families.  They publish paired cursor
+values, advance phase `0x17a`, and feed the common status transition protocol;
+their aligned ends are `0x54a54` and `0x54db0`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.

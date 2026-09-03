@@ -673,6 +673,20 @@ label(0x00053fe0, "geometry_object_profile_status_transition_variant_c",
       "Compact profile transition using the 0x473f8 descriptor range, shared cursor publication, and an indirect completion return.")
 label(0x000540a0, "geometry_object_profile_status_transition_variant_d",
       "Alternate compact profile transition using the 0x47400 descriptor range, shared cursor publication, and an indirect completion return.")
+label(0x00054160, "geometry_object_profile_phase_state_dispatch_variant_h",
+      "Profile phase-state dispatcher using the 0x47410/0x47418/0x47428 records, shared cursor publication, and geometry/status completion paths.")
+label(0x00054340, "geometry_object_profile_compact_transition_variant_a",
+      "Compact profile transition using the 0x475d0 descriptor and an indirect completion return, with phase reset at the range boundary.")
+label(0x000543f0, "geometry_object_profile_compact_transition_variant_b",
+      "Compact profile transition sibling using the 0x475d8 descriptor and an indirect completion return, with phase reset at the range boundary.")
+label(0x000544a0, "geometry_object_profile_threshold_event_update_variant_c",
+      "Threshold-event handler using the 0x475c0 descriptor, status message path, object flag 0x1a6, and paired terminal state arms.")
+label(0x000545f0, "geometry_object_profile_threshold_event_update_variant_d",
+      "Threshold-event handler sibling using the 0x475c8 descriptor, status message path, object flag 0x1a6, and paired terminal state arms.")
+label(0x00054760, "geometry_object_profile_indexed_geometry_update_variant_a",
+      "Indexed profile geometry update using the paired 0x47440 records, shared cursor publication, phase progression, and status completion.")
+label(0x00054a60, "geometry_object_profile_indexed_geometry_update_variant_b",
+      "Indexed profile geometry update sibling using the 0x47470 records, shared cursor publication, phase progression, and status completion.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1410,6 +1424,13 @@ ensure_function(0x00053a20, "geometry_object_profile_status_transition_variant_a
 ensure_function(0x00053d00, "geometry_object_profile_status_transition_variant_b", 0x00053fe0)
 ensure_function(0x00053fe0, "geometry_object_profile_status_transition_variant_c", 0x000540a0)
 ensure_function(0x000540a0, "geometry_object_profile_status_transition_variant_d", 0x00054160)
+ensure_function(0x00054160, "geometry_object_profile_phase_state_dispatch_variant_h", 0x00054340)
+ensure_function(0x00054340, "geometry_object_profile_compact_transition_variant_a", 0x000543f0)
+ensure_function(0x000543f0, "geometry_object_profile_compact_transition_variant_b", 0x000544a0)
+ensure_function(0x000544a0, "geometry_object_profile_threshold_event_update_variant_c", 0x000545f0)
+ensure_function(0x000545f0, "geometry_object_profile_threshold_event_update_variant_d", 0x00054760)
+ensure_function(0x00054760, "geometry_object_profile_indexed_geometry_update_variant_a", 0x00054a60)
+ensure_function(0x00054a60, "geometry_object_profile_indexed_geometry_update_variant_b", 0x00054db0)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)
