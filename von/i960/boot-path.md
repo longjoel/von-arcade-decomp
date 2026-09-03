@@ -1498,6 +1498,12 @@ return the saved register context. Their short early exits at `0xe4700` and
 `0xe4190`, `0xe41c0`, `0xe41f0`, and `0xe4220` are literal machine-name
 character maps used by this status subsystem.
 
+The startup dispatch target at `0xe4ae0` is a long shared runtime service,
+ending at `0xe5430`. It updates mode/timing fields, services both player
+object records through indirect callbacks and transform helpers, then advances
+the status/geometry state. The visible `ret` at `0xe5430` provides the
+boundary; the following `0xe5440` region is literal data.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

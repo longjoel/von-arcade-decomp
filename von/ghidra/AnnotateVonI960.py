@@ -394,6 +394,8 @@ label(0x000e4700, "startup_runtime_status_prepare_early_exit")
 label(0x000e4720, "startup_runtime_status_prepare_alt",
       "Alternate runtime status-table preparation path using the same machine-name alphabet tables.")
 label(0x000e4abc, "startup_runtime_status_prepare_alt_early_exit")
+label(0x000e4ae0, "startup_runtime_match_service",
+      "Startup-dispatch service that updates mode/timing state, services both player object paths, and invokes geometry/status helpers.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -444,6 +446,7 @@ ensure_function(0x000e4250, "startup_runtime_status_prepare", 0x000e4700)
 ensure_function(0x000e4700, "startup_runtime_status_prepare_early_exit", 0x000e4718)
 ensure_function(0x000e4720, "startup_runtime_status_prepare_alt", 0x000e4abc)
 ensure_function(0x000e4abc, "startup_runtime_status_prepare_alt_early_exit", 0x000e4adc)
+ensure_function(0x000e4ae0, "startup_runtime_match_service", 0x000e5434)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
