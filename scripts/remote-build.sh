@@ -59,6 +59,10 @@ rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/mame/sega/m2comm
     "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/mame/sega/m2comm.cpp" || {
     printf 'error: failed to synchronize communication diagnostics source\n' >&2; exit 1
 }
+rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/mame/sega/model2.cpp" \
+    "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/mame/sega/model2.cpp" || {
+    printf 'error: failed to synchronize Model 2 source\n' >&2; exit 1
+}
 rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/mame/sega/model2_v.cpp" \
     "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/mame/sega/model2_v.cpp" || {
     printf 'error: failed to synchronize geometry tracing source\n' >&2; exit 1
