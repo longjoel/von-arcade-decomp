@@ -495,6 +495,18 @@ label(0x000429f0, "geometry_object_profile_state_transition",
       "Full framed profile transition handler: advances object phase, emits paired command-5/18/19/21 state packets, updates timing fields, and publishes bounded state at offsets 0xc2/c8.")
 label(0x000430d0, "geometry_object_profile_state_transition_alt",
       "Continuation-style alternate profile transition using the 0x429e0 descriptor values and the shared phase/timing state.")
+label(0x000431a0, "geometry_profile_state_table_d",
+      "Six-word profile-state descriptor table for the next transition sibling family.")
+label(0x000431c0, "geometry_object_profile_state_variant_e",
+      "Profile-state transition variant using the 0x431a0 descriptor table; advances shared cursor timing and clamps object offsets 0xd2/0xd4.")
+label(0x00043420, "geometry_object_profile_state_variant_f",
+      "Alternate framed profile-state transition using the 0x431b0 descriptor pair and the shared cursor/timing state.")
+label(0x00043510, "geometry_profile_state_table_e",
+      "Six-word profile-state descriptor table consumed by the next object transition variant.")
+label(0x00043530, "geometry_object_profile_state_variant_g",
+      "Profile-state transition variant using the 0x43510 descriptor table; initializes phase-dependent object fields and publishes bounded offsets 0xc2/c8.")
+label(0x00043680, "geometry_object_profile_state_variant_h",
+      "Alternate profile-state transition using the 0x43520 descriptor pair and the shared cursor/timing state.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1150,6 +1162,10 @@ ensure_function(0x00042780, "geometry_object_profile_state_variant_c", 0x000428e
 ensure_function(0x000428e0, "geometry_object_profile_state_variant_d", 0x000429c0)
 ensure_function(0x000429f0, "geometry_object_profile_state_transition", 0x000430d0)
 ensure_function(0x000430d0, "geometry_object_profile_state_transition_alt", 0x00043198)
+ensure_function(0x000431c0, "geometry_object_profile_state_variant_e", 0x00043420)
+ensure_function(0x00043420, "geometry_object_profile_state_variant_f", 0x00043500)
+ensure_function(0x00043530, "geometry_object_profile_state_variant_g", 0x00043680)
+ensure_function(0x00043680, "geometry_object_profile_state_variant_h", 0x00043774)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

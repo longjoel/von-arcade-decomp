@@ -2056,6 +2056,14 @@ at `0x430d0` uses the adjacent descriptor values and returns through
 `0x43194`/`0x43198`.  This is the next layer above the smaller cursor-state
 variants, not a fall-through extension of `0x428e0`.
 
+The next sibling block continues the same state protocol.  Descriptor tables at
+`0x431a0`, `0x43510`, and their adjacent continuation pairs feed distinct
+handlers at `0x431c0`, `0x43420`, `0x43530`, and `0x43680`.  These routines
+advance the shared profile cursor/timing globals, apply phase-dependent limits,
+and publish bounded object fields, including the `0xd2`/`0xd4` and `0xc2`/`0xc8`
+windows.  Their exact returns at `0x43410`, `0x43500`, `0x43678`, and `0x43770`
+separate four handlers from the descriptor/data regions.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
