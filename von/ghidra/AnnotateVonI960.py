@@ -408,6 +408,10 @@ label(0x000e56e0, "status_record_list_render",
       "Renders the active status record list, including ordinal/count fields and blank inactive rows.")
 label(0x000e5a90, "status_record_list_render_alt",
       "Alternate status record-list renderer using the same ordinal and token helpers.")
+label(0x000e5bb4, "status_record_list_render_variant_b",
+      "Third record-list renderer using the alternate runtime record buffer and blank-row fallback.")
+label(0x000e5d30, "status_service_state_dispatch",
+      "Checks hardware enable state and dispatches the current status counter to a state-specific handler.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -463,6 +467,8 @@ ensure_function(0x000e54a0, "status_token_normalize_and_publish", 0x000e564c)
 ensure_function(0x000e5650, "status_runtime_state_dispatch", 0x000e569c)
 ensure_function(0x000e56e0, "status_record_list_render", 0x000e5a8c)
 ensure_function(0x000e5a90, "status_record_list_render_alt", 0x000e5bb4)
+ensure_function(0x000e5bb4, "status_record_list_render_variant_b", 0x000e5d30)
+ensure_function(0x000e5d30, "status_service_state_dispatch", 0x000e5d80)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
