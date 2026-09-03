@@ -2360,6 +2360,13 @@ paired records from the `0x474a0` family according to the two object phase
 indices, publishes both cursor coordinates, and contains the status reset and
 message path before its return at `0x552f4`.
 
+The `0x55300` and `0x55550` entries continue the indexed updater family with
+the `0x47500` and `0x47560` paired record tables.  Both publish the two cursor
+coordinates and advance phase `0x17a`; the first has internal exits at
+`0x55380`, `0x55454`, and `0x554dc` before its final status arm and aligned end
+at `0x5554c`.  The sibling’s threshold/event arms run through `0x5578c`,
+`0x55794`, and `0x55804`, ending at `0x55808`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
