@@ -1806,6 +1806,11 @@ The following callback builder at `0x6ff20–0x6fff4` is also now bounded as a
 function (exclusive end `0x70000`). It emits the fixed command preamble and
 the caller-supplied vector words through `0x804000`, then branches through
 the continuation saved in `g7`; the `0x6fff8` `ret` is its normal stub.
+The next aligned entry, `0x70000–0x700d4`, is a sibling callback builder with
+the same command-window protocol but a different coordinate arrangement. The
+short fixed-constant writer at `0x700e0–0x70194` is separately bounded as a
+third variant; its following aligned code at `0x701a0` is therefore not
+accidentally absorbed into the packet writer.
 
 The motion/update family continues through `0x2f360–0x30220`.  The aligned
 entries at `0x2f360`, `0x2f460`, `0x2f580`, `0x2f930`, `0x2fb20`, `0x2fe30`,

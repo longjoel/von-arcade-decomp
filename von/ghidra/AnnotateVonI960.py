@@ -2138,6 +2138,8 @@ ensure_function(0x0006fb90, "geometry_record_initializer", 0x0006fd50)
 ensure_function(0x0006fd50, "geometry_link_release", 0x0006fe70)
 ensure_function(0x0006fec0, "geometry_device_command_initialize", 0x0006ff20)
 ensure_function(0x0006ff20, "geometry_command_packet_builder", 0x00070000)
+ensure_function(0x00070000, "geometry_command_packet_builder_variant_b", 0x000700e0)
+ensure_function(0x000700e0, "geometry_command_packet_builder_variant_c", 0x000701a0)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2301,6 +2303,10 @@ label(0x00023ef0, "geometry_response_selector",
       "Indexes table 0x2be0008 with state-derived values masked to 31; fallback pointers are 0x49c980 and 0x40005c, selected by the low state bit.")
 label(0x0006ff20, "geometry_command_packet_builder",
       "Builds an 18-word packet containing literals 0x01540601, 0x7f000000, and 0x3f800000 plus register sums/differences.")
+label(0x00070000, "geometry_command_packet_builder_variant_b",
+      "Callback-style packet builder: emits caller vector words and fixed 0x01540601/0x7f000000/1.0 fields through 0x804000, then branches through g7.")
+label(0x000700e0, "geometry_command_packet_builder_variant_c",
+      "Emits fixed 0x202 setup, 1.0 and 0x01540601/0x7f000000 constants, followed by caller vector words through 0x804000.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",
