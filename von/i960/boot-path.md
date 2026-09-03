@@ -2426,6 +2426,13 @@ through its saved link at `0x57e28`.  The following `0x57e30` command producer
 uses `0x47848`, repeats the command-port polling and phase/status publication,
 and ends at `0x57fb8`.
 
+The next compact transition run contains `0x57fc0` and `0x58070`, which use
+the `0x47a30` and `0x47a38` descriptors and return through saved links.  The
+qword-record siblings at `0x58120` and `0x58230` use `0x47a10` and `0x47a20`,
+publish the paired cursor values, and emit the same status message on phase
+completion.  Their aligned ends are `0x58068`, `0x58118`, `0x58228`, and
+`0x58338`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
