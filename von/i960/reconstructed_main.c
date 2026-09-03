@@ -13,6 +13,11 @@
 typedef unsigned long u32;
 typedef unsigned short u16;
 
+static const unsigned char TEXT_COPRO_STATUS[] = "Downloading COPRO prog ... Done";
+static const unsigned char TEXT_GEO_STATUS[] = "Downloading GEO prog   ... Done";
+static const unsigned char TEXT_TEXTURE_STATUS[] = "Loading Texture  Bank0 ... Done";
+static const unsigned char TEXT_BANK1_STATUS[] = "Loading Texture  Bank1 ... Done";
+
 #define WORKRAM ((volatile u32 *)0x00500000)
 
 u32 recovered_io_self_test(void);
@@ -48,16 +53,28 @@ void i960_reconstructed_main(void)
     recovered_text_video_initialize();
     recovered_text_ascii_font_initialize();
     recovered_text_font_asset_initialize();
-    recovered_text_set_position(8U, 12U);
-    recovered_text_write_string(
-        (volatile const unsigned char *)0x0001f440U);
     /* vonjdev does not map the recovered SCSP control window. Keep the
      * recovered routine linked for oracle work, but skip its MMIO writes in
      * this development image so the attract-state adapter can run. */
     state[7] = recovered_object_state_runtime_tick();
     recovered_text_palette_initialize();
-    recovered_texture_initializer();
-    state[8] = (u32)recovered_texture_loader_profile_setup();
+    /* The recovered texture loader is retained for offline analysis, but its
+     * completion latch is not modeled by vonjdev and its stream can run
+     * indefinitely. Record the observed development status and continue with
+     * the captured startup status screen. */
+    state[8] = 7U;
+    /* vonjdev has no recovered texture-device completion latch. Preserve its
+     * status in state[8], then render the captured post-loader status screen
+     * from local strings so the reconstructed host has a deterministic handoff
+     * point for attract-state recovery. */
+    recovered_text_set_position(8U, 12U);
+    recovered_text_write_string(TEXT_COPRO_STATUS);
+    recovered_text_set_position(8U, 13U);
+    recovered_text_write_string(TEXT_GEO_STATUS);
+    recovered_text_set_position(8U, 14U);
+    recovered_text_write_string(TEXT_TEXTURE_STATUS);
+    recovered_text_set_position(8U, 15U);
+    recovered_text_write_string(TEXT_BANK1_STATUS);
     state[3] = 0x47454f30UL; /* GEO0 */
     state[6] = 0;
     state[4] = 0x494e4954UL; /* INIT */
