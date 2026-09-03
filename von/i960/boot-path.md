@@ -1625,6 +1625,13 @@ publishers from `0xeca30` through `0xecb20` store the derived event results in
 the separate `0x578530–0x578544` workspace fields. The literal handler table
 at `0xecb50` follows these wrappers.
 
+The table is followed by diagnostic formatting support: `0xecbb8–0xecd78`
+holds the result format, GOOD/BAD text, and IC-number labels; `0xecbe0` and
+`0xecc40` are the basic and expected-value comparison formatters. The result
+menu renderer at `0xecd80` lays out the IC results and accumulated status
+values, returning at `0xecd c4` (the listing address is `0xecd c4` with the
+values, returning at `0xed0c4`.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

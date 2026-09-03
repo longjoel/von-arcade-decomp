@@ -556,6 +556,14 @@ label(0x000ecb20, "runtime_event_result_publish_f",
       "Computes and publishes the alternate flag-derived event result.")
 label(0x000ecb50, "runtime_event_handler_table",
       "Literal event-handler dispatch table for the runtime menu/service states.")
+label(0x000ecbb8, "diagnostic_result_strings",
+      "Literal result-format, GOOD/BAD, and IC-number strings used by diagnostics.")
+label(0x000ecbe0, "diagnostic_result_format",
+      "Formats a diagnostic result and selects the corresponding GOOD/BAD text.")
+label(0x000ecc40, "diagnostic_result_format_compare",
+      "Formats a diagnostic result with an expected-value comparison.")
+label(0x000ecd80, "diagnostic_result_menu_render",
+      "Renders the diagnostic IC result menu and its accumulated runtime results.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -678,6 +686,9 @@ ensure_function(0x000eca90, "runtime_event_result_publish_c", 0x000ecac0)
 ensure_function(0x000ecac0, "runtime_event_result_publish_d", 0x000ecaf0)
 ensure_function(0x000ecaf0, "runtime_event_result_publish_e", 0x000ecb20)
 ensure_function(0x000ecb20, "runtime_event_result_publish_f", 0x000ecb50)
+ensure_function(0x000ecbe0, "diagnostic_result_format", 0x000ecc38)
+ensure_function(0x000ecc40, "diagnostic_result_format_compare", 0x000ecc98)
+ensure_function(0x000ecd80, "diagnostic_result_menu_render", 0x000ed0c8)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
