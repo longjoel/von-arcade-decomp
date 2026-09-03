@@ -2481,6 +2481,12 @@ the paired `0x47f10`/`0x47f14` records and ends at `0x5acb8`, while `0x5acc0`
 consumes `0x47f70`/`0x47f74` and ends at `0x5af00`.  All three continue the
 shared cursor publication and phase/status completion pattern.
 
+The next large phase transitions are `0x5af10` through `0x5b1dc`, using the
+`0x47fd0`/`0x47fd8`/`0x47fe0` records and status-gated frame progression, and
+`0x5b1e0` through `0x5b4ac`, using the parallel `0x47ff0`/`0x47ff8`/`0x48000`
+records.  Both handlers converge their threshold arms into terminal reset
+logic rather than representing separate functions at each internal return.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
