@@ -725,6 +725,12 @@ label(0x00056d10, "geometry_object_profile_phase_state_dispatch_variant_j",
       "Profile phase-state dispatcher that resets object fields 0x186/0x188, recomputes 0x2e, and selects the 0x477a0/0x477a8/0x477b0 records.")
 label(0x00056f40, "geometry_object_profile_phase_state_dispatch_variant_k",
       "Extended profile phase-state dispatcher using the 0x477c0/0x477c8/0x477d0 records, collision flags, status messages, and shared cursor publication.")
+label(0x00057270, "geometry_object_profile_phase_state_dispatch_variant_l",
+      "Profile phase-state dispatcher using the 0x477e0/0x477e8/0x477f0 records, collision/status gating, shared cursor publication, and geometry completion.")
+label(0x00057530, "geometry_object_profile_indexed_geometry_update_variant_f",
+      "Indexed profile geometry update using the 0x47800 record pair, shared cursor publication, phase progression, and status reset paths.")
+label(0x000576d0, "geometry_object_profile_indexed_geometry_update_variant_g",
+      "Indexed profile geometry update sibling using the 0x47810 record pair, shared cursor publication, phase progression, and status reset paths.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1488,6 +1494,9 @@ ensure_function(0x00056930, "geometry_object_profile_indexed_transition_variant_
 ensure_function(0x00056b30, "geometry_object_profile_indexed_transition_variant_e", 0x00056d08)
 ensure_function(0x00056d10, "geometry_object_profile_phase_state_dispatch_variant_j", 0x00056f40)
 ensure_function(0x00056f40, "geometry_object_profile_phase_state_dispatch_variant_k", 0x00057264)
+ensure_function(0x00057270, "geometry_object_profile_phase_state_dispatch_variant_l", 0x00057530)
+ensure_function(0x00057530, "geometry_object_profile_indexed_geometry_update_variant_f", 0x000576d0)
+ensure_function(0x000576d0, "geometry_object_profile_indexed_geometry_update_variant_g", 0x00057870)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

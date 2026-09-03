@@ -2407,6 +2407,13 @@ its internal arms end at `0x56f3c`.  The larger `0x56f40` sibling uses the
 `0x477c0`/`0x477c8`/`0x477d0` records and adds collision-flag checks and status
 message paths before its aligned end at `0x57264`.
 
+The `0x57270` handler continues the phase/status dispatcher family with
+records at `0x477e0`/`0x477e8`/`0x477f0`; it gates on collision state, publishes
+the shared cursor fields, and completes at `0x5752c`.  The paired indexed
+updaters at `0x57530` and `0x576d0` use the `0x47800` and `0x47810` record
+families, respectively, with phase progression and reset paths ending at
+`0x576cc` and `0x5786c`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
