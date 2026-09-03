@@ -1574,6 +1574,12 @@ the event setup packet, derives the shared fields at `0x5783e4–0x5783f8`,
 resets the event counters when required, and returns at `0xead1c`.
 `0xead20` begins its literal geometry-event lookup data.
 
+The following compact helpers are now separated by their visible return
+stubs: `0xeada0`, `0xeade0`, and `0xeae20` are feature-flag gates that return
+boolean results through caller continuations; `0xeae60` copies a byte span;
+and `0xeaeb0`, `0xeaed0`, and `0xeaf20` wrap the shared numeric/text rendering
+helpers, including the board-specific adjustment path.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.

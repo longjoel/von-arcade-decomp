@@ -450,6 +450,20 @@ label(0x000eaa60, "geometry_event_setup_helper",
       "Emits the event setup packet, derives shared geometry fields, and updates the event workspace.")
 label(0x000ead20, "geometry_event_lookup_data",
       "Literal geometry-event lookup records following the setup helper.")
+label(0x000eada0, "runtime_flag_gate_a",
+      "Tests the runtime feature flags and returns a boolean through the supplied continuation.")
+label(0x000eade0, "runtime_flag_gate_b",
+      "Tests the alternate runtime feature flags and returns a boolean through the supplied continuation.")
+label(0x000eae20, "runtime_flag_gate_c",
+      "Tests the geometry feature flags and returns a boolean through the supplied continuation.")
+label(0x000eae60, "runtime_byte_copy_continuation",
+      "Copies a byte span and returns through the caller-supplied continuation.")
+label(0x000eaeb0, "runtime_format_value",
+      "Formats the supplied runtime value through the shared text conversion helper.")
+label(0x000eaed0, "runtime_format_value_adjusted",
+      "Formats an adjusted runtime value and selects the board-specific output path.")
+label(0x000eaf20, "runtime_render_value_string",
+      "Renders the supplied runtime value through the alternate printable-string path.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -521,6 +535,13 @@ ensure_function(0x000e7390, "geometry_object_packet_dispatch", 0x000e79e4)
 ensure_function(0x000e79f0, "geometry_status_scene_dispatch", 0x000e913c)
 ensure_function(0x000e9140, "geometry_runtime_event_dispatch", 0x000eaa54)
 ensure_function(0x000eaa60, "geometry_event_setup_helper", 0x000ead20)
+ensure_function(0x000eada0, "runtime_flag_gate_a", 0x000eaddc)
+ensure_function(0x000eade0, "runtime_flag_gate_b", 0x000eae1c)
+ensure_function(0x000eae20, "runtime_flag_gate_c", 0x000eae5c)
+ensure_function(0x000eae60, "runtime_byte_copy_continuation", 0x000eaea8)
+ensure_function(0x000eaeb0, "runtime_format_value", 0x000eaec4)
+ensure_function(0x000eaed0, "runtime_format_value_adjusted", 0x000eaf20)
+ensure_function(0x000eaf20, "runtime_render_value_string", 0x000eaf34)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)
