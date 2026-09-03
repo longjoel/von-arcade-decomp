@@ -2173,6 +2173,15 @@ ensure_function(0x000747e4, "match_state_handler_19", 0x00074848)
 ensure_function(0x00074848, "match_state_default_reject", 0x00074860)
 ensure_function(0x00074860, "match_status_transition_update", 0x00074e60)
 ensure_function(0x00074e60, "match_transition_state_dispatch", 0x00074ea4)
+ensure_function(0x00074ec4, "match_transition_handler_0", 0x00074ef0)
+ensure_function(0x00074ef0, "match_transition_handler_1", 0x00074f28)
+ensure_function(0x00074f28, "match_transition_handler_2", 0x00074f3c)
+ensure_function(0x00074f3c, "match_transition_handler_3", 0x00074f60)
+ensure_function(0x00074f60, "match_transition_handler_4", 0x00074fa0)
+ensure_function(0x00074fa0, "match_transition_handler_5", 0x00074fc8)
+ensure_function(0x00074fc8, "match_transition_handler_6", 0x00075048)
+ensure_function(0x00075048, "match_transition_handler_7", 0x0007510c)
+ensure_function(0x0007510c, "match_transition_counter_clamp", 0x00075134)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2404,6 +2413,24 @@ label(0x00074860, "match_status_transition_update",
       "Computes shared status/result command fields from mode, counter, object flags, and alignment state before returning at 0x74e50.")
 label(0x00074e60, "match_transition_state_dispatch",
       "Clamps the shared transition counter, stores its boolean result, and dispatches through the eight-entry state table at 0x74ea4.")
+label(0x00074ec4, "match_transition_handler_0",
+      "Transition-table handler 0: updates the threshold boolean and selects state 3 before the shared continuation.")
+label(0x00074ef0, "match_transition_handler_1",
+      "Transition-table handler 1: updates the threshold boolean, clears the auxiliary field, and selects state 3.")
+label(0x00074f28, "match_transition_handler_2",
+      "Transition-table handler 2: stores the threshold boolean for the shared transition state.")
+label(0x00074f3c, "match_transition_handler_3",
+      "Transition-table handler 3: stores the alternate threshold boolean for the shared transition state.")
+label(0x00074f60, "match_transition_handler_4",
+      "Transition-table handler 4: initializes the transition state and selects the zero/nonzero auxiliary path.")
+label(0x00074fa0, "match_transition_handler_5",
+      "Transition-table handler 5: selects state 6 and initializes the transition auxiliary fields.")
+label(0x00074fc8, "match_transition_handler_6",
+      "Transition-table handler 6: applies the object-state/counter threshold and selects the shared transition state.")
+label(0x00075048, "match_transition_handler_7",
+      "Transition-table handler 7: applies the high-counter threshold, selects state 3 or 6, and updates auxiliary fields.")
+label(0x0007510c, "match_transition_counter_clamp",
+      "Out-of-range transition clamp: converts the shared counter threshold to a boolean, selects state 3, and joins the common continuation.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",
