@@ -2628,6 +2628,12 @@ FIFO, and calculates the fixed-point transform value stored at `0x1c4`; the
 handler ends at `0x62d28`.  The following phase transition at `0x62d30` uses
 the `0x47c00`/`0x47c08` records and ends at `0x62fc8`.
 
+The next compact transitions use the `0x47c18` pair (`0x62fd0–0x6311c`)
+and the `0x47c20` pair (`0x63120–0x631dc`), followed by the short
+`0x47e10` controller at `0x631e0–0x63284` and the `0x47e00` transition at
+`0x63290–0x6336c`.  The larger indexed controller at `0x63370` uses the
+`0x47c30`/`0x47c34` records with status gating and ends at `0x636b0`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
