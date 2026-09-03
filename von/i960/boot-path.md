@@ -2514,6 +2514,11 @@ The next multi-arm indexed transition begins at `0x5c370`, uses the object
 record, clears phase fields, and initializes the next state before returning at
 `0x5c6b8`.
 
+The next indexed sibling at `0x5c6c0` uses the paired `0x480f0`/`0x480f4`
+records and the object arrays, ending at `0x5c97c` after its terminal
+phase/status arms.  Its reset helper at `0x5c980` selects the mode-specific
+record and reinitializes object state through `0x5c9e8`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
