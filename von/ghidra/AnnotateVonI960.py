@@ -731,6 +731,14 @@ label(0x00057530, "geometry_object_profile_indexed_geometry_update_variant_f",
       "Indexed profile geometry update using the 0x47800 record pair, shared cursor publication, phase progression, and status reset paths.")
 label(0x000576d0, "geometry_object_profile_indexed_geometry_update_variant_g",
       "Indexed profile geometry update sibling using the 0x47810 record pair, shared cursor publication, phase progression, and status reset paths.")
+label(0x00057870, "geometry_object_profile_video_command_producer_variant_a",
+      "Video/geometry command producer that emits the object packet to 0x884000, polls the result threshold, and publishes fields 0x1c4/0x19c/0x1af.")
+label(0x00057ad0, "geometry_object_profile_video_command_producer_variant_b",
+      "Video/geometry command producer sibling using the 0x47830 record pair, command-port polling, phase progression, and status completion.")
+label(0x00057d70, "geometry_object_profile_compact_transition_variant_f",
+      "Compact profile transition using the 0x47840 descriptor and shared cursor publication, with an indirect completion return.")
+label(0x00057e30, "geometry_object_profile_video_command_producer_variant_c",
+      "Video/geometry command producer sibling using the 0x47848 descriptor, command-port polling, phase progression, and status completion.")
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
@@ -1497,6 +1505,10 @@ ensure_function(0x00056f40, "geometry_object_profile_phase_state_dispatch_varian
 ensure_function(0x00057270, "geometry_object_profile_phase_state_dispatch_variant_l", 0x00057530)
 ensure_function(0x00057530, "geometry_object_profile_indexed_geometry_update_variant_f", 0x000576d0)
 ensure_function(0x000576d0, "geometry_object_profile_indexed_geometry_update_variant_g", 0x00057870)
+ensure_function(0x00057870, "geometry_object_profile_video_command_producer_variant_a", 0x00057ac8)
+ensure_function(0x00057ad0, "geometry_object_profile_video_command_producer_variant_b", 0x00057d64)
+ensure_function(0x00057d70, "geometry_object_profile_compact_transition_variant_f", 0x00057e30)
+ensure_function(0x00057e30, "geometry_object_profile_video_command_producer_variant_c", 0x00057fb8)
 ensure_function(0x0002dc50, "startup_status_arm_geometry_init", 0x0002dd2c)
 ensure_function(0x0002dd30, "startup_status_arm_geometry_build", 0x0002dec8)
 ensure_function(0x0002ded0, "startup_status_arm_geometry_frame_service", 0x0002e140)

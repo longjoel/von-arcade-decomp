@@ -2414,6 +2414,18 @@ updaters at `0x57530` and `0x576d0` use the `0x47800` and `0x47810` record
 families, respectively, with phase progression and reset paths ending at
 `0x576cc` and `0x5786c`.
 
+The `0x57870` entry is the first explicit video/geometry command producer in
+this run.  It emits the object packet through `0x884000`, polls the command
+result, advances subphase `0x17e`, and publishes `0x1c4` plus the associated
+status fields before ending at `0x57ac8`.  Its larger sibling at `0x57ad0`
+uses the `0x47830` record pair and follows the same command-port handoff,
+ending at `0x57d64`.
+
+The compact `0x57d70` transition uses the `0x47840` descriptor and returns
+through its saved link at `0x57e28`.  The following `0x57e30` command producer
+uses `0x47848`, repeats the command-port polling and phase/status publication,
+and ends at `0x57fb8`.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
