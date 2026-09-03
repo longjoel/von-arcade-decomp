@@ -2072,6 +2072,15 @@ bounded state and phase latch.  The returns at `0x438d0`, `0x439bc`, and the
 two internal exits of `0x439e0` establish the boundaries; `0x43ac4` is a
 branch target inside the last handler, not a separate function.
 
+The next cursor-transition group contains `0x43b00`, `0x43bb0`, and `0x43cb0`,
+which share descriptor data around `0x43b90` and publish the same profile cursor
+globals.  The latter two include initial-state and phase-threshold handling;
+`0x43cb0` is the compact advance-only form.  The following descriptor table at
+`0x43d20` feeds floating-point variants `0x43d50` and `0x43e00`, which update
+the object scalar at `0xac` while retaining the shared cursor/timing protocol.
+Returns at `0x43b88`, `0x43ca0`, `0x43d0c`, `0x43dfc`, and `0x43ed8` delimit
+these handlers from their tables and padding.
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
