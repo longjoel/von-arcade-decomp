@@ -1692,6 +1692,11 @@ credit/manual settings through its return at `0xf22e0`, while `0xf2770`
 formats the live coin/input matrix and multipliers through its return at
 `0xf2930`.
 
+The shared coin-configuration decoder at `0xf19e8` derives the live input and
+coin fields from the selected configuration and returns through its caller
+continuation at `0xf1aa4`. The arithmetic helper at `0xf23e0` then builds a
+nine-entry coin/credit matrix using those bytes, returning at `0xf264c`.
+
 The statistics renderer at `0xf33a0` reads the `0x1d00040–0x1d000a0`
 accounting fields and formats game-time/bookkeeping results, returning at
 `0xf3a64`. The EEPROM confirmation service at `0xf3ab0` displays the clear /
