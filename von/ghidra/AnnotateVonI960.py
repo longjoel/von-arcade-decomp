@@ -446,6 +446,10 @@ label(0x000e9140, "geometry_runtime_event_dispatch",
       "Updates the rolling geometry-event fields, computes pair deltas, and dispatches the next event arm.")
 label(0x000e91f0, "geometry_runtime_event_arm_table",
       "Twelve-entry event-arm table selected from the rolling event counter.")
+label(0x000eaa60, "geometry_event_setup_helper",
+      "Emits the event setup packet, derives shared geometry fields, and updates the event workspace.")
+label(0x000ead20, "geometry_event_lookup_data",
+      "Literal geometry-event lookup records following the setup helper.")
 label(0x000d24b0, "startup_status_arm_text_status_init",
       "Initializes status-text counters/assets, resets the video context, and advances the service counter.")
 label(0x000d2560, "startup_status_arm_profile_dispatch",
@@ -516,6 +520,7 @@ ensure_function(0x000e7340, "geometry_status_emit_dispatch", 0x000e738c)
 ensure_function(0x000e7390, "geometry_object_packet_dispatch", 0x000e79e4)
 ensure_function(0x000e79f0, "geometry_status_scene_dispatch", 0x000e913c)
 ensure_function(0x000e9140, "geometry_runtime_event_dispatch", 0x000eaa54)
+ensure_function(0x000eaa60, "geometry_event_setup_helper", 0x000ead20)
 ensure_function(0x000d24b0, "startup_status_arm_text_status_init", 0x000d2560)
 ensure_function(0x000d2560, "startup_status_arm_profile_dispatch", 0x000d25b0)
 ensure_function(0x000d25b0, "startup_status_arm_profile_service", 0x000d25f0)

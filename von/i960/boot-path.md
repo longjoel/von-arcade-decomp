@@ -1569,6 +1569,11 @@ through the later `0xea...` region, but converge through the shared finalizer
 at `0xea9a0` and return at `0xeaa50`; `0xeaa60` begins the next separate
 command/setup entry. This bounds the complete dispatcher at `0xe9140–0xeaa54`.
 
+The helper at `0xeaa60` is called by both status-preparation paths. It emits
+the event setup packet, derives the shared fields at `0x5783e4–0x5783f8`,
+resets the event counters when required, and returns at `0xead1c`.
+`0xead20` begins its literal geometry-event lookup data.
+
 `0x6fec0` initializes a geometry-device command path: it validates the
 selector, programs `0x800030`, and emits the associated fixed packet through
 the `0x804000` command window.
