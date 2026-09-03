@@ -2142,6 +2142,8 @@ ensure_function(0x00070000, "geometry_command_packet_builder_variant_b", 0x00070
 ensure_function(0x000700e0, "geometry_command_packet_builder_variant_c", 0x000701a0)
 ensure_function(0x000701a0, "geometry_clip_packet_builder", 0x00070970)
 ensure_function(0x00070970, "geometry_extended_packet_builder", 0x00070c74)
+ensure_function(0x00070c80, "geometry_command_packet_builder_variant_d", 0x00070fc0)
+ensure_function(0x00070fc0, "geometry_command_packet_builder_variant_e", 0x00071080)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2313,6 +2315,10 @@ label(0x000701a0, "geometry_clip_packet_builder",
       "Selects one of four signed coordinate-ordering arms, emits the matching geometry packet through 0x804000, and converges on the shared internal tail at 0x70950.")
 label(0x00070970, "geometry_extended_packet_builder",
       "Builds the extended multi-command geometry packet sequence through 0x804000, including transformed coordinate pairs and fixed 1.0/0x01540601 fields.")
+label(0x00070c80, "geometry_command_packet_builder_variant_d",
+      "Emits the extended geometry packet variant through 0x804000, initializing four frame words before publishing transformed coordinate fields.")
+label(0x00070fc0, "geometry_command_packet_builder_variant_e",
+      "Emits a compact geometry packet through 0x804000 with caller coordinates, fixed 1.0/0x01540601/0x7f000000 fields, and a final frame word.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",

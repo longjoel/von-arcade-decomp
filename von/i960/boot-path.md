@@ -1819,6 +1819,11 @@ both startup geometry setup and the active object/update paths.
 The separate late-path target at `0x70970–0x70c70` is now bounded as
 `geometry_extended_packet_builder`; it emits the longer multi-command packet
 sequence used by the object setup callers and returns at `0x70c70`.
+The following table-style entries are bounded independently as well:
+`0x70c80–0x70fb8` emits the longer frame-initializing packet variant, and
+`0x70fc0–0x7107c` emits the compact fixed-constant variant. Their separate
+return sites leave the prologue at `0x71080` available as the next routine
+boundary.
 
 The motion/update family continues through `0x2f360–0x30220`.  The aligned
 entries at `0x2f360`, `0x2f460`, `0x2f580`, `0x2f930`, `0x2fb20`, `0x2fe30`,
