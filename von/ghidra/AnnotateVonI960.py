@@ -385,6 +385,8 @@ label(0x0002bdc0, "startup_geometry_status_dispatch_table",
       "Three-entry geometry/status arm table selected by the low two bits of 0x503a00.")
 label(0x0002bdd0, "startup_geometry_status_dispatch",
       "Dispatches the selected geometry/status arm and advances the startup counter on fallback.")
+label(0x0002bee4, "geometry_frame_service_arm_table",
+      "Twelve-entry frame-service target table whose geometry arms share downstream code and returns.")
 label(0x0002dc50, "startup_status_arm_geometry_init")
 label(0x0002dd30, "startup_status_arm_geometry_build")
 label(0x0002ded0, "startup_status_arm_geometry_frame_service",

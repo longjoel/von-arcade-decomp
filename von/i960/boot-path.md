@@ -160,6 +160,9 @@ tables using offsets `0x40` and `0x100`.
 `0x2b430`, which indexes object records and dispatches either to `0x6fd50` or
 an indirect table entry, and `0x2be30`, which initializes frame-service
 counters and dispatches through the 12-entry table at `0x2bee4`.
+The table targets are geometry entry points into shared downstream code rather
+than independent leaf functions; several paths converge on common returns in
+the `0x2d9xx` region.
 
 The subsequent trace comparison adds six boundary labels. `0x2d9a0` routes
 geometry transforms back through the profile uploader; `0x2e1c8` and
