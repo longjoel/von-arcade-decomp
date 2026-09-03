@@ -2568,6 +2568,15 @@ at `0x5e730` uses the `0x48420` records and returns through a saved callback,
 ending at `0x5e900`.  The parallel controller at `0x5e910` repeats the
 multi-arm `0x79034` asset/phase pattern and ends at `0x5eae4`.
 
+The following controller at `0x5eaf0` uses the `0x26d1f5c` asset records,
+phase/status gates, and object geometry setup before returning through its
+callback at `0x5ecbc`.  The compact transitions at `0x5ecc0` and `0x5efa0`
+use the `0x48480`/`0x48488`/`0x48490` and `0x484a0`/`0x484a8`/`0x484b0`
+records respectively, with shared cursor publication and terminal resets;
+they end at `0x5ef94` and `0x5f24c`.  Two parallel record-backed transitions
+follow at `0x5f250` (`0x484f0`, ending `0x5f584`) and `0x5f590` (`0x484c0`,
+ending `0x5f750`).
+
 `0x1bc20` converts asset words in bulk, swapping the two byte lanes of each
 16-bit source word while preserving the masked layout for ROM-backed graphics
 and data regions.
