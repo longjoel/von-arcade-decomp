@@ -8,10 +8,20 @@ import gzip
 import tempfile
 from pathlib import Path
 
-from compare_ordered_events import capture_provenance_errors, compare, context_errors, load_events
+from compare_ordered_events import (capture_provenance_errors, compare, context_errors,
+                                    load_events)
 
 
 def main() -> int:
+    fixture_root = Path(__file__).resolve().parents[1] / "tests/fixtures/ordered-events"
+    fixture_report = compare(
+        load_events(fixture_root / "original.ndjson"),
+        load_events(fixture_root / "reconstructed.ndjson"),
+    )
+    assert fixture_report["first_divergence_index"] == 2
+    assert fixture_report["last_matching_event"]["name"] == "scheduler"
+    assert fixture_report["first_divergence"]["original"]["target"] == "0x00002000"
+    assert fixture_report["first_divergence"]["reconstructed"]["target"] == "0x00003000"
     original = [
         {"seq": 1, "time": 1.0, "frame": 1, "cpu": "maincpu", "kind": "checkpoint", "name": "reset"},
         {"seq": 2, "time": 1.0, "frame": 1, "cpu": "maincpu", "kind": "checkpoint", "name": "scheduler"},
