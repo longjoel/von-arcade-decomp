@@ -71,6 +71,13 @@ def main() -> int:
         broken = copy.deepcopy(manifest)
         broken["inputs"] = {"path": "rom-manifest.json"}
         assert any("inputs must be an array" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["artifacts"].append(copy.deepcopy(broken["artifacts"][0]))
+        assert any("duplicate file" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["isolation"]["nvram_directory"] = "cfg"
+        broken["isolation"]["nvram_directory_sha256"] = broken["isolation"]["cfg_directory_sha256"]
+        assert any("directories must be distinct" in error for error in validate(broken, root))
         outside = root.parent / "outside-capture-fixture.txt"
         outside.write_text("outside\n", encoding="utf-8")
         link = root / "linked-artifact.txt"

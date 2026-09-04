@@ -104,6 +104,7 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
                 if report.get("phase") is not None and report.get("phase") != expected_phase:
                     errors.append("coverage report phase does not match sidecar stimulus phase")
     isolation = manifest.get("isolation", {})
+    isolation_resolved: dict[str, Path] = {}
     for field in ("cfg_directory", "nvram_directory", "state_directory"):
         path = isolation.get(field)
         if not safe_path(path) or not path:
@@ -112,11 +113,16 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
             errors.append(f"missing isolation directory {path}")
         elif isolation.get(f"{field}_sha256") != directory_sha256(rooted(root, path)):
             errors.append(f"hash mismatch for isolation.{field}")
+        else:
+            isolation_resolved[field] = rooted(root, path).resolve()
+    if len(set(isolation_resolved.values())) != len(isolation_resolved):
+        errors.append("isolation directories must be distinct")
     for section in ("inputs", "artifacts"):
         items = manifest.get(section, [])
         if not isinstance(items, list):
             errors.append(f"{section} must be an array")
             continue
+        paths: set[Path] = set()
         for index, item in enumerate(items):
             if not isinstance(item, dict):
                 errors.append(f"{section}[{index}] must be an object")
@@ -126,6 +132,11 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
             if path is None or not path.is_file():
                 errors.append(f"{section}[{index}]: missing file {path_text}")
                 continue
+            resolved_path = path.resolve()
+            if resolved_path in paths:
+                errors.append(f"{section}[{index}]: duplicate file {path_text}")
+                continue
+            paths.add(resolved_path)
             if not isinstance(item.get("sha256"), str) or not SHA256_RE.fullmatch(item["sha256"]):
                 errors.append(f"{section}[{index}]: sha256 must be a SHA-256 digest")
                 continue
