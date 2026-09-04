@@ -89,9 +89,11 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
             value = document.get(field)
             if not isinstance(value, int) or isinstance(value, bool) or value < 0:
                 raise ValueError(f"metrics {name}.{field} must be a nonnegative integer")
-    for field in ("original_checkpoints", "missed_checkpoints", "unexpected_checkpoints"):
+    for field in ("original_checkpoints", "missed_checkpoints", "unexpected_checkpoints",
+                  "missing_original_checkpoints", "missing_reconstructed_checkpoints"):
         if not isinstance(comparison.get(field), list) or not all(isinstance(item, str) for item in comparison[field]):
-            raise ValueError(f"metrics comparison.{field} must be a string array")
+            if field in comparison:
+                raise ValueError(f"metrics comparison.{field} must be a string array")
     if experiments is not None:
         for field in ("changed_decision", "quarantined"):
             value = experiments.get(field, 0)
@@ -130,10 +132,15 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
             "matched_prefix_events": comparison.get("matched_prefix_events", 0),
             "confirmed_dynamic_edges": comparison.get("confirmed_dynamic_edge_count", 0),
             "observed_indirect_targets": comparison.get("observed_indirect_target_count", 0),
+            "checkpoint_outcome": comparison.get("checkpoint_outcome", "unknown"),
             "checkpoints_passed": [name for name in comparison.get("original_checkpoints", [])
-                                   if name not in comparison.get("missed_checkpoints", [])],
+                                   if name not in comparison.get("missed_checkpoints", [])
+                                   and name not in comparison.get("missing_original_checkpoints", [])
+                                   and name not in comparison.get("missing_reconstructed_checkpoints", [])],
             "missed_checkpoints": comparison.get("missed_checkpoints", []),
             "unexpected_checkpoints": comparison.get("unexpected_checkpoints", []),
+            "missing_original_checkpoints": comparison.get("missing_original_checkpoints", []),
+            "missing_reconstructed_checkpoints": comparison.get("missing_reconstructed_checkpoints", []),
         },
         "experiments": {
             "changed_decision": (experiments or {}).get("changed_decision", 0),
