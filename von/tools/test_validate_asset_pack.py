@@ -32,6 +32,9 @@ def main() -> int:
         broken = copy.deepcopy(pack)
         broken["basis"] = []
         assert any("basis must be an object" in error for error in validate(broken, evidence, root))
+        broken = copy.deepcopy(pack)
+        broken["basis"]["tool_revision"] = ["tool"]
+        assert any("missing basis.tool_revision" in error for error in validate(broken, evidence, root))
         broken_evidence = {"entries": ["malformed"]}
         assert any("unknown canonical basis" in error for error in validate(pack, broken_evidence, root))
         rom_manifest = root / "rom-manifest.json"

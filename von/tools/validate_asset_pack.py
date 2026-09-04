@@ -66,7 +66,7 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         errors.append("basis must be an object")
         basis = {}
     for field in ("romset_hash", "map_revision", "capture_id", "tool_revision"):
-        if not basis.get(field):
+        if not isinstance(basis.get(field), str) or not basis.get(field):
             errors.append(f"missing basis.{field}")
     if basis.get("romset_hash") and not SHA256_RE.fullmatch(str(basis["romset_hash"])):
         errors.append("basis.romset_hash must be a SHA-256 digest")
