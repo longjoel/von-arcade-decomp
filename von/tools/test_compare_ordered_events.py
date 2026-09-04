@@ -64,6 +64,10 @@ def main() -> int:
     mismatched_inputs["inputs"][0]["sha256"] = "b" * 64
     assert any("input inventories differ" in error
                for error in context_errors(context, mismatched_inputs))
+    mismatched_checkpoints = copy.deepcopy(reconstructed_context)
+    mismatched_checkpoints["checkpoints"] = ["reset"]
+    assert any("capture checkpoints differ" in error
+               for error in context_errors(context, mismatched_checkpoints))
     try:
         compare(original, reconstructed, context,
                 {"schema_version": 1, "id": "reconstructed-v1", "objective": "other",
@@ -75,7 +79,8 @@ def main() -> int:
     assert context_errors(context, {"schema_version": 1, "id": "other", "objective": "other",
                                     "stimulus": context["stimulus"],
                                     "configuration": reconstructed_context["configuration"],
-                                    "inputs": reconstructed_context["inputs"]}) == ["capture objectives differ"]
+                                    "inputs": reconstructed_context["inputs"],
+                                    "checkpoints": reconstructed_context["checkpoints"]}) == ["capture objectives differ"]
     mismatched_configuration = copy.deepcopy(reconstructed_context)
     mismatched_configuration["configuration"]["mame_revision"] = "def"
     assert any("configuration.mame_revision differs" in error
