@@ -82,6 +82,11 @@ def indirect_targets(events: list[dict[str, Any]]) -> set[str]:
             if event.get("kind") == "indirect-call" and event.get("target") is not None}
 
 
+def edge_records(edges: set[tuple[str, str]]) -> list[list[str]]:
+    """Encode dynamic edge sets deterministically for JSON reports."""
+    return [[caller, target] for caller, target in sorted(edges)]
+
+
 def context_errors(original: dict[str, Any], reconstructed: dict[str, Any]) -> list[str]:
     errors = []
     for label, context in (("original", original), ("reconstructed", reconstructed)):
@@ -139,6 +144,10 @@ def compare(original: list[dict[str, Any]], reconstructed: list[dict[str, Any]],
             raise ValueError("; ".join(context_problems))
     validate_order(original)
     validate_order(reconstructed)
+    original_edges = dynamic_edges(original)
+    reconstructed_edges = dynamic_edges(reconstructed)
+    original_indirect = indirect_targets(original)
+    reconstructed_indirect = indirect_targets(reconstructed)
     common = min(len(original), len(reconstructed))
     divergence = next(
         (index for index in range(common)
@@ -154,9 +163,15 @@ def compare(original: list[dict[str, Any]], reconstructed: list[dict[str, Any]],
         "outcome": "pass" if divergence is None else "divergence",
         "original_checkpoints": checkpoints(original),
         "reconstructed_checkpoints": checkpoints(reconstructed),
-        "confirmed_dynamic_edge_count": len(dynamic_edges(original)),
-        "observed_indirect_targets": sorted(indirect_targets(original)),
-        "observed_indirect_target_count": len(indirect_targets(original)),
+        "confirmed_dynamic_edge_count": len(original_edges),
+        "observed_indirect_targets": sorted(original_indirect),
+        "observed_indirect_target_count": len(original_indirect),
+        "original_dynamic_edges": edge_records(original_edges),
+        "reconstructed_dynamic_edges": edge_records(reconstructed_edges),
+        "missing_dynamic_edges": edge_records(original_edges - reconstructed_edges),
+        "unexpected_dynamic_edges": edge_records(reconstructed_edges - original_edges),
+        "missing_indirect_targets": sorted(original_indirect - reconstructed_indirect),
+        "unexpected_indirect_targets": sorted(reconstructed_indirect - original_indirect),
     }
     if original_context is not None and reconstructed_context is not None:
         result["original_capture_id"] = original_context.get("id")

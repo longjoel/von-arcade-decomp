@@ -30,6 +30,14 @@ def main() -> int:
     call_report = compare(calls, copy.deepcopy(calls))
     assert call_report["confirmed_dynamic_edge_count"] == 1
     assert call_report["observed_indirect_targets"] == ["0x20"]
+    altered_calls = copy.deepcopy(calls)
+    altered_calls[-2]["target"] = "0x30"
+    altered_calls[-1]["target"] = "0x30"
+    edge_delta = compare(calls, altered_calls)
+    assert edge_delta["missing_dynamic_edges"] == [["0x10", "0x20"]]
+    assert edge_delta["unexpected_dynamic_edges"] == [["0x10", "0x30"]]
+    assert edge_delta["missing_indirect_targets"] == ["0x20"]
+    assert edge_delta["unexpected_indirect_targets"] == ["0x30"]
     assert compare(original, reconstructed)["missed_checkpoints"] == []
     context = {"schema_version": 1, "id": "original-v1", "objective": "pilot", "stimulus": {"kind": "attract", "seconds": 1}}
     reconstructed_context = {"schema_version": 1, "id": "reconstructed-v1", "objective": "pilot", "stimulus": {"kind": "attract", "seconds": 1}}
