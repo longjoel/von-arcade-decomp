@@ -35,6 +35,11 @@ def validate_lifecycle(
     images = ledger.get("images")
     if not isinstance(images, list):
         return ["ledger images must be an array"]
+    if not isinstance(manifest, dict):
+        return ["evidence manifest must be an object"]
+    manifest_entries = manifest.get("entries")
+    if not isinstance(manifest_entries, list):
+        return ["evidence manifest entries must be an array"]
     errors: list[str] = []
 
     def safe_reference(value: Any) -> bool:
@@ -122,32 +127,30 @@ def validate_lifecycle(
         if isinstance(image.get("work_units", []), list)
         and isinstance(unit, dict) and isinstance(unit.get("id"), str) and unit.get("id")
     }
-    manifest_entries = manifest.get("entries", []) if isinstance(manifest, dict) else []
     manifest_ids: set[str] = set()
-    if isinstance(manifest_entries, list):
-        for index, entry in enumerate(manifest_entries):
-            if not isinstance(entry, dict):
-                continue
-            evidence_id = entry.get("id")
-            if isinstance(evidence_id, str) and evidence_id:
-                if evidence_id in manifest_ids:
-                    errors.append(f"manifest.entries[{index}]: duplicate stable id")
-                manifest_ids.add(evidence_id)
-            if not isinstance(entry.get("canonical"), bool):
-                errors.append(f"manifest.entries[{index}]: canonical must be boolean")
-            elif entry.get("canonical") is True:
-                consumers = entry.get("consumers")
-                if (not isinstance(consumers, list) or not consumers
-                        or not all(isinstance(consumer, str) and consumer for consumer in consumers)):
-                    errors.append(f"manifest.entries[{index}]: canonical consumers must be a non-empty string array")
-                elif len(set(consumers)) != len(consumers):
-                    errors.append(f"manifest.entries[{index}]: canonical consumers must be unique")
-                else:
-                    unknown_consumers = sorted(set(consumers) - ledger_unit_ids)
-                    if unknown_consumers:
-                        errors.append(
-                            f"manifest.entries[{index}]: canonical consumers are unknown: "
-                            + ", ".join(unknown_consumers))
+    for index, entry in enumerate(manifest_entries):
+        if not isinstance(entry, dict):
+            continue
+        evidence_id = entry.get("id")
+        if isinstance(evidence_id, str) and evidence_id:
+            if evidence_id in manifest_ids:
+                errors.append(f"manifest.entries[{index}]: duplicate stable id")
+            manifest_ids.add(evidence_id)
+        if not isinstance(entry.get("canonical"), bool):
+            errors.append(f"manifest.entries[{index}]: canonical must be boolean")
+        elif entry.get("canonical") is True:
+            consumers = entry.get("consumers")
+            if (not isinstance(consumers, list) or not consumers
+                    or not all(isinstance(consumer, str) and consumer for consumer in consumers)):
+                errors.append(f"manifest.entries[{index}]: canonical consumers must be a non-empty string array")
+            elif len(set(consumers)) != len(consumers):
+                errors.append(f"manifest.entries[{index}]: canonical consumers must be unique")
+            else:
+                unknown_consumers = sorted(set(consumers) - ledger_unit_ids)
+                if unknown_consumers:
+                    errors.append(
+                        f"manifest.entries[{index}]: canonical consumers are unknown: "
+                        + ", ".join(unknown_consumers))
     canonical_entries = {
         entry.get("id"): entry
         for entry in manifest_entries
@@ -169,6 +172,8 @@ def validate_lifecycle(
                 continue
             where = f"images[{image_name}].work_units[{index}]"
             stage = unit.get("stage")
+            if stage not in STAGES:
+                errors.append(f"{where}: stage must be one of the known lifecycle stages")
             if "active" in unit and not isinstance(unit.get("active"), bool):
                 errors.append(f"{where}: active must be boolean")
             if unit.get("active") is True and stage != "modeled":

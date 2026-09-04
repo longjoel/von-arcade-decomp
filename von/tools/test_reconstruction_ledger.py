@@ -25,6 +25,10 @@ def main() -> int:
                for error in validate({"schema_version": 2, "images": {}}, Path.cwd()))
     assert any("ledger must be an object" in error
                for error in validate_lifecycle([], {"entries": []}))
+    assert any("evidence manifest must be an object" in error
+               for error in validate_lifecycle({"images": []}, []))
+    assert any("evidence manifest entries must be an array" in error
+               for error in validate_lifecycle({"images": []}, {}))
     malformed_shape = {"schema_version": 2, "images": [{"name": "maincpu", "work_units": {}}]}
     assert any("work_units must be an array" in error for error in validate(malformed_shape))
     malformed_shape["images"][0]["work_units"] = [{"id": "unit", "classification": "code",
@@ -218,6 +222,10 @@ def main() -> int:
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][4]["byte_validation"]["comparison"] = "mismatch"
     assert any("must be match" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][0]["stage"] = "finished"
+    assert any("stage must be one of the known lifecycle stages" in error
+               for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][4]["verifier"] = "../verify.py"
     assert any("safe relative path" in error for error in validate_lifecycle(broken, manifest))
