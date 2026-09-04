@@ -216,6 +216,11 @@ def main() -> int:
         parser.error("--window-events must be non-negative")
     if args.trigger_kind is not None and args.window_events is None:
         parser.error("--trigger-kind requires --window-events")
+    for label, path in (("trace", args.trace), ("capture manifest", args.capture_manifest),
+                        ("normalized output", args.ndjson), ("summary output", args.summary)):
+        if path is not None and path.is_symlink():
+            print(f"Trace provenance: {label} path must not be a symlink")
+            return 1
 
     provenance = None
     if args.capture_manifest:

@@ -5,10 +5,15 @@ from __future__ import annotations
 
 import json
 import gzip
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 from normalize_mame_trace import ndjson_event, read_trace, select_events, summary, trigger_window
+
+
+TOOL = Path(__file__).resolve().parent / "normalize_mame_trace.py"
 
 
 def main() -> int:
@@ -67,6 +72,14 @@ def main() -> int:
         with gzip.open(compressed, "wt", encoding="utf-8") as stream:
             stream.write(json.dumps(event) + "\n")
         assert read_trace(compressed).strip() == json.dumps(event)
+        linked = Path(directory) / "linked-events.ndjson"
+        linked.symlink_to(path)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), str(linked)],
+            cwd=directory, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "trace path must not be a symlink" in cli_result.stdout
     print("PASS: MAME trace normalizer emits ordered NDJSON events")
     return 0
 
