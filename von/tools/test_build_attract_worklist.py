@@ -52,12 +52,14 @@ def main() -> int:
         assert output["units"][0]["possible_static_edges"] == 1
         assert "observed_call_edges" not in output["units"][0]
         comparison = {"missing_dynamic_edges": [["0x200", "0x100"], ["0x300", "0x400"]],
-                      "missed_checkpoints": ["scheduler"]}
+                      "missed_checkpoints": ["scheduler"], "first_divergence_index": 12}
         result = run(coverage, ledger, work, comparison)
         assert result.returncode == 0, result.stderr
         causal = json.loads((work / "worklist.json").read_text(encoding="utf-8"))
         assert causal["missing_dynamic_edge_count"] == 2
         assert causal["missed_checkpoints"] == ["scheduler"]
+        assert causal["checkpoint_distance"] == 1
+        assert causal["first_divergence_index"] == 12
         assert causal["units"][0]["causal_priority"] == 0
         assert causal["units"][0]["dynamic_dependencies"] == [["0x00000200", "0x00000100"]]
         assert causal["dynamic_targets_added"] == 1
@@ -65,6 +67,8 @@ def main() -> int:
         assert dynamic_target["discovery"] == "tier-b-dynamic-target"
         assert dynamic_target["stage"] == "planned"
         invalid_comparison = {"missing_dynamic_edges": ["malformed"]}
+        assert run(coverage, ledger, work, invalid_comparison).returncode != 0
+        invalid_comparison = {"missing_dynamic_edges": [], "missed_checkpoints": "scheduler"}
         assert run(coverage, ledger, work, invalid_comparison).returncode != 0
         invalid = dict(coverage)
         invalid["edge_semantics"] = "executed_direct_edges"

@@ -42,6 +42,8 @@ def main() -> int:
     ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
     comparison = None
     causal_edges: list[tuple[int, int]] = []
+    checkpoint_distance = 0
+    first_divergence_index = None
     if args.comparison:
         comparison = json.loads(args.comparison.read_text(encoding="utf-8"))
         if not isinstance(comparison, dict):
@@ -50,6 +52,19 @@ def main() -> int:
             causal_edges = missing_dynamic_edges(comparison)
         except ValueError as error:
             raise SystemExit(str(error)) from error
+        checkpoint_fields = ("missed_checkpoints", "unexpected_checkpoints",
+                             "missing_original_checkpoints", "missing_reconstructed_checkpoints")
+        for field in checkpoint_fields:
+            value = comparison.get(field, [])
+            if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+                raise SystemExit(f"comparison {field} must be a string array")
+            checkpoint_distance += len(value)
+        first_divergence_index = comparison.get("first_divergence_index")
+        if (first_divergence_index is not None
+                and (not isinstance(first_divergence_index, int)
+                     or isinstance(first_divergence_index, bool)
+                     or first_divergence_index < 0)):
+            raise SystemExit("comparison first_divergence_index must be a non-negative integer")
     if coverage.get("tier") != "A" or coverage.get("edge_semantics") != "possible_static_edges":
         raise SystemExit("coverage must be a Tier A possible_static_edges report")
     work_units = []
@@ -134,6 +149,8 @@ def main() -> int:
         output["dynamic_targets_added"] = len({target for _, target in causal_edges}
                                                - tier_a_targets)
         output["missed_checkpoints"] = comparison.get("missed_checkpoints", [])
+        output["checkpoint_distance"] = checkpoint_distance
+        output["first_divergence_index"] = first_divergence_index
     args.json.parent.mkdir(parents=True, exist_ok=True)
     args.json.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
 
@@ -144,6 +161,7 @@ def main() -> int:
         f"- Modeled integration queue: {modeled_count}",
         f"- Integrated or validated: {integrated_count}",
         f"- Untriaged: {len(units) - represented_count}",
+        *([f"- Checkpoint distance: {checkpoint_distance}"] if comparison is not None else []),
         "",
         "| Entry | Edges | Triage | Work unit |",
         "| --- | ---: | --- | --- |",
