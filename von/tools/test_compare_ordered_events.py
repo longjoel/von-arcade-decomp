@@ -13,11 +13,13 @@ from compare_ordered_events import compare, context_errors, load_events
 def main() -> int:
     original = [
         {"seq": 1, "time": 1.0, "frame": 1, "kind": "checkpoint", "name": "reset"},
-        {"seq": 1, "time": 1.0, "frame": 1, "kind": "checkpoint", "name": "scheduler"},
-        {"seq": 2, "time": 1.1, "frame": 2, "kind": "mmio-write", "address": "0x4d", "value": 77},
+        {"seq": 2, "time": 1.0, "frame": 1, "kind": "checkpoint", "name": "scheduler"},
+        {"seq": 3, "time": 1.1, "frame": 2, "kind": "mmio-write", "address": "0x4d", "value": 77},
     ]
     reconstructed = copy.deepcopy(original)
     reconstructed[0]["seq"] = 100
+    reconstructed[1]["seq"] = 101
+    reconstructed[2]["seq"] = 102
     reconstructed[0]["time"] = 9.0
     reconstructed[0]["source_line"] = 900
     assert compare(original, reconstructed)["outcome"] == "pass"
@@ -55,6 +57,15 @@ def main() -> int:
             assert "event seq" in str(error)
         else:
             raise AssertionError("negative sequence was accepted")
+        malformed.write_text(
+            '{"kind": "checkpoint", "seq": 1}\n{"kind": "checkpoint", "seq": 1}\n',
+            encoding="utf-8")
+        try:
+            load_events(malformed)
+        except ValueError as error:
+            assert "increase strictly" in str(error)
+        else:
+            raise AssertionError("duplicate sequence was accepted")
     print("PASS: ordered event comparison identifies the first divergence")
     return 0
 

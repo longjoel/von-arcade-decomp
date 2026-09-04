@@ -15,6 +15,7 @@ VOLATILE_FIELDS = {"seq", "time", "frame", "source_line"}
 
 def load_events(path: Path) -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = []
+    previous_sequence: int | None = None
     for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         if not line.strip():
             continue
@@ -29,8 +30,24 @@ def load_events(path: Path) -> list[dict[str, Any]]:
         sequence = event.get("seq")
         if not isinstance(sequence, int) or isinstance(sequence, bool) or sequence < 0:
             raise ValueError(f"{path}:{line_number}: event seq must be a non-negative integer")
+        if previous_sequence is not None and sequence <= previous_sequence:
+            raise ValueError(f"{path}:{line_number}: event seq must increase strictly")
+        previous_sequence = sequence
         events.append(event)
     return events
+
+
+def validate_order(events: list[dict[str, Any]]) -> None:
+    previous_sequence: int | None = None
+    for index, event in enumerate(events):
+        if not isinstance(event, dict) or not isinstance(event.get("kind"), str) or not event["kind"]:
+            raise ValueError(f"event {index}: kind must be a non-empty string")
+        sequence = event.get("seq")
+        if not isinstance(sequence, int) or isinstance(sequence, bool) or sequence < 0:
+            raise ValueError(f"event {index}: seq must be a non-negative integer")
+        if previous_sequence is not None and sequence <= previous_sequence:
+            raise ValueError(f"event {index}: seq must increase strictly")
+        previous_sequence = sequence
 
 
 def comparable(event: dict[str, Any]) -> dict[str, Any]:
@@ -60,6 +77,8 @@ def context_errors(original: dict[str, Any], reconstructed: dict[str, Any]) -> l
 def compare(original: list[dict[str, Any]], reconstructed: list[dict[str, Any]],
             original_context: dict[str, Any] | None = None,
             reconstructed_context: dict[str, Any] | None = None) -> dict[str, Any]:
+    validate_order(original)
+    validate_order(reconstructed)
     common = min(len(original), len(reconstructed))
     divergence = next(
         (index for index in range(common)
