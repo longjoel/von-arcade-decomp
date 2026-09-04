@@ -43,6 +43,14 @@ def main() -> int:
         mismatched_capture["objective"] = "different"
         assert any("differs from on-disk" in error for error in register(
             {}, mismatched_capture, capture_path, "mismatch", "verify.py", ["unit-1"], root))
+        partially_invalid = {"images": [{"work_units": [
+            {"id": "unit-1"}, {"id": "unit-2", "evidence": "invalid"}
+        ]}]}
+        before = copy.deepcopy(partially_invalid)
+        assert any("invalid evidence list" in error for error in register(
+            {}, capture, capture_path, "partial", "verify.py", ["unit-1", "unit-2"],
+            root, partially_invalid))
+        assert partially_invalid == before
         broken = copy.deepcopy(manifest)
         assert register(broken, capture, capture_path, "duplicate", "verify.py", ["unit-1"], root)
         assert "unknown ledger consumers" in register({}, capture, root / "capture.json", "unknown", "verify.py", ["missing"], root, ledger)[0]

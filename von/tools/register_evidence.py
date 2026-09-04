@@ -45,14 +45,20 @@ def register(
         unknown = sorted(set(consumers) - unit_ids)
         if unknown:
             return [f"unknown ledger consumers: {', '.join(unknown)}"]
+        consumer_units = []
         for image in ledger.get("images", []):
             for unit in image.get("work_units", []):
                 if unit.get("id") in consumers:
-                    evidence = unit.setdefault("evidence", [])
-                    if not isinstance(evidence, list):
+                    evidence = unit.get("evidence")
+                    if evidence is not None and not isinstance(evidence, list):
                         return [f"ledger consumer {unit['id']} has invalid evidence list"]
-                    if capture_id not in evidence:
-                        evidence.append(capture_id)
+                    consumer_units.append((unit, evidence))
+        for unit, evidence in consumer_units:
+            if evidence is None:
+                evidence = []
+                unit["evidence"] = evidence
+            if capture_id not in evidence:
+                evidence.append(capture_id)
     entry = {
         "id": capture_id,
         "canonical": True,
