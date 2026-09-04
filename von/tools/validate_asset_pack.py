@@ -87,8 +87,14 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         item.get("id") for item in evidence_entries
         if isinstance(item, dict) and item.get("canonical") and isinstance(item.get("id"), str)
     }
+    canonical_entries = {
+        item.get("id"): item for item in evidence_entries
+        if isinstance(item, dict) and item.get("canonical") and isinstance(item.get("id"), str)
+    }
     if basis.get("capture_id") not in canonical_ids:
         errors.append(f"unknown canonical basis capture id {basis.get('capture_id')}")
+    elif canonical_entries[basis["capture_id"]].get("outcome") != "pass":
+        errors.append("basis capture evidence outcome must be pass")
     assets = pack.get("assets")
     if not isinstance(assets, list) or not assets:
         errors.append("assets must be a non-empty array")
@@ -134,6 +140,8 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
                 errors.append(f"{where}: evidence_ids must contain non-empty strings")
             elif evidence_id not in canonical_ids:
                 errors.append(f"{where}: unknown canonical evidence id {evidence_id}")
+            elif canonical_entries[evidence_id].get("outcome") != "pass":
+                errors.append(f"{where}: evidence id {evidence_id} does not have a passing outcome")
         verifiers = asset.get("verifiers")
         if not isinstance(verifiers, list) or not verifiers or not all(isinstance(item, str) and item for item in verifiers):
             errors.append(f"{where}: verifiers must be a non-empty string array")

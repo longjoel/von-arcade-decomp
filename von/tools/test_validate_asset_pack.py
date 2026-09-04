@@ -27,7 +27,7 @@ def main() -> int:
                         "evidence_ids": ["capture-v1"], "verifiers": ["verify-fighter"],
                         "verifier_results": {"verify-fighter": "pass"}}],
         }
-        evidence = {"entries": [{"id": "capture-v1", "canonical": True}]}
+        evidence = {"entries": [{"id": "capture-v1", "canonical": True, "outcome": "pass"}]}
         assert not validate(pack, evidence, root)
         broken = copy.deepcopy(pack)
         broken["basis"] = []
@@ -73,6 +73,8 @@ def main() -> int:
         broken = copy.deepcopy(pack)
         broken["basis"]["capture_id"] = "missing"
         assert any("basis capture id" in error for error in validate(broken, evidence, root))
+        failed_evidence = {"entries": [{"id": "capture-v1", "canonical": True, "outcome": "fail"}]}
+        assert any("evidence outcome must be pass" in error for error in validate(pack, failed_evidence, root))
         outside = root.parent / "outside-asset-fixture.glb"
         outside.write_bytes(b"outside-payload")
         (root / "linked.glb").symlink_to(outside)
