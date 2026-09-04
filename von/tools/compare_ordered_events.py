@@ -240,6 +240,28 @@ def compare(original: list[dict[str, Any]], reconstructed: list[dict[str, Any]],
         name for name in result["reconstructed_checkpoints"]
         if name not in result["original_checkpoints"]
     ]
+    declared_checkpoints = (original_context.get("checkpoints")
+                            if original_context is not None else None)
+    if isinstance(declared_checkpoints, list):
+        result["missing_original_checkpoints"] = [
+            name for name in declared_checkpoints
+            if name not in result["original_checkpoints"]
+        ]
+        result["missing_reconstructed_checkpoints"] = [
+            name for name in declared_checkpoints
+            if name not in result["reconstructed_checkpoints"]
+        ]
+    else:
+        result["missing_original_checkpoints"] = []
+        result["missing_reconstructed_checkpoints"] = []
+    result["checkpoint_outcome"] = (
+        "pass" if not result["missed_checkpoints"]
+        and not result["unexpected_checkpoints"]
+        and not result["missing_original_checkpoints"]
+        and not result["missing_reconstructed_checkpoints"] else "divergence"
+    )
+    if result["outcome"] == "pass" and result["checkpoint_outcome"] != "pass":
+        result["outcome"] = "divergence"
     result["last_matching_event"] = original[divergence - 1] if divergence and divergence > 0 else None
     if divergence is not None:
         result["first_divergence_index"] = divergence

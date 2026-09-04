@@ -57,6 +57,11 @@ def main() -> int:
     assert contextual["original_capture_id"] == "original-v1"
     assert contextual["capture_provenance"]["original"]["checkpoints"] == ["reset", "scheduler"]
     assert contextual["capture_provenance"]["original"]["hypothesis"] == "startup reaches scheduler"
+    checkpoint_missing = compare(original[:1], original[:1], context, reconstructed_context)
+    assert checkpoint_missing["outcome"] == "divergence"
+    assert checkpoint_missing["checkpoint_outcome"] == "divergence"
+    assert checkpoint_missing["missing_original_checkpoints"] == ["scheduler"]
+    assert checkpoint_missing["missing_reconstructed_checkpoints"] == ["scheduler"]
     context["inputs"] = [{"path": "original-rom.json", "sha256": "a" * 64}]
     reconstructed_context["inputs"] = [{"path": "isolated-rom.json", "sha256": "a" * 64}]
     assert compare(original, reconstructed, context, reconstructed_context)["outcome"] == "pass"
