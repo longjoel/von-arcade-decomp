@@ -25,6 +25,17 @@ def safe_path(path_text: Any) -> bool:
     return not path.is_absolute() and ".." not in path.parts
 
 
+def rooted(root: Path, path_text: Any) -> Path | None:
+    if not safe_path(path_text):
+        return None
+    candidate = root / path_text
+    try:
+        candidate.resolve().relative_to(root.resolve())
+    except ValueError:
+        return None
+    return candidate
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -84,7 +95,7 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         if status not in STATUSES:
             errors.append(f"{where}: invalid status {status!r}")
         payload_text = asset.get("payload")
-        payload = root / payload_text if safe_path(payload_text) else None
+        payload = rooted(root, payload_text)
         if payload is None or not payload.is_file():
             errors.append(f"{where}: missing payload {asset.get('payload')}")
         elif asset.get("sha256") != sha256(payload):

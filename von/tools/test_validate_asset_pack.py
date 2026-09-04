@@ -55,6 +55,12 @@ def main() -> int:
         broken = copy.deepcopy(pack)
         broken["basis"]["capture_id"] = "missing"
         assert any("basis capture id" in error for error in validate(broken, evidence, root))
+        outside = root.parent / "outside-asset-fixture.glb"
+        outside.write_bytes(b"outside-payload")
+        (root / "linked.glb").symlink_to(outside)
+        broken = copy.deepcopy(pack)
+        broken["assets"][0]["payload"] = "linked.glb"
+        assert any("missing payload" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
         del broken["assets"][0]["verifier_results"]
         assert any("passing verifier_results" in error for error in validate(broken, evidence, root))
