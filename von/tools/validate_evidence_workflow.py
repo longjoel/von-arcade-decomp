@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import subprocess
 import sys
 from pathlib import Path
@@ -34,6 +35,11 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
             verifier = rooted(root, entry["verifier"])
             if verifier is None or verifier.is_symlink() or not verifier.is_file():
                 errors.append(f"verifier {entry.get('id', '?')} skipped: unsafe or missing path")
+                continue
+            expected_hash = entry.get("verifier_sha256")
+            actual_hash = hashlib.sha256(verifier.read_bytes()).hexdigest()
+            if not isinstance(expected_hash, str) or expected_hash != actual_hash:
+                errors.append(f"verifier {entry.get('id', '?')} skipped: hash mismatch")
                 continue
             completed = subprocess.run([sys.executable, str(verifier)], cwd=root,
                                        capture_output=True, text=True, check=False)

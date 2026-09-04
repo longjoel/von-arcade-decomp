@@ -95,6 +95,18 @@ def main() -> int:
         errors = validate_workflow(root, root / "von/reconstruction_ledger.json", symlinked_path,
                                    run_verifiers=True)
         assert any("skipped: unsafe" in error for error in errors)
+    stale = {
+        "schema_version": 1,
+        "entries": [{"id": "stale", "canonical": True,
+                      "verifier": "von/tools/test_validate_evidence_workflow.py",
+                      "verifier_sha256": "0" * 64}],
+    }
+    with tempfile.TemporaryDirectory(dir=root) as directory:
+        stale_path = Path(directory) / "stale-evidence.json"
+        stale_path.write_text(json.dumps(stale), encoding="utf-8")
+        errors = validate_workflow(root, root / "von/reconstruction_ledger.json", stale_path,
+                                   run_verifiers=True)
+        assert any("skipped: hash mismatch" in error for error in errors)
     missing_pack = root / "von/build/missing-pack.json"
     errors = validate_workflow(
         root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
