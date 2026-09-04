@@ -18,6 +18,12 @@ def register(
     if errors:
         return [f"capture: {error}" for error in errors]
     capture_id = capture.get("id")
+    try:
+        capture_relative = str(capture_path.resolve().relative_to(root.resolve()))
+    except ValueError:
+        capture_relative = ""
+    if not safe_path(capture_relative) or not capture_path.is_file():
+        return [f"missing capture manifest {capture_path}"]
     entries = manifest.setdefault("entries", [])
     if any(entry.get("id") == capture_id for entry in entries):
         return [f"duplicate evidence id {capture_id}"]
@@ -33,6 +39,14 @@ def register(
         unknown = sorted(set(consumers) - unit_ids)
         if unknown:
             return [f"unknown ledger consumers: {', '.join(unknown)}"]
+        for image in ledger.get("images", []):
+            for unit in image.get("work_units", []):
+                if unit.get("id") in consumers:
+                    evidence = unit.setdefault("evidence", [])
+                    if not isinstance(evidence, list):
+                        return [f"ledger consumer {unit['id']} has invalid evidence list"]
+                    if capture_id not in evidence:
+                        evidence.append(capture_id)
     entry = {
         "id": capture_id,
         "canonical": True,
@@ -44,7 +58,7 @@ def register(
         "configuration": capture["configuration"],
         "inputs": capture.get("inputs", []),
         "artifacts": capture.get("artifacts", []),
-        "capture_manifest": str(capture_path.resolve().relative_to(root.resolve())),
+        "capture_manifest": capture_relative,
         "verifier": verifier,
         "outcome": "pass",
         "consumers": consumers,
@@ -76,6 +90,7 @@ def main() -> int:
             print(f"- {error}")
         return 1
     args.manifest.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    args.ledger.write_text(json.dumps(ledger, indent=2) + "\n", encoding="utf-8")
     print(f"Registered canonical evidence: {capture['id']}")
     return 0
 

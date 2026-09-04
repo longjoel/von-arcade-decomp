@@ -30,13 +30,16 @@ def main() -> int:
             capture["isolation"][f"{field}_sha256"] = directory_sha256(root / capture["isolation"][field])
         verifier = root / "verify.py"
         verifier.write_text("# verifier\n", encoding="utf-8")
+        capture_path = root / "capture.json"
+        capture_path.write_text("{}\n", encoding="utf-8")
         manifest = {"schema_version": 1, "entries": []}
         ledger = {"images": [{"work_units": [{"id": "unit-1"}]}]}
-        assert not register(manifest, capture, root / "capture.json", "pilot capture", "verify.py", ["unit-1"], root, ledger)
+        assert not register(manifest, capture, capture_path, "pilot capture", "verify.py", ["unit-1"], root, ledger)
         assert manifest["entries"][0]["canonical"] is True
         assert manifest["entries"][0]["capture_manifest"] == "capture.json"
+        assert ledger["images"][0]["work_units"][0]["evidence"] == ["capture-v1"]
         broken = copy.deepcopy(manifest)
-        assert register(broken, capture, root / "capture.json", "duplicate", "verify.py", ["unit-1"], root)
+        assert register(broken, capture, capture_path, "duplicate", "verify.py", ["unit-1"], root)
         assert "unknown ledger consumers" in register({}, capture, root / "capture.json", "unknown", "verify.py", ["missing"], root, ledger)[0]
         assert "missing verifier" in register({}, capture, root / "capture.json", "unsafe", "../verify.py", ["unit-1"], root, ledger)[0]
     print("PASS: canonical evidence registration validates and deduplicates")
