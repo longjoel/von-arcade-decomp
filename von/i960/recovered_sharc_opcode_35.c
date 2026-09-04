@@ -1,5 +1,6 @@
 /* Recovered normal-case stateful division contract for SHARC opcode 0x35. */
 #include <stdint.h>
+#include "recovered_float.h"
 
 /* ADSP-2106x RECIPS mantissa table, copied from MAME's SHARC core. */
 static const uint32_t recips_mantissa[128] = {
@@ -21,18 +22,6 @@ static const uint32_t recips_mantissa[128] = {
     0x00030000,0x00030000,0x00020000,0x00020000,0x00010000,0x00010000,0x00000000,
 };
 
-static float bits_float(uint32_t bits)
-{
-    union { uint32_t bits; float value; } converted = { bits };
-    return converted.value;
-}
-
-static uint32_t float_bits(float value)
-{
-    union { float value; uint32_t bits; } converted = { value };
-    return converted.bits;
-}
-
 uint32_t recovered_sharc_recips_seed(uint32_t bits)
 {
     uint32_t exponent = (bits >> 23) & 0xffU;
@@ -50,24 +39,6 @@ uint32_t recovered_sharc_recips_seed(uint32_t bits)
            recips_mantissa[(bits & 0x007fffffU) >> 16];
 }
 
-static float rounded_mul(float left, float right)
-{
-    volatile float result = left * right;
-    return result;
-}
-
-static float rounded_sub(float left, float right)
-{
-    volatile float result = left - right;
-    return result;
-}
-
-static float rounded_add(float left, float right)
-{
-    volatile float result = left + right;
-    return result;
-}
-
 /*
  * The preceding handler supplies F0/F2/F13 state. The visible 0x35 path
  * forms (F0_previous*w0 + F2_previous*w2 + w4) / w5. Its RECIPS/Newton path
@@ -78,13 +49,13 @@ uint32_t recovered_sharc_opcode_35_divide(
     uint32_t previous_f0, uint32_t w0, uint32_t previous_f2,
     uint32_t w2, uint32_t w4, uint32_t w5)
 {
-    float numerator = rounded_mul(bits_float(previous_f0), bits_float(w0));
-    float second = rounded_mul(bits_float(previous_f2), bits_float(w2));
-    float denominator = bits_float(w5);
-    float reciprocal = bits_float(recovered_sharc_recips_seed(w5));
+    float numerator = recovered_rounded_mul(recovered_float_from_bits(previous_f0), recovered_float_from_bits(w0));
+    float second = recovered_rounded_mul(recovered_float_from_bits(previous_f2), recovered_float_from_bits(w2));
+    float denominator = recovered_float_from_bits(w5);
+    float reciprocal = recovered_float_from_bits(recovered_sharc_recips_seed(w5));
 
-    numerator = rounded_add(numerator, second);
-    numerator = rounded_add(numerator, bits_float(w4));
+    numerator = recovered_rounded_add(numerator, second);
+    numerator = recovered_rounded_add(numerator, recovered_float_from_bits(w4));
     /* RECIPS(+-0) and the subsequent zero/infinity correction path produce
      * the SHARC canonical NaN. Infinity and NaN denominators likewise cannot
      * produce a finite quotient. */
@@ -95,12 +66,12 @@ uint32_t recovered_sharc_opcode_35_divide(
      * Updating the reciprocal completely and multiplying the numerator only
      * once at the end is algebraically equivalent, but not bit-equivalent:
      * each visible correction has its own 32-bit rounding boundary. */
-    float quotient = rounded_mul(numerator, reciprocal);
-    float residual = rounded_mul(reciprocal, denominator);
+    float quotient = recovered_rounded_mul(numerator, reciprocal);
+    float residual = recovered_rounded_mul(reciprocal, denominator);
     for (int round = 0; round < 3; ++round) {
-        float correction = rounded_sub(2.0f, residual);
-        quotient = rounded_mul(quotient, correction);
-        residual = rounded_mul(correction, residual);
+        float correction = recovered_rounded_sub(2.0f, residual);
+        quotient = recovered_rounded_mul(quotient, correction);
+        residual = recovered_rounded_mul(correction, residual);
     }
-    return float_bits(quotient);
+    return recovered_float_to_bits(quotient);
 }

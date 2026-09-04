@@ -1,5 +1,6 @@
 /* Flagged geometry state packet recovered from i960 0x9d334-0x9d454. */
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -32,14 +33,14 @@ void recovered_geometry_flagged_state_packet_plan(
     plan->state_word = (uint16_t)state_word;
     plan->state_low_nibble = ((u32)(uint16_t)state_word) & 0xfU;
     plan->masked_state_parameter = (plan->state_low_nibble << 12) & 0xf000U;
-    plan->fifo_address = 0x00884000U;
+    plan->fifo_address = RECOVERED_FIFO_ADDRESS;
     plan->first_response_address = 0x00884000U;
     plan->second_response_address = 0x00884000U;
-    plan->published_pointer_address = 0x00801008U;
-    plan->published_pointer_offset = 0x34U;
-    plan->control_address = 0x00800010U;
-    plan->control_value = 0x101U;
-    plan->frame_publish_address = 0x00804000U;
+    plan->published_pointer_address = RECOVERED_FRAME_POINTER;
+    plan->published_pointer_offset = RECOVERED_POINTER_OFFSET;
+    plan->control_address = RECOVERED_GEOMETRY_CONTROL;
+    plan->control_value = RECOVERED_GEOMETRY_CONTROL_VALUE;
+    plan->frame_publish_address = RECOVERED_FRAME_PUBLISH;
     plan->frame_word[0] = 0U;
     plan->frame_word[1] = 0x40009cU;
     plan->first_board_response = first_board_response;
@@ -49,17 +50,7 @@ void recovered_geometry_flagged_state_packet_plan(
     if (!plan->flag_bit1)
         return;
 
-    plan->fifo_word[0] = 29U;
-    plan->fifo_word[1] = plan->masked_state_parameter;
-    plan->fifo_word[2] = 0x40400000U;
-    plan->fifo_word[3] = 19U;
-    plan->fifo_word[4] = second_derived_word;
-    plan->fifo_word[5] = 0x42200000U;
-    plan->fifo_word[6] = second_derived_word;
-    plan->fifo_word[7] = 0x3f800000U;
-    plan->fifo_word[8] = 18U;
-    plan->fifo_word[9] = 0x3f800000U;
-    plan->fifo_word[10] = 0U;
-    plan->fifo_word[11] = 0U;
-    plan->fifo_word[12] = 58U;
+    recovered_fill_thirteen_word_geometry_packet(plan->fifo_word,
+                                                  plan->masked_state_parameter,
+                                                  second_derived_word);
 }

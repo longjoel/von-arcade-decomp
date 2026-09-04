@@ -43,7 +43,6 @@ if GEOMETRY_STATE_LOG_PATH then
     geometry_state_file:write("geometry-state: session start\n")
     geometry_state_file:flush()
 end
-
 local function log(message)
     log_file:write(message .. "\n")
     log_file:flush()

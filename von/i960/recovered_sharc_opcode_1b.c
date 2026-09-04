@@ -2,26 +2,7 @@
 #include <stdint.h>
 
 typedef uint32_t u32;
-
-static float bits_float(u32 bits)
-{
-    union { u32 bits; float value; } value;
-    value.bits = bits;
-    return value.value;
-}
-
-static u32 float_bits(float value)
-{
-    union { u32 bits; float value; } result;
-    result.value = value;
-    return result.bits;
-}
-
-static float rounded_mul(float left, float right)
-{
-    volatile float result = left * right;
-    return result;
-}
+#include "recovered_float.h"
 
 extern u32 recovered_sharc_helper_20dc4_sine(u32 magnitude, int negative);
 
@@ -31,8 +12,8 @@ u32 recovered_sharc_opcode_1b(u32 angle_word)
     int16_t signed_angle = (int16_t)(angle_word & 0xffffU);
     int negative = signed_angle < 0;
     int magnitude_word = negative ? -(int)signed_angle : (int)signed_angle;
-    float radians = rounded_mul((float)magnitude_word,
-                                bits_float(0x38c9116d));
+    float radians = recovered_rounded_mul((float)magnitude_word,
+                                recovered_float_from_bits(0x38c9116d));
     /* The standalone helper model exposes the post-staging radian contract. */
-    return recovered_sharc_helper_20dc4_sine(float_bits(radians), negative);
+    return recovered_sharc_helper_20dc4_sine(recovered_float_to_bits(radians), negative);
 }

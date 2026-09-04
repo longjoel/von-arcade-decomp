@@ -38,8 +38,8 @@ _boot_fault_table:
 
 	.align 4
 _boot_intr_table:
-	.space 16
-	.rept 248
+	.space 36
+	.rept 256
 	.word _fatal_intr
 	.endr
 

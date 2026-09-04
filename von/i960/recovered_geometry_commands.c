@@ -242,4 +242,6 @@ void recovered_geometry_match_object_seed(void)
     GEO_DISPLAY_BUFFER[write_index++] = 0x00800101U;
     for (index = 0U; index < 4U; ++index)
         GEO_DISPLAY_BUFFER[write_index++] = object_packet[index];
+    *GEO_READ_START = 0x00010000U;
+    *GEO_WRITE_START = 0U;
 }

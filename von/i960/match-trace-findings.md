@@ -1,5 +1,9 @@
 # Original-ROM match trace findings
 
+> **Retained evidence note:** reproduce this capture under the current canonical
+> evidence process before using it to promote an asset or reconstruction stage.
+> See [geometry recovery](../docs/geometry.md).
+
 Evidence source: `von/build/disasm/vonj-post-start-45s-drone0.trace`.
 
 The trace was produced on `drone0` from the original `vonj` ROM set. The main

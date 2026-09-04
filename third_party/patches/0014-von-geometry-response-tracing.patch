@@ -1,7 +1,7 @@
 diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
 --- a/src/mame/sega/model2.cpp
 +++ b/src/mame/sega/model2.cpp
-@@ -673,7 +673,33 @@ u32 model2b_state::copro_fifo_r()
+@@ -673,7 +673,41 @@ u32 model2b_state::copro_fifo_r()
  	if ((machine().system().name == std::string_view("vonj")) && (vonj_copro_response_trace_count < 256))
  	{
  		logerror("vonj_copro_response: pc=%08x data=%08x\n", m_maincpu->pc(), data);
@@ -33,9 +33,17 @@ diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
 +		else
 +			vonj_geometry_object_response_trace_count++;
 +	}
++	static unsigned vonj_geometry_76240_read_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) &&
++		(pc >= 0x00076234) && (pc < 0x0007649c) &&
++		(vonj_geometry_76240_read_trace_count < 4096))
++	{
++		logerror("vonj_geometry_76240_fifo: kind=read pc=%08x data=%08x\n", pc, data);
++		vonj_geometry_76240_read_trace_count++;
++	}
  	return data;
  }
-@@ -887,6 +916,14 @@ void model2_state::geo_w(offs_t offset, u32 data)
+@@ -887,5 +916,13 @@ void model2_state::geo_w(offs_t offset, u32 data)
  {
  	int address = offset * 4;
 +	static unsigned vonj_geometry_write_trace_count;
@@ -47,5 +55,6 @@ diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
 +			m_maincpu->pc(), address, data);
 +		vonj_geometry_write_trace_count++;
 +	}
+-
 
  	if (address < 0x1000)

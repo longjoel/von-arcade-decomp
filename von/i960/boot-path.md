@@ -1,5 +1,10 @@
 # i960 Boot-Path Notes
 
+> **Working notebook:** this file preserves accumulated address-level research,
+> including historical and provisional interpretations. Use the
+> [reconstruction handbook](../docs/reconstruction.md) for current workflow and
+> require ledger-backed canonical evidence before treating a claim as validated.
+
 The original `vonj` host image can be reconstructed and disassembled with:
 
 ```sh

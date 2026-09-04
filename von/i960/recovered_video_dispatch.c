@@ -81,13 +81,6 @@ enum recovered_video_post_route {
     RECOVERED_VIDEO_POST_DONE = 4,
 };
 
-struct recovered_video_exit_tile_plan {
-    u32 tile[3];
-    u32 source[3];
-    u32 count;
-    u32 exit_address;
-};
-
 static u32 recovered_video_bank_a_flag(u32 geometry_mode,
                                        u32 palette_mode,
                                        u32 geometry_gate,

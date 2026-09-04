@@ -37,13 +37,17 @@ void recovered_host_queue_initialize(void);
 void recovered_audio_initialize_scsp(void);
 void recovered_audio_service_pending(void);
 void recovered_text_video_initialize(void);
+void recovered_text_video_control_bootstrap(u32 caller_g14);
 void recovered_text_font_asset_initialize(void);
 void recovered_text_ascii_font_initialize(void);
+void recovered_text_video_upload(void);
 void recovered_text_palette_initialize(void);
+void recovered_text_startup_asset_transfer(u32 profile);
 void recovered_texture_initializer(void);
 int recovered_texture_loader_profile_setup(void);
 void recovered_text_set_position(u32 column, u32 row);
 void recovered_text_write_string(volatile const unsigned char *text);
+void recovered_text_write_glyph_string(volatile const unsigned char *text);
 
 static void recovered_render_mech_select(void)
 {
@@ -81,10 +85,11 @@ void i960_reconstructed_main(void)
         recovered_host_queue_initialize();
     }
 
+    recovered_text_startup_asset_transfer(0U);
     recovered_geometry_pipeline_startup(0);
-    recovered_text_video_initialize();
-    recovered_text_ascii_font_initialize();
+    recovered_text_video_control_bootstrap(0U);
     recovered_text_font_asset_initialize();
+    recovered_text_video_upload();
     /* vonjdev does not map the recovered SCSP control window. Keep the
      * recovered routine linked for oracle work, but skip its MMIO writes in
      * this development image so the attract-state adapter can run. */
@@ -100,18 +105,18 @@ void i960_reconstructed_main(void)
      * from local strings so the reconstructed host has a deterministic handoff
      * point for attract-state recovery. */
     recovered_text_set_position(8U, 12U);
-    recovered_text_write_string(TEXT_COPRO_STATUS);
+    recovered_text_write_glyph_string(TEXT_COPRO_STATUS);
     recovered_text_set_position(8U, 13U);
-    recovered_text_write_string(TEXT_GEO_STATUS);
+    recovered_text_write_glyph_string(TEXT_GEO_STATUS);
     recovered_text_set_position(8U, 14U);
-    recovered_text_write_string(TEXT_TEXTURE_STATUS);
+    recovered_text_write_glyph_string(TEXT_TEXTURE_STATUS);
     recovered_text_set_position(8U, 15U);
-    recovered_text_write_string(TEXT_BANK1_STATUS);
+    recovered_text_write_glyph_string(TEXT_BANK1_STATUS);
     /* The recovered 0x1f470 attract arm selects this message after the
      * startup loader handoff. Keep the known text path live while the full
      * menu/object scheduler is integrated. */
     recovered_text_set_position(24U, 31U);
-    recovered_text_write_string(TEXT_INSERT_COIN);
+    recovered_text_write_glyph_string(TEXT_INSERT_COIN);
     state[3] = 0x47454f30UL; /* GEO0 */
     state[6] = 0;
     state[4] = 0x494e4954UL; /* INIT */
@@ -147,7 +152,6 @@ void i960_reconstructed_main(void)
              * device path while object-record production is integrated. */
             recovered_geometry_frame_submission();
             recovered_geometry_match_object_seed();
-            recovered_geometry_frame_submission();
             state[10] = state[10] + 1U;
         }
     }

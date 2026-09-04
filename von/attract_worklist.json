@@ -2,10 +2,10 @@
   "schema_version": 1,
   "coverage_source": "von/build/attract-coverage/vonj-attract-60s.json",
   "discovered_units": 262,
-  "represented_units": 94,
-  "modeled_units": 81,
-  "integrated_units": 13,
-  "untriaged_units": 168,
+  "represented_units": 100,
+  "modeled_units": 75,
+  "integrated_units": 25,
+  "untriaged_units": 162,
   "ordering": "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality",
   "units": [
     {
@@ -177,30 +177,6 @@
       ]
     },
     {
-      "entry": "0x0001bb90",
-      "observed_call_edges": 6,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.word-expand-blocks",
-      "sources": [
-        "von/i960/recovered_text.c"
-      ]
-    },
-    {
-      "entry": "0x0001bc20",
-      "observed_call_edges": 3,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.halfword-byte-swap-copy",
-      "sources": [
-        "von/i960/recovered_text.c"
-      ]
-    },
-    {
       "entry": "0x0001bc90",
       "observed_call_edges": 1,
       "triage": "modeled-integration-queue",
@@ -208,66 +184,6 @@
       "priority": 0,
       "weight": null,
       "work_unit": "maincpu.text-video-row-transfer-plan",
-      "sources": [
-        "von/i960/recovered_text.c"
-      ]
-    },
-    {
-      "entry": "0x0001bda0",
-      "observed_call_edges": 2,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.startup-asset-transfer-plan",
-      "sources": [
-        "von/i960/recovered_text.c"
-      ]
-    },
-    {
-      "entry": "0x0001c220",
-      "observed_call_edges": 2,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.video-control-bootstrap-plan",
-      "sources": [
-        "von/i960/recovered_text.c"
-      ]
-    },
-    {
-      "entry": "0x0001c618",
-      "observed_call_edges": 8,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.text-video-initialize",
-      "sources": [
-        "von/i960/recovered_text.c"
-      ]
-    },
-    {
-      "entry": "0x0001c730",
-      "observed_call_edges": 1,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.video-byte-lane-expand",
-      "sources": [
-        "von/i960/recovered_text.c"
-      ]
-    },
-    {
-      "entry": "0x0001cc40",
-      "observed_call_edges": 2,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.text-character-output",
       "sources": [
         "von/i960/recovered_text.c"
       ]
@@ -321,18 +237,6 @@
       ]
     },
     {
-      "entry": "0x0001d310",
-      "observed_call_edges": 5,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.text-glyph-address-plan",
-      "sources": [
-        "von/i960/recovered_text.c"
-      ]
-    },
-    {
       "entry": "0x0001d9e0",
       "observed_call_edges": 4,
       "triage": "modeled-integration-queue",
@@ -342,18 +246,6 @@
       "work_unit": "maincpu.text-alternate-string-font-mode",
       "sources": [
         "von/i960/recovered_text_alt_string.c"
-      ]
-    },
-    {
-      "entry": "0x0001da90",
-      "observed_call_edges": 4,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.text-string-font-mode",
-      "sources": [
-        "von/i960/recovered_text.c"
       ]
     },
     {
@@ -438,6 +330,54 @@
       "work_unit": "maincpu.geometry-function-command-submit",
       "sources": [
         "von/i960/recovered_geometry_commands.c"
+      ]
+    },
+    {
+      "entry": "0x00029a80",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.audio-device-table-clear-plan",
+      "sources": [
+        "von/i960/recovered_audio_queue.c"
+      ]
+    },
+    {
+      "entry": "0x00029ae8",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.audio-service-table-reset-plan",
+      "sources": [
+        "von/i960/recovered_audio_queue.c"
+      ]
+    },
+    {
+      "entry": "0x00029b20",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.audio-device-record-converter",
+      "sources": [
+        "von/i960/recovered_audio_queue.c"
+      ]
+    },
+    {
+      "entry": "0x00029ca0",
+      "observed_call_edges": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.audio-device-buffer-copy",
+      "sources": [
+        "von/i960/recovered_audio_queue.c"
       ]
     },
     {
@@ -969,18 +909,6 @@
       ]
     },
     {
-      "entry": "0x000f5d40",
-      "observed_call_edges": 10,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.memory-copy-forward",
-      "sources": [
-        "von/i960/recovered_memory.c"
-      ]
-    },
-    {
       "entry": "0x00002730",
       "observed_call_edges": 1,
       "triage": "integrated-validation-queue",
@@ -1005,6 +933,78 @@
       ]
     },
     {
+      "entry": "0x0001bb90",
+      "observed_call_edges": 6,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.word-expand-blocks",
+      "sources": [
+        "von/i960/recovered_text.c"
+      ]
+    },
+    {
+      "entry": "0x0001bc20",
+      "observed_call_edges": 3,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.halfword-byte-swap-copy",
+      "sources": [
+        "von/i960/recovered_text.c"
+      ]
+    },
+    {
+      "entry": "0x0001bda0",
+      "observed_call_edges": 2,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.startup-asset-transfer-plan",
+      "sources": [
+        "von/i960/recovered_text.c"
+      ]
+    },
+    {
+      "entry": "0x0001c220",
+      "observed_call_edges": 2,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.video-control-bootstrap-plan",
+      "sources": [
+        "von/i960/recovered_text.c"
+      ]
+    },
+    {
+      "entry": "0x0001c618",
+      "observed_call_edges": 8,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.text-video-initialize",
+      "sources": [
+        "von/i960/recovered_text.c"
+      ]
+    },
+    {
+      "entry": "0x0001c730",
+      "observed_call_edges": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.video-byte-lane-expand",
+      "sources": [
+        "von/i960/recovered_text.c"
+      ]
+    },
+    {
       "entry": "0x0001cac8",
       "observed_call_edges": 23,
       "triage": "integrated-validation-queue",
@@ -1017,10 +1017,46 @@
       ]
     },
     {
+      "entry": "0x0001cc40",
+      "observed_call_edges": 2,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.text-character-output",
+      "sources": [
+        "von/i960/recovered_text.c"
+      ]
+    },
+    {
+      "entry": "0x0001d310",
+      "observed_call_edges": 5,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.text-glyph-address-plan",
+      "sources": [
+        "von/i960/recovered_text.c"
+      ]
+    },
+    {
+      "entry": "0x0001da90",
+      "observed_call_edges": 4,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.text-string-font-mode",
+      "sources": [
+        "von/i960/recovered_text.c"
+      ]
+    },
+    {
       "entry": "0x00027e50",
       "observed_call_edges": 3,
       "triage": "integrated-validation-queue",
-      "stage": "integrated",
+      "stage": "trace-validated",
       "priority": 1,
       "weight": null,
       "work_unit": "maincpu.texture-decompressor",
@@ -1041,6 +1077,18 @@
       ]
     },
     {
+      "entry": "0x000282e0",
+      "observed_call_edges": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.sharc-bootstrap-upload",
+      "sources": [
+        "von/i960/recovered_geometry.c"
+      ]
+    },
+    {
       "entry": "0x00028418",
       "observed_call_edges": 1,
       "triage": "integrated-validation-queue",
@@ -1048,6 +1096,18 @@
       "priority": 1,
       "weight": null,
       "work_unit": "maincpu.geometry-initial-handshake",
+      "sources": [
+        "von/i960/recovered_geometry_commands.c"
+      ]
+    },
+    {
+      "entry": "0x000284b8",
+      "observed_call_edges": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.geometry-command-window-clear-route",
       "sources": [
         "von/i960/recovered_geometry_commands.c"
       ]
@@ -1134,6 +1194,18 @@
       "work_unit": "maincpu.audio-scsp-queue-initialize",
       "sources": [
         "von/i960/recovered_audio_queue.c"
+      ]
+    },
+    {
+      "entry": "0x000f5d40",
+      "observed_call_edges": 10,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.memory-copy-forward",
+      "sources": [
+        "von/i960/recovered_memory.c"
       ]
     },
     {
@@ -1597,26 +1669,6 @@
       "sources": []
     },
     {
-      "entry": "0x000282e0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000284b8",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
       "entry": "0x000292d8",
       "observed_call_edges": 2,
       "triage": "untriaged",
@@ -1677,47 +1729,7 @@
       "sources": []
     },
     {
-      "entry": "0x00029a80",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00029ae8",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00029b20",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
       "entry": "0x00029c08",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00029ca0",
       "observed_call_edges": 1,
       "triage": "untriaged",
       "stage": "planned",

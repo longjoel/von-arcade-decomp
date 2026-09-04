@@ -1,12 +1,7 @@
 /* Recovered normal/degenerate state update for SHARC opcode 0x3d. */
 #include <math.h>
 #include <stdint.h>
-
-static uint32_t float_bits(float value)
-{
-    union { float value; uint32_t bits; } converted = { value };
-    return converted.bits;
-}
+#include "recovered_float.h"
 
 /* Opcode 0x3d stores the transposed frame convention used by its sibling. */
 void recovered_sharc_opcode_3d_frame(float x, float y, float z,
@@ -24,14 +19,14 @@ void recovered_sharc_opcode_3d_frame(float x, float y, float z,
         return;
     }
 
-    state[0] = float_bits(z / horizontal);
-    state[1] = float_bits(0.0f);
-    state[2] = float_bits(-x / horizontal);
-    state[3] = float_bits(-x * y / (length * horizontal));
-    state[4] = float_bits(horizontal / length);
-    state[5] = float_bits(-z * y / (length * horizontal));
-    state[6] = float_bits(x / length);
-    state[7] = float_bits(y / length);
-    state[8] = float_bits(z / length);
+    state[0] = recovered_float_to_bits(z / horizontal);
+    state[1] = recovered_float_to_bits(0.0f);
+    state[2] = recovered_float_to_bits(-x / horizontal);
+    state[3] = recovered_float_to_bits(-x * y / (length * horizontal));
+    state[4] = recovered_float_to_bits(horizontal / length);
+    state[5] = recovered_float_to_bits(-z * y / (length * horizontal));
+    state[6] = recovered_float_to_bits(x / length);
+    state[7] = recovered_float_to_bits(y / length);
+    state[8] = recovered_float_to_bits(z / length);
     state[9] = state[10] = state[11] = 0;
 }

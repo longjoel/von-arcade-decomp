@@ -1,5 +1,6 @@
 /* Second geometry-object variant preamble recovered from i960 0x23980-0x23a14. */
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -17,11 +18,6 @@ struct recovered_geometry_object_variant_plan {
     u32 transform_path;
     u32 alternate_path;
 };
-
-static int32_t sign_extend_16(u32 value)
-{
-    return (int32_t)(int16_t)(value & 0xffffU);
-}
 
 void recovered_geometry_object_variant_plan(
     u32 object_0c, u32 parent_0c, u32 object_7c,

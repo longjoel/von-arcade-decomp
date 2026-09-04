@@ -1,5 +1,11 @@
 # i960 Disassembly Annotations
 
+> **Working notebook:** labels and bounded interpretations here guide analysis
+> but are not validation by themselves. Current promotion rules and evidence
+> requirements live in the
+> [reconstruction handbook](../docs/reconstruction.md) and
+> [evidence plan](../docs/evidence-and-assets-plan.md).
+
 This sidecar records confirmed interpretations of the generated listing at
 `von/build/disasm/vonj-maincpu.lst`. Recreate the listing with:
 
@@ -1049,6 +1055,16 @@ checked alongside the exhaustive interrupt-mask table by
 `von/tools/test_recovered_host_control.py`.
 
 ### Additional Audio Producer Helpers
+
+Ghidra labels for the host-side audio boundary are maintained in
+`von/ghidra/AnnotateVonI960.py`. The audio labels intentionally stop at the
+host-to-SCSP interface: `audio_scsp_fifo_send_u16` and its idle-gated sibling
+produce command bytes, `audio_scsp_initialize` performs the six-value SCSP
+startup sequence, and `audio_scsp_fifo_consumer` drains one byte into
+`0x009c0000` when status bit 0 permits it. The sample ROM is not itself an i960
+address space; its sound assets belong to the separate 68000 program and must
+be annotated from decoded SCSP descriptors rather than inferred from raw WAV
+segments.
 
 Five adjacent host-side audio units are now represented in
 `von/i960/recovered_audio_queue.c`:
@@ -5544,6 +5560,30 @@ bit 15 on each tile; the second additionally ORs `0xc000`. Both advance the
 column only when the incoming column is at most 30. This write plan is
 implemented and exhaustively checked for all 256 byte values in
 `recovered_text_alt_glyph.c`.
+
+## Geometry response boundary at `0x76240`
+
+The authoritative original-ROM capture in
+`/tmp/von-original-28f-debug-local/mame.log` now covers the FIFO traffic
+through `0x76240-0x76498`. The smallest stable fixture is the framing
+sequence, not a response algorithm: command 29/30 requests use masked
+`0xe000`, `0x2000`, and `0x8000) operands, with the corresponding
+constant words `0x41700000) or `0x44bb8000). Each read returns an initial
+`0x00000000) followed by a state-dependent word:
+`c129b5af/4129b39a), `4129b5af/4129b39a), or
+`3e1359e0/c4bb7fff), respectively.
+
+The listing shows those returned words immediately feeding later masked
+coordinates and a floating-point cross-product/sign-selection sequence
+(`0x763a4-0x76498)); the captured FIFO data alone does not determine the
+response function or the object-relative inputs. Therefore this boundary is
+documented as captured evidence, not promoted to a pure model.
+
+The next minimal capture must log `g0), the object words at
+`g0+0x14`, `g0+0x1c), and `g0+0x184), plus each FIFO read/write
+`(PC,direction,data)) for the same range. That correlates request operands
+and returned words without broad instruction tracing and is required before
+modeling the transform.
 
 ## Text-mode setup at `0x1f010`
 

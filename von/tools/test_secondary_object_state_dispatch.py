@@ -9,7 +9,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 LISTING = ROOT / "von/build/disasm/vonj-maincpu.lst"
-WORKLIST = ROOT / "von/build/attract-coverage/vonj-attract-60s.worklist.json"
+# The checked-in worklist is authoritative.  The 60-second trace output is
+# reproducible, but is intentionally prunable and must not be required by the
+# contract suite.
+WORKLIST = ROOT / "von/attract_worklist.json"
 
 
 def main() -> int:
@@ -181,7 +184,7 @@ def main() -> int:
     )
     if worklist_entry.get("observed_call_edges") != 5:
         raise SystemExit("secondary dispatcher worklist edge count changed")
-    if worklist_entry.get("triage") != "represented-needs-integration":
+    if worklist_entry.get("triage") != "modeled-integration-queue":
         raise SystemExit("secondary dispatcher worklist triage changed")
 
     print("PASS: secondary object-state dispatcher boundary plus states 0-9 and terminal exits")

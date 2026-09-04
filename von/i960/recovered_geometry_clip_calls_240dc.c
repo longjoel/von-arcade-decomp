@@ -1,5 +1,6 @@
 /* Four geometry clip calls recovered from i960 0x240dc-0x2422c. */
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -20,19 +21,13 @@ void recovered_geometry_clip_calls_plan(
     u32 derived_clip_word, u32 fourth_call_g0,
     struct recovered_geometry_clip_calls_plan *plan)
 {
-    static const u32 one = 0x3f800000U;
+    static const u32 one = RECOVERED_FLOAT_ONE;
     static const u32 geometry_base = 0x400028U;
 
-    plan->clip_dispatch = 0x000701a0U;
+    RECOVERED_SET_CLIP_PLAN_COMMON(plan);
     plan->frame_zero_offset = 0xc0U;
     plan->frame_selected_offset = 0xc4U;
-    plan->frame_constants[0] = 0x084553fU;
-    plan->frame_constants[1] = 1U;
-    plan->control_address = 0x00800010U;
-    plan->control_value = 0x101U;
-    plan->frame_publish_address = 0x00804000U;
     plan->frame_publish_offset = 0x400028U;
-    plan->call_count = 4U;
 
     plan->call_argument[0][0] = 0xc2040000U;
     plan->call_argument[0][1] = 0x43310000U;

@@ -1,0 +1,16 @@
+{
+  "provenance": {
+    "rom": "original vonj",
+    "capture": "/tmp/von-original-28f-debug-local/mame.log",
+    "pc_range": ["0x76240", "0x763e8"],
+    "authoritative": true
+  },
+  "transactions": [
+    {"command_pc":"0x76240","command":29,"value_pc":"0x76278","value":"0xe000","responses":[["0x76288","0x00000000"],["0x76290","0xc129b5af"]]},
+    {"command_pc":"0x762a0","command":30,"value_pc":"0x762b0","value":"0xe000","responses":[["0x762b8","0x00000000"],["0x762c0","0x4129b39a"]]},
+    {"command_pc":"0x762d8","command":29,"value_pc":"0x762e8","value":"0x2000","responses":[["0x762f0","0x00000000"],["0x762f8","0x4129b5af"]]},
+    {"command_pc":"0x76308","command":30,"value_pc":"0x76318","value":"0x2000","responses":[["0x76320","0x00000000"],["0x76328","0x4129b39a"]]},
+    {"command_pc":"0x76338","command":29,"value_pc":"0x76344","value":"0x8000","responses":[["0x76354","0x00000000"],["0x7635c","0x3e1359e0"]]},
+    {"command_pc":"0x76368","command":30,"value_pc":"0x76374","value":"0x8000","responses":[["0x7637c","0x00000000"],["0x76384","0xc4bb7fff"]]}
+  ]
+}

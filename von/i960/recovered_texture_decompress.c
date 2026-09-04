@@ -9,10 +9,10 @@ typedef unsigned char u8;
 #define TEXTURE_FORMAT_TABLE ((volatile const u8 *)0x00027c50)
 #define TEXTURE_STATUS ((volatile u32 *)0x00515080)
 
-static __inline__ __attribute__((always_inline)) int texture_use_secondary_bank(u32 output_index)
+int recovered_texture_secondary_route(u32 output_index, u32 low, u32 high)
 {
-    u8 low = TEXTURE_FORMAT_TABLE[output_index & 0x1ffU];
-    u8 high = TEXTURE_FORMAT_TABLE[(output_index >> 8) & 0x1feU];
+    if (output_index < 0x60000U)
+        return 0;
 
     if (high == 1 || low == 1)
         return 1;
@@ -33,6 +33,13 @@ static __inline__ __attribute__((always_inline)) int texture_use_secondary_bank(
     if (low == 9 && high >= 10)
         return 1;
     return 0;
+}
+
+static __inline__ __attribute__((always_inline)) int texture_use_secondary_bank(u32 output_index)
+{
+    u8 low = TEXTURE_FORMAT_TABLE[output_index & 0x1ffU];
+    u8 high = TEXTURE_FORMAT_TABLE[(output_index >> 8) & 0x1feU];
+    return recovered_texture_secondary_route(output_index, low, high);
 }
 
 int recovered_texture_decompress(volatile const u8 *source,

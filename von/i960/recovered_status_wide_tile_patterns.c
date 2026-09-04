@@ -1,5 +1,6 @@
 /* Wide tile-pattern writers recovered from i960 0x22970-0x22a40. */
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -39,6 +40,7 @@ u32 recovered_status_wide_tile_pattern_destination(
     u32 variant, u32 column, u32 row, u32 index)
 {
     u32 width = variant == 0U ? 23U : variant == 1U ? 29U : 19U;
-    return (variant == 0U ? 0x01000000U : 0x01000034U) +
-           (((row + index / width) << 6) + column + index % width) * 2U;
+    return recovered_pattern_tile_address(
+        variant == 0U ? 0x01000000U : 0x01000034U,
+        column, row, index, width, 0U);
 }

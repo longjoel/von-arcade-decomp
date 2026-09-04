@@ -1,5 +1,6 @@
 /* Tile pattern writer recovered from i960 0x228f0-0x22960. */
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -34,7 +35,6 @@ u32 recovered_status_tile_pattern_value(u32 index)
 
 u32 recovered_status_tile_pattern_destination(u32 column, u32 row, u32 index)
 {
-    u32 row_offset = (index / 16U + row) & 0x3fU;
-    u32 column_offset = column + (index % 16U);
-    return 0x01000000U + ((row_offset << 6) + column_offset) * 2U;
+    return recovered_pattern_tile_address(0x01000000U, column, row,
+                                          index, 16U, 0x3fU);
 }

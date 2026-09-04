@@ -1,5 +1,6 @@
 /* Clear-flag geometry packet recovered from i960 0x9d454-0x9d59c. */
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -45,26 +46,18 @@ void recovered_geometry_clear_flag_packet_plan(
 {
     plan->object_1e4 = object_1e4;
     plan->derived_packet_word = derived_packet_word;
-    plan->fifo_address = 0x00884000U;
+    plan->fifo_address = RECOVERED_FIFO_ADDRESS;
     plan->fifo_word_count = 9U;
-    plan->fifo_word[0] = 19U;
-    plan->fifo_word[1] = derived_packet_word;
-    plan->fifo_word[2] = 0x40a00000U;
-    plan->fifo_word[3] = 0x3f800000U;
-    plan->fifo_word[4] = 18U;
-    plan->fifo_word[5] = 0x3f800000U;
-    plan->fifo_word[6] = 0U;
-    plan->fifo_word[7] = 0U;
-    plan->fifo_word[8] = 58U;
+    recovered_fill_nine_word_geometry_packet(plan->fifo_word, derived_packet_word);
     plan->board_readback_address = board_readback_address;
-    plan->published_pointer_address = 0x00801008U;
-    plan->published_pointer_offset = 0x34U;
+    plan->published_pointer_address = RECOVERED_FRAME_POINTER;
+    plan->published_pointer_offset = RECOVERED_POINTER_OFFSET;
     plan->object_flag_1de = object_flag_1de & 0xffU;
     plan->frame_value = frame_value;
-    plan->control_address = 0x00800010U;
-    plan->control_value = 0x101U;
-    plan->frame_publish_address = 0x00804000U;
-    plan->frame_tail[0] = 0x084553fU;
+    plan->control_address = RECOVERED_GEOMETRY_CONTROL;
+    plan->control_value = RECOVERED_GEOMETRY_CONTROL_VALUE;
+    plan->frame_publish_address = RECOVERED_FRAME_PUBLISH;
+    plan->frame_tail[0] = RECOVERED_FRAME_CONSTANT;
     plan->frame_tail[1] = 1U;
 
     if (plan->object_flag_1de == 0U) {

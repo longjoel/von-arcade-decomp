@@ -1,5 +1,6 @@
 /* Handler contract recovered from i960 0x214bc-0x2157c. */
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -20,14 +21,9 @@ void recovered_weapon_five_marker_plan(u32 selector, u32 text_mode,
                                        u32 x, u32 y,
                                        struct recovered_weapon_five_marker_plan *plan)
 {
-    plan->text_helper = text_mode == 0U ? 0x0001dd80U : 0x0001dc10U;
-    plan->text_plane = text_mode == 0U ? 0x01002000U : 0x01000000U;
-    plan->text_column = 1U;
-    plan->text_row = 8U;
-    plan->text_width = 31U;
-    plan->text_height = selector + 31U;
+    RECOVERED_SET_MARKER_TEXT_PLAN(plan, text_mode, 1U, selector + 31U);
     plan->marker_table_offset = 0x114U;
-    plan->marker_start = plan->text_plane + 0x114U + ((y << 6) + x) * 2U;
+    plan->marker_start = recovered_tile_address(plan->text_plane, 0x114U, x, y);
     plan->marker_value = 0x2674U;
     plan->marker_count = 5U;
 }

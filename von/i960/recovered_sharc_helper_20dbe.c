@@ -1,38 +1,9 @@
 /* Bounded model of the shared SHARC 0x20dca sine/reduction body. */
 #include <math.h>
 #include <stdint.h>
-
-static float bits_float(uint32_t bits)
-{
-    union { uint32_t bits; float value; } converted = { bits };
-    return converted.value;
-}
-
-static uint32_t float_bits(float value)
-{
-    union { float value; uint32_t bits; } converted = { value };
-    return converted.bits;
-}
+#include "recovered_float.h"
 
 /* Force the same single-precision boundary as a SHARC RND32 operation. */
-static float rounded_mul(float left, float right)
-{
-    volatile float result = left * right;
-    return result;
-}
-
-static float rounded_add(float left, float right)
-{
-    volatile float result = left + right;
-    return result;
-}
-
-static float rounded_sub(float left, float right)
-{
-    volatile float result = left - right;
-    return result;
-}
-
 /*
  * The ROM keeps pi as a high word plus a correction word.  Reconstructing
  * their sum in long double preserves the correction that would disappear if
@@ -40,8 +11,8 @@ static float rounded_sub(float left, float right)
  */
 static long double recovered_pi(void)
 {
-    return (long double)bits_float(0x40491000) +
-           (long double)bits_float(0xb715777a);
+    return (long double)recovered_float_from_bits(0x40491000) +
+           (long double)recovered_float_from_bits(0xb715777a);
 }
 
 static float evaluate_polynomial(float residual)
@@ -55,13 +26,13 @@ static float evaluate_polynomial(float residual)
         0x3c088889, /* c9 */
         0xbe2aaaab, /* c10 */
     };
-    float squared = rounded_mul(residual, residual);
-    float polynomial = bits_float(coefficient_bits[0]);
+    float squared = recovered_rounded_mul(residual, residual);
+    float polynomial = recovered_float_from_bits(coefficient_bits[0]);
 
     for (unsigned index = 1; index < sizeof(coefficient_bits) / sizeof(coefficient_bits[0]); ++index)
-        polynomial = rounded_add(rounded_mul(squared, polynomial), bits_float(coefficient_bits[index]));
+        polynomial = recovered_rounded_add(recovered_rounded_mul(squared, polynomial), recovered_float_from_bits(coefficient_bits[index]));
 
-    return rounded_add(rounded_mul(rounded_mul(squared, polynomial), residual), residual);
+    return recovered_rounded_add(recovered_rounded_mul(recovered_rounded_mul(squared, polynomial), residual), residual);
 }
 
 static float evaluate_sine(float x, int negative)
@@ -86,23 +57,23 @@ static float evaluate_sine(float x, int negative)
  */
 uint32_t recovered_sharc_helper_20dc4_sine(uint32_t magnitude, int negative)
 {
-    return float_bits(evaluate_sine(bits_float(magnitude), negative));
+    return recovered_float_to_bits(evaluate_sine(recovered_float_from_bits(magnitude), negative));
 }
 
 /* 0x20dbe seeds the same body with pi/2, producing the ROM's cos path. */
 uint32_t recovered_sharc_helper_20dbe_cosine(uint32_t magnitude, int negative)
 {
-    float angle = bits_float(magnitude);
+    float angle = recovered_float_from_bits(magnitude);
     /* 0x20dbe starts with ABS(F0); the observed cosine service is even. */
     (void)negative;
     /* The ROM uses +pi/2 before the shared reducer.  Subtraction is an
      * equivalent mathematical identity, but not an equivalent finite
      * polynomial and therefore loses the observed low bits. */
-    float phase = rounded_add(bits_float(0x3fc90fdb), angle);
-    int quadrant = (int)rounded_mul(phase, bits_float(0x3ea2f983));
+    float phase = recovered_rounded_add(recovered_float_from_bits(0x3fc90fdb), angle);
+    int quadrant = (int)recovered_rounded_mul(phase, recovered_float_from_bits(0x3ea2f983));
     float phase_fraction = (float)quadrant - 0.5f;
-    float residual = rounded_sub(
-        rounded_sub(angle, rounded_mul(bits_float(0x40491000), phase_fraction)),
-        rounded_mul(bits_float(0xb715777a), phase_fraction));
-    return float_bits(evaluate_polynomial(residual) * ((quadrant & 1) ? -1.0f : 1.0f));
+    float residual = recovered_rounded_sub(
+        recovered_rounded_sub(angle, recovered_rounded_mul(recovered_float_from_bits(0x40491000), phase_fraction)),
+        recovered_rounded_mul(recovered_float_from_bits(0xb715777a), phase_fraction));
+    return recovered_float_to_bits(evaluate_polynomial(residual) * ((quadrant & 1) ? -1.0f : 1.0f));
 }

@@ -1,6 +1,7 @@
 /* Panel routes recovered from i960 0x1fdf0 and 0x1fe60. */
 
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -40,9 +41,8 @@ void recovered_panel11_plan(struct recovered_panel11_plan *plan)
 void recovered_panel12_plan(u32 source_present,
                             struct recovered_panel12_plan *plan)
 {
-    plan->source = source_present ? 0x02fe0cb0U : 0U;
-    plan->source_helper = source_present ? 0x0001dc10U : 0U;
-    plan->fill_helper = source_present ? 0U : 0x0001df00U;
+    RECOVERED_SET_SOURCE_OR_CLEAR(plan, source_present, 0x02fe0cb0U,
+                                  RECOVERED_HELPER_TRANSFER, RECOVERED_HELPER_CLEAR);
     plan->column_comes_from_current_position = 1U;
     plan->row_comes_from_current_position = 1U;
     plan->width = 20U;

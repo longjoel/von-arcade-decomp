@@ -1,5 +1,6 @@
 /* Shared three-point handler contract recovered from i960 0x21240-0x214b8. */
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -27,19 +28,14 @@ void recovered_weapon_three_point_plan(u32 handler_kind, u32 selector,
                                        struct recovered_weapon_three_point_plan *plan)
 {
     (void)asset_pointer;
-    plan->text_helper = text_mode == 0U ? 0x0001dd80U : 0x0001dc10U;
-    plan->text_plane = text_mode == 0U ? 0x01002000U : 0x01000000U;
-    plan->text_column = 3U;
-    plan->text_row = 8U;
-    plan->text_width = 31U;
-    plan->text_height = selector + 31U;
+    RECOVERED_SET_MARKER_TEXT_PLAN(plan, text_mode, 3U, selector + 31U);
     plan->marker_table_offset = handler_kind == 0U ? 0x114U
         : handler_kind == 1U ? 0x118U : 0x110U;
 
     plan->point[0] = (struct recovered_weapon_point){x0, y0,
-        plan->text_plane + plan->marker_table_offset + ((y0 << 6) + x0) * 2U};
+        recovered_tile_address(plan->text_plane, plan->marker_table_offset, x0, y0)};
     plan->point[1] = (struct recovered_weapon_point){x1, y1,
-        plan->text_plane + plan->marker_table_offset + ((y1 << 6) + x1) * 2U};
+        recovered_tile_address(plan->text_plane, plan->marker_table_offset, x1, y1)};
     plan->point[2] = (struct recovered_weapon_point){x2, y2,
-        plan->text_plane + plan->marker_table_offset + ((y2 << 6) + x2) * 2U};
+        recovered_tile_address(plan->text_plane, plan->marker_table_offset, x2, y2)};
 }

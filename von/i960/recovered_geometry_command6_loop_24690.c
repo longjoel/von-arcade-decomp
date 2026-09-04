@@ -1,6 +1,7 @@
 /* Proven routing and FIFO framing for the dynamic command-6 phase at 0x24690. */
 #include <stdint.h>
 #include <string.h>
+#include "recovered_float.h"
 
 typedef uint32_t u32;
 
@@ -25,15 +26,6 @@ struct recovered_geometry_command6_loop_plan {
 struct recovered_geometry_command6_packet {
     u32 words[6];
 };
-
-static u32 recovered_geometry_command6_float_bits(float value)
-{
-    union {
-        float value;
-        u32 bits;
-    } converted = { value };
-    return converted.bits;
-}
 
 /*
  * The disassembly compares 0x503a78 against zero before entering the loop.
@@ -88,7 +80,7 @@ void recovered_geometry_command6_packet_from_r6_bits(
 
     memcpy(&r6_value, &r6_bits, sizeof(r6_value));
     recovered_geometry_command6_packet(
-        recovered_geometry_command6_float_bits((float)(4.0 / 600.0)),
-        recovered_geometry_command6_float_bits((float)((double)r6_value / 600.0)),
+        recovered_float_to_bits((float)(4.0 / 600.0)),
+        recovered_float_to_bits((float)((double)r6_value / 600.0)),
         packet);
 }

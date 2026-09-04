@@ -1,28 +1,15 @@
 /* Semantic model of the SHARC opcode-0x0b normalized cross-product service. */
 
 #include <math.h>
+#include "recovered_float.h"
 
 typedef unsigned int u32;
 
 extern u32 recovered_sharc_rsqrts_seed(u32 bits);
 
-static float bits_float(u32 bits)
-{
-    union { u32 bits; float value; } value;
-    value.bits = bits;
-    return value.value;
-}
-
-static u32 float_bits(float value)
-{
-    union { u32 bits; float value; } result;
-    result.value = value;
-    return result.bits;
-}
-
 static float rsqrt(float value)
 {
-    float r = bits_float(recovered_sharc_rsqrts_seed(float_bits(value)));
+    float r = recovered_float_from_bits(recovered_sharc_rsqrts_seed(recovered_float_to_bits(value)));
     for (int round = 0; round < 3; ++round) {
         float r2 = r * r;
         r2 = r2 * value;
@@ -34,14 +21,14 @@ static float rsqrt(float value)
 
 void recovered_sharc_opcode_0b_normalized_cross(const u32 input[9], u32 output[3])
 {
-    float ax = bits_float(input[0]);
-    float ay = bits_float(input[1]);
-    float az = bits_float(input[2]);
-    float bx = bits_float(input[3]);
-    float by = bits_float(input[4]);
-    float bz = bits_float(input[5]);
-    float ex = bits_float(input[6]);
-    float ey = bits_float(input[7]);
+    float ax = recovered_float_from_bits(input[0]);
+    float ay = recovered_float_from_bits(input[1]);
+    float az = recovered_float_from_bits(input[2]);
+    float bx = recovered_float_from_bits(input[3]);
+    float by = recovered_float_from_bits(input[4]);
+    float bz = recovered_float_from_bits(input[5]);
+    float ex = recovered_float_from_bits(input[6]);
+    float ey = recovered_float_from_bits(input[7]);
     /* The ninth FIFO read at 0x2022c overwrites R8 after the arithmetic
      * operands have been formed; it is consumed but does not affect this
      * recovered finite path. */
@@ -61,7 +48,7 @@ void recovered_sharc_opcode_0b_normalized_cross(const u32 input[9], u32 output[3
         return;
     }
     float scale = rsqrt(squared);
-    output[0] = float_bits(x * scale);
-    output[1] = float_bits(y * scale);
-    output[2] = float_bits(z * scale);
+    output[0] = recovered_float_to_bits(x * scale);
+    output[1] = recovered_float_to_bits(y * scale);
+    output[2] = recovered_float_to_bits(z * scale);
 }

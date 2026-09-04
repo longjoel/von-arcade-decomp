@@ -1,5 +1,6 @@
 /* Alternate object update recovered from i960 0x238a0-0x23950. */
 #include <stdint.h>
+#include "recovered_float.h"
 
 typedef uint32_t u32;
 
@@ -25,13 +26,6 @@ struct recovered_geometry_object_alternate_plan {
     u32 object_19_after;
 };
 
-static u32 add_float_bits(u32 value, u32 bias)
-{
-    union { u32 bits; float number; } lhs = { value }, rhs = { bias }, result;
-    result.number = lhs.number + rhs.number;
-    return result.bits;
-}
-
 void recovered_geometry_object_alternate_update_plan(
     u32 object_08, u32 object_0c, u32 object_10,
     int16_t object_184, int32_t delta_g6,
@@ -48,7 +42,7 @@ void recovered_geometry_object_alternate_update_plan(
     plan->object_8_after_first = adjusted;
     plan->object_0c_after_first = adjusted;
     plan->float_bias = 0x40200000U;
-    plan->adjusted_object_0c = add_float_bits(object_0c, plan->float_bias);
+    plan->adjusted_object_0c = recovered_float_add_bits(object_0c, plan->float_bias);
     plan->object_4_after = plan->adjusted_object_0c;
     plan->object_10_after = plan->adjusted_object_0c;
     plan->second_command = 0x1eU;

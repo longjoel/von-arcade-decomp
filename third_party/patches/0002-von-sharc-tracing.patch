@@ -24,7 +24,7 @@ diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
 +	return data;
  }
  
-@@ -677,21 +684,33 @@ void model2b_state::copro_fifo_w(u32 data)
+@@ -677,21 +684,42 @@ void model2b_state::copro_fifo_w(u32 data)
  void model2b_state::copro_fifo_w(u32 data)
  {
  	if (m_coproctl & 0x80000000)
@@ -39,6 +39,15 @@ diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
 +		{
 +			logerror("vonj_copro_fifo: pc=%08x data=%08x\n", m_maincpu->pc(), data);
 +			vonj_copro_fifo_trace_count++;
++		}
++		static unsigned vonj_geometry_76240_write_trace_count;
++		offs_t pc = m_maincpu->pc();
++		if ((machine().system().name == std::string_view("vonj")) &&
++			(pc >= 0x00076234) && (pc < 0x0007649c) &&
++			(vonj_geometry_76240_write_trace_count < 4096))
++		{
++			logerror("vonj_geometry_76240_fifo: kind=write pc=%08x data=%08x\n", pc, data);
++			vonj_geometry_76240_write_trace_count++;
 +		}
  		m_copro_fifo_in->push(u32(data));
  	}

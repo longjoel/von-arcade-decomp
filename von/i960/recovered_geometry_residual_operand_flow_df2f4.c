@@ -2,14 +2,7 @@
 
 #include <stdint.h>
 #include <string.h>
-
-static uint32_t
-float_bits(float value)
-{
-    uint32_t bits;
-    memcpy(&bits, &value, sizeof(bits));
-    return bits;
-}
+#include "recovered_float.h"
 
 /*
  * Decimal host commands 28 and 27 dispatch to SHARC opcodes 0x1c and 0x1b.
@@ -36,19 +29,19 @@ recovered_geometry_residual_distance_requests(
     float first_z = object_scale_58 * object_scale_5c * opcode_1b_result;
 
     packets[0] = 31U;
-    packets[1] = float_bits(first_x);
+    packets[1] = recovered_float_to_bits(first_x);
     packets[2] = 0U;
     packets[3] = 0U;
     packets[4] = 0U;
-    packets[5] = float_bits(first_z);
+    packets[5] = recovered_float_to_bits(first_z);
     packets[6] = 0U;
 
     packets[7] = 31U;
-    packets[8] = float_bits(selected_z);
+    packets[8] = recovered_float_to_bits(selected_z);
     packets[9] = 0U;
     packets[10] = 0U;
     packets[11] = 0U;
-    packets[12] = float_bits(affine_z);
+    packets[12] = recovered_float_to_bits(affine_z);
     packets[13] = 0U;
     return 14U;
 }

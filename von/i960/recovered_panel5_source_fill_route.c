@@ -1,6 +1,7 @@
 /* Source-or-clear route recovered from i960 0x1fa30. */
 
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -17,9 +18,8 @@ struct recovered_panel5_source_fill_plan {
 void recovered_panel5_source_fill_plan(u32 source_present, u32 caller_g27,
                                        struct recovered_panel5_source_fill_plan *plan)
 {
-    plan->source = source_present ? 0x02fe053aU : 0U;
-    plan->source_helper = source_present ? 0x0001dc10U : 0U;
-    plan->fill_helper = source_present ? 0U : 0x0001df00U;
+    RECOVERED_SET_SOURCE_OR_CLEAR(plan, source_present, 0x02fe053aU,
+                                  RECOVERED_HELPER_TRANSFER, RECOVERED_HELPER_CLEAR);
     plan->column = 2U;
     plan->row = 20U;
     plan->width = caller_g27 + 31U;

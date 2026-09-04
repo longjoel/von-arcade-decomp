@@ -1,9 +1,9 @@
 # Attract Reconstruction Worklist
 
 - Observed direct-call units: 262
-- Modeled integration queue: 81
-- Integrated or validated: 13
-- Untriaged: 168
+- Modeled integration queue: 75
+- Integrated or validated: 25
+- Untriaged: 162
 
 | Entry | Edges | Triage | Work unit |
 | --- | ---: | --- | --- |
@@ -21,21 +21,12 @@
 | `0x00002da0` | 1 | modeled-integration-queue | maincpu.io-controller-byte-average |
 | `0x00003120` | 4 | modeled-integration-queue | maincpu.runtime-crc16-table-checksum |
 | `0x00018ab0` | 4 | modeled-integration-queue | maincpu.timing-sample-extrema-update |
-| `0x0001bb90` | 6 | modeled-integration-queue | maincpu.word-expand-blocks |
-| `0x0001bc20` | 3 | modeled-integration-queue | maincpu.halfword-byte-swap-copy |
 | `0x0001bc90` | 1 | modeled-integration-queue | maincpu.text-video-row-transfer-plan |
-| `0x0001bda0` | 2 | modeled-integration-queue | maincpu.startup-asset-transfer-plan |
-| `0x0001c220` | 2 | modeled-integration-queue | maincpu.video-control-bootstrap-plan |
-| `0x0001c618` | 8 | modeled-integration-queue | maincpu.text-video-initialize |
-| `0x0001c730` | 1 | modeled-integration-queue | maincpu.video-byte-lane-expand |
-| `0x0001cc40` | 2 | modeled-integration-queue | maincpu.text-character-output |
 | `0x0001ccf8` | 7 | modeled-integration-queue | maincpu.text-tile-control-write |
 | `0x0001ce00` | 1 | modeled-integration-queue | maincpu.text-alternate-two-row-glyph-plan |
 | `0x0001cea0` | 1 | modeled-integration-queue | maincpu.text-alternate-two-row-glyph-plan |
 | `0x0001d1b0` | 4 | modeled-integration-queue | maincpu.text-string-byte-dispatch |
-| `0x0001d310` | 5 | modeled-integration-queue | maincpu.text-glyph-address-plan |
 | `0x0001d9e0` | 4 | modeled-integration-queue | maincpu.text-alternate-string-font-mode |
-| `0x0001da90` | 4 | modeled-integration-queue | maincpu.text-string-font-mode |
 | `0x0001de80` | 4 | modeled-integration-queue | maincpu.text-tile-block-writer |
 | `0x00028840` | 1 | modeled-integration-queue | maincpu.geometry-profile-dispatch |
 | `0x00028b40` | 4 | modeled-integration-queue | maincpu.geometry-float-conversion-helper |
@@ -43,6 +34,10 @@
 | `0x00028c80` | 1 | modeled-integration-queue | maincpu.geometry-command-batch-loop |
 | `0x00028de8` | 7 | modeled-integration-queue | maincpu.geometry-frame-submission |
 | `0x00028e88` | 1 | modeled-integration-queue | maincpu.geometry-function-command-submit |
+| `0x00029a80` | 1 | modeled-integration-queue | maincpu.audio-device-table-clear-plan |
+| `0x00029ae8` | 1 | modeled-integration-queue | maincpu.audio-service-table-reset-plan |
+| `0x00029b20` | 1 | modeled-integration-queue | maincpu.audio-device-record-converter |
+| `0x00029ca0` | 1 | modeled-integration-queue | maincpu.audio-device-buffer-copy |
 | `0x0002a430` | 5 | modeled-integration-queue | maincpu.audio-short-delay |
 | `0x0002a458` | 4 | modeled-integration-queue | maincpu.audio-queue-capacity-check |
 | `0x0002a4a8` | 10 | modeled-integration-queue | maincpu.audio-queue-byte-push |
@@ -87,13 +82,23 @@
 | `0x000f5100` | 9 | modeled-integration-queue | maincpu.text-general-formatter-boundary |
 | `0x000f5190` | 1 | modeled-integration-queue | maincpu.text-general-formatter-boundary |
 | `0x000f5c58` | 4 | modeled-integration-queue | maincpu.runtime-byte-compare |
-| `0x000f5d40` | 10 | modeled-integration-queue | maincpu.memory-copy-forward |
 | `0x00002730` | 1 | integrated-validation-queue | maincpu.io-self-test-core |
 | `0x00018488` | 1 | integrated-validation-queue | maincpu.host-byte-queue-initialize |
+| `0x0001bb90` | 6 | integrated-validation-queue | maincpu.word-expand-blocks |
+| `0x0001bc20` | 3 | integrated-validation-queue | maincpu.halfword-byte-swap-copy |
+| `0x0001bda0` | 2 | integrated-validation-queue | maincpu.startup-asset-transfer-plan |
+| `0x0001c220` | 2 | integrated-validation-queue | maincpu.video-control-bootstrap-plan |
+| `0x0001c618` | 8 | integrated-validation-queue | maincpu.text-video-initialize |
+| `0x0001c730` | 1 | integrated-validation-queue | maincpu.video-byte-lane-expand |
 | `0x0001cac8` | 23 | integrated-validation-queue | maincpu.text-position-state |
+| `0x0001cc40` | 2 | integrated-validation-queue | maincpu.text-character-output |
+| `0x0001d310` | 5 | integrated-validation-queue | maincpu.text-glyph-address-plan |
+| `0x0001da90` | 4 | integrated-validation-queue | maincpu.text-string-font-mode |
 | `0x00027e50` | 3 | integrated-validation-queue | maincpu.texture-decompressor |
 | `0x00028120` | 1 | integrated-validation-queue | maincpu.texture-loader-profile-setup |
+| `0x000282e0` | 1 | integrated-validation-queue | maincpu.sharc-bootstrap-upload |
 | `0x00028418` | 1 | integrated-validation-queue | maincpu.geometry-initial-handshake |
+| `0x000284b8` | 1 | integrated-validation-queue | maincpu.geometry-command-window-clear-route |
 | `0x00028548` | 1 | integrated-validation-queue | maincpu.texture-initializer |
 | `0x00028620` | 1 | integrated-validation-queue | maincpu.geometry-program-upload |
 | `0x00028c08` | 1 | integrated-validation-queue | maincpu.geometry-batch-submit |
@@ -101,6 +106,7 @@
 | `0x00028d30` | 3 | integrated-validation-queue | maincpu.geometry-auxiliary-submit-select |
 | `0x00028d80` | 1 | integrated-validation-queue | maincpu.geometry-pipeline-startup |
 | `0x0002a8a0` | 1 | integrated-validation-queue | maincpu.audio-scsp-queue-initialize |
+| `0x000f5d40` | 10 | integrated-validation-queue | maincpu.memory-copy-forward |
 | `0x00002040` | 1 | untriaged |  |
 | `0x00002080` | 2 | untriaged |  |
 | `0x000022f0` | 2 | untriaged |  |
@@ -147,19 +153,13 @@
 | `0x00025040` | 1 | untriaged |  |
 | `0x00027550` | 2 | untriaged |  |
 | `0x000281f0` | 1 | untriaged |  |
-| `0x000282e0` | 1 | untriaged |  |
-| `0x000284b8` | 1 | untriaged |  |
 | `0x000292d8` | 2 | untriaged |  |
 | `0x000294b0` | 2 | untriaged |  |
 | `0x000295d0` | 2 | untriaged |  |
 | `0x000296d0` | 1 | untriaged |  |
 | `0x00029738` | 1 | untriaged |  |
 | `0x00029778` | 1 | untriaged |  |
-| `0x00029a80` | 1 | untriaged |  |
-| `0x00029ae8` | 1 | untriaged |  |
-| `0x00029b20` | 1 | untriaged |  |
 | `0x00029c08` | 1 | untriaged |  |
-| `0x00029ca0` | 1 | untriaged |  |
 | `0x00029d50` | 1 | untriaged |  |
 | `0x0002b430` | 1 | untriaged |  |
 | `0x0002be30` | 1 | untriaged |  |

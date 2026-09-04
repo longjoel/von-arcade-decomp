@@ -1,25 +1,8 @@
 /* Recovered contract for SHARC opcode 0x0a at 0x20211. */
 #include <stdint.h>
+#include "recovered_float.h"
 
 typedef unsigned int u32;
-
-static float bits_float(u32 bits)
-{
-    union { u32 bits; float value; } converted = { bits };
-    return converted.value;
-}
-
-static u32 float_bits(float value)
-{
-    union { float value; u32 bits; } converted = { value };
-    return converted.bits;
-}
-
-static float rounded_mul(float left, float right)
-{
-    volatile float result = left * right;
-    return result;
-}
 
 extern float recovered_sharc_helper_20d68_candidate(float first, float second);
 
@@ -32,9 +15,9 @@ extern float recovered_sharc_helper_20d68_candidate(float first, float second);
  */
 u32 recovered_sharc_opcode_0a_angle_registers(u32 r0_bits, u32 r1_bits)
 {
-    float angle = recovered_sharc_helper_20d68_candidate(bits_float(r0_bits),
-                                                         bits_float(r1_bits));
-    float scaled = rounded_mul(angle, bits_float(0x4622f83d));
+    float angle = recovered_sharc_helper_20d68_candidate(recovered_float_from_bits(r0_bits),
+                                                         recovered_float_from_bits(r1_bits));
+    float scaled = recovered_rounded_mul(angle, recovered_float_from_bits(0x4622f83d));
     return (u32)(int32_t)scaled;
 }
 

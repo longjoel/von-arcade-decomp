@@ -1,6 +1,7 @@
 /* Adjacent panel routes recovered from i960 0x1fb10 and 0x1fb50. */
 
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -36,9 +37,8 @@ void recovered_panel8_plan(u32 caller_g17, struct recovered_panel8_plan *plan)
 void recovered_panel9_plan(u32 source_present, u32 caller_g22,
                            struct recovered_panel9_plan *plan)
 {
-    plan->source = source_present ? 0x02fe0d42U : 0U;
-    plan->source_helper = source_present ? 0x0001dc10U : 0U;
-    plan->fill_helper = source_present ? 0U : 0x0001df00U;
+    RECOVERED_SET_SOURCE_OR_CLEAR(plan, source_present, 0x02fe0d42U,
+                                  RECOVERED_HELPER_TRANSFER, RECOVERED_HELPER_CLEAR);
     plan->column = 5U;
     plan->row = 10U;
     plan->width = caller_g22 + 31U;

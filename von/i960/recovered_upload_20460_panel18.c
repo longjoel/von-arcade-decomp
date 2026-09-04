@@ -1,6 +1,7 @@
 /* Upload and status-panel routes recovered from i960 0x20460/0x20480. */
 
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -25,12 +26,7 @@ struct recovered_panel18_plan {
 void recovered_upload_20460_plan(u32 caller_g17,
                                  struct recovered_upload_20460_plan *plan)
 {
-    plan->source = 0x01004000U;
-    plan->destination = 0x01fd89d0U;
-    plan->flags = 0x40U;
-    plan->halfwords_per_row = 0x40U;
-    plan->rows = caller_g17 + 31U;
-    plan->helper = 0x0001bc90U;
+    RECOVERED_SET_UPLOAD_PLAN(plan, 0x01fd89d0U, caller_g17 + 31U);
 }
 
 void recovered_panel18_plan(u32 source_present,

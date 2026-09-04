@@ -3,6 +3,77 @@
 typedef unsigned int u32;
 typedef signed int s32;
 typedef unsigned char u8;
+
+/* Pure descriptors for the unresolved 0x29a80/0x29ae8 setup helpers. */
+u32 recovered_audio_device_copy_plan(u32 index, u32 *source,
+                                     u32 *destination, u32 *bytes,
+                                     u32 *count_source)
+{
+    if (index == 0U) {
+        *source = 0x000f48d0U;
+        *destination = 0x01800000U;
+        *bytes = 4U;
+        *count_source = 0U;
+        return 1U;
+    }
+    if (index == 1U) {
+        *source = 0x000f48d2U;
+        *destination = 0x01802000U;
+        *bytes = 0U;
+        *count_source = 0x000f48d0U;
+        return 1U;
+    }
+    return 0U;
+}
+
+u32 recovered_audio_device_table_clear_plan(u32 index, u32 *address,
+                                             u32 *value)
+{
+    if (index >= 52U)
+        return 0U;
+    *address = 0x0051a0c0U + (index << 3);
+    *value = 0U;
+    return 1U;
+}
+
+u32 recovered_audio_service_table_reset_plan(u32 index, u32 *address,
+                                             u32 *value)
+{
+    if (index >= 24U)
+        return 0U;
+    *address = 0x00504c30U + (index << 1);
+    *value = 0xffffU;
+    return 1U;
+}
+
+u32 recovered_audio_device_record_plan(u32 index, u32 *source_record,
+                                       u32 *destination)
+{
+    if (index >= 23U)
+        return 0U;
+    *source_record = 0x02bf83c8U + (index << 3);
+    *destination = 0x01802010U + (index << 1);
+    return 1U;
+}
+
+/* The 0x29b20 index calculation before its unresolved table read. */
+u32 recovered_audio_device_record_index(u32 selector, u32 exponent,
+                                        u32 mask)
+{
+    return (selector << (exponent & 0xffffU)) & (mask & 0xffffU);
+}
+
+/* Pure 0x29ca0 copy: 96 rows, 64 words per row, 0x200-byte row stride. */
+void recovered_audio_device_buffer_copy(u32 *destination,
+                                        const u32 *source)
+{
+    u32 row;
+    u32 word;
+
+    for (row = 0U; row < 96U; ++row)
+        for (word = 0U; word < 64U; ++word)
+            destination[row * 128U + word] = source[row * 128U + word];
+}
 typedef unsigned short u16;
 
 #define AUDIO_READ_INDEX  (*(volatile u32 *)0x0051aa70)

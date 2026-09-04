@@ -1,5 +1,9 @@
 # MAME SHARC precision follow-up
 
+> **Specialized reference:** current SHARC scope and the stop rule are summarized
+> in [SHARC recovery boundary](../docs/sharc.md). This file retains the detailed
+> architectural and potential-upstream analysis.
+
 This is the proposed follow-up from the Virtual-On reduction work. It is kept
 separate from the game-specific recovered C model because the current
 Virtual-On trig path already agrees between MAME's DRC and interpreter.

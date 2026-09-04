@@ -1,5 +1,6 @@
 /* Common mode-zero geometry sequence recovered from i960 0x24cc8-0x24eb0. */
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -26,10 +27,10 @@ void recovered_geometry_mode_zero_clip_calls_plan(
     u32 frame_pointer, u32 board_readback_address,
     struct recovered_geometry_mode_zero_clip_calls_plan *plan)
 {
-    static const u32 one = 0x3f800000U;
+    static const u32 one = RECOVERED_FLOAT_ONE;
     static const u32 geometry_base = 0x400028U;
 
-    plan->fifo_address = 0x00884000U;
+    plan->fifo_address = RECOVERED_FIFO_ADDRESS;
     plan->fifo_prefix_count = 15U;
     plan->fifo_prefix[0] = 5U;
     plan->fifo_prefix[1] = 16U;
@@ -54,9 +55,9 @@ void recovered_geometry_mode_zero_clip_calls_plan(
     plan->frame_flag_offset = 0xbcU;
     plan->frame_flag = 1U;
     plan->board_readback_address = board_readback_address;
-    plan->control_address = 0x00800010U;
-    plan->control_value = 0x101U;
-    plan->frame_publish_address = 0x00804000U;
+    plan->control_address = RECOVERED_GEOMETRY_CONTROL;
+    plan->control_value = RECOVERED_GEOMETRY_CONTROL_VALUE;
+    plan->frame_publish_address = RECOVERED_FRAME_PUBLISH;
     plan->clip_dispatch = 0x000701a0U;
     plan->call_count = 4U;
 

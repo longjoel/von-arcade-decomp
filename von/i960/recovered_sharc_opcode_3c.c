@@ -1,12 +1,7 @@
 /* Recovered normal/degenerate state update for SHARC opcode 0x3c. */
 #include <math.h>
 #include <stdint.h>
-
-static uint32_t float_bits(float value)
-{
-    union { float value; uint32_t bits; } converted = { value };
-    return converted.bits;
-}
+#include "recovered_float.h"
 
 /*
  * The normal path writes a frame from (x,y,z) into state[0..8].  The ROM's
@@ -28,14 +23,14 @@ void recovered_sharc_opcode_3c_frame(float x, float y, float z,
         return;
     }
 
-    state[0] = float_bits(z / horizontal);
-    state[1] = float_bits(-x * y / (length * horizontal));
-    state[2] = float_bits(x / length);
-    state[3] = float_bits(0.0f);
-    state[4] = float_bits(horizontal / length);
-    state[5] = float_bits(y / length);
-    state[6] = float_bits(-x / horizontal);
-    state[7] = float_bits(-z * y / (length * horizontal));
-    state[8] = float_bits(z / length);
+    state[0] = recovered_float_to_bits(z / horizontal);
+    state[1] = recovered_float_to_bits(-x * y / (length * horizontal));
+    state[2] = recovered_float_to_bits(x / length);
+    state[3] = recovered_float_to_bits(0.0f);
+    state[4] = recovered_float_to_bits(horizontal / length);
+    state[5] = recovered_float_to_bits(y / length);
+    state[6] = recovered_float_to_bits(-x / horizontal);
+    state[7] = recovered_float_to_bits(-z * y / (length * horizontal));
+    state[8] = recovered_float_to_bits(z / length);
     state[9] = state[10] = state[11] = 0;
 }

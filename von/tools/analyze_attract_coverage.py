@@ -11,6 +11,7 @@ from pathlib import Path
 
 INSTRUCTION_RE = re.compile(r"^\s*([0-9a-fA-F]+):")
 CALL_RE = re.compile(r"\b(?:call|bal)\s+0x([0-9a-fA-F]+)")
+LABEL_RE = re.compile(r'^\s*label\(0x([0-9a-fA-F]+),\s*["\']([^"\']+)["\']')
 
 
 def load_pcs(path: Path) -> set[int]:
@@ -51,12 +52,25 @@ def listing_data(path: Path) -> tuple[set[int], dict[int, set[int]]]:
     return instructions, callers
 
 
+def load_annotations(path: Path | None) -> dict[int, str]:
+    if path is None:
+        return {}
+    labels: dict[int, str] = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        match = LABEL_RE.match(line)
+        if match:
+            labels[int(match.group(1), 16)] = match.group(2)
+    return labels
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--pcs", required=True, type=Path)
     parser.add_argument("--listing", required=True, type=Path)
     parser.add_argument("--json", required=True, type=Path)
     parser.add_argument("--markdown", required=True, type=Path)
+    parser.add_argument("--annotations", type=Path,
+                        help="Ghidra annotation source to resolve labels in the report")
     args = parser.parse_args()
 
     pcs = load_pcs(args.pcs)
@@ -71,6 +85,7 @@ def main() -> int:
         if caller in visited
     )
     executed_targets = sorted({target for _, target in executed_edges})
+    annotations = load_annotations(args.annotations)
     ranges = contiguous_ranges(visited)
     report = {
         "schema_version": 1,
@@ -86,8 +101,13 @@ def main() -> int:
         "maximum_pc": f"0x{max(visited):08x}" if visited else None,
         "executed_direct_targets": [f"0x{target:08x}" for target in executed_targets],
         "executed_direct_edges": [
-            {"caller": f"0x{caller:08x}", "target": f"0x{target:08x}"}
+            {"caller": f"0x{caller:08x}", "caller_label": annotations.get(caller),
+             "target": f"0x{target:08x}", "target_label": annotations.get(target)}
             for caller, target in executed_edges
+        ],
+        "executed_annotations": [
+            {"address": f"0x{address:08x}", "label": annotations[address]}
+            for address in sorted(visited & annotations.keys())
         ],
         "ranges": [
             {"start": f"0x{start:08x}", "end": f"0x{end:08x}", "bytes": end - start}
@@ -103,8 +123,14 @@ def main() -> int:
         f"- Visited direct call edges: {len(executed_edges):,}\n"
         f"- Contiguous visited ranges: {len(ranges):,}\n"
         f"- PCs absent from decoded listing: {len(unknown):,}\n"
+        f"- Executed annotated PCs: {len(visited & annotations.keys()):,}\n"
         f"- Observed ROM span: {report['minimum_pc']}–{report['maximum_pc']}\n"
     )
+    if annotations:
+        markdown += "\n## Executed semantic annotations\n\n"
+        markdown += "| Address | Label |\n| --- | --- |\n"
+        for address in sorted(visited & annotations.keys()):
+            markdown += f"| `0x{address:08x}` | `{annotations[address]}` |\n"
     args.markdown.write_text(markdown, encoding="utf-8")
     print(markdown, end="")
     return 0

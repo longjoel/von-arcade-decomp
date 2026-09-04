@@ -132,9 +132,21 @@ u32 recovered_text_string_font_mode(const u8 *text)
 /* Recovered glyph-string writer at i960 0x0001da90. */
 void recovered_text_write_glyph_string(volatile const u8 *text)
 {
-    u32 font_mode = recovered_text_string_font_mode((const u8 *)text);
     u8 character;
-
+    /* Keep this leaf self-contained.  Calling recovered_text_string_font_mode
+     * here creates a nested callx in the compact i960 wrapper at 0x38b0;
+     * that wrapper does not preserve g14, so its ret would branch into the
+     * caller's string data (the observed 0x186c attract loop). */
+    u32 font_mode = 1U;
+    const u8 *mode_cursor = (const u8 *)text;
+    if (*mode_cursor != 0U) {
+        ++mode_cursor;
+        while (*mode_cursor != 0U) {
+            if (*mode_cursor >= (u8)'a' && *mode_cursor <= (u8)'z')
+                font_mode = 0U;
+            ++mode_cursor;
+        }
+    }
     while ((character = *text++) != 0U)
         recovered_text_emit_glyph(character, font_mode, 0U);
 }
@@ -381,6 +393,38 @@ u32 recovered_text_startup_asset_transfer_plan(
     *source_or_value = transfer.source_or_value;
     *units = transfer.units;
     return 1U;
+}
+
+/* Execute the fixed startup transfer schedule recovered at 0x1bda0. */
+void recovered_text_startup_asset_transfer(u32 profile)
+{
+    u32 index;
+    u32 kind;
+    u32 destination;
+    u32 source_or_value;
+    u32 units;
+
+    for (index = 0U;
+         recovered_text_startup_asset_transfer_plan(
+             profile, index, &kind, &destination, &source_or_value, &units);
+         ++index) {
+        if (kind == RECOVERED_STARTUP_WORD_EXPAND) {
+            recovered_word_expand_blocks(
+                (volatile u16 *)(unsigned long)destination,
+                (volatile const u16 *)(unsigned long)source_or_value,
+                units);
+        } else if (kind == RECOVERED_STARTUP_HALFWORD_SWAP) {
+            recovered_halfword_byte_swap_copy(
+                (volatile u16 *)(unsigned long)destination,
+                (volatile const u16 *)(unsigned long)source_or_value,
+                units);
+        } else {
+            volatile u16 *target =
+                (volatile u16 *)(unsigned long)destination;
+            while (units-- != 0U)
+                *target++ = (u16)source_or_value;
+        }
+    }
 }
 
 /* Describe the fixed 0x1c730 request prepared by 0x1c220. */
@@ -695,6 +739,26 @@ void recovered_text_video_initialize(void)
         recovered_text_video_clear_plan(index, &address, &halfwords);
         recovered_text_clear_video_region(address, halfwords);
     }
+}
+
+/* Execute the fixed 0x1c220 video bootstrap and its 0x1c730 font expansion. */
+void recovered_text_video_control_bootstrap(u32 caller_g14)
+{
+    u32 index;
+    u32 address;
+    u32 value;
+    u32 width;
+
+    for (index = 0U; index < 10U; ++index) {
+        recovered_text_video_control_write_plan(
+            index, caller_g14, &address, &value, &width);
+        if (width == 2U)
+            *(volatile u16 *)(unsigned long)address = (u16)value;
+        else
+            *(volatile u32 *)(unsigned long)address = value;
+    }
+    recovered_text_video_initialize();
+    recovered_text_ascii_font_initialize();
 }
 
 /* Recovered warning-message sequence at i960 0x00001674-0x000016d8. */

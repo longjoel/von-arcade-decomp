@@ -1,6 +1,7 @@
 /* Upload and panel helpers recovered from i960 0x20390/0x203b0. */
 
 #include <stdint.h>
+#include "recovered_common.h"
 
 typedef uint32_t u32;
 
@@ -25,12 +26,7 @@ struct recovered_panel17_plan {
 void recovered_upload_20390_plan(u32 caller_g17,
                                  struct recovered_upload_20390_plan *plan)
 {
-    plan->source = 0x01004000U;
-    plan->destination = 0x01fccd20U;
-    plan->flags = 0x40U;
-    plan->halfwords_per_row = 0x40U;
-    plan->rows = caller_g17 + 31U;
-    plan->helper = 0x0001bc90U;
+    RECOVERED_SET_UPLOAD_PLAN(plan, 0x01fccd20U, caller_g17 + 31U);
 }
 
 void recovered_panel17_plan(struct recovered_panel17_plan *plan)

@@ -1,26 +1,7 @@
 /* Recovered two-vector/angle contract for SHARC opcode 0x34. */
 #include <math.h>
 #include <stdint.h>
-
-static void rotate_y(float matrix[9], float sine, float cosine)
-{
-    for (unsigned column = 0; column < 3; ++column) {
-        float row0 = matrix[column];
-        float row2 = matrix[6 + column];
-        matrix[column] = cosine * row0 + sine * row2;
-        matrix[6 + column] = -sine * row0 + cosine * row2;
-    }
-}
-
-static void rotate_x(float matrix[9], float sine, float cosine)
-{
-    for (unsigned column = 0; column < 3; ++column) {
-        float row1 = matrix[3 + column];
-        float row2 = matrix[6 + column];
-        matrix[3 + column] = cosine * row1 - sine * row2;
-        matrix[6 + column] = sine * row1 + cosine * row2;
-    }
-}
+#include "recovered_float.h"
 
 static void add_matrix_vector(float tail[3], const float matrix[9], const float vector[3])
 {
@@ -46,7 +27,7 @@ void recovered_sharc_opcode_34_initialize(
     const float x = (float)angle_words[1] * radians_per_word;
 
     add_matrix_vector(tail, matrix, first_vector);
-    rotate_y(matrix, sinf(y), cosf(y));
-    rotate_x(matrix, sinf(x), cosf(x));
+    recovered_rotate_y(matrix, sinf(y), cosf(y));
+    recovered_rotate_x(matrix, sinf(x), cosf(x));
     add_matrix_vector(tail, matrix, second_vector);
 }

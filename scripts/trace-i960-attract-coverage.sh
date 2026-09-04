@@ -29,7 +29,8 @@ SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}" \
 
 python3 "$ROOT_DIR/von/tools/analyze_attract_coverage.py" \
     --pcs "$PC_LOG" --listing "$LISTING" \
-    --json "$JSON_REPORT" --markdown "$MARKDOWN_REPORT"
+    --json "$JSON_REPORT" --markdown "$MARKDOWN_REPORT" \
+    --annotations "$ROOT_DIR/von/ghidra/AnnotateVonI960.py"
 python3 "$ROOT_DIR/von/tools/build_attract_worklist.py" \
     --coverage "$JSON_REPORT" --ledger "$ROOT_DIR/von/reconstruction_ledger.json" \
     --json "$WORKLIST_JSON" --markdown "$WORKLIST_MARKDOWN"

@@ -1959,6 +1959,39 @@
           "notes": "Models the packed-status tail from four 16-bit controller reads and prior work words: it builds the 24-bit +2/+4/+6 mask, complements it into status_49c, stores the +c low byte at status_498/499/49a, and applies the two i960 andnot/notand masks to work words at 0x5024a0..0x5024bc. Controller write timing and higher-level bit meanings remain separate."
         },
         {
+          "id": "maincpu.io-controller-command-upload-2850",
+          "name": "io_controller_command_upload_2850",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_io.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_io.py"],
+          "ranges": [{"start": "0x00002850", "end": "0x00002884"}],
+          "symbol": "recovered_io_setup_plan",
+          "notes": "Pure 0x2830 controller upload schedule: copies 21 fixed bytes to the controller port and invokes the status wait per byte. MMIO execution/timing remains outside the model."
+        },
+        {
+          "id": "maincpu.io-controller-indexed-upload-2990",
+          "name": "io_controller_indexed_upload_2990",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_io.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_io.py"],
+          "ranges": [{"start": "0x00002990", "end": "0x00002ab0"}],
+          "symbol": "recovered_io_setup_plan, recovered_io_command_plan",
+          "notes": "Pure indexed controller upload schedule: fixed 0x2980 setup, indexed 0x2aa0 command construction, and bounded byte-plan behavior. Port writes and status waits remain external."
+        },
+        {
+          "id": "maincpu.io-runtime-upload-handoff-25d0",
+          "name": "io_runtime_upload_handoff_25d0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_io_runtime_upload.c", "von/i960/recovered_io.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_io_runtime_upload.py"],
+          "ranges": [{"start": "0x000025d0", "end": "0x00002a30"}],
+          "symbol": "recovered_io_runtime_upload_plan",
+          "notes": "Pure 0x29d0 gate and 0x25d0 callback/publication contract, followed by the bounded 0x2990 indexed-command handoff. Callback bodies, port reads/writes, and status waits are explicit inputs or remain external."
+        },
+        {
           "id": "maincpu.io-normal-input-schedule",
           "name": "io_normal_input_schedule",
           "classification": "code",
@@ -2260,6 +2293,122 @@
           }
         },
         {
+      "id": "maincpu.audio-device-table-clear-plan",
+          "name": "audio_device_table_clear_plan",
+          "classification": "code",
+      "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_audio_queue.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/boot-path.md",
+            "von/tools/test_recovered_audio_helpers.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00029a80",
+              "end": "0x00029ad0"
+            }
+          ],
+          "symbol": "recovered_audio_device_copy_plan",
+          "notes": "Pure plans capture the two exact source/destination copy descriptors and the 52-entry eight-byte clear schedule. The unresolved device MMIO writes remain intentionally excluded.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00029a80"
+              ]
+            }
+          }
+        },
+        {
+      "id": "maincpu.audio-service-table-reset-plan",
+          "name": "audio_service_table_reset_plan",
+          "classification": "code",
+      "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_audio_queue.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/boot-path.md",
+            "von/tools/test_recovered_audio_helpers.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00029ae8",
+              "end": "0x00029b18"
+            }
+          ],
+          "symbol": "recovered_audio_service_table_reset_plan",
+          "notes": "Pure plan captures the 24-entry 0xffff reset of the 0x00504c30 service table and the adjacent zero state write; no device protocol is inferred.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00029ae8"
+              ]
+            }
+          }
+        },
+        {
+      "id": "maincpu.audio-device-record-converter",
+          "name": "audio_device_record_converter",
+          "classification": "code",
+      "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_audio_queue.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/boot-path.md",
+            "von/tools/test_recovered_audio_helpers.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00029b20",
+              "end": "0x00029bf8"
+            }
+          ],
+          "symbol": "recovered_audio_device_record_index",
+          "notes": "Purely recovers the 23-record source/destination schedule and selector/exponent/mask index arithmetic before the unresolved ROM table read and device writes. Fixture vectors cover the schedule and 327,680 index cases; MMIO execution remains excluded.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00029b20"
+              ]
+            }
+          }
+        },
+        {
+      "id": "maincpu.audio-device-buffer-copy",
+          "name": "audio_device_buffer_copy",
+          "classification": "code",
+      "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_audio_queue.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/boot-path.md",
+            "von/tools/test_recovered_audio_helpers.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00029ca0",
+              "end": "0x00029d20"
+            }
+          ],
+          "symbol": "recovered_audio_device_buffer_copy",
+          "notes": "Pure fixture-tested reconstruction of the 0x29ca0 nested loops: 96 rows, 64 32-bit words per row, and 0x200-byte row stride. Device-window ownership and MMIO semantics remain unresolved.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00029ca0"
+              ]
+            }
+          }
+        },
+        {
       "id": "maincpu.audio-scsp-queue-initialize",
           "name": "audio_scsp_queue_initialize",
           "classification": "code",
@@ -2521,6 +2670,34 @@
           }
         },
         {
+      "id": "maincpu.sharc-bootstrap-upload",
+          "name": "sharc_bootstrap_upload",
+          "classification": "code",
+      "stage": "integrated",
+          "sources": [
+            "von/i960/recovered_geometry.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md"
+          ],
+          "ranges": [
+            {
+              "start": "0x000282e0",
+              "end": "0x00028418"
+            }
+          ],
+          "symbol": "recovered_sharc_bootstrap_upload",
+          "notes": "Executes the recovered 0x282e0 SHARC bootstrap upload: enables upload mode, transfers 0x2b1e source halfwords to the SHARC FIFO, and clears the control latch. The integrated geometry pipeline invokes it on zero mode; runtime validation remains pending.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x000282e0"
+              ]
+            }
+          }
+        },
+        {
       "id": "maincpu.geometry-program-upload",
           "name": "geometry_program_upload",
           "classification": "code",
@@ -2572,6 +2749,34 @@
             "c-only-i960-attract-60s": {
               "entries": [
                 "0x0002a990"
+              ]
+            }
+          }
+        },
+        {
+      "id": "maincpu.geometry-command-window-clear-route",
+          "name": "geometry_command_window_clear_route",
+          "classification": "code",
+      "stage": "integrated",
+          "sources": [
+            "von/i960/recovered_geometry_commands.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md"
+          ],
+          "ranges": [
+            {
+              "start": "0x000284b8",
+              "end": "0x000284e8"
+            }
+          ],
+          "symbol": "recovered_geometry_command_window_clear",
+          "notes": "Executes the recovered 0x284b8 command-window clear route, zeroing the +4 and +8 fields of all 64 command slots. The integrated geometry pipeline invokes it before command-table setup; runtime validation remains pending.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x000284b8"
               ]
             }
           }
@@ -2634,7 +2839,7 @@
           "id": "maincpu.text-character-output",
           "name": "text_character_output",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
@@ -2710,7 +2915,7 @@
           "id": "maincpu.memory-copy-forward",
           "name": "memory_copy_forward",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_memory.c"
           ],
@@ -2726,7 +2931,7 @@
             }
           ],
           "symbol": "recovered_memory_copy_forward",
-          "notes": "Recovers the forward non-overlap copy primitive's byte-for-byte contract. The original dispatches among aligned 16-, 8-, 4-, 2-, and 1-byte loops; the C implementation preserves their common forward-copy behavior.",
+          "notes": "Recovers and executes the forward non-overlap copy primitive's byte-for-byte contract. The original dispatches among aligned 16-, 8-, 4-, 2-, and 1-byte loops; reconstructed_main now invokes the recovered video upload, and the C implementation preserves their common forward-copy behavior. Runtime attract validation remains pending.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -2844,6 +3049,27 @@
           ],
           "symbol": "recovered_attribute_pair_plan",
           "notes": "Recovers the selector-dependent direct pair writes, 14*g1 byte offset, c000 attribute OR, and indirect return stub 0x2038c."
+        },
+        {
+          "id": "maincpu.rom-signature-compare-2040",
+          "name": "rom_signature_compare_2040",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_rom_signature_compare_2040.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_rom_signature_compare_2040.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00002040",
+              "end": "0x0000207c"
+            }
+          ],
+          "symbol": "recovered_rom_signature_compare_2040",
+          "notes": "Exact four-byte comparison against signatures SEGA and S32A; returns one on either match and zero otherwise."
         },
         {
           "id": "maincpu.video-upload-20390-panel17",
@@ -4104,7 +4330,7 @@
           "id": "maincpu.text-glyph-address-plan",
           "name": "text_glyph_address_plan",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
@@ -4163,7 +4389,7 @@
           "id": "maincpu.word-expand-blocks",
           "name": "word_expand_blocks",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
@@ -4192,7 +4418,7 @@
           "id": "maincpu.halfword-byte-swap-copy",
           "name": "halfword_byte_swap_copy",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
@@ -4221,7 +4447,7 @@
           "id": "maincpu.startup-asset-transfer-plan",
           "name": "startup_asset_transfer_plan",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
@@ -4237,7 +4463,7 @@
             }
           ],
           "symbol": "recovered_text_startup_asset_transfer_plan",
-          "notes": "Captures the 0x1bda0 loader's fixed profile-dependent asset-transfer schedule without executing mapped writes. Zero profile yields 20 records and every nonzero input yields 17: block expansions, ROM halfword byte swaps, a 0x9999 fill, and four final color-table expansions. All 37 distinct records are host-tested. Resource semantics and active hardware integration remain separate.",
+          "notes": "Captures and executes the 0x1bda0 loader's fixed profile-dependent asset-transfer schedule. Zero profile yields 20 records and every nonzero input yields 17: block expansions, ROM halfword byte swaps, a 0x9999 fill, and four final color-table expansions. All 37 distinct records are host-tested; reconstructed_main now invokes the zero-profile schedule. Runtime attract validation remains pending.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -4279,7 +4505,7 @@
           "id": "maincpu.video-control-bootstrap-plan",
           "name": "video_control_bootstrap_plan",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
@@ -4295,7 +4521,7 @@
             }
           ],
           "symbol": "recovered_text_video_control_write_plan",
-          "notes": "Recovers the 0x1c220 video-control bootstrap's fixed 0x1c730 helper request and ten direct bus/state writes around the existing 0x1c618 clear call. The plan preserves caller g14 propagation and the final 0xffffffff sentinel; all records are host-tested. Active mapped-write integration remains separate.",
+          "notes": "Recovers and executes the 0x1c220 video-control bootstrap's fixed 0x1c730 helper request and ten direct bus/state writes around the 0x1c618 clear call. The reconstructed startup invokes it with the zero-profile caller state; all records are host-tested. Runtime attract validation remains pending.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -4308,7 +4534,7 @@
           "id": "maincpu.video-byte-lane-expand",
           "name": "video_byte_lane_expand",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
@@ -4324,7 +4550,7 @@
             }
           ],
           "symbol": "recovered_text_expand_video_blocks",
-          "notes": "Recovers the packed-byte expansion: each mode-masked source byte becomes two four-pixel 4-bit lane groups in a 32-bit destination word, with eight values processed per positive block. All 256 source bytes and 16 mode values are host-tested, along with block scheduling. Mapped-RAM execution remains separate.",
+          "notes": "Recovers and executes the packed-byte expansion: each mode-masked source byte becomes two four-pixel 4-bit lane groups in a 32-bit destination word, with eight values processed per positive block. All 256 source bytes and 16 mode values are host-tested; the reconstructed video bootstrap invokes the block scheduler. Runtime attract validation remains pending.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -4337,7 +4563,7 @@
           "id": "maincpu.text-string-font-mode",
           "name": "text_string_font_mode",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
@@ -4366,7 +4592,7 @@
           "id": "maincpu.text-video-initialize",
           "name": "text_video_initialize",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
@@ -4382,7 +4608,7 @@
             }
           ],
           "symbol": "recovered_text_video_initialize",
-          "notes": "Resets the nine observed text/video state fields and clears the four exact halfword regions at 0x01000000, 0x0100c000, 0x01008000, and 0x0100a000.",
+          "notes": "Resets the nine observed text/video state fields and clears the four exact halfword regions at 0x01000000, 0x0100c000, 0x01008000, and 0x0100a000. The reconstructed startup and attract render paths invoke this recovered implementation; runtime attract validation remains pending.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -4449,13 +4675,14 @@
       "id": "maincpu.texture-decompressor",
           "name": "texture_decompressor",
           "classification": "code",
-      "stage": "integrated",
+      "stage": "trace-validated",
           "sources": [
             "von/i960/recovered_texture_decompress.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
-            "von/tools/verify_texture_decompress.py"
+            "von/tools/verify_texture_decompress.py",
+            "von/build/disasm/vonj-texture-buffers.trace"
           ],
           "ranges": [
             {
@@ -4464,7 +4691,7 @@
             }
           ],
           "symbol": "recovered_texture_decompress",
-          "notes": "Recovered production C matches all 64 original MAME debug write-trace records (address and halfword value) from the first texture stream. It also clears and returns the shared 0x00515080 status latch exactly as the ROM does; the decoder does not assign that latch itself. Post-load RAM snapshots are intentionally excluded because later loader calls overwrite the same windows. Byte validation is blocked on compiler/ABI calibration.",
+          "notes": "Recovered production C matches all 64 original MAME debug write-trace records (address and halfword value) from the first texture stream. It also clears and returns the shared 0x00515080 status latch exactly as the ROM does; the decoder does not assign that latch itself. Post-load RAM snapshots are intentionally excluded because later loader calls overwrite the same windows. The bank-selection helper is forced inline; the pinned i960 build emits no callx to 0x38e0, preserving the decompressor return-link ABI. Secondary-route boundary vectors cover the 0x60000 threshold and all palette-table comparison branches. Byte-for-byte validation remains separate from these control-flow and routing checks.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -4718,6 +4945,61 @@
           }
         },
         {
+          "id": "maincpu.object-threshold-constant-761b0",
+          "name": "object_threshold_constant_761b0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_object_threshold_constant_761b0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/i960/boot-path.md", "von/tools/test_recovered_object_threshold_constant_761b0.py"],
+          "ranges": [{"start": "0x000761b0", "end": "0x00076234"}],
+          "symbol": "recovered_object_threshold_constant_761b0",
+          "notes": "Pure fixture-tested threshold mapping: counters through 0x54 map to 0x45000000, 0x55..0x59 to 0x45800000, 0x5a..0x5e to 0x46000000, and 0x5f+ to 0x46800000; selector 29 is emitted. State/FIFO/MMIO effects remain external."
+        },
+        {
+          "id": "maincpu.geometry-fifo-argument-plan-76240",
+          "name": "geometry_fifo_argument_plan_76240",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_fifo_argument_plan_76240.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/i960/geometry-transform-fifo-findings.md", "von/tools/test_recovered_geometry_fifo_argument_plan_76240.py"],
+          "ranges": [{"start": "0x00076240", "end": "0x00076340"}],
+          "symbol": "recovered_geometry_fifo_argument_plan_76240",
+          "notes": "Pure original-listing arithmetic only: sign-extend object +0x184, then form 16-bit-wrapped +/-0x6000 and center coordinate words. FIFO commands, hardware readbacks, and subsequent fixed-point/FPU transform are intentionally excluded because the bounded original-ROM capture does not establish their stateful response semantics."
+        },
+        {
+          "id": "maincpu.object-state-descriptor-75f00",
+          "name": "object_state_descriptor_75f00",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_object_state_descriptor_75f00.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_object_state_descriptor_75f00.py"],
+          "ranges": [{"start": "0x00075f00", "end": "0x0007602c"}],
+          "symbol": "recovered_object_state_descriptor_75f00",
+          "notes": "Pure fixture-tested selector and descriptor copy from the original object initializer: selector-derived 9-entry table index, 0x48-byte record stride, and 18-word state copy. Downstream object/MMIO effects remain external."
+        },
+        {
+          "id": "maincpu.geometry-frame-plan-28de8",
+          "name": "geometry_frame_plan_28de8",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_frame_plan_28de8.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_frame_plan_28de8.py"],
+          "ranges": [{"start": "0x00028de8", "end": "0x00028e7c"}],
+          "symbol": "recovered_geometry_frame_plan_28de8",
+          "notes": "Pure fixture-tested phase selection and status-bit polling contract; read/write command-window MMIO remains outside this boundary."
+        },
+        {
+          "id": "maincpu.linked-list-append-298b8",
+          "name": "linked_list_append_298b8",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_linked_list_append_298b8.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_linked_list_append_298b8.py"],
+          "ranges": [{"start": "0x000298b8", "end": "0x000298f0"}],
+          "symbol": "recovered_linked_list_append_298b8",
+          "notes": "Pure fixture-tested intrusive doubly-linked-list append: sentinel next link, old-tail predecessor, old-tail successor update, and global tail publication. Memory ownership and allocator effects remain external."
+        },
+        {
           "id": "maincpu.geometry-function-command-submit",
           "name": "geometry_function_command_submit",
           "classification": "code",
@@ -4743,6 +5025,17 @@
               ]
             }
           }
+        },
+        {
+          "id": "maincpu.geometry-function-plan-28e88",
+          "name": "geometry_function_plan_28e88",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_function_plan_28e88.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_function_plan_28e88.py"],
+          "ranges": [{"start": "0x00028e88", "end": "0x00028efc"}],
+          "symbol": "recovered_geometry_function_plan_28e88",
+          "notes": "Pure fixture-tested command stream: 0x404 function word, bit-23 command normalization, count, masked 16-bit payload, 0x1010 completion word, and terminal zero. Device MMIO remains external."
         },
         {
           "id": "maincpu.command-profile-initializer",
@@ -9888,6 +10181,250 @@
           ],
           "symbol": "recovered_geometry_object_xz_state_output_request",
           "notes": "Host decimal command 26 maps to SHARC opcode 0x1a, not opcode 0x26. The post-gate packet is [26, selected_x, 0, selected_z], and opcode 0x1a returns tail + matrix*(x,0,z). Opcode 0x26 remains the separate five-word parameter upload service."
+        },
+        {
+          "id": "maincpu.geometry-accumulator-transition-7f5d0",
+          "name": "geometry_accumulator_transition_7f5d0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_accumulator_transition_7f5d0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_accumulator_transition_7f5d0.py"],
+          "ranges": [{"start": "0x0007f5d0", "end": "0x0007f6b0"}],
+          "symbol": "recovered_geometry_accumulator_transition_7f5d0",
+          "notes": "Pure deterministic state gates and action selection; floating-point and FIFO outcomes are explicit boolean inputs and MMIO is excluded."
+        },
+        {
+          "id": "maincpu.geometry-accumulator-scan-7f4d0",
+          "name": "geometry_accumulator_scan_7f4d0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_accumulator_scan_7f4d0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_accumulator_scan_7f4d0.py"],
+          "ranges": [{"start": "0x0007f4d0", "end": "0x0007f5d0"}],
+          "symbol": "recovered_geometry_accumulator_scan_7f4d0",
+          "notes": "Pure 32-entry byte-table candidate predicate: nonzero table byte, peer in [table, table+5), and minimum supplied metric selection. FIFO, floating-point, and MMIO effects are excluded."
+        },
+        {
+          "id": "maincpu.geometry-inner-packet-8e120",
+          "name": "geometry_inner_packet_8e120",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_inner_packet_8e120.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_inner_packet_8e120.py"],
+          "ranges": [{"start": "0x0008e120", "end": "0x0008e2b0"}],
+          "symbol": "recovered_geometry_inner_packet_8e120",
+          "notes": "Pure per-record packet: models 0x8e238 FIFO-response selection of object +0x4/+0x8, command-window fields, returned pair destinations +0x174/+0x17c versus 0x562430+index*12, and exact FIFO word order. Outer setup and MMIO remain external."
+        },
+        {
+          "id": "maincpu.geometry-packet-tail-8e310",
+          "name": "geometry_packet_tail_8e310",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_packet_tail_8e310.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_packet_tail_8e310.py"],
+          "ranges": [{"start": "0x0008e310", "end": "0x0008e398"}],
+          "symbol": "recovered_geometry_packet_tail_8e310",
+          "notes": "Models the byte-indexed packet tail's selectors 5 and 46 (31+15), three widened vector halfwords, three masked bytes, and frame readback fixture. Device/MMIO setup remains external."
+        },
+        {
+          "id": "maincpu.geometry-indexed-packet-8d5d0",
+          "name": "geometry_indexed_packet_8d5d0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_indexed_packet_8d5d0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_indexed_packet_8d5d0.py"],
+          "ranges": [{"start": "0x0008d5d0", "end": "0x0008d6b8"}],
+          "symbol": "recovered_geometry_indexed_packet_8d5d0",
+          "notes": "Models the indexed variant prefix: selectors 20/21/22 with negated 16-bit values, selector 47, bit-15 XOR when normalized count equals one, and the 12-byte record advance. Remaining packet/MMIO tail is outside this modeled boundary."
+        },
+        {
+          "id": "maincpu.geometry-object-packet-8dd40",
+          "name": "geometry_object_packet_8dd40",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_object_packet_8dd40.c"],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_geometry_object_packet_8dd40.py"
+          ],
+          "ranges": [{"start": "0x0008dd40", "end": "0x0008dfb0"}],
+          "symbol": "recovered_geometry_object_packet_8dd40",
+          "notes": "Pure object-state packet plan: FIFO selectors 5/47/22/21/20/58, masked record values, 0x8e238-dependent selection of object +0x4/+0x8, command-window words, output +0x174/+0x17c stores, and bounded 0x562430 table destination. MMIO and device response remain external."
+        },
+        {
+          "id": "maincpu.geometry-batch-packet-8d400",
+          "name": "geometry_batch_packet_8d400",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_geometry_batch_packet_8d400.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_geometry_batch_packet_8d400.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0008d400",
+              "end": "0x0008d5c0"
+            }
+          ],
+          "symbol": "recovered_geometry_batch_packet_8d400",
+          "notes": "Pure per-record contract for the fixed FIFO sequence [5,47, masked coordinates 4/6/8,22,coordinate 2,21,coordinate 0,20,parameter,58,0x802008 readback], followed by 0x101 at 0x800010, record/window words at 0x804000..0x80400c, and completion 6. The 0x884000 readback and device/MMIO effects remain external to the host model."
+        },
+        {
+          "id": "maincpu.pointer-table-initialization-29738",
+          "name": "pointer_table_initialization_29738",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_pointer_table_init_29738.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_pointer_table_init_29738.py"
+          ],
+          "ranges": [
+            {"start": "0x00029738", "end": "0x00029768"},
+            {"start": "0x00029778", "end": "0x000297a8"}
+          ],
+          "symbol": "recovered_pointer_table_init_29738",
+          "notes": "Both original helpers initialize exactly 64 contiguous nodes by storing the next node at +0x0c, then clear the terminal link. 0x29738 uses stride 0x40 from head 0x5150c0; 0x29778 uses stride 0x100 from head 0x5190c0. The pure schedule excludes allocator/MMIO ownership."
+        },
+        {
+          "id": "maincpu.geometry-template-copy-2b5b0",
+          "name": "geometry_template_copy_2b5b0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_template_copy_2b5b0.c"],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_geometry_template_copy_2b5b0.py"
+          ],
+          "ranges": [{"start": "0x0002b5b0", "end": "0x0002b5dc"}],
+          "symbol": "recovered_geometry_template_copy_2b5b0",
+          "notes": "Original code computes destination 0x51c5b0 + index*100, copies five 4-word template blocks from 0x2aa80..0x2aac0, and stores the final 0x2aad0 word at +0x50. The model excludes surrounding allocation and device calls."
+        },
+        {
+          "id": "maincpu.geometry-record-counter-address-2b6ac",
+          "name": "geometry_record_counter_address_2b6ac",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_record_counter_address_2b6ac.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_record_counter_address_2b6ac.py"],
+          "ranges": [{"start": "0x0002b6ac", "end": "0x0002b6c0"}],
+          "symbol": "recovered_geometry_record_counter_address_2b6ac",
+          "notes": "The original shift/add sequence computes 25*index and addresses the 100-byte-stride record counter table at 0x51c5b4. The subsequent counter increment/threshold and MMIO call are intentionally excluded."
+        },
+        {
+          "id": "maincpu.status-counter-add2-2b7b0",
+          "name": "status_counter_add2_2b7b0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_status_counter_add2_2b7b0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_status_counter_add2_2b7b0.py"],
+          "ranges": [{"start": "0x0002b7b0", "end": "0x0002b7d8"}],
+          "symbol": "recovered_status_counter_add2_2b7b0",
+          "notes": "Original instructions load 0x503a00, add exactly 2, store it, and return through a fixed callback. Callback/MMIO behavior is excluded."
+        },
+        {
+          "id": "maincpu.status-counter-add1-2b7e0",
+          "name": "status_counter_add1_2b7e0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_status_counter_add1_2b7e0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_status_counter_add1_2b7e0.py"],
+          "ranges": [{"start": "0x0002b7e0", "end": "0x0002b808"}],
+          "symbol": "recovered_status_counter_add1_2b7e0",
+          "notes": "Original instructions load global 0x503a00, decrement/advance the local status by one, store it, and return through a fixed callback. Callback behavior is excluded."
+        },
+        {
+          "id": "maincpu.progress-mapping-2b870",
+          "name": "progress_mapping_2b870",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_progress_mapping_2b870.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_progress_mapping_2b870.py"],
+          "ranges": [{"start": "0x0002b870", "end": "0x0002b930"}],
+          "symbol": "recovered_progress_mapping_2b870",
+          "notes": "Pure portion maps progress <=15 to 0x200-(progress<<5), odd 17..31 to 2*(progress-32), and all other values to zero; advances progress by one and increments 0x503a00 only when the prior value is 0x80. MMIO/message calls and fixed writes are excluded."
+        },
+        {
+          "id": "maincpu.progress-dispatch-2ba44",
+          "name": "progress_dispatch_2ba44",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_progress_dispatch_2ba44.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_progress_dispatch_2ba44.py"],
+          "ranges": [{"start": "0x0002ba44", "end": "0x0002ba84"}],
+          "symbol": "recovered_progress_dispatch_2ba44",
+          "notes": "After caller-side progress&31 table lookup, original code resets progress to 1 when callback is null, or when service mode is 2 and callback is 0xe3ab0; otherwise it invokes the callback. Callback/MMIO effects are excluded."
+        },
+        {
+          "id": "maincpu.status-record-init-3ecd0",
+          "name": "status_record_init_3ecd0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_status_record_init_3ecd0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_status_record_init_3ecd0.py"],
+          "ranges": [{"start": "0x0003ecd0", "end": "0x0003ed58"}],
+          "symbol": "recovered_status_record_init_3ecd0",
+          "notes": "Exact bounded first-free-record scan over 23 records at 0x51ad10 with 0x24-byte stride and status bit 15, followed by the observed field initialization and selector-masked 0x3eca0 halfword lookup. The helper call and pool memory side effects are outside the pure result contract."
+        },
+        {
+          "id": "maincpu.status-record-init-3ed60",
+          "name": "status_record_init_3ed60",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_status_record_init_3ed60.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_status_record_init_3ed60.py"],
+          "ranges": [{"start": "0x0003ed60", "end": "0x0003edd0"}],
+          "symbol": "recovered_status_record_init_3ed60",
+          "notes": "Exact sibling bounded scan over 23 records at 0x51ad10 with 0x24-byte stride and status bit 15. Preserves the distinct 0x3ed60 argument mapping: g5 selector, g3 byte field, g4 final field, and selector-masked 0x3eca0 halfword. The helper/MMIO side effect is excluded."
+        },
+        {
+          "id": "maincpu.status-record-seed-3f4e8",
+          "name": "status_record_seed_3f4e8",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_status_record_seed_3f4e8.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_status_record_seed_3f4e8.py"],
+          "ranges": [{"start": "0x0003f4e8", "end": "0x0003f548"}],
+          "symbol": "recovered_status_record_seed_3f4e8",
+          "notes": "Exact pure bounded slice of the selector-10 pool service: scans 23 signed status halfwords at 0x51ad10 with 0x24-byte stride, initializes the first bit-15/free slot, stores caller g1/g0 at offsets 6/8, and derives offset 2 from 0x3eca0[10]. Continuation and helper effects are excluded."
+        },
+        {
+          "id": "maincpu.status-record-reset-3eeb0",
+          "name": "status_record_reset_3eeb0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_status_record_reset_3eeb0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_status_record_reset_3eeb0.py"],
+          "ranges": [{"start": "0x0003eeb0", "end": "0x0003ef48"}],
+          "symbol": "recovered_status_record_reset_3eeb0",
+          "notes": "Exact bounded first-active-record scan over 23 records at 0x51ad10 with 0x24-byte stride. Captures selector g1, selector-masked 0x3eca0 halfword, caller g0, three 0x884000 readback values, cleared fields, and g14 helper result; device I/O and 0xf5058 bookkeeping are supplied as inputs and excluded."
+        },
+        {
+          "id": "maincpu.input-byte-parser-3a38",
+          "name": "input_byte_parser_3a38",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_input_byte_parser_3a38.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_input_byte_parser_3a38.py"],
+          "ranges": [{"start": "0x00003a38", "end": "0x00003ad8"}],
+          "symbol": "recovered_input_byte_parser_3a38",
+          "notes": "Exact state transition for one parser call: empty first/second bytes leave state unchanged when count is zero; a nonzero count is decremented and replenishes both bytes to 7 while setting the selected status bit; otherwise the first byte is decremented, with zero clearing the selected bit and positive values also decrementing the second byte. The indirect return and caller scheduling are excluded."
+        },
+        {
+          "id": "maincpu.input-byte-parser-wrapper-3ae0",
+          "name": "input_byte_parser_wrapper_3ae0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_input_byte_parser_wrapper_3ae0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/i960/recovered_input_byte_parser_3a38.c", "von/tools/test_recovered_input_byte_parser_wrapper_3ae0.py"],
+          "ranges": [{"start": "0x00003ae0", "end": "0x00003b00"}],
+          "symbol": "recovered_input_byte_parser_wrapper_3ae0",
+          "notes": "Exact wrapper invokes the recovered 0x3a38 byte/state transition on the two records at 0x5024cc and 0x5024d0, in order, with status-bit selectors 0 and 1. The original indirect returns are discarded."
         },
         {
           "id": "sharc.geometry-dual-distance-predicate",

@@ -1,15 +1,9 @@
 /* Recovered selector/staging and determinant gate for SHARC opcode 0x17. */
 #include <stddef.h>
 #include <stdint.h>
+#include "recovered_float.h"
 
 typedef uint32_t u32;
-
-static float bits_float(u32 bits)
-{
-    union { u32 bits; float value; } value;
-    value.bits = bits;
-    return value.value;
-}
 
 /*
  * Select one entry from the streamed table and stage its twelve-word record.
@@ -37,10 +31,10 @@ int recovered_sharc_opcode_17_select_record(const u32 *selectors,
     for (size_t index = 0; index < 12U; ++index)
         staged[index] = record_bank[offset + index];
 
-    float value = (r8 - bits_float(staged[3])) *
-                  (bits_float(staged[2]) - bits_float(staged[5])) -
-                  (r9 - bits_float(staged[5])) *
-                  (bits_float(staged[0]) - bits_float(staged[3]));
+    float value = (r8 - recovered_float_from_bits(staged[3])) *
+                  (recovered_float_from_bits(staged[2]) - recovered_float_from_bits(staged[5])) -
+                  (r9 - recovered_float_from_bits(staged[5])) *
+                  (recovered_float_from_bits(staged[0]) - recovered_float_from_bits(staged[3]));
     if (determinant != NULL)
         *determinant = value;
     return value == 0.0f ? 0 : 1;

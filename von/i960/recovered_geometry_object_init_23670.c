@@ -1,5 +1,6 @@
 /* Geometry-object initializer prefix recovered from i960 0x23670-0x237a8. */
 #include <stdint.h>
+#include "recovered_float.h"
 
 typedef uint32_t u32;
 
@@ -26,13 +27,6 @@ struct recovered_geometry_object_init_plan {
     u32 object_a1_after;
 };
 
-static u32 add_float_bits(u32 value, u32 bias)
-{
-    union { u32 bits; float number; } lhs = { value }, rhs = { bias }, result;
-    result.number = lhs.number + rhs.number;
-    return result.bits;
-}
-
 void recovered_geometry_object_init_plan(
     u32 object_0c, u32 object_08, u32 object_10,
     int16_t object_84, int16_t object_184,
@@ -54,7 +48,7 @@ void recovered_geometry_object_init_plan(
     plan->object_8_after = adjusted;
     plan->object_94_after = adjusted;
     plan->float_bias = 0x40200000U;
-    plan->object_0c_plus_bias = add_float_bits(object_0c, plan->float_bias);
+    plan->object_0c_plus_bias = recovered_float_add_bits(object_0c, plan->float_bias);
     plan->third_command = 0x1eU;
     plan->third_argument_0 = (u32)(uint16_t)object_184;
     plan->third_argument_1 = (u32)depth_delta;

@@ -1,18 +1,7 @@
 /* Recovered normal-case contract for SHARC opcode 0x3f. */
 #include <math.h>
 #include <stdint.h>
-
-static float bits_float(uint32_t bits)
-{
-    union { uint32_t bits; float value; } converted = { bits };
-    return converted.value;
-}
-
-static uint32_t float_bits(float value)
-{
-    union { float value; uint32_t bits; } converted = { value };
-    return converted.bits;
-}
+#include "recovered_float.h"
 
 static int32_t signed_word(uint32_t word)
 {
@@ -29,8 +18,8 @@ uint32_t recovered_sharc_opcode_3f_followup(const uint32_t input[4])
 {
     int32_t a_word = signed_word(input[0]);
     int32_t b_word = signed_word(input[1]);
-    float c = bits_float(input[2]);
-    float d = bits_float(input[3]);
+    float c = recovered_float_from_bits(input[2]);
+    float d = recovered_float_from_bits(input[3]);
 
     /* These are the observed ROM boundaries of the RECIPS/FPU path. */
     if (isnan(c))
@@ -40,5 +29,5 @@ uint32_t recovered_sharc_opcode_3f_followup(const uint32_t input[4])
     if (b_word == 0 && (a_word == 0 || a_word == 1))
         return UINT32_C(0xffffffff);
 
-    return float_bits(d + c * ((float)a_word / (float)b_word));
+    return recovered_float_to_bits(d + c * ((float)a_word / (float)b_word));
 }

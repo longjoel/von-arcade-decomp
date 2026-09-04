@@ -7,38 +7,21 @@
  */
 
 #include <stdint.h>
+#include "recovered_float.h"
 
 typedef unsigned int u32;
 
-static u32 float_bits(float value)
-{
-    union {
-        float f;
-        u32 u;
-    } bits = { .f = value };
-    return bits.u;
-}
-
-static float bits_float(u32 value)
-{
-    union {
-        float f;
-        u32 u;
-    } bits = { .u = value };
-    return bits.f;
-}
-
 static float normalize_sharc_input(float value)
 {
-    u32 bits = float_bits(value);
+    u32 bits = recovered_float_to_bits(value);
     u32 magnitude = bits & 0x7fffffffU;
 
     /* The SHARC input path canonicalizes NaNs and flushes denormals. */
     if ((magnitude & 0x7f800000U) == 0x7f800000U &&
         (magnitude & 0x007fffffU) != 0U)
-        return bits_float(0xffffffffU);
+        return recovered_float_from_bits(0xffffffffU);
     if ((magnitude & 0x7f800000U) == 0U && magnitude != 0U)
-        return bits_float(bits & 0x80000000U);
+        return recovered_float_from_bits(bits & 0x80000000U);
     return value;
 }
 
@@ -95,12 +78,12 @@ float recovered_sharc_helper_20d68_candidate(float first, float second)
     first = normalize_sharc_input(first);
     second = normalize_sharc_input(second);
 
-    if ((float_bits(first) & 0x7f800000U) == 0x7f800000U &&
-        (float_bits(first) & 0x007fffffU) != 0U)
-        return bits_float(0xffffffffU);
-    if ((float_bits(second) & 0x7f800000U) == 0x7f800000U &&
-        (float_bits(second) & 0x007fffffU) != 0U)
-        return bits_float(0xffffffffU);
+    if ((recovered_float_to_bits(first) & 0x7f800000U) == 0x7f800000U &&
+        (recovered_float_to_bits(first) & 0x007fffffU) != 0U)
+        return recovered_float_from_bits(0xffffffffU);
+    if ((recovered_float_to_bits(second) & 0x7f800000U) == 0x7f800000U &&
+        (recovered_float_to_bits(second) & 0x007fffffU) != 0U)
+        return recovered_float_from_bits(0xffffffffU);
 
     if (first == 0.0f && second == 0.0f)
         return 0.0f;
@@ -114,8 +97,8 @@ float recovered_sharc_helper_20d68_candidate(float first, float second)
      * Normal finite values expose the same boundary directly through their
      * exponent fields.  Keep subnormals, infinities, and NaNs outside this
      * readable model until their SHARC-specific LOGB behavior is captured. */
-    first_bits = float_bits(first) & 0x7fffffffU;
-    second_bits = float_bits(second) & 0x7fffffffU;
+    first_bits = recovered_float_to_bits(first) & 0x7fffffffU;
+    second_bits = recovered_float_to_bits(second) & 0x7fffffffU;
     first_exponent = (first_bits >> 23) & 0xffU;
     second_exponent = (second_bits >> 23) & 0xffU;
     if (first_exponent != 0U && first_exponent != 0xffU &&
