@@ -49,6 +49,12 @@ def main() -> int:
         for field in ("cfg_directory", "nvram_directory", "state_directory"):
             manifest["isolation"][f"{field}_sha256"] = directory_sha256(root / manifest["isolation"][field])
         assert not validate(manifest, root)
+        relative_command_manifest = copy.deepcopy(manifest)
+        for flag, directory in (("-cfg_directory", "cfg"), ("-nvram_directory", "nvram"),
+                                 ("-state_directory", "state")):
+            index = relative_command_manifest["command"].index(flag)
+            relative_command_manifest["command"][index + 1] = directory
+        assert not validate(relative_command_manifest, root)
         manifest_path = root / "capture.json"
         manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
         provenance = load_provenance(manifest_path, root, artifact_path)

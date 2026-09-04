@@ -181,7 +181,10 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
             errors.append(f"command must declare {flag}")
         elif expected is not None:
             try:
-                if Path(argument).resolve() != expected:
+                command_path = Path(argument)
+                if not command_path.is_absolute():
+                    command_path = root / command_path
+                if command_path.resolve() != expected:
                     errors.append(f"command {flag} does not match isolation.{field}")
             except (OSError, RuntimeError):
                 errors.append(f"command {flag} has an invalid path")
