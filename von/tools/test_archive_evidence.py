@@ -96,6 +96,15 @@ def main() -> int:
         linked_metadata["source"]["path"] = str(linked_source)
         assert any("source file must not be a symlink" in error
                    for error in validate_metadata(linked_metadata))
+        linked_metadata_path = root / "linked-metadata.json"
+        linked_metadata_path.symlink_to(metadata)
+        linked_metadata_run = subprocess.run(
+            [sys.executable, str(TOOL), str(source), "--archive", str(archive),
+             "--metadata", str(linked_metadata_path)],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert linked_metadata_run.returncode != 0
+        assert "metadata path must not be a symlink" in linked_metadata_run.stderr
     print("PASS: evidence archive emits reproducible source and blob metadata")
     return 0
 

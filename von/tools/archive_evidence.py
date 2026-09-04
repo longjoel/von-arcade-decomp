@@ -79,6 +79,13 @@ def main() -> int:
     if args.archive.is_symlink():
         print("Evidence archive: archive directory must not be a symlink", file=sys.stderr)
         return 1
+    if args.metadata and args.metadata.is_symlink():
+        print("Evidence archive: metadata path must not be a symlink", file=sys.stderr)
+        return 1
+    quarantine = Path("von/build/evidence/quarantine")
+    if args.quarantine and quarantine.is_symlink():
+        print("Evidence archive: quarantine directory must not be a symlink", file=sys.stderr)
+        return 1
     payload = args.capture.read_bytes()
     digest = hashlib.sha256(payload).hexdigest()
     args.archive.mkdir(parents=True, exist_ok=True)
@@ -100,9 +107,11 @@ def main() -> int:
         with gzip.GzipFile(filename=str(target), mode="wb", mtime=0) as stream:
             stream.write(payload)
     if args.quarantine:
-        quarantine = Path("von/build/evidence/quarantine")
         quarantine.mkdir(parents=True, exist_ok=True)
         preserved = quarantine / args.capture.name
+        if preserved.is_symlink():
+            print("Evidence archive: quarantine target must not be a symlink", file=sys.stderr)
+            return 1
         if not preserved.exists():
             shutil.copy2(args.capture, preserved)
     if args.metadata:
