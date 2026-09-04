@@ -56,6 +56,18 @@ def main() -> int:
         broken = copy.deepcopy(manifest)
         broken.pop("coverage_report")
         assert any("requires coverage_report" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["objective"] = ""
+        assert any("objective" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["stimulus"]["seconds"] = -1
+        assert any("numeric seconds" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["artifacts"] = ["malformed"]
+        assert any("must be an object" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["inputs"] = {"path": "rom-manifest.json"}
+        assert any("inputs must be an array" in error for error in validate(broken, root))
     print("PASS: capture sidecar manifest hashes and provenance")
     return 0
 

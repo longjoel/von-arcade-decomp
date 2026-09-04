@@ -46,11 +46,17 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
     errors: list[str] = []
     if manifest.get("schema_version") != 1:
         errors.append("schema_version must be 1")
-    if not manifest.get("id"):
+    if not isinstance(manifest.get("id"), str) or not manifest.get("id"):
         errors.append("missing stable capture id")
     stimulus = manifest.get("stimulus", {})
-    if not stimulus.get("kind") or not isinstance(stimulus.get("seconds"), (int, float)):
+    if not isinstance(stimulus, dict):
+        stimulus = {}
+    if not isinstance(stimulus, dict) or not isinstance(stimulus.get("kind"), str) \
+            or not stimulus.get("kind") or not isinstance(stimulus.get("seconds"), (int, float)) \
+            or isinstance(stimulus.get("seconds"), bool) or stimulus.get("seconds") < 0:
         errors.append("stimulus requires kind and numeric seconds")
+    if not isinstance(manifest.get("objective"), str) or not manifest.get("objective"):
+        errors.append("missing capture objective")
     artifacts = manifest.get("artifacts")
     if not isinstance(artifacts, list) or not artifacts:
         errors.append("capture requires at least one artifact")
@@ -91,7 +97,14 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
         elif isolation.get(f"{field}_sha256") != directory_sha256(root / path):
             errors.append(f"hash mismatch for isolation.{field}")
     for section in ("inputs", "artifacts"):
-        for index, item in enumerate(manifest.get(section, [])):
+        items = manifest.get(section, [])
+        if not isinstance(items, list):
+            errors.append(f"{section} must be an array")
+            continue
+        for index, item in enumerate(items):
+            if not isinstance(item, dict):
+                errors.append(f"{section}[{index}] must be an object")
+                continue
             path_text = item.get("path")
             path = root / path_text if safe_path(path_text) else None
             if path is None or not path.is_file():
