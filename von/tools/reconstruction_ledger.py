@@ -13,6 +13,9 @@ STAGES = {
     "planned", "modeled", "integrated", "trace-validated",
     "byte-validated", "blocked",
 }
+STAGE_ORDER = {stage: index for index, stage in enumerate(
+    ("planned", "modeled", "integrated", "trace-validated", "byte-validated")
+)}
 
 
 def validate_lifecycle(
@@ -39,6 +42,11 @@ def validate_lifecycle(
             stage = unit.get("stage")
             if stage == "modeled" and unit.get("active") is True:
                 active_modeled.append(str(unit.get("id", "<missing>")))
+            stage_rank = STAGE_ORDER.get(stage, -1)
+            if stage_rank >= STAGE_ORDER["modeled"] and not isinstance(unit.get("modeling"), dict):
+                errors.append(f"{where}: {stage} requires preceding modeling evidence")
+            if stage_rank >= STAGE_ORDER["integrated"] and not isinstance(unit.get("integration"), dict):
+                errors.append(f"{where}: {stage} requires preceding integration evidence")
             if stage == "planned":
                 if not unit.get("notes"):
                     errors.append(f"{where}: planned requires a reason in notes")

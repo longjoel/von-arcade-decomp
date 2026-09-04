@@ -41,10 +41,16 @@ def main() -> int:
                 "boundary": "MMIO inputs/outputs", "test": "test.py",
                 "unresolved_behavior": "bus timing"
             }},
-            {"id": "integrated", "stage": "integrated", "integration": {
+            {"id": "integrated", "stage": "integrated", "modeling": {
+                "boundary": "RAM", "test": "test.py", "unresolved_behavior": "timing"
+            }, "integration": {
                 "image": "build/image.bin", "checkpoint": "startup", "test": "test.py"
             }},
-            {"id": "trace", "stage": "trace-validated",
+            {"id": "trace", "stage": "trace-validated", "modeling": {
+                "boundary": "RAM", "test": "test.py", "unresolved_behavior": "timing"
+            }, "integration": {
+                "image": "build/image.bin", "checkpoint": "startup", "test": "test.py"
+            },
              "canonical_evidence_id": "capture-v1", "verifier": "verify.py"},
             {"id": "blocked", "stage": "blocked", "blocked": {
                 "missing_fact": "target", "failed_discriminator": "no event",
@@ -68,6 +74,9 @@ def main() -> int:
     broken = copy.deepcopy(lifecycle)
     del broken["images"][0]["work_units"][2]["integration"]
     assert any("integrated requires" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    del broken["images"][0]["work_units"][3]["modeling"]
+    assert any("preceding modeling" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
     del broken["images"][0]["work_units"][2]["integration"]["image"]
     assert any("integration.image" in error for error in validate_lifecycle(broken, manifest))
