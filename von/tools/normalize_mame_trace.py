@@ -42,6 +42,14 @@ def fields(body: str) -> dict[str, str | int | float]:
 
 
 def ndjson_event(line: str, seq: int) -> dict | None:
+    try:
+        document = json.loads(line)
+    except json.JSONDecodeError:
+        document = None
+    if isinstance(document, dict) and isinstance(document.get("kind"), str) and document["kind"]:
+        event = dict(document)
+        event["seq"] = seq
+        return event
     match = EVENT_RE.match(line)
     if match:
         event = {"seq": seq, "kind": match.group("event")}

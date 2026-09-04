@@ -19,6 +19,11 @@ def main() -> int:
     assert sample["time"] == 0.25
     assert sample["pc"] == 0x1BC50
     assert ndjson_event("not an event", 2) is None
+    causal = ndjson_event(
+        '{"seq":99,"time":1.0,"frame":2,"cpu":"maincpu",'
+        '"pc":"0x10","next_pc":"0x20","target":"0x20","kind":"direct-call"}', 3)
+    assert causal["kind"] == "direct-call" and causal["seq"] == 3
+    assert ndjson_event('["not", "an", "event"]', 4) is None
     selected = select_events([event, sample], max_events=1, event_kinds={"vonj_copro_fifo"})
     assert len(selected) == 1 and selected[0]["seq"] == 0
     assert select_events([event], pc_min=0x2000) == []
