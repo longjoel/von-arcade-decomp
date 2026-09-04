@@ -95,7 +95,8 @@ A capture used for integration or validation needs a sidecar manifest:
   "objective": "c-only-i960-attract-60s",
   "hypothesis": "startup slot 1 advances the scheduler after status service completion",
   "expected_discriminator": "the indirect call returns with 0x005039f4 incremented",
-  "stimulus": {"kind":"input-free-attract","seconds":8},
+  "stimulus": {"kind":"input-free-attract","seconds":8,"phase":"scheduler-entry"},
+  "checkpoints": ["reset", "hardware-init", "scheduler-entry"],
   "configuration": {
     "set": "vonj",
     "mame_revision": "<commit>",
@@ -263,6 +264,9 @@ Apply the process in this order so existing evidence remains usable:
 - Label direct targets as observed entries, not observed invocations from every
   listed caller.
 - Add capture identity and isolated cfg/NVRAM directories.
+- Require a non-empty ordered checkpoint list, hypothesis, and expected
+  discriminator in each capture sidecar; preserve the phase and sidecar hash
+  when registering canonical evidence.
 - Register the canonical 60-second coverage artifact or explicitly classify it
   as a noncanonical discovery input.
 - Add analyzer and worklist regression tests.
