@@ -48,6 +48,42 @@ def validate_lifecycle(
     def nonempty_text(value: Any) -> bool:
         return isinstance(value, str) and bool(value)
 
+    def validate_modeling(where: str, unit: dict[str, Any]) -> None:
+        modeling = unit.get("modeling")
+        if not isinstance(modeling, dict):
+            errors.append(f"{where}: {unit.get('stage')} requires preceding modeling evidence")
+            return
+        for field in ("boundary", "test", "unresolved_behavior"):
+            if not nonempty_text(modeling.get(field)):
+                errors.append(f"{where}: {unit.get('stage')} requires modeling.{field}")
+        test = modeling.get("test")
+        if test and not safe_reference(test):
+            errors.append(f"{where}: modeling.test must be a safe relative path")
+        elif isinstance(test, str) and not existing_reference(test):
+            errors.append(f"{where}: missing modeling test {test}")
+
+    def validate_integration(where: str, unit: dict[str, Any]) -> None:
+        integration = unit.get("integration")
+        if not isinstance(integration, dict):
+            errors.append(f"{where}: {unit.get('stage')} requires preceding integration evidence")
+            return
+        image = integration.get("image")
+        if not nonempty_text(image):
+            errors.append(f"{where}: {unit.get('stage')} requires integration.image")
+        elif not safe_reference(image):
+            errors.append(f"{where}: integration.image must be a safe relative path")
+        elif root is not None and not existing_reference(image):
+            errors.append(f"{where}: missing integration image {image}")
+        if not nonempty_text(integration.get("checkpoint")):
+            errors.append(f"{where}: {unit.get('stage')} requires integration.checkpoint")
+        test = integration.get("test")
+        if not nonempty_text(test):
+            errors.append(f"{where}: {unit.get('stage')} requires integration.test")
+        elif not safe_reference(test):
+            errors.append(f"{where}: integration.test must be a safe relative path")
+        elif not existing_reference(test):
+            errors.append(f"{where}: missing integration test {test}")
+
     active_modeled: list[str] = []
     manifest_entries = manifest.get("entries", []) if isinstance(manifest, dict) else []
     manifest_ids: set[str] = set()
@@ -76,47 +112,17 @@ def validate_lifecycle(
             if stage == "modeled" and unit.get("active") is True:
                 active_modeled.append(str(unit.get("id", "<missing>")))
             stage_rank = STAGE_ORDER.get(stage, -1)
-            if stage_rank >= STAGE_ORDER["modeled"] and not isinstance(unit.get("modeling"), dict):
-                errors.append(f"{where}: {stage} requires preceding modeling evidence")
-            if stage_rank >= STAGE_ORDER["integrated"] and not isinstance(unit.get("integration"), dict):
-                errors.append(f"{where}: {stage} requires preceding integration evidence")
+            if stage_rank >= STAGE_ORDER["modeled"]:
+                validate_modeling(where, unit)
+            if stage_rank >= STAGE_ORDER["integrated"]:
+                validate_integration(where, unit)
             if stage == "planned":
                 if not nonempty_text(unit.get("notes")):
                     errors.append(f"{where}: planned requires a reason in notes")
             elif stage == "modeled":
-                modeling = unit.get("modeling")
-                if not isinstance(modeling, dict):
-                    errors.append(f"{where}: modeled requires modeling evidence")
-                    continue
-                for field in ("boundary", "test", "unresolved_behavior"):
-                    if not nonempty_text(modeling.get(field)):
-                        errors.append(f"{where}: modeled requires modeling.{field}")
-                test = modeling.get("test")
-                if test and not safe_reference(test):
-                    errors.append(f"{where}: modeling.test must be a safe relative path")
-                elif isinstance(test, str) and not existing_reference(test):
-                    errors.append(f"{where}: missing modeling test {test}")
+                pass
             elif stage == "integrated":
-                integration = unit.get("integration")
-                if not isinstance(integration, dict):
-                    errors.append(f"{where}: integrated requires integration evidence")
-                    continue
-                image = integration.get("image")
-                if not nonempty_text(image):
-                    errors.append(f"{where}: integrated requires integration.image")
-                elif not safe_reference(image):
-                    errors.append(f"{where}: integration.image must be a safe relative path")
-                elif root is not None and not existing_reference(image):
-                    errors.append(f"{where}: missing integration image {image}")
-                if not nonempty_text(integration.get("checkpoint")):
-                    errors.append(f"{where}: integrated requires integration.checkpoint")
-                test = integration.get("test")
-                if not nonempty_text(test):
-                    errors.append(f"{where}: integrated requires integration.test")
-                elif not safe_reference(test):
-                    errors.append(f"{where}: integration.test must be a safe relative path")
-                elif not existing_reference(test):
-                    errors.append(f"{where}: missing integration test {test}")
+                pass
             elif stage == "trace-validated":
                 evidence_id = unit.get("canonical_evidence_id")
                 if not isinstance(evidence_id, str) or evidence_id not in canonical_ids:
