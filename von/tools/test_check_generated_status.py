@@ -21,6 +21,9 @@ def main() -> int:
         stale.write_text(current.read_text(encoding="utf-8") + "\n# stale\n", encoding="utf-8")
         errors = check(root, stale)
         assert errors == [f"stale generated status: {stale}"]
+        linked = Path(directory) / "linked-status.md"
+        linked.symlink_to(current)
+        assert check(root, linked) == [f"status path must not be a symlink: {linked}"]
     print("PASS: generated status freshness is checked without mutation")
     return 0
 

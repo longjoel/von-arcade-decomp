@@ -11,6 +11,8 @@ from project_status import collect, markdown
 
 
 def check(root: Path, expected: Path) -> list[str]:
+    if expected.is_symlink():
+        return [f"status path must not be a symlink: {expected}"]
     try:
         actual = expected.read_text(encoding="utf-8")
         generated = markdown(collect(root))
