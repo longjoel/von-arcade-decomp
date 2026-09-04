@@ -4,10 +4,11 @@
 from __future__ import annotations
 
 import json
+import gzip
 import tempfile
 from pathlib import Path
 
-from normalize_mame_trace import ndjson_event, select_events, summary
+from normalize_mame_trace import ndjson_event, read_trace, select_events, summary
 
 
 def main() -> int:
@@ -36,6 +37,10 @@ def main() -> int:
         path = Path(directory) / "events.ndjson"
         path.write_text(json.dumps(event) + "\n", encoding="utf-8")
         assert json.loads(path.read_text(encoding="utf-8"))["kind"] == "vonj_copro_fifo"
+        compressed = Path(directory) / "events.ndjson.gz"
+        with gzip.open(compressed, "wt", encoding="utf-8") as stream:
+            stream.write(json.dumps(event) + "\n")
+        assert read_trace(compressed).strip() == json.dumps(event)
     print("PASS: MAME trace normalizer emits ordered NDJSON events")
     return 0
 

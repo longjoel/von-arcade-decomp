@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import re
 from collections import Counter
@@ -51,6 +52,14 @@ def ndjson_event(line: str, seq: int) -> dict | None:
         event.update(fields(sample.group("body")))
         return event
     return None
+
+
+def read_trace(path: Path) -> str:
+    """Read plain or content-addressed gzip traces without changing provenance."""
+    if path.suffix == ".gz":
+        with gzip.open(path, "rt", encoding="utf-8", errors="replace") as stream:
+            return stream.read()
+    return path.read_text(encoding="utf-8", errors="replace")
 
 
 def select_events(events: list[dict], max_events: int | None = None,
@@ -135,6 +144,10 @@ def main() -> int:
     parser.add_argument("--capture-root", type=Path,
                         help="root used to resolve paths in --capture-manifest (defaults to its parent)")
     args = parser.parse_args()
+    if args.max_events is not None and args.max_events < 0:
+        parser.error("--max-events must be non-negative")
+    if args.pc_min is not None and args.pc_max is not None and args.pc_min > args.pc_max:
+        parser.error("--pc-min cannot exceed --pc-max")
 
     provenance = None
     if args.capture_manifest:
@@ -151,7 +164,7 @@ def main() -> int:
     tile_count = 0
 
     normalized: list[dict] = []
-    for line_number, line in enumerate(args.trace.read_text(errors="replace").splitlines(), 1):
+    for line_number, line in enumerate(read_trace(args.trace).splitlines(), 1):
         event_record = ndjson_event(line, len(normalized))
         if event_record is not None:
             event_record["source_line"] = line_number
