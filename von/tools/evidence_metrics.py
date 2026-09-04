@@ -14,7 +14,8 @@ def load(path: Path | None) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8")) if path else {}
 
 
-def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str, Any], comparison: dict[str, Any]) -> dict[str, Any]:
+def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str, Any],
+            comparison: dict[str, Any], experiments: dict[str, Any] | None = None) -> dict[str, Any]:
     stages = Counter(
         unit.get("stage") for image in ledger.get("images", [])
         for unit in image.get("work_units", [])
@@ -31,20 +32,27 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
         "discovery": {
             "units": discovered,
             "modeled_conversion_percent": percentage(modeled, discovered),
-            "integrated_conversion_percent": percentage(integrated, modeled),
+            "integrated_conversion_percent": percentage(integrated, discovered),
             "active_modeled_units": worklist.get("active_modeled_units", []),
             "modeled_wip_limit": worklist.get("modeled_wip_limit", 1),
         },
         "coverage": {
             "tier": coverage.get("tier"),
             "possible_static_edges": coverage.get("possible_static_edge_count", 0),
+            "confirmed_dynamic_edges": coverage.get("confirmed_dynamic_edge_count", 0),
             "observed_entry_points": coverage.get("observed_entry_point_count", 0),
         },
         "comparison": {
             "events_compared": comparison.get("compared_events", 0),
             "matched_prefix_events": comparison.get("matched_prefix_events", 0),
+            "checkpoints_passed": [name for name in comparison.get("original_checkpoints", [])
+                                   if name not in comparison.get("missed_checkpoints", [])],
             "missed_checkpoints": comparison.get("missed_checkpoints", []),
             "unexpected_checkpoints": comparison.get("unexpected_checkpoints", []),
+        },
+        "experiments": {
+            "changed_decision": (experiments or {}).get("changed_decision", 0),
+            "quarantined": (experiments or {}).get("quarantined", 0),
         },
     }
 
@@ -55,9 +63,11 @@ def main() -> int:
     parser.add_argument("--worklist", type=Path)
     parser.add_argument("--coverage", type=Path)
     parser.add_argument("--comparison", type=Path)
+    parser.add_argument("--experiments", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    report = metrics(load(args.ledger), load(args.worklist), load(args.coverage), load(args.comparison))
+    report = metrics(load(args.ledger), load(args.worklist), load(args.coverage),
+                     load(args.comparison), load(args.experiments))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(f"Evidence metrics: {args.output}")
