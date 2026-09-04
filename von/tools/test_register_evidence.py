@@ -103,6 +103,28 @@ def main() -> int:
         )
         assert cli_result.returncode == 1
         assert "manifest path must not be a symlink" in cli_result.stdout
+        linked_capture_cli = root / "linked-capture-cli.json"
+        linked_capture_cli.symlink_to(capture_path)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--manifest", str(manifest_path),
+             "--capture-manifest", str(linked_capture_cli), "--verifier", "verify.py",
+             "--description", "description", "--consumer", "unit-1", "--root", str(root),
+             "--ledger", str(ledger_path)],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "capture manifest path must not be a symlink" in cli_result.stdout
+        outside_manifest = root.parent / "outside-evidence-manifest.json"
+        outside_manifest.write_text(json.dumps(manifest), encoding="utf-8")
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--manifest", str(outside_manifest),
+             "--capture-manifest", str(capture_path), "--verifier", "verify.py",
+             "--description", "description", "--consumer", "unit-1", "--root", str(root),
+             "--ledger", str(ledger_path)],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "manifest path escapes root" in cli_result.stdout
         assert any("non-empty string array" in error for error in register(
             {"schema_version": 1, "entries": []}, capture, capture_path, "scalar consumer", "verify.py",
             "unit-1", root, ledger))

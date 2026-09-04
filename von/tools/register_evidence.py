@@ -138,11 +138,21 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--ledger", type=Path, required=True)
     args = parser.parse_args()
-    for label, path in (("manifest", args.manifest), ("ledger", args.ledger)):
+    root = args.root.resolve()
+    for label, path in (("manifest", args.manifest),
+                        ("capture manifest", args.capture_manifest),
+                        ("ledger", args.ledger)):
         if path.is_symlink():
             print(f"Evidence registration: {label} path must not be a symlink")
             return 1
-    root = args.root.resolve()
+        try:
+            path.resolve().relative_to(root)
+        except (OSError, RuntimeError, ValueError):
+            print(f"Evidence registration: {label} path escapes root: {path}")
+            return 1
+        if not path.is_file():
+            print(f"Evidence registration: missing {label}: {path}")
+            return 1
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     capture = json.loads(args.capture_manifest.read_text(encoding="utf-8"))
     ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
