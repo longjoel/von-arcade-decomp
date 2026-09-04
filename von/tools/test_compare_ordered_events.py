@@ -6,11 +6,16 @@ from __future__ import annotations
 import copy
 import gzip
 import hashlib
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 from compare_ordered_events import (capture_provenance_errors, compare, context_errors,
                                     event_artifact_provenance, load_events)
+
+
+TOOL = Path(__file__).resolve().parent / "compare_ordered_events.py"
 
 
 def main() -> int:
@@ -261,6 +266,19 @@ def main() -> int:
             assert "unable to read event stream" in str(error)
         else:
             raise AssertionError("invalid gzip stream was accepted")
+        cli_root = Path(directory)
+        cli_source = cli_root / "cli-source.ndjson"
+        cli_source.write_text(
+            '{"seq": 1, "time": 1.0, "frame": 1, "cpu": "maincpu", '
+            '"kind": "checkpoint", "name": "reset"}\n', encoding="utf-8")
+        cli_link = cli_root / "cli-link.ndjson"
+        cli_link.symlink_to(cli_source)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), str(cli_link), str(cli_source)],
+            cwd=cli_root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 2
+        assert "original path must not be a symlink" in cli_result.stderr
     print("PASS: ordered event comparison identifies the first divergence")
     return 0
 

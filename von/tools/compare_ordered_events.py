@@ -349,6 +349,12 @@ def main() -> int:
                         help="root used to validate capture manifests and artifact paths")
     args = parser.parse_args()
     try:
+        for label, path in (("original", args.original), ("reconstructed", args.reconstructed),
+                            ("original capture manifest", args.original_manifest),
+                            ("reconstructed capture manifest", args.reconstructed_manifest),
+                            ("summary", args.summary)):
+            if path is not None and path.is_symlink():
+                raise ValueError(f"{label} path must not be a symlink: {path}")
         original_context = json.loads(args.original_manifest.read_text(encoding="utf-8")) if args.original_manifest else None
         reconstructed_context = json.loads(args.reconstructed_manifest.read_text(encoding="utf-8")) if args.reconstructed_manifest else None
         if (original_context is None) != (reconstructed_context is None):
