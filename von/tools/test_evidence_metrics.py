@@ -39,6 +39,10 @@ def main() -> int:
     assert report["stages"]["modeled"] == 1
     assert report["discovery"]["modeled_conversion_percent"] == 25.0
     assert report["discovery"]["integrated_conversion_percent"] == 50.0
+    assert report["discovery"]["stage_conversion_percent"] == {
+        "modeled": 25.0, "integrated": 25.0,
+        "trace-validated": 25.0, "byte-validated": 0.0,
+    }
     assert report["discovery"]["newly_discovered_dynamic_targets"] == 2
     assert report["coverage"]["possible_static_edges"] == 7
     assert report["coverage"]["confirmed_dynamic_edges"] == 2
@@ -47,6 +51,8 @@ def main() -> int:
     assert report["comparison"]["checkpoint_outcome"] == "divergence"
     assert report["comparison"]["missing_reconstructed_checkpoints"] == ["audio"]
     assert report["comparison"]["confirmed_dynamic_edges"] == 2
+    assert report["comparison"]["original_events"] == 0
+    assert report["comparison"]["reconstructed_events"] == 0
     assert report["comparison"]["observed_indirect_targets"] == 1
     assert report["experiments"] == {"changed_decision": 3, "quarantined": 1}
     assert report["age"]["modeled"]["median_age_seconds"] == 3600.0

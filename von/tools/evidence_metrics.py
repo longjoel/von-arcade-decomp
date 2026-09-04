@@ -113,6 +113,12 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
     integrated = stages.get("integrated", 0) + stages.get("trace-validated", 0) + stages.get("byte-validated", 0)
     def percentage(value: int, total: int) -> float | None:
         return round(value * 100.0 / total, 2) if total else None
+    stage_conversion = {
+        "modeled": percentage(modeled, discovered),
+        "integrated": percentage(stages.get("integrated", 0), discovered),
+        "trace-validated": percentage(stages.get("trace-validated", 0), discovered),
+        "byte-validated": percentage(stages.get("byte-validated", 0), discovered),
+    }
     return {
         "schema_version": 1,
         "stages": {stage: stages.get(stage, 0) for stage in
@@ -122,6 +128,7 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
             "units": discovered,
             "modeled_conversion_percent": percentage(modeled, discovered),
             "integrated_conversion_percent": percentage(integrated, discovered),
+            "stage_conversion_percent": stage_conversion,
             "active_modeled_units": worklist.get("active_modeled_units", []),
             "modeled_wip_limit": worklist.get("modeled_wip_limit", 1),
             "newly_discovered_dynamic_targets": worklist.get("dynamic_targets_added", 0),
@@ -134,6 +141,8 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
         },
         "comparison": {
             "events_compared": comparison.get("compared_events", 0),
+            "original_events": comparison.get("original_events", 0),
+            "reconstructed_events": comparison.get("reconstructed_events", 0),
             "matched_prefix_events": comparison.get("matched_prefix_events", 0),
             "confirmed_dynamic_edges": comparison.get("confirmed_dynamic_edge_count", 0),
             "observed_indirect_targets": comparison.get("observed_indirect_target_count", 0),
