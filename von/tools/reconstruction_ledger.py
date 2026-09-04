@@ -373,6 +373,10 @@ def validate(ledger: dict[str, Any], root: Path | None = None) -> list[str]:
             sources = unit.get("sources")
             if not isinstance(sources, list) or not all(isinstance(v, str) for v in sources):
                 errors.append(f"{where}: sources must be a string array")
+            evidence = unit.get("evidence")
+            if (not isinstance(evidence, list)
+                    or not all(isinstance(v, str) and v for v in evidence)):
+                errors.append(f"{where}: evidence must be a string array")
             if "source" in unit or "status" in unit:
                 errors.append(f"{where}: legacy source/status field is forbidden")
             ranges = unit.get("ranges", [])

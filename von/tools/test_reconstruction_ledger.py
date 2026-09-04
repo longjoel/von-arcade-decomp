@@ -38,6 +38,11 @@ def main() -> int:
     malformed_shape["images"][0]["work_units"] = [{"id": "unit", "classification": "code",
                                                      "stage": "planned", "sources": [], "ranges": {}}]
     assert any("ranges must be an array" in error for error in validate(malformed_shape))
+    malformed_shape["images"][0]["work_units"][0]["ranges"] = []
+    malformed_shape["images"][0]["work_units"][0]["evidence"] = "capture-v1"
+    assert any("evidence must be a string array" in error for error in validate(malformed_shape))
+    malformed_shape["images"][0]["work_units"][0]["evidence"] = [""]
+    assert any("evidence must be a string array" in error for error in validate(malformed_shape))
     old = {"schema_version": 1, "images": [{"name": "maincpu", "size": 256, "slices": [
         {"name": "outer", "start": "0x10", "end": "0x30", "classification": "code", "status": "provisional", "source": "notes.md", "evidence": []},
         {"name": "inner", "start": "0x18", "end": "0x20", "classification": "code", "status": "provisional", "source": "model.c", "evidence": ["von/i960/recovered_example.c"]},
