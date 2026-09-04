@@ -138,6 +138,8 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
     for flag, field in (("-cfg_directory", "cfg_directory"),
                         ("-nvram_directory", "nvram_directory"),
                         ("-state_directory", "state_directory")):
+        if isinstance(command, list) and command.count(flag) > 1:
+            errors.append(f"command must contain {flag} only once")
         argument = command_argument(flag)
         expected = isolation_resolved.get(field)
         if argument is None:

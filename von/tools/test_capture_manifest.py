@@ -63,6 +63,9 @@ def main() -> int:
         broken["command"][broken["command"].index("-cfg_directory") + 1] = str(root / "nvram")
         assert any("does not match isolation.cfg_directory" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
+        broken["command"].extend(["-cfg_directory", str(root / "cfg")])
+        assert any("contain -cfg_directory only once" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
         broken["stimulus"]["phase"] = "startup"
         assert any("phase" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
