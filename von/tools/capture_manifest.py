@@ -75,6 +75,9 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
         errors.append("stimulus requires kind and numeric seconds")
     if not isinstance(manifest.get("objective"), str) or not manifest.get("objective"):
         errors.append("missing capture objective")
+    for field in ("hypothesis", "expected_discriminator"):
+        if not isinstance(manifest.get(field), str) or not manifest.get(field):
+            errors.append(f"missing capture {field}")
     checkpoints = manifest.get("checkpoints")
     if (not isinstance(checkpoints, list) or not checkpoints
             or not all(isinstance(item, str) and item for item in checkpoints)
@@ -208,6 +211,8 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--id", required=True)
     parser.add_argument("--objective", required=True)
+    parser.add_argument("--hypothesis", required=True)
+    parser.add_argument("--expected-discriminator", required=True)
     parser.add_argument("--seconds", required=True, type=float)
     parser.add_argument("--stimulus-kind", choices=("input-free-attract", "bounded-trace", "causal-trace"),
                         default="input-free-attract")
@@ -231,6 +236,8 @@ def main() -> int:
         "schema_version": 1,
         "id": args.id,
         "objective": args.objective,
+        "hypothesis": args.hypothesis,
+        "expected_discriminator": args.expected_discriminator,
         "stimulus": {"kind": args.stimulus_kind, "seconds": args.seconds, "phase": args.phase},
         "checkpoints": args.checkpoint,
         "configuration": {

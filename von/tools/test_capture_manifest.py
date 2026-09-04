@@ -26,6 +26,7 @@ def main() -> int:
         report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "possible_static_edges", "phase": "stable-attract"}\n', encoding="utf-8")
         manifest = {
             "schema_version": 1, "id": "fixture-v1", "objective": "test-capture",
+            "hypothesis": "coverage is bounded", "expected_discriminator": "report is Tier A",
             "stimulus": {"kind": "input-free-attract", "seconds": 1, "phase": "stable-attract"},
             "checkpoints": ["reset", "scheduler"],
             "configuration": {"set": "fixture", "mame_revision": "abc",

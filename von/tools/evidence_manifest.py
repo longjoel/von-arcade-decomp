@@ -100,6 +100,9 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                                 sidecar_errors.append("capture stimulus duration does not match evidence entry")
                             if capture_document.get("checkpoints") != entry.get("checkpoints"):
                                 sidecar_errors.append("capture checkpoints do not match evidence entry")
+                            for field in ("hypothesis", "expected_discriminator"):
+                                if capture_document.get(field) != entry.get(field):
+                                    sidecar_errors.append(f"capture {field} does not match evidence entry")
                             capture_configuration = capture_document.get("configuration", {})
                             if isinstance(capture_configuration, dict):
                                 for field, value in configuration_fields(entry).items():

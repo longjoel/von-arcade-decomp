@@ -22,6 +22,7 @@ def main() -> int:
         artifact.write_text('{"capture_id":"capture-v1","tier":"A","edge_semantics":"possible_static_edges"}\n', encoding="utf-8")
         capture = {
             "schema_version": 1, "id": "capture-v1", "objective": "pilot",
+            "hypothesis": "startup reaches scheduler", "expected_discriminator": "scheduler checkpoint",
             "stimulus": {"kind": "input-free-attract", "seconds": 1},
             "checkpoints": ["reset", "scheduler"],
             "configuration": {"set": "vonj", "mame_revision": "abc", "patch_profile": "none", "execution_engine": "interpreter"},
@@ -44,6 +45,7 @@ def main() -> int:
         assert manifest["entries"][0]["canonical"] is True
         assert manifest["entries"][0]["capture_manifest"] == "capture.json"
         assert manifest["entries"][0]["checkpoints"] == capture["checkpoints"]
+        assert manifest["entries"][0]["hypothesis"] == capture["hypothesis"]
         assert manifest["entries"][0]["capture_manifest_sha256"] == hashlib.sha256(
             capture_path.read_bytes()).hexdigest()
         assert ledger["images"][0]["work_units"][0]["evidence"] == ["capture-v1"]

@@ -40,6 +40,8 @@ python3 "$ROOT_DIR/von/tools/analyze_attract_coverage.py" \
 python3 "$ROOT_DIR/von/tools/capture_manifest.py" \
     --output "$CAPTURE_MANIFEST" --root "$ROOT_DIR" \
     --id "$CAPTURE_ID" --objective "c-only-i960-attract-60s" \
+    --hypothesis "Tier A coverage inventories territory reached by the input-free attract stimulus" \
+    --expected-discriminator "The coverage report records possible_static_edges without claiming executed edges" \
     --seconds "$SECONDS_TO_RUN" --phase stable-attract --set vonj \
     --checkpoint reset --checkpoint hardware-init --checkpoint scheduler \
     --checkpoint attract-entry --checkpoint duration-complete \

@@ -69,6 +69,8 @@ def register(
     entry = {
         "id": capture_id,
         "canonical": True,
+        "hypothesis": capture["hypothesis"],
+        "expected_discriminator": capture["expected_discriminator"],
         "stimulus": {
             "kind": capture["stimulus"]["kind"],
             "description": description,
