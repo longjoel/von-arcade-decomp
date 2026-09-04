@@ -37,6 +37,8 @@ def register(
         return [f"missing verifier {verifier}"]
     if not consumers:
         return ["at least one ledger consumer is required"]
+    if len(set(consumers)) != len(consumers):
+        return ["ledger consumers must be unique"]
     if ledger is not None:
         unit_ids = {
             unit.get("id") for image in ledger.get("images", [])
