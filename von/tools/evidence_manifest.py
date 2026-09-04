@@ -101,6 +101,10 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                             if isinstance(capture_artifacts, list) and isinstance(entry.get("artifacts"), list):
                                 if capture_artifacts != entry["artifacts"]:
                                     sidecar_errors.append("capture artifacts do not match evidence entry")
+                            capture_inputs = capture_document.get("inputs", [])
+                            if isinstance(capture_inputs, list) and isinstance(entry.get("inputs"), list):
+                                if capture_inputs != entry["inputs"]:
+                                    sidecar_errors.append("capture inputs do not match evidence entry")
                     except (OSError, json.JSONDecodeError, TypeError) as exc:
                         sidecar_errors = [f"unable to read capture manifest: {exc}"]
                     errors.extend(f"{where}: {error}" for error in sidecar_errors)
@@ -120,26 +124,31 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                 or len(set(consumers)) != len(consumers)
                 or any(consumer not in unit_ids for consumer in consumers)):
             errors.append(f"{where}: must name existing ledger consumers")
+        inputs = entry.get("inputs", [])
+        if not isinstance(inputs, list):
+            errors.append(f"{where}: inputs must be an array")
+            inputs = []
         artifacts = entry.get("artifacts", [])
         if not isinstance(artifacts, list) or not artifacts:
             errors.append(f"{where}: no artifacts")
-        for artifact in artifacts if isinstance(artifacts, list) else []:
-            if not isinstance(artifact, dict) or not safe_path(artifact.get("path")):
-                errors.append(f"{where}: invalid artifact path")
-                continue
-            path = rooted(root, artifact["path"])
-            if path is None:
-                errors.append(f"{where}: invalid artifact path")
-                continue
-            if not path.is_file():
-                errors.append(f"{where}: missing artifact {artifact.get('path')}")
-                continue
-            if not isinstance(artifact.get("sha256"), str) or not SHA256_RE.fullmatch(artifact["sha256"]):
-                errors.append(f"{where}: artifact sha256 must be a SHA-256 digest")
-                continue
-            digest = hashlib.sha256(path.read_bytes()).hexdigest()
-            if digest != artifact.get("sha256"):
-                errors.append(f"{where}: hash mismatch for {artifact.get('path')}")
+        for section, items in (("inputs", inputs), ("artifacts", artifacts if isinstance(artifacts, list) else [])):
+            for artifact in items:
+                if not isinstance(artifact, dict) or not safe_path(artifact.get("path")):
+                    errors.append(f"{where}: invalid {section[:-1]} path")
+                    continue
+                path = rooted(root, artifact["path"])
+                if path is None:
+                    errors.append(f"{where}: invalid {section[:-1]} path")
+                    continue
+                if not path.is_file():
+                    errors.append(f"{where}: missing {section[:-1]} {artifact.get('path')}")
+                    continue
+                if not isinstance(artifact.get("sha256"), str) or not SHA256_RE.fullmatch(artifact["sha256"]):
+                    errors.append(f"{where}: {section[:-1]} sha256 must be a SHA-256 digest")
+                    continue
+                digest = hashlib.sha256(path.read_bytes()).hexdigest()
+                if digest != artifact.get("sha256"):
+                    errors.append(f"{where}: hash mismatch for {artifact.get('path')}")
     return errors
 
 

@@ -37,6 +37,9 @@ def main() -> int:
     broken["entries"][0]["artifacts"][0]["sha256"] = "invalid"
     assert any("artifact sha256" in error for error in validate(broken, ledger, root))
     broken = json.loads(json.dumps(manifest))
+    broken["entries"][0]["inputs"] = [{"path": "/tmp/private-rom-manifest.json", "sha256": "a" * 64}]
+    assert any("invalid input path" in error for error in validate(broken, ledger, root))
+    broken = json.loads(json.dumps(manifest))
     broken["entries"] = ["malformed"]
     assert any("entry must be an object" in error for error in validate(broken, ledger, root))
     broken = json.loads(json.dumps(manifest))
