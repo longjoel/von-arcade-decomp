@@ -42,13 +42,21 @@ def main() -> int:
     configuration = {"set": "vonj", "mame_revision": "abc", "execution_engine": "interpreter",
                     "patch_profile": "original"}
     context = {"schema_version": 1, "id": "original-v1", "objective": "pilot",
-               "stimulus": {"kind": "attract", "seconds": 1}, "configuration": configuration}
+               "stimulus": {"kind": "attract", "seconds": 1}, "configuration": configuration,
+               "checkpoints": ["reset", "scheduler"],
+               "hypothesis": "startup reaches scheduler",
+               "expected_discriminator": "scheduler checkpoint"}
     reconstructed_context = {"schema_version": 1, "id": "reconstructed-v1", "objective": "pilot",
                              "stimulus": {"kind": "attract", "seconds": 1},
-                             "configuration": {**configuration, "patch_profile": "reconstructed"}}
+                             "configuration": {**configuration, "patch_profile": "reconstructed"},
+                             "checkpoints": ["reset", "scheduler"],
+                             "hypothesis": "startup reaches scheduler",
+                             "expected_discriminator": "scheduler checkpoint"}
     contextual = compare(original, reconstructed, context, reconstructed_context)
     assert contextual["context_compatible"] is True
     assert contextual["original_capture_id"] == "original-v1"
+    assert contextual["capture_provenance"]["original"]["checkpoints"] == ["reset", "scheduler"]
+    assert contextual["capture_provenance"]["original"]["hypothesis"] == "startup reaches scheduler"
     context["inputs"] = [{"path": "original-rom.json", "sha256": "a" * 64}]
     reconstructed_context["inputs"] = [{"path": "isolated-rom.json", "sha256": "a" * 64}]
     assert compare(original, reconstructed, context, reconstructed_context)["outcome"] == "pass"

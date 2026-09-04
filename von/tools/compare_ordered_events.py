@@ -103,6 +103,18 @@ def edge_records(edges: set[tuple[str, str]]) -> list[list[str]]:
     return [[caller, target] for caller, target in sorted(edges)]
 
 
+def provenance_summary(context: dict[str, Any]) -> dict[str, Any]:
+    """Keep comparison provenance compact and free of command/path details."""
+    return {
+        "id": context.get("id"),
+        "objective": context.get("objective"),
+        "stimulus": context.get("stimulus"),
+        "checkpoints": context.get("checkpoints"),
+        "hypothesis": context.get("hypothesis"),
+        "expected_discriminator": context.get("expected_discriminator"),
+    }
+
+
 def context_errors(original: dict[str, Any], reconstructed: dict[str, Any]) -> list[str]:
     errors = []
     for label, context in (("original", original), ("reconstructed", reconstructed)):
@@ -214,6 +226,10 @@ def compare(original: list[dict[str, Any]], reconstructed: list[dict[str, Any]],
         result["original_capture_id"] = original_context.get("id")
         result["reconstructed_capture_id"] = reconstructed_context.get("id")
         result["context_compatible"] = not context_errors(original_context, reconstructed_context)
+        result["capture_provenance"] = {
+            "original": provenance_summary(original_context),
+            "reconstructed": provenance_summary(reconstructed_context),
+        }
     result["missed_checkpoints"] = [
         name for name in result["original_checkpoints"]
         if name not in result["reconstructed_checkpoints"]
