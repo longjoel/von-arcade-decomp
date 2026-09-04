@@ -24,6 +24,13 @@ def main() -> int:
         strict_lifecycle=True,
     )
     assert any("lifecycle:" in error for error in errors)
+    errors = validate_workflow(
+        root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
+        check_generated=True, generated_coverage_path=root / "von/build/attract-coverage/vonj-attract-60s.json",
+        generated_worklist_path=root / "von/attract_worklist.json",
+        generated_status_path=root / "von/generated-status.md",
+    )
+    assert any("generated:" in error for error in errors)
     unsafe = {
         "schema_version": 1,
         "entries": [{"id": "unsafe", "canonical": True, "verifier": "/tmp/not-a-verifier.py"}],

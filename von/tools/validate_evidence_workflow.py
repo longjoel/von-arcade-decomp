@@ -17,7 +17,11 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
                       strict_lifecycle: bool = False, asset_pack_path: Path | None = None,
                       run_verifiers: bool = False, rom_manifest_path: Path | None = None,
                       expected_tool_revision: str | None = None,
-                      expected_map_revision: str | None = None) -> list[str]:
+                      expected_map_revision: str | None = None,
+                      check_generated: bool = False,
+                      generated_coverage_path: Path | None = None,
+                      generated_worklist_path: Path | None = None,
+                      generated_status_path: Path | None = None) -> list[str]:
     ledger = load(ledger_path)
     evidence = load(evidence_path)
     errors = [f"ledger: {error}" for error in validate_ledger(ledger, root)]
@@ -42,6 +46,16 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
         errors.extend(f"asset-pack: {error}" for error in validate_pack(
             pack, evidence, root, rom_manifest_path, expected_tool_revision,
             expected_map_revision))
+    if check_generated:
+        if not all((generated_coverage_path, generated_worklist_path, generated_status_path)):
+            errors.append("generated checks require coverage, worklist, and status paths")
+        else:
+            from check_generated_status import check as check_status
+            from check_generated_worklist import check as check_worklist
+
+            errors.extend(f"generated: {error}" for error in check_status(root, generated_status_path))
+            errors.extend(f"generated: {error}" for error in check_worklist(
+                generated_coverage_path, ledger_path, generated_worklist_path, root))
     return errors
 
 
@@ -58,11 +72,20 @@ def main() -> int:
                         help="optional expected asset-pack tool revision")
     parser.add_argument("--map-revision",
                         help="optional expected asset-pack map revision")
+    parser.add_argument("--check-generated", action="store_true",
+                        help="require generated status and worklist files to be current")
+    parser.add_argument("--coverage", type=Path,
+                        help="Tier A coverage input for --check-generated")
+    parser.add_argument("--worklist", type=Path,
+                        help="generated worklist for --check-generated")
+    parser.add_argument("--status", type=Path,
+                        help="generated status Markdown for --check-generated")
     parser.add_argument("--run-verifiers", action="store_true")
     args = parser.parse_args()
     errors = validate_workflow(args.root, args.ledger, args.evidence, args.strict_lifecycle,
                                args.asset_pack, args.run_verifiers, args.rom_manifest,
-                               args.tool_revision, args.map_revision)
+                               args.tool_revision, args.map_revision, args.check_generated,
+                               args.coverage, args.worklist, args.status)
     if errors:
         print(f"Evidence workflow validation: {len(errors)} error(s)")
         for error in errors:
