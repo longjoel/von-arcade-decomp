@@ -96,6 +96,14 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
                         ("comparison.first_divergence_index", comparison.get("first_divergence_index"))):
         if value is not None and (not isinstance(value, int) or isinstance(value, bool) or value < 0):
             raise ValueError(f"metrics {name} must be a nonnegative integer")
+    if "checkpoint_distance" in worklist:
+        comparison_distance = sum(
+            len(comparison.get(field, [])) for field in (
+                "missed_checkpoints", "unexpected_checkpoints",
+                "missing_original_checkpoints", "missing_reconstructed_checkpoints")
+        )
+        if worklist["checkpoint_distance"] != comparison_distance:
+            raise ValueError("metrics checkpoint distance disagrees with comparison")
     if "dynamic_targets_added" in worklist:
         value = worklist["dynamic_targets_added"]
         if not isinstance(value, int) or isinstance(value, bool) or value < 0:

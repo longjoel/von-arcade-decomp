@@ -26,7 +26,7 @@ def main() -> int:
             {"stage": "integrated"}, {"stage": "trace-validated"},
         ]}]},
         {"discovered_units": 4, "active_modeled_units": ["unit-1"], "modeled_wip_limit": 1,
-         "dynamic_targets_added": 2, "checkpoint_distance": 3},
+         "dynamic_targets_added": 2, "checkpoint_distance": 2},
         {"tier": "A", "possible_static_edge_count": 7, "confirmed_dynamic_edge_count": 2,
          "observed_entry_point_count": 3},
         {"compared_events": 10, "matched_prefix_events": 8,
@@ -46,7 +46,7 @@ def main() -> int:
         "trace-validated": 25.0, "byte-validated": 0.0,
     }
     assert report["discovery"]["newly_discovered_dynamic_targets"] == 2
-    assert report["discovery"]["checkpoint_distance"] == 3
+    assert report["discovery"]["checkpoint_distance"] == 2
     assert report["discovery"]["active_modeled_units"] == ["m"]
     assert report["coverage"]["possible_static_edges"] == 7
     assert report["coverage"]["confirmed_dynamic_edges"] == 2
@@ -62,6 +62,20 @@ def main() -> int:
     assert report["experiments"] == {"changed_decision": 3, "quarantined": 1}
     assert report["age"]["modeled"]["median_age_seconds"] == 3600.0
     assert report["age"]["modeled"]["oldest_unit_id"] == "m"
+    inconsistent_worklist = {
+        "discovered_units": 4, "checkpoint_distance": 2,
+    }
+    try:
+        metrics({"images": []}, inconsistent_worklist,
+                {"possible_static_edge_count": 0, "confirmed_dynamic_edge_count": 0,
+                 "observed_entry_point_count": 0},
+                {"compared_events": 0, "matched_prefix_events": 0,
+                 "missed_checkpoints": ["scheduler"], "unexpected_checkpoints": [],
+                 "missing_original_checkpoints": [], "missing_reconstructed_checkpoints": []})
+    except ValueError as error:
+        assert "checkpoint distance disagrees" in str(error)
+    else:
+        raise AssertionError("inconsistent checkpoint distance was accepted")
     cohort_report = metrics(
         {"images": [{"work_units": [
             {"id": "cohort-modeled", "stage": "modeled"},
