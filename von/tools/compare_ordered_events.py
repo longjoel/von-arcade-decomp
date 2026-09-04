@@ -210,6 +210,19 @@ def capture_provenance_errors(context: Any, event_path: Path, root: Path,
     return errors
 
 
+def event_artifact_provenance(context: dict[str, Any], event_path: Path,
+                              root: Path) -> dict[str, str]:
+    """Return the declared path/hash binding for a validated event stream."""
+    relative_event = str(event_path.resolve().relative_to(root.resolve()))
+    for artifact in context.get("artifacts", []):
+        if isinstance(artifact, dict) and artifact.get("path") == relative_event:
+            digest = artifact.get("sha256")
+            if isinstance(digest, str):
+                return {"path": relative_event, "sha256": digest}
+            break
+    raise ValueError(f"event stream has no hashed artifact declaration: {relative_event}")
+
+
 def compare(original: list[dict[str, Any]], reconstructed: list[dict[str, Any]],
             original_context: dict[str, Any] | None = None,
             reconstructed_context: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -326,6 +339,12 @@ def main() -> int:
             if provenance_errors:
                 raise ValueError("; ".join(provenance_errors))
         result = compare(load_events(args.original), load_events(args.reconstructed), original_context, reconstructed_context)
+        if original_context is not None and reconstructed_context is not None:
+            result["event_stream_provenance"] = {
+                "original": event_artifact_provenance(original_context, args.original, args.capture_root),
+                "reconstructed": event_artifact_provenance(
+                    reconstructed_context, args.reconstructed, args.capture_root),
+            }
     except ValueError as error:
         print(f"event comparison: {error}", file=sys.stderr)
         return 2

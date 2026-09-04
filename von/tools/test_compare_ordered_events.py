@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 
 from compare_ordered_events import (capture_provenance_errors, compare, context_errors,
-                                    load_events)
+                                    event_artifact_provenance, load_events)
 
 
 def main() -> int:
@@ -189,6 +189,16 @@ def main() -> int:
             with gzip.open(compressed, "wb") as stream:
                 stream.write(payload)
         assert compare(load_events(compressed_original), load_events(compressed_reconstructed))["outcome"] == "pass"
+        provenance = event_artifact_provenance(
+            {"artifacts": [{"path": "original.ndjson.gz", "sha256": "a" * 64}]},
+            compressed_original, Path(directory))
+        assert provenance == {"path": "original.ndjson.gz", "sha256": "a" * 64}
+        try:
+            event_artifact_provenance({"artifacts": []}, compressed_original, Path(directory))
+        except ValueError as error:
+            assert "no hashed artifact declaration" in str(error)
+        else:
+            raise AssertionError("undeclared comparison provenance was accepted")
         compressed_original.write_bytes(b"not gzip")
         try:
             load_events(compressed_original)
