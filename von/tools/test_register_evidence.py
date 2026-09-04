@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import tempfile
 from pathlib import Path
 
@@ -31,13 +32,17 @@ def main() -> int:
         verifier = root / "verify.py"
         verifier.write_text("# verifier\n", encoding="utf-8")
         capture_path = root / "capture.json"
-        capture_path.write_text("{}\n", encoding="utf-8")
+        capture_path.write_text(json.dumps(capture) + "\n", encoding="utf-8")
         manifest = {"schema_version": 1, "entries": []}
         ledger = {"images": [{"work_units": [{"id": "unit-1"}]}]}
         assert not register(manifest, capture, capture_path, "pilot capture", "verify.py", ["unit-1"], root, ledger)
         assert manifest["entries"][0]["canonical"] is True
         assert manifest["entries"][0]["capture_manifest"] == "capture.json"
         assert ledger["images"][0]["work_units"][0]["evidence"] == ["capture-v1"]
+        mismatched_capture = copy.deepcopy(capture)
+        mismatched_capture["objective"] = "different"
+        assert any("differs from on-disk" in error for error in register(
+            {}, mismatched_capture, capture_path, "mismatch", "verify.py", ["unit-1"], root))
         broken = copy.deepcopy(manifest)
         assert register(broken, capture, capture_path, "duplicate", "verify.py", ["unit-1"], root)
         assert "unknown ledger consumers" in register({}, capture, root / "capture.json", "unknown", "verify.py", ["missing"], root, ledger)[0]

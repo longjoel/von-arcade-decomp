@@ -24,6 +24,12 @@ def register(
         capture_relative = ""
     if not safe_path(capture_relative) or not capture_path.is_file():
         return [f"missing capture manifest {capture_path}"]
+    try:
+        stored_capture = json.loads(capture_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return [f"unable to read capture manifest {capture_path}: {exc}"]
+    if stored_capture != capture:
+        return ["capture manifest argument differs from on-disk sidecar"]
     entries = manifest.setdefault("entries", [])
     if any(entry.get("id") == capture_id for entry in entries):
         return [f"duplicate evidence id {capture_id}"]
