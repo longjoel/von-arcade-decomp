@@ -8,6 +8,7 @@ import gzip
 import hashlib
 import json
 import shutil
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -69,7 +70,17 @@ def main() -> int:
     digest = hashlib.sha256(payload).hexdigest()
     args.archive.mkdir(parents=True, exist_ok=True)
     target = args.archive / f"{digest}.gz"
-    if not target.exists():
+    if target.exists():
+        try:
+            with gzip.open(target, "rb") as stream:
+                existing_payload = stream.read()
+        except (OSError, EOFError) as error:
+            print(f"Evidence archive: existing archive is unreadable: {error}", file=sys.stderr)
+            return 1
+        if existing_payload != payload:
+            print("Evidence archive: existing digest target payload mismatch", file=sys.stderr)
+            return 1
+    else:
         with gzip.GzipFile(filename=str(target), mode="wb", mtime=0) as stream:
             stream.write(payload)
     if args.quarantine:

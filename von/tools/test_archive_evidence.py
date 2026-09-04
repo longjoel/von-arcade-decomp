@@ -46,6 +46,12 @@ def main() -> int:
         assert any("decompressed payload mismatch" in error for error in validate_metadata(record))
         with gzip.open(target, "rb") as stream:
             assert stream.read() == b'{"wrong":true}\n'
+        poisoned = subprocess.run(
+            [sys.executable, str(TOOL), str(source), "--archive", str(archive)],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert poisoned.returncode != 0
+        assert "payload mismatch" in poisoned.stderr
         malformed = {"schema_version": 1, "source": [], "archive": {}}
         assert any("source metadata must be an object" in error
                    for error in validate_metadata(malformed))
