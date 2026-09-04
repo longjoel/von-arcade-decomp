@@ -127,7 +127,9 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
             errors.append(f"{where}: evidence_ids must be an array")
             evidence_ids = []
         for evidence_id in evidence_ids:
-            if evidence_id not in canonical_ids:
+            if not isinstance(evidence_id, str) or not evidence_id:
+                errors.append(f"{where}: evidence_ids must contain non-empty strings")
+            elif evidence_id not in canonical_ids:
                 errors.append(f"{where}: unknown canonical evidence id {evidence_id}")
         verifiers = asset.get("verifiers")
         if not isinstance(verifiers, list) or not verifiers or not all(isinstance(item, str) and item for item in verifiers):

@@ -62,6 +62,9 @@ def main() -> int:
         broken["assets"][0]["evidence_ids"] = ["missing"]
         assert any("unknown canonical evidence" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
+        broken["assets"][0]["evidence_ids"] = [{}]
+        assert any("non-empty strings" in error for error in validate(broken, evidence, root))
+        broken = copy.deepcopy(pack)
         broken["basis"]["capture_id"] = "missing"
         assert any("basis capture id" in error for error in validate(broken, evidence, root))
         outside = root.parent / "outside-asset-fixture.glb"
