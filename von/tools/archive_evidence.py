@@ -73,6 +73,12 @@ def main() -> int:
     parser.add_argument("--metadata", type=Path,
                         help="write source/archive hashes and sizes to this JSON file")
     args = parser.parse_args()
+    if args.capture.is_symlink():
+        print("Evidence archive: capture source must not be a symlink", file=sys.stderr)
+        return 1
+    if args.archive.is_symlink():
+        print("Evidence archive: archive directory must not be a symlink", file=sys.stderr)
+        return 1
     payload = args.capture.read_bytes()
     digest = hashlib.sha256(payload).hexdigest()
     args.archive.mkdir(parents=True, exist_ok=True)

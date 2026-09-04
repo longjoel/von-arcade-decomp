@@ -62,6 +62,23 @@ def main() -> int:
         )
         assert linked.returncode != 0
         assert "must not be a symlink" in linked.stderr
+        linked_source_archive = root / "source-link.ndjson"
+        linked_source_archive.symlink_to(source)
+        linked_source_run = subprocess.run(
+            [sys.executable, str(TOOL), str(linked_source_archive),
+             "--archive", str(root / "source-link-archive")],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert linked_source_run.returncode != 0
+        assert "capture source must not be a symlink" in linked_source_run.stderr
+        archive_directory_link = root / "archive-directory-link"
+        archive_directory_link.symlink_to(archive, target_is_directory=True)
+        linked_directory_run = subprocess.run(
+            [sys.executable, str(TOOL), str(source), "--archive", str(archive_directory_link)],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert linked_directory_run.returncode != 0
+        assert "archive directory must not be a symlink" in linked_directory_run.stderr
         wrong_target = archive / "not-content-addressed.gz"
         wrong_target.write_bytes(target.read_bytes())
         wrong_name = json.loads(json.dumps(record))
