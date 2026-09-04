@@ -76,6 +76,10 @@ def main() -> int:
                          "outcome": "pass", "consumers": ["unit"]}],
         }
         assert not validate(runtime, {"images": [{"work_units": [{"id": "unit"}]}]}, temp)
+        missing_set = json.loads(json.dumps(runtime))
+        del missing_set["entries"][0]["configuration"]["set"]
+        assert any("configuration.set" in error for error in validate(
+            missing_set, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
         outside = temp.parent / "outside-evidence-fixture.json"
         outside.write_text("{}\n", encoding="utf-8")
         (temp / "linked-capture.json").symlink_to(outside)

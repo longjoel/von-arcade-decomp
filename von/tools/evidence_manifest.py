@@ -109,7 +109,10 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                         sidecar_errors = [f"unable to read capture manifest: {exc}"]
                     errors.extend(f"{where}: {error}" for error in sidecar_errors)
         configuration = entry.get("configuration", {})
-        for field in ("mame_revision", "patch_profile", "execution_engine"):
+        required_configuration = ("mame_revision", "patch_profile", "execution_engine")
+        if stimulus.get("kind") in {"input-free-attract", "bounded-trace", "causal-trace"}:
+            required_configuration = ("set",) + required_configuration
+        for field in required_configuration:
             if not configuration.get(field):
                 errors.append(f"{where}: missing configuration.{field}")
         if entry.get("outcome") != "pass":
