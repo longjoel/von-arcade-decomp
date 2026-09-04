@@ -23,6 +23,18 @@ def load_pcs(path: Path) -> set[int]:
     return pcs
 
 
+def preflight_path(label: str, path: Path, root: Path, *, output: bool = False) -> str | None:
+    if path.is_symlink():
+        return f"{label} path must not be a symlink: {path}"
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, RuntimeError, ValueError):
+        return f"{label} path escapes root: {path}"
+    if not output and not path.is_file():
+        return f"missing {label}: {path}"
+    return None
+
+
 def contiguous_ranges(pcs: set[int]) -> list[tuple[int, int]]:
     if not pcs:
         return []
@@ -69,12 +81,25 @@ def main() -> int:
     parser.add_argument("--listing", required=True, type=Path)
     parser.add_argument("--json", required=True, type=Path)
     parser.add_argument("--markdown", required=True, type=Path)
+    parser.add_argument("--root", type=Path, default=Path.cwd(),
+                        help="root that all report inputs and outputs must remain within")
     parser.add_argument("--capture-id", required=True,
                         help="stable identity for this bounded capture")
     parser.add_argument("--phase", default="stable-attract")
     parser.add_argument("--annotations", type=Path,
                         help="Ghidra annotation source to resolve labels in the report")
     args = parser.parse_args()
+
+    root = args.root.resolve()
+    paths = [("PC log", args.pcs, False), ("listing", args.listing, False),
+             ("JSON output", args.json, True), ("Markdown output", args.markdown, True)]
+    if args.annotations:
+        paths.append(("annotations", args.annotations, False))
+    for label, path, output in paths:
+        error = preflight_path(label, path, root, output=output)
+        if error:
+            print(f"Attract coverage: {error}")
+            return 1
 
     pcs = load_pcs(args.pcs)
     instructions, callers = listing_data(args.listing)

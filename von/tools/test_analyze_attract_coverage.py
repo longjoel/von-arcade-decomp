@@ -38,6 +38,8 @@ def main() -> int:
                 str(report_path),
                 "--markdown",
                 str(work / "report.md"),
+                "--root",
+                str(work),
                 "--capture-id",
                 "fixture-attract-1",
                 "--phase",
@@ -58,6 +60,15 @@ def main() -> int:
         assert len(report["possible_static_edges"]) == 1
         assert "executed_direct_edges" not in report
         assert "executed_direct_targets" not in report
+        outside_output = work.parent / "outside-attract-coverage.json"
+        result = subprocess.run(
+            [sys.executable, str(TOOL), "--root", str(work), "--pcs", str(work / "pcs"),
+             "--listing", str(work / "listing"), "--json", str(outside_output),
+             "--markdown", str(work / "report-2.md"), "--capture-id", "fixture-attract-2"],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert result.returncode == 1
+        assert "JSON output path escapes root" in result.stdout
     print("PASS: Tier A coverage reports possible static edges")
     return 0
 
