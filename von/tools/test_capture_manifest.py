@@ -65,6 +65,14 @@ def main() -> int:
             assert "manifest must not be a symlink" in str(error)
         else:
             raise AssertionError("symlinked capture provenance was accepted")
+        outside_manifest = root.parent / "outside-capture.json"
+        outside_manifest.write_text(manifest_path.read_text(encoding="utf-8"), encoding="utf-8")
+        try:
+            load_provenance(outside_manifest, root, artifact_path)
+        except ValueError as error:
+            assert "escapes capture root" in str(error)
+        else:
+            raise AssertionError("external capture provenance was accepted")
         try:
             load_provenance(manifest_path, root, root / "unlisted.ndjson")
         except ValueError as error:
