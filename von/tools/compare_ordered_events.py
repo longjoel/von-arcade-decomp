@@ -246,6 +246,18 @@ def event_artifact_provenance(context: dict[str, Any], event_path: Path,
     raise ValueError(f"event stream has no hashed artifact declaration: {relative_event}")
 
 
+def path_error(label: str, path: Path, root: Path, *, output: bool = False) -> str | None:
+    if path.is_symlink():
+        return f"{label} path must not be a symlink: {path}"
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, RuntimeError, ValueError):
+        return f"{label} path escapes root: {path}"
+    if not output and not path.is_file():
+        return f"missing {label}: {path}"
+    return None
+
+
 def compare(original: list[dict[str, Any]], reconstructed: list[dict[str, Any]],
             original_context: dict[str, Any] | None = None,
             reconstructed_context: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -349,12 +361,16 @@ def main() -> int:
                         help="root used to validate capture manifests and artifact paths")
     args = parser.parse_args()
     try:
+        capture_root = args.capture_root.resolve()
         for label, path in (("original", args.original), ("reconstructed", args.reconstructed),
                             ("original capture manifest", args.original_manifest),
                             ("reconstructed capture manifest", args.reconstructed_manifest),
                             ("summary", args.summary)):
-            if path is not None and path.is_symlink():
-                raise ValueError(f"{label} path must not be a symlink: {path}")
+            if path is None:
+                continue
+            error = path_error(label, path, capture_root, output=label == "summary")
+            if error:
+                raise ValueError(error)
         original_context = json.loads(args.original_manifest.read_text(encoding="utf-8")) if args.original_manifest else None
         reconstructed_context = json.loads(args.reconstructed_manifest.read_text(encoding="utf-8")) if args.reconstructed_manifest else None
         if (original_context is None) != (reconstructed_context is None):
@@ -364,17 +380,17 @@ def main() -> int:
             if errors:
                 raise ValueError("; ".join(errors))
             provenance_errors = capture_provenance_errors(
-                original_context, args.original, args.capture_root, "original")
+                original_context, args.original, capture_root, "original")
             provenance_errors.extend(capture_provenance_errors(
-                reconstructed_context, args.reconstructed, args.capture_root, "reconstructed"))
+                reconstructed_context, args.reconstructed, capture_root, "reconstructed"))
             if provenance_errors:
                 raise ValueError("; ".join(provenance_errors))
         result = compare(load_events(args.original), load_events(args.reconstructed), original_context, reconstructed_context)
         if original_context is not None and reconstructed_context is not None:
             result["event_stream_provenance"] = {
-                "original": event_artifact_provenance(original_context, args.original, args.capture_root),
+                "original": event_artifact_provenance(original_context, args.original, capture_root),
                 "reconstructed": event_artifact_provenance(
-                    reconstructed_context, args.reconstructed, args.capture_root),
+                    reconstructed_context, args.reconstructed, capture_root),
             }
     except ValueError as error:
         print(f"event comparison: {error}", file=sys.stderr)

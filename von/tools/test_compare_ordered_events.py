@@ -279,6 +279,14 @@ def main() -> int:
         )
         assert cli_result.returncode == 2
         assert "original path must not be a symlink" in cli_result.stderr
+        outside_summary = cli_root.parent / "outside-event-comparison.json"
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), str(cli_source), str(cli_source),
+             "--capture-root", str(cli_root), "--summary", str(outside_summary)],
+            cwd=cli_root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 2
+        assert "summary path escapes root" in cli_result.stderr
     print("PASS: ordered event comparison identifies the first divergence")
     return 0
 
