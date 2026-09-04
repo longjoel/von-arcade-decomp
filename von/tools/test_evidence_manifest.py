@@ -63,7 +63,7 @@ def main() -> int:
         capture = {
             "schema_version": 1, "id": "capture-v1", "objective": "pilot",
             "hypothesis": "startup reaches scheduler", "expected_discriminator": "scheduler checkpoint",
-            "stimulus": {"kind": "input-free-attract", "seconds": 1},
+            "stimulus": {"kind": "input-free-attract", "seconds": 1, "phase": "startup"},
             "checkpoints": ["reset", "scheduler"],
             "configuration": {"set": "vonj", "mame_revision": "abc", "patch_profile": "none", "execution_engine": "interpreter"},
             "command": ["mame", "vonj", "-cfg_directory", str(temp / "cfg"),
@@ -79,7 +79,8 @@ def main() -> int:
         runtime = {
             "schema_version": 1,
             "entries": [{"id": "capture-v1", "canonical": True,
-                         "stimulus": {"kind": "input-free-attract", "description": "pilot"},
+                         "stimulus": {"kind": "input-free-attract", "description": "pilot",
+                                      "seconds": 1, "phase": "startup"},
                          "checkpoints": capture["checkpoints"],
                          "hypothesis": capture["hypothesis"],
                          "expected_discriminator": capture["expected_discriminator"],
@@ -113,6 +114,10 @@ def main() -> int:
         mismatched = json.loads(json.dumps(runtime))
         mismatched["entries"][0]["checkpoints"] = ["reset"]
         assert any("checkpoints" in error for error in validate(
+            mismatched, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
+        mismatched = json.loads(json.dumps(runtime))
+        mismatched["entries"][0]["stimulus"]["phase"] = "stable-attract"
+        assert any("stimulus phase" in error for error in validate(
             mismatched, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
         mismatched = json.loads(json.dumps(runtime))
         mismatched["entries"][0]["hypothesis"] = "different"

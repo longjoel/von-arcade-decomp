@@ -67,16 +67,19 @@ def register(
                 unit["evidence"] = evidence
             if capture_id not in evidence:
                 evidence.append(capture_id)
+    stimulus = {
+        "kind": capture["stimulus"]["kind"],
+        "description": description,
+        "seconds": capture["stimulus"]["seconds"],
+    }
+    if capture["stimulus"].get("phase") is not None:
+        stimulus["phase"] = capture["stimulus"]["phase"]
     entry = {
         "id": capture_id,
         "canonical": True,
         "hypothesis": capture["hypothesis"],
         "expected_discriminator": capture["expected_discriminator"],
-        "stimulus": {
-            "kind": capture["stimulus"]["kind"],
-            "description": description,
-            "seconds": capture["stimulus"]["seconds"],
-        },
+        "stimulus": stimulus,
         "checkpoints": capture["checkpoints"],
         "configuration": capture["configuration"],
         "inputs": capture.get("inputs", []),
