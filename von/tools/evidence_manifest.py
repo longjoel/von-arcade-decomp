@@ -132,6 +132,7 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
         if not isinstance(artifacts, list) or not artifacts:
             errors.append(f"{where}: no artifacts")
         for section, items in (("inputs", inputs), ("artifacts", artifacts if isinstance(artifacts, list) else [])):
+            seen_paths: set[Path] = set()
             for artifact in items:
                 if not isinstance(artifact, dict) or not safe_path(artifact.get("path")):
                     errors.append(f"{where}: invalid {section[:-1]} path")
@@ -140,6 +141,11 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                 if path is None:
                     errors.append(f"{where}: invalid {section[:-1]} path")
                     continue
+                resolved_path = path.resolve()
+                if resolved_path in seen_paths:
+                    errors.append(f"{where}: duplicate {section[:-1]} {artifact['path']}")
+                    continue
+                seen_paths.add(resolved_path)
                 if not path.is_file():
                     errors.append(f"{where}: missing {section[:-1]} {artifact.get('path')}")
                     continue
