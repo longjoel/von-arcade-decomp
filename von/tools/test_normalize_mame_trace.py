@@ -7,7 +7,7 @@ import json
 import tempfile
 from pathlib import Path
 
-from normalize_mame_trace import ndjson_event, select_events
+from normalize_mame_trace import ndjson_event, select_events, summary
 
 
 def main() -> int:
@@ -21,6 +21,12 @@ def main() -> int:
     selected = select_events([event, sample], max_events=1, event_kinds={"vonj_copro_fifo"})
     assert len(selected) == 1 and selected[0]["seq"] == 0
     assert select_events([event], pc_min=0x2000) == []
+    report = summary([event, sample], Path("trace.log"), max_events=1,
+                     event_kinds={"vonj_copro_fifo"})
+    assert report["event_count"] == 1
+    assert report["event_counts"] == {"vonj_copro_fifo": 1}
+    assert report["first_event"]["kind"] == "vonj_copro_fifo"
+    assert report["filters"]["event_kinds"] == ["vonj_copro_fifo"]
     with tempfile.TemporaryDirectory() as directory:
         path = Path(directory) / "events.ndjson"
         path.write_text(json.dumps(event) + "\n", encoding="utf-8")

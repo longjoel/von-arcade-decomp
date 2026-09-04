@@ -70,11 +70,34 @@ def select_events(events: list[dict], max_events: int | None = None,
     return selected
 
 
+def summary(events: list[dict], source: Path, max_events: int | None = None,
+            event_kinds: set[str] | None = None, pc_min: int | None = None,
+            pc_max: int | None = None) -> dict:
+    selected = select_events(events, max_events, event_kinds, pc_min, pc_max)
+    counts = Counter(event.get("kind") for event in selected)
+    return {
+        "schema_version": 1,
+        "source": str(source),
+        "event_count": len(selected),
+        "event_counts": dict(sorted(counts.items())),
+        "first_event": selected[0] if selected else None,
+        "last_event": selected[-1] if selected else None,
+        "filters": {
+            "max_events": max_events,
+            "event_kinds": sorted(event_kinds or set()),
+            "pc_min": pc_min,
+            "pc_max": pc_max,
+        },
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("trace", type=Path)
     parser.add_argument("--ndjson", type=Path,
                         help="also write normalized ordered events")
+    parser.add_argument("--summary", type=Path,
+                        help="also write a compact normalized-event summary")
     parser.add_argument("--max-events", type=int)
     parser.add_argument("--event-kind", action="append", default=[])
     parser.add_argument("--pc-min", type=lambda value: int(value, 0))
@@ -123,14 +146,24 @@ def main() -> int:
         print(f"  line={line_number} pc={pc} address={address} data={data}")
 
     print(f"Tile writes: {tile_count}")
+    event_kinds = set(args.event_kind)
+    all_normalized = normalized
+    if args.ndjson or args.summary:
+        normalized = select_events(normalized, args.max_events, event_kinds, args.pc_min, args.pc_max)
     if args.ndjson:
-        normalized = select_events(normalized, args.max_events, set(args.event_kind), args.pc_min, args.pc_max)
         args.ndjson.parent.mkdir(parents=True, exist_ok=True)
         args.ndjson.write_text(
             "".join(json.dumps(event, sort_keys=True) + "\n" for event in normalized),
             encoding="utf-8",
         )
         print(f"Normalized events: {len(normalized)} -> {args.ndjson}")
+    if args.summary:
+        args.summary.parent.mkdir(parents=True, exist_ok=True)
+        args.summary.write_text(json.dumps(
+            summary(all_normalized, args.trace, args.max_events, event_kinds,
+                    args.pc_min, args.pc_max), indent=2
+        ) + "\n", encoding="utf-8")
+        print(f"Event summary: {args.summary}")
     return 0
 
 
