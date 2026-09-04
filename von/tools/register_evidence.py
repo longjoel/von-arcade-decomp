@@ -56,6 +56,10 @@ def register(
     verifier_path = rooted(root, verifier)
     if verifier_path is None or verifier_path.is_symlink() or not verifier_path.is_file():
         return [f"missing verifier {verifier}"]
+    if not isinstance(consumers, list) or not all(
+        isinstance(consumer, str) and consumer for consumer in consumers
+    ):
+        return ["ledger consumers must be a non-empty string array"]
     if not consumers:
         return ["at least one ledger consumer is required"]
     if len(set(consumers)) != len(consumers):

@@ -83,6 +83,12 @@ def main() -> int:
         assert any("consumers must be unique" in error for error in register(
             {"schema_version": 1, "entries": []}, capture, capture_path, "duplicate consumers", "verify.py",
             ["unit-1", "unit-1"], root, ledger))
+        assert any("non-empty string array" in error for error in register(
+            {"schema_version": 1, "entries": []}, capture, capture_path, "scalar consumer", "verify.py",
+            "unit-1", root, ledger))
+        assert any("non-empty string array" in error for error in register(
+            {"schema_version": 1, "entries": []}, capture, capture_path, "empty consumer", "verify.py",
+            [""], root, ledger))
         broken = copy.deepcopy(manifest)
         assert register(broken, capture, capture_path, "duplicate", "verify.py", ["unit-1"], root)
         assert "unknown ledger consumers" in register({"schema_version": 1, "entries": []}, capture, root / "capture.json", "unknown", "verify.py", ["missing"], root, ledger)[0]
