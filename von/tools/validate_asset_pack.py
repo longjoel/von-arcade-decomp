@@ -12,6 +12,10 @@ from typing import Any
 
 STATUSES = {"legacy-unreviewed", "candidate", "observed", "validated", "rejected", "reference-capture"}
 CLAIM_STATUSES = STATUSES | {"unresolved"}
+CLAIM_NAMES = {
+    "geometry", "source_ranges", "transform_association", "identity", "textures",
+    "hierarchy", "animation", "audio_descriptor", "audio_sequence", "source_bytes",
+}
 
 
 def safe_path(path_text: Any) -> bool:
@@ -88,9 +92,10 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         claims = asset.get("claims")
         if not isinstance(claims, dict) or not claims:
             errors.append(f"{where}: claims must be a non-empty object")
-        elif any(not isinstance(name, str) or not isinstance(value, str) or value not in CLAIM_STATUSES
+        elif any(not isinstance(name, str) or name not in CLAIM_NAMES
+                 or not isinstance(value, str) or value not in CLAIM_STATUSES
                  for name, value in claims.items()):
-            errors.append(f"{where}: claims must use the shared status vocabulary")
+            errors.append(f"{where}: claims must use the supported claim/status vocabulary")
         evidence_ids = asset.get("evidence_ids", [])
         if not isinstance(evidence_ids, list):
             errors.append(f"{where}: evidence_ids must be an array")

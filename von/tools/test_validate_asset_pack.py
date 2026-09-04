@@ -45,7 +45,10 @@ def main() -> int:
         assert any("invalid status" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
         broken["assets"][0]["claims"]["identity"] = True
-        assert any("shared status vocabulary" in error for error in validate(broken, evidence, root))
+        assert any("claim/status vocabulary" in error for error in validate(broken, evidence, root))
+        broken = copy.deepcopy(pack)
+        broken["assets"][0]["claims"]["unsupported_claim"] = "candidate"
+        assert any("claim/status vocabulary" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
         broken["assets"][0]["evidence_ids"] = ["missing"]
         assert any("unknown canonical evidence" in error for error in validate(broken, evidence, root))
