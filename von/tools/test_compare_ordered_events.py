@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import copy
 import gzip
+import hashlib
 import tempfile
 from pathlib import Path
 
@@ -189,10 +190,19 @@ def main() -> int:
             with gzip.open(compressed, "wb") as stream:
                 stream.write(payload)
         assert compare(load_events(compressed_original), load_events(compressed_reconstructed))["outcome"] == "pass"
+        original_digest = hashlib.sha256(compressed_original.read_bytes()).hexdigest()
         provenance = event_artifact_provenance(
-            {"artifacts": [{"path": "original.ndjson.gz", "sha256": "a" * 64}]},
+            {"artifacts": [{"path": "original.ndjson.gz", "sha256": original_digest}]},
             compressed_original, Path(directory))
-        assert provenance == {"path": "original.ndjson.gz", "sha256": "a" * 64}
+        assert provenance == {"path": "original.ndjson.gz", "sha256": original_digest}
+        try:
+            event_artifact_provenance(
+                {"artifacts": [{"path": "original.ndjson.gz", "sha256": "a" * 64}]},
+                compressed_original, Path(directory))
+        except ValueError as error:
+            assert "artifact hash mismatch" in str(error)
+        else:
+            raise AssertionError("stale artifact hash was accepted")
         try:
             event_artifact_provenance({"artifacts": []}, compressed_original, Path(directory))
         except ValueError as error:

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import hashlib
 import json
 import math
 import sys
@@ -218,6 +219,9 @@ def event_artifact_provenance(context: dict[str, Any], event_path: Path,
         if isinstance(artifact, dict) and artifact.get("path") == relative_event:
             digest = artifact.get("sha256")
             if isinstance(digest, str):
+                actual = hashlib.sha256(event_path.read_bytes()).hexdigest()
+                if actual != digest:
+                    raise ValueError(f"event stream artifact hash mismatch: {relative_event}")
                 return {"path": relative_event, "sha256": digest}
             break
     raise ValueError(f"event stream has no hashed artifact declaration: {relative_event}")
