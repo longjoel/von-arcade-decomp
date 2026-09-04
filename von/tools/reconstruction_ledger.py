@@ -45,6 +45,9 @@ def validate_lifecycle(
     def existing_reference(value: str) -> bool:
         return root is None or (root / value).is_file()
 
+    def nonempty_text(value: Any) -> bool:
+        return isinstance(value, str) and bool(value)
+
     active_modeled: list[str] = []
     manifest_entries = manifest.get("entries", []) if isinstance(manifest, dict) else []
     canonical_entries = {
@@ -66,7 +69,7 @@ def validate_lifecycle(
             if stage_rank >= STAGE_ORDER["integrated"] and not isinstance(unit.get("integration"), dict):
                 errors.append(f"{where}: {stage} requires preceding integration evidence")
             if stage == "planned":
-                if not unit.get("notes"):
+                if not nonempty_text(unit.get("notes")):
                     errors.append(f"{where}: planned requires a reason in notes")
             elif stage == "modeled":
                 modeling = unit.get("modeling")
@@ -74,7 +77,7 @@ def validate_lifecycle(
                     errors.append(f"{where}: modeled requires modeling evidence")
                     continue
                 for field in ("boundary", "test", "unresolved_behavior"):
-                    if not modeling.get(field):
+                    if not nonempty_text(modeling.get(field)):
                         errors.append(f"{where}: modeled requires modeling.{field}")
                 test = modeling.get("test")
                 if test and not safe_reference(test):
@@ -87,16 +90,16 @@ def validate_lifecycle(
                     errors.append(f"{where}: integrated requires integration evidence")
                     continue
                 image = integration.get("image")
-                if not isinstance(image, str) or not image:
+                if not nonempty_text(image):
                     errors.append(f"{where}: integrated requires integration.image")
                 elif not safe_reference(image):
                     errors.append(f"{where}: integration.image must be a safe relative path")
                 elif root is not None and not existing_reference(image):
                     errors.append(f"{where}: missing integration image {image}")
-                if not isinstance(integration.get("checkpoint"), str) or not integration.get("checkpoint"):
+                if not nonempty_text(integration.get("checkpoint")):
                     errors.append(f"{where}: integrated requires integration.checkpoint")
                 test = integration.get("test")
-                if not isinstance(test, str) or not test:
+                if not nonempty_text(test):
                     errors.append(f"{where}: integrated requires integration.test")
                 elif not safe_reference(test):
                     errors.append(f"{where}: integration.test must be a safe relative path")
@@ -153,14 +156,15 @@ def validate_lifecycle(
                     errors.append(f"{where}: byte-validated requires byte validation evidence")
                 else:
                     for field in ("original_range", "reconstructed_range", "comparison"):
-                        if not comparison.get(field):
+                        if not nonempty_text(comparison.get(field)):
                             errors.append(f"{where}: byte-validated requires byte_validation.{field}")
                     if comparison.get("comparison") != "match":
                         errors.append(f"{where}: byte validation comparison must be match")
             elif stage == "blocked":
                 blocked = unit.get("blocked")
                 required = ("missing_fact", "failed_discriminator", "next_experiment")
-                if not isinstance(blocked, dict) or any(not blocked.get(field) for field in required):
+                if not isinstance(blocked, dict) or any(
+                        not nonempty_text(blocked.get(field)) for field in required):
                     errors.append(f"{where}: blocked requires missing fact, discriminator, and next experiment")
     if len(active_modeled) > 1:
         errors.append(

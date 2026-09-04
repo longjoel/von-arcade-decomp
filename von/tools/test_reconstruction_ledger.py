@@ -82,6 +82,9 @@ def main() -> int:
     broken["images"][0]["work_units"][1]["modeling"].pop("boundary")
     assert any("modeled requires modeling.boundary" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][1]["modeling"]["boundary"] = ["RAM"]
+    assert any("modeled requires modeling.boundary" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
     del broken["images"][0]["work_units"][2]["integration"]
     assert any("integrated requires" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
@@ -140,6 +143,9 @@ def main() -> int:
     broken = copy.deepcopy(lifecycle)
     del broken["images"][0]["work_units"][4]["byte_validation"]["reconstructed_range"]
     assert any("reconstructed_range" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][5]["blocked"]["next_experiment"] = {"command": "capture"}
+    assert any("blocked requires" in error for error in validate_lifecycle(broken, manifest))
     bypass = copy.deepcopy(lifecycle)
     for field in ("canonical_evidence_id", "verifier", "verification"):
         bypass["images"][0]["work_units"][4].pop(field)
