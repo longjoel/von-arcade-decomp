@@ -10,7 +10,8 @@ import tempfile
 import wave
 from pathlib import Path
 
-from verify_scsp_descriptor import pcm8_to_pcm16, swap_words, validate, validate_rom_inputs
+from verify_scsp_descriptor import (pcm8_to_pcm16, swap_words, validate,
+                                    validate_rom_inputs, validate_trace_input)
 
 
 def main() -> int:
@@ -32,6 +33,23 @@ def main() -> int:
             {"path": "a.bin", "bytes": 4, "sha256": hashlib.sha256(rom_a.read_bytes()).hexdigest()},
             {"path": "b.bin", "bytes": 4, "sha256": hashlib.sha256(rom_b.read_bytes()).hexdigest()},
         ]
+        trace = root / "trace.log"
+        trace.write_bytes(b"runtime trace fixture\n")
+        catalog["trace_bytes"] = trace.stat().st_size
+        catalog["trace_sha256"] = hashlib.sha256(trace.read_bytes()).hexdigest()
+        validate_trace_input(catalog, trace, trace.read_bytes())
+        try:
+            validate_trace_input(catalog, trace, b"changed")
+        except ValueError as error:
+            assert "trace hash or size" in str(error)
+        else:
+            raise AssertionError("mismatched runtime trace was accepted")
+        try:
+            validate_trace_input(catalog, None, None)
+        except ValueError as error:
+            assert "no trace" in str(error)
+        else:
+            raise AssertionError("missing runtime trace was accepted")
         validate_rom_inputs(catalog, [rom_a, rom_b], [rom_a.read_bytes(), rom_b.read_bytes()])
         bad_roms = [rom_a.read_bytes(), b"wrong!"]
         try:

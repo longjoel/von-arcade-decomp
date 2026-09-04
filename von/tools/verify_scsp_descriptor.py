@@ -104,21 +104,36 @@ def validate_rom_inputs(catalog: dict[str, Any], paths: list[Path], data: list[b
             raise ValueError(f"sample ROM {index} hash or size does not match catalog")
 
 
+def validate_trace_input(catalog: dict[str, Any], path: Path | None, data: bytes | None) -> None:
+    declared_hash = catalog.get("trace_sha256")
+    if declared_hash is None:
+        return
+    if path is None or data is None:
+        raise ValueError("catalog declares trace provenance but no trace was supplied")
+    if catalog.get("trace_bytes") != len(data) or declared_hash != sha256(data):
+        raise ValueError("trace hash or size does not match catalog")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--catalog", type=Path, required=True)
+    parser.add_argument("--trace", type=Path,
+                        help="runtime trace whose hash is declared by the catalog")
     parser.add_argument("--sample-rom", type=Path, action="append", required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
         catalog_bytes = args.catalog.read_bytes()
         catalog = json.loads(catalog_bytes)
+        trace_data = args.trace.read_bytes() if args.trace else None
+        validate_trace_input(catalog, args.trace, trace_data)
         physical_roms = [path.read_bytes() for path in args.sample_rom]
         validate_rom_inputs(catalog, args.sample_rom, physical_roms)
         sample = swap_words(b"".join(physical_roms))
         entries = validate(catalog, sample, args.catalog.parent)
         report = {"schema_version": 1, "status": "validated", "catalog_sha256": sha256(catalog_bytes),
                   "sample_rom_sha256": sha256(sample),
+                  "trace_sha256": sha256(trace_data) if trace_data is not None else None,
                   "sample_roms": [{"path": path.name, "sha256": sha256(data), "bytes": len(data)}
                                   for path, data in zip(args.sample_rom, physical_roms)],
                   "entries": entries}
