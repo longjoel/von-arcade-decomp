@@ -12,8 +12,8 @@ from compare_ordered_events import capture_provenance_errors, compare, context_e
 
 def main() -> int:
     original = [
-        {"seq": 1, "time": 1.0, "frame": 1, "kind": "checkpoint", "name": "reset"},
-        {"seq": 2, "time": 1.0, "frame": 1, "kind": "checkpoint", "name": "scheduler"},
+        {"seq": 1, "time": 1.0, "frame": 1, "cpu": "maincpu", "kind": "checkpoint", "name": "reset"},
+        {"seq": 2, "time": 1.0, "frame": 1, "cpu": "maincpu", "kind": "checkpoint", "name": "scheduler"},
         {"seq": 3, "time": 1.1, "frame": 2, "kind": "mmio-write", "address": "0x4d", "value": 77},
     ]
     reconstructed = copy.deepcopy(original)
@@ -24,8 +24,10 @@ def main() -> int:
     reconstructed[0]["source_line"] = 900
     assert compare(original, reconstructed)["outcome"] == "pass"
     calls = original + [
-        {"seq": 4, "kind": "indirect-call", "pc": "0x10", "target": "0x20"},
-        {"seq": 5, "kind": "indirect-call", "pc": "0x10", "target": "0x20"},
+        {"seq": 4, "time": 1.2, "frame": 2, "cpu": "maincpu", "kind": "indirect-call",
+         "pc": "0x10", "next_pc": "0x20", "target": "0x20"},
+        {"seq": 5, "time": 1.3, "frame": 2, "cpu": "maincpu", "kind": "indirect-call",
+         "pc": "0x10", "next_pc": "0x20", "target": "0x20"},
     ]
     call_report = compare(calls, copy.deepcopy(calls))
     assert call_report["confirmed_dynamic_edge_count"] == 1
@@ -123,8 +125,8 @@ def main() -> int:
         else:
             raise AssertionError("negative sequence was accepted")
         malformed.write_text(
-            '{"kind": "checkpoint", "name": "x", "seq": 1}\n'
-            '{"kind": "checkpoint", "name": "x", "seq": 1}\n',
+            '{"kind": "checkpoint", "name": "x", "time": 1.0, "frame": 1, "cpu": "maincpu", "seq": 1}\n'
+            '{"kind": "checkpoint", "name": "x", "time": 1.0, "frame": 1, "cpu": "maincpu", "seq": 1}\n',
             encoding="utf-8")
         try:
             load_events(malformed)
@@ -132,7 +134,9 @@ def main() -> int:
             assert "increase strictly" in str(error)
         else:
             raise AssertionError("duplicate sequence was accepted")
-        malformed.write_text('{"kind": "indirect-call", "seq": 1}\n', encoding="utf-8")
+        malformed.write_text(
+            '{"kind": "indirect-call", "seq": 1, "time": 1.0, "frame": 1, "cpu": "maincpu"}\n',
+            encoding="utf-8")
         try:
             load_events(malformed)
         except ValueError as error:

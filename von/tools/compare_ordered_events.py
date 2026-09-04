@@ -40,12 +40,12 @@ def load_events(path: Path) -> list[dict[str, Any]]:
 
 def validate_event_shape(event: dict[str, Any], where: str) -> None:
     required_fields = {
-        "direct-call": ("pc", "target"),
-        "indirect-call": ("pc", "target"),
-        "return": ("pc", "next_pc"),
-        "exception": ("pc",),
-        "reset": ("pc",),
-        "checkpoint": ("name",),
+        "direct-call": ("time", "frame", "cpu", "pc", "next_pc", "target"),
+        "indirect-call": ("time", "frame", "cpu", "pc", "next_pc", "target"),
+        "return": ("time", "frame", "cpu", "pc", "next_pc"),
+        "exception": ("time", "frame", "cpu", "pc"),
+        "reset": ("time", "frame", "cpu", "pc"),
+        "checkpoint": ("time", "frame", "cpu", "name"),
     }.get(event["kind"], ())
     for field in required_fields:
         if field not in event or event[field] is None or event[field] == "":
