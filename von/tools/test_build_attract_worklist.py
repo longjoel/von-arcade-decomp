@@ -73,6 +73,17 @@ def main() -> int:
         invalid = dict(coverage)
         invalid["edge_semantics"] = "executed_direct_edges"
         assert run(invalid, ledger, work).returncode != 0
+        invalid = dict(coverage)
+        invalid["possible_static_edges"] = "malformed"
+        assert run(invalid, ledger, work).returncode != 0
+        invalid = dict(coverage)
+        invalid["possible_static_edges"] = [{}]
+        assert run(invalid, ledger, work).returncode != 0
+        invalid = dict(coverage)
+        invalid["observed_entry_points"] = [True]
+        assert run(invalid, ledger, work).returncode != 0
+        invalid_ledger = {"images": {}}
+        assert run(coverage, invalid_ledger, work).returncode != 0
         over_limit = {"images": [{"name": "maincpu", "work_units": [
             {"id": "one", "stage": "modeled", "active": True},
             {"id": "two", "stage": "modeled", "active": True},

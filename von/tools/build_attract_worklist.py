@@ -13,6 +13,18 @@ def number(value: str | int) -> int:
     return int(value, 0) if isinstance(value, str) else value
 
 
+def address(value: object, label: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, (str, int)):
+        raise ValueError(f"{label} must be an address")
+    try:
+        parsed = number(value)
+    except (TypeError, ValueError) as error:
+        raise ValueError(f"{label} must be an address") from error
+    if isinstance(parsed, bool) or not isinstance(parsed, int) or parsed < 0:
+        raise ValueError(f"{label} must be a non-negative address")
+    return parsed
+
+
 def missing_dynamic_edges(comparison: dict) -> list[tuple[int, int]]:
     raw_edges = comparison.get("missing_dynamic_edges", [])
     if not isinstance(raw_edges, list):
@@ -40,6 +52,10 @@ def main() -> int:
 
     coverage = json.loads(args.coverage.read_text(encoding="utf-8"))
     ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
+    if not isinstance(coverage, dict):
+        raise SystemExit("coverage must be a JSON object")
+    if not isinstance(ledger, dict):
+        raise SystemExit("ledger must be a JSON object")
     comparison = None
     causal_edges: list[tuple[int, int]] = []
     checkpoint_distance = 0
@@ -67,12 +83,42 @@ def main() -> int:
             raise SystemExit("comparison first_divergence_index must be a non-negative integer")
     if coverage.get("tier") != "A" or coverage.get("edge_semantics") != "possible_static_edges":
         raise SystemExit("coverage must be a Tier A possible_static_edges report")
+    possible_edges = coverage.get("possible_static_edges", [])
+    if not isinstance(possible_edges, list):
+        raise SystemExit("coverage possible_static_edges must be an array")
+    for index, edge in enumerate(possible_edges):
+        if not isinstance(edge, dict):
+            raise SystemExit(f"coverage possible_static_edges[{index}] must be an object")
+        try:
+            address(edge.get("target"), f"coverage possible_static_edges[{index}].target")
+        except ValueError as error:
+            raise SystemExit(str(error)) from error
+    observed_entries = coverage.get("observed_entry_points", [])
+    if not isinstance(observed_entries, list):
+        raise SystemExit("coverage observed_entry_points must be an array")
+    try:
+        observed_addresses = {
+            address(value, f"coverage observed_entry_points[{index}]")
+            for index, value in enumerate(observed_entries)
+        }
+    except ValueError as error:
+        raise SystemExit(str(error)) from error
+    images = ledger.get("images", [])
+    if not isinstance(images, list):
+        raise SystemExit("ledger images must be an array")
     work_units = []
     milestone_units = {}
-    for image in ledger.get("images", []):
+    for image_index, image in enumerate(images):
+        if not isinstance(image, dict):
+            raise SystemExit(f"ledger images[{image_index}] must be an object")
         if image.get("name") != "maincpu":
             continue
-        for entry in image.get("work_units", []):
+        image_work_units = image.get("work_units", [])
+        if not isinstance(image_work_units, list):
+            raise SystemExit("ledger maincpu work_units must be an array")
+        for entry_index, entry in enumerate(image_work_units):
+            if not isinstance(entry, dict):
+                raise SystemExit(f"ledger maincpu work_units[{entry_index}] must be an object")
             milestone = entry.get("milestones", {}).get("c-only-i960-attract-60s", {})
             for target in milestone.get("entries", []):
                 milestone_units[number(target)] = entry
@@ -81,10 +127,9 @@ def main() -> int:
             for semantic_range in entry.get("ranges", []):
                 work_units.append((number(semantic_range["start"]), number(semantic_range["end"]), entry))
 
-    edge_counts = Counter(
-        number(edge["target"]) for edge in coverage.get("possible_static_edges", [])
-    )
-    tier_a_targets = {number(target) for target in coverage.get("observed_entry_points", [])}
+    edge_counts = Counter(address(edge["target"], "coverage possible_static_edges.target")
+                          for edge in possible_edges)
+    tier_a_targets = observed_addresses
     candidate_targets = set(tier_a_targets)
     if comparison is not None:
         candidate_targets.update(callee for _, callee in causal_edges)
