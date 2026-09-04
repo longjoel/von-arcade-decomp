@@ -64,6 +64,14 @@ def main() -> int:
         broken = copy.deepcopy(pack)
         broken["basis"]["romset_hash"] = "0" * 64
         assert any("romset_hash" in error for error in validate(broken, evidence, root, rom_manifest))
+        linked_rom_manifest = root / "linked-rom-manifest.json"
+        linked_rom_manifest.symlink_to(rom_manifest)
+        assert any("missing ROM manifest" in error for error in validate(
+            pack, evidence, root, linked_rom_manifest))
+        outside_rom_manifest = root.parent / "outside-rom-manifest.json"
+        outside_rom_manifest.write_text('{"rom":"outside"}\n', encoding="utf-8")
+        assert any("escapes pack root" in error for error in validate(
+            pack, evidence, root, outside_rom_manifest))
         broken["basis"]["romset_hash"] = "rom"
         assert any("must be a SHA-256" in error for error in validate(broken, evidence, root))
         pack["basis"]["romset_hash"] = "a" * 64

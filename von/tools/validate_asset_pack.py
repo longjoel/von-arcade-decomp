@@ -75,10 +75,15 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
     if expected_map_revision is not None and basis.get("map_revision") != expected_map_revision:
         errors.append("basis.map_revision does not match expected map revision")
     if rom_manifest is not None:
-        if not rom_manifest.is_file():
+        try:
+            rom_manifest.resolve().relative_to(root.resolve())
+        except (OSError, RuntimeError, ValueError):
+            errors.append(f"ROM manifest escapes pack root: {rom_manifest}")
+        if rom_manifest.is_symlink() or not rom_manifest.is_file():
             errors.append(f"missing ROM manifest {rom_manifest}")
-        elif basis.get("romset_hash") != sha256(rom_manifest):
-            errors.append("basis.romset_hash does not match ROM manifest")
+        elif not any("escapes pack root" in error for error in errors):
+            if basis.get("romset_hash") != sha256(rom_manifest):
+                errors.append("basis.romset_hash does not match ROM manifest")
     evidence_entries = evidence.get("entries", [])
     if not isinstance(evidence_entries, list):
         errors.append("evidence entries must be an array")
