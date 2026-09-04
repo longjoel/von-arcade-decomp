@@ -117,14 +117,16 @@ def load_provenance(manifest_path: Path, root: Path, source: Path) -> dict[str, 
     except ValueError as error:
         raise ValueError("trace source escapes capture root") from error
     artifacts = manifest.get("artifacts", [])
-    artifact_paths = {item.get("path") for item in artifacts if isinstance(item, dict)}
-    if source_relative not in artifact_paths:
+    artifact = next((item for item in artifacts
+                     if isinstance(item, dict) and item.get("path") == source_relative), None)
+    if artifact is None:
         raise ValueError(f"trace source is not declared as a capture artifact: {source_relative}")
     return {
         "capture_id": manifest["id"],
         "objective": manifest["objective"],
         "stimulus": manifest["stimulus"],
         "artifact": source_relative,
+        "artifact_sha256": artifact.get("sha256"),
     }
 
 

@@ -45,6 +45,7 @@ def main() -> int:
         manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
         provenance = load_provenance(manifest_path, root, artifact_path)
         assert provenance["capture_id"] == "fixture-v1"
+        assert provenance["artifact_sha256"] == manifest["artifacts"][0]["sha256"]
         try:
             load_provenance(manifest_path, root, root / "unlisted.ndjson")
         except ValueError as error:
