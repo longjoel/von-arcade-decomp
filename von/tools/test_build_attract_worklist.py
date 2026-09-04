@@ -14,16 +14,23 @@ ROOT = Path(__file__).resolve().parents[2]
 TOOL = ROOT / "von/tools/build_attract_worklist.py"
 
 
-def run(coverage: dict, ledger: dict, work: Path) -> subprocess.CompletedProcess[str]:
+def run(coverage: dict, ledger: dict, work: Path,
+        comparison: dict | None = None) -> subprocess.CompletedProcess[str]:
     coverage_path = work / "coverage.json"
     ledger_path = work / "ledger.json"
     output_path = work / "worklist.json"
     markdown_path = work / "worklist.md"
     coverage_path.write_text(json.dumps(coverage), encoding="utf-8")
     ledger_path.write_text(json.dumps(ledger), encoding="utf-8")
+    comparison_path = work / "comparison.json"
+    if comparison is not None:
+        comparison_path.write_text(json.dumps(comparison), encoding="utf-8")
+    command = [sys.executable, str(TOOL), "--coverage", str(coverage_path), "--ledger", str(ledger_path),
+               "--json", str(output_path), "--markdown", str(markdown_path)]
+    if comparison is not None:
+        command.extend(["--comparison", str(comparison_path)])
     return subprocess.run(
-        [sys.executable, str(TOOL), "--coverage", str(coverage_path), "--ledger", str(ledger_path),
-         "--json", str(output_path), "--markdown", str(markdown_path)],
+        command,
         cwd=ROOT, capture_output=True, text=True, check=False,
     )
 
@@ -44,6 +51,17 @@ def main() -> int:
         assert output["active_modeled_units"] == []
         assert output["units"][0]["possible_static_edges"] == 1
         assert "observed_call_edges" not in output["units"][0]
+        comparison = {"missing_dynamic_edges": [["0x200", "0x100"], ["0x300", "0x400"]],
+                      "missed_checkpoints": ["scheduler"]}
+        result = run(coverage, ledger, work, comparison)
+        assert result.returncode == 0, result.stderr
+        causal = json.loads((work / "worklist.json").read_text(encoding="utf-8"))
+        assert causal["missing_dynamic_edge_count"] == 2
+        assert causal["missed_checkpoints"] == ["scheduler"]
+        assert causal["units"][0]["causal_priority"] == 0
+        assert causal["units"][0]["dynamic_dependencies"] == [["0x00000200", "0x00000100"]]
+        invalid_comparison = {"missing_dynamic_edges": ["malformed"]}
+        assert run(coverage, ledger, work, invalid_comparison).returncode != 0
         invalid = dict(coverage)
         invalid["edge_semantics"] = "executed_direct_edges"
         assert run(invalid, ledger, work).returncode != 0

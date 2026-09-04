@@ -13,16 +13,43 @@ def number(value: str | int) -> int:
     return int(value, 0) if isinstance(value, str) else value
 
 
+def missing_dynamic_edges(comparison: dict) -> list[tuple[int, int]]:
+    raw_edges = comparison.get("missing_dynamic_edges", [])
+    if not isinstance(raw_edges, list):
+        raise ValueError("comparison missing_dynamic_edges must be an array")
+    edges = []
+    for index, edge in enumerate(raw_edges):
+        if not isinstance(edge, list) or len(edge) != 2:
+            raise ValueError(f"comparison missing_dynamic_edges[{index}] must be a caller/target pair")
+        try:
+            edges.append((number(edge[0]), number(edge[1])))
+        except (TypeError, ValueError) as error:
+            raise ValueError(f"comparison missing_dynamic_edges[{index}] must contain addresses") from error
+    return edges
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--coverage", required=True, type=Path)
     parser.add_argument("--ledger", required=True, type=Path)
+    parser.add_argument("--comparison", type=Path,
+                        help="optional ordered comparison used for causal prioritization")
     parser.add_argument("--json", required=True, type=Path)
     parser.add_argument("--markdown", required=True, type=Path)
     args = parser.parse_args()
 
     coverage = json.loads(args.coverage.read_text(encoding="utf-8"))
     ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
+    comparison = None
+    causal_edges: list[tuple[int, int]] = []
+    if args.comparison:
+        comparison = json.loads(args.comparison.read_text(encoding="utf-8"))
+        if not isinstance(comparison, dict):
+            raise SystemExit("comparison must be a JSON object")
+        try:
+            causal_edges = missing_dynamic_edges(comparison)
+        except ValueError as error:
+            raise SystemExit(str(error)) from error
     if coverage.get("tier") != "A" or coverage.get("edge_semantics") != "possible_static_edges":
         raise SystemExit("coverage must be a Tier A possible_static_edges report")
     work_units = []
@@ -50,10 +77,14 @@ def main() -> int:
         matched = milestone_units.get(target)
         stage = matched.get("stage") if matched else None
         represented = stage in {"modeled", "integrated", "trace-validated", "byte-validated"}
+        dependencies = [[f"0x{caller:08x}", f"0x{callee:08x}"]
+                        for caller, callee in causal_edges if callee == target]
         units.append(
             {
                 "entry": f"0x{target:08x}",
                 "possible_static_edges": edge_counts[target],
+                "dynamic_dependencies": dependencies,
+                "causal_priority": 0 if dependencies else 1,
                 "triage": "modeled-integration-queue" if stage == "modeled" else ("integrated-validation-queue" if represented else "untriaged"),
                 "stage": stage or "planned",
                 "priority": 0 if stage == "modeled" else (1 if represented else 2),
@@ -63,7 +94,9 @@ def main() -> int:
             }
         )
 
-    units.sort(key=lambda unit: (unit["priority"], number(unit["entry"])))
+    units.sort(key=lambda unit: ((unit["causal_priority"], unit["priority"], number(unit["entry"]))
+                                 if comparison is not None else
+                                 (unit["priority"], number(unit["entry"]))))
     represented_count = sum(unit["priority"] < 2 for unit in units)
     modeled_count = sum(unit["stage"] == "modeled" for unit in units)
     integrated_count = sum(unit["stage"] in {"integrated", "trace-validated", "byte-validated"} for unit in units)
@@ -86,9 +119,15 @@ def main() -> int:
         "untriaged_units": len(units) - represented_count,
         "modeled_wip_limit": 1,
         "active_modeled_units": active_modeled,
-        "ordering": "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality",
+        "ordering": ("causal dynamic dependencies first, then modeled integration queue, then integrated validation, then untriaged"
+                     if comparison is not None else
+                     "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality"),
         "units": units,
     }
+    if comparison is not None:
+        output["comparison_source"] = str(args.comparison)
+        output["missing_dynamic_edge_count"] = len(causal_edges)
+        output["missed_checkpoints"] = comparison.get("missed_checkpoints", [])
     args.json.parent.mkdir(parents=True, exist_ok=True)
     args.json.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
 
