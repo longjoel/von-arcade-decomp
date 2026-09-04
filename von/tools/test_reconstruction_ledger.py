@@ -69,7 +69,7 @@ def main() -> int:
         ]}],
     }
     manifest = {"entries": [{"id": "capture-v1", "canonical": True, "verifier": "verify.py", "outcome": "pass",
-                              "consumers": ["trace", "bytes"]}]}
+                              "checkpoints": ["startup"], "consumers": ["trace", "bytes"]}]}
     assert not validate_lifecycle(lifecycle, manifest)
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][1]["active"] = True
@@ -97,6 +97,10 @@ def main() -> int:
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][3]["integration"].pop("test")
     assert any("trace-validated requires integration.test" in error
+               for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][3]["integration"]["checkpoint"] = "other"
+    assert any("does not declare integration checkpoint" in error
                for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
     del broken["images"][0]["work_units"][2]["integration"]["image"]

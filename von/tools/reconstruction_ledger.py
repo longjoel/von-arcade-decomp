@@ -84,6 +84,13 @@ def validate_lifecycle(
         elif not existing_reference(test):
             errors.append(f"{where}: missing integration test {test}")
 
+    def validate_evidence_checkpoint(where: str, unit: dict[str, Any],
+                                     evidence_entry: dict[str, Any]) -> None:
+        checkpoint = unit.get("integration", {}).get("checkpoint")
+        checkpoints = evidence_entry.get("checkpoints")
+        if not isinstance(checkpoints, list) or checkpoint not in checkpoints:
+            errors.append(f"{where}: canonical evidence does not declare integration checkpoint")
+
     active_modeled: list[str] = []
     manifest_entries = manifest.get("entries", []) if isinstance(manifest, dict) else []
     manifest_ids: set[str] = set()
@@ -141,6 +148,8 @@ def validate_lifecycle(
                 if (isinstance(evidence_id, str) and evidence_id in canonical_ids
                         and registered_entry.get("outcome") != "pass"):
                     errors.append(f"{where}: canonical evidence outcome must be pass")
+                if isinstance(evidence_id, str) and evidence_id in canonical_ids:
+                    validate_evidence_checkpoint(where, unit, registered_entry)
                 verification = unit.get("verification")
                 if not isinstance(verification, dict) or verification.get("result") != "pass":
                     errors.append(f"{where}: trace-validated requires verification.result=pass")
@@ -158,6 +167,7 @@ def validate_lifecycle(
                         errors.append(f"{where}: byte-validated requires passing canonical evidence")
                     if unit.get("id") not in registered_entry.get("consumers", []):
                         errors.append(f"{where}: canonical evidence does not name this byte-validation consumer")
+                    validate_evidence_checkpoint(where, unit, registered_entry)
                     if registered_entry.get("verifier") != unit.get("verifier"):
                         errors.append(f"{where}: verifier differs from canonical evidence entry")
                 verifier = unit.get("verifier")
