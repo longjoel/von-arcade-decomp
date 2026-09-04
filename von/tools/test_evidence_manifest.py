@@ -5,11 +5,16 @@ from __future__ import annotations
 
 import json
 import hashlib
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 from capture_manifest import directory_sha256, entry
 from evidence_manifest import validate
+
+
+TOOL = Path(__file__).resolve().parent / "evidence_manifest.py"
 
 
 def main() -> int:
@@ -174,6 +179,26 @@ def main() -> int:
         stale_hash["entries"][0]["capture_manifest_sha256"] = "0" * 64
         assert any("capture manifest hash mismatch" in error for error in validate(
             stale_hash, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
+    with tempfile.TemporaryDirectory(dir=root) as directory:
+        temp = Path(directory)
+        linked_manifest = temp / "linked-manifest.json"
+        linked_manifest.symlink_to(root / "von/evidence/manifest.json")
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--manifest", str(linked_manifest),
+             "--ledger", str(root / "von/reconstruction_ledger.json")],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "manifest path must not be a symlink" in cli_result.stdout
+        malformed_ledger = temp / "malformed-ledger.json"
+        malformed_ledger.write_text("{invalid\n", encoding="utf-8")
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--manifest", str(root / "von/evidence/manifest.json"),
+             "--ledger", str(malformed_ledger)],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "unable to read validation document" in cli_result.stdout
     print("PASS: canonical evidence manifest contract")
     return 0
 

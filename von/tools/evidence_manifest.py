@@ -219,8 +219,24 @@ def main() -> int:
     parser.add_argument("--run-verifiers", action="store_true")
     args = parser.parse_args()
     root = Path.cwd()
-    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-    ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
+    for label, path in (("manifest", args.manifest), ("ledger", args.ledger)):
+        if path.is_symlink():
+            print(f"Evidence validation: {label} path must not be a symlink")
+            return 1
+        try:
+            path.resolve().relative_to(root.resolve())
+        except (OSError, RuntimeError, ValueError):
+            print(f"Evidence validation: {label} path escapes root: {path}")
+            return 1
+        if not path.is_file():
+            print(f"Evidence validation: missing {label}: {path}")
+            return 1
+    try:
+        manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+        ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as error:
+        print(f"Evidence validation: unable to read validation document: {error}")
+        return 1
     errors = validate(manifest, ledger, root)
     if errors:
         print(f"Evidence validation: {len(errors)} error(s)")
