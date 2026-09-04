@@ -60,6 +60,13 @@ def main() -> int:
                          "outcome": "pass", "consumers": ["unit"]}],
         }
         assert not validate(runtime, {"images": [{"work_units": [{"id": "unit"}]}]}, temp)
+        outside = temp.parent / "outside-evidence-fixture.json"
+        outside.write_text("{}\n", encoding="utf-8")
+        (temp / "linked-capture.json").symlink_to(outside)
+        escaped = json.loads(json.dumps(runtime))
+        escaped["entries"][0]["capture_manifest"] = "linked-capture.json"
+        assert any("missing capture manifest" in error for error in validate(
+            escaped, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
         mismatched = json.loads(json.dumps(runtime))
         mismatched["entries"][0]["stimulus"]["kind"] = "causal-trace"
         assert any("stimulus kind" in error for error in validate(

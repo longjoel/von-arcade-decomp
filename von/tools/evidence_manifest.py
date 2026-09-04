@@ -18,6 +18,17 @@ def safe_path(path_text: object) -> bool:
     return not path.is_absolute() and ".." not in path.parts
 
 
+def rooted(root: Path, path_text: object) -> Path | None:
+    if not safe_path(path_text):
+        return None
+    candidate = root / path_text
+    try:
+        candidate.resolve().relative_to(root.resolve())
+    except ValueError:
+        return None
+    return candidate
+
+
 def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
     errors: list[str] = []
     unit_ids = {
@@ -51,8 +62,8 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
             if not safe_path(sidecar):
                 errors.append(f"{where}: runtime evidence requires capture_manifest")
             else:
-                sidecar_path = root / sidecar
-                if not sidecar_path.is_file():
+                sidecar_path = rooted(root, sidecar)
+                if sidecar_path is None or not sidecar_path.is_file():
                     errors.append(f"{where}: missing capture manifest {sidecar}")
                 else:
                     try:
@@ -92,7 +103,8 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
         if entry.get("outcome") != "pass":
             errors.append(f"{where}: canonical outcome must be pass")
         verifier = entry.get("verifier")
-        if not safe_path(verifier) or not (root / verifier).is_file():
+        verifier_path = rooted(root, verifier)
+        if verifier_path is None or not verifier_path.is_file():
             errors.append(f"{where}: verifier is missing")
         consumers = entry.get("consumers", [])
         if (not isinstance(consumers, list) or not consumers
@@ -106,7 +118,10 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
             if not isinstance(artifact, dict) or not safe_path(artifact.get("path")):
                 errors.append(f"{where}: invalid artifact path")
                 continue
-            path = root / artifact["path"]
+            path = rooted(root, artifact["path"])
+            if path is None:
+                errors.append(f"{where}: invalid artifact path")
+                continue
             if not path.is_file():
                 errors.append(f"{where}: missing artifact {artifact.get('path')}")
                 continue
