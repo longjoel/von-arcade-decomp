@@ -114,6 +114,13 @@ def validate_lifecycle(
             errors.append(f"{where}: canonical evidence does not declare integration checkpoint")
 
     active_modeled: list[str] = []
+    ledger_unit_ids = {
+        unit.get("id")
+        for image in images if isinstance(image, dict)
+        for unit in image.get("work_units", [])
+        if isinstance(image.get("work_units", []), list)
+        and isinstance(unit, dict) and isinstance(unit.get("id"), str) and unit.get("id")
+    }
     manifest_entries = manifest.get("entries", []) if isinstance(manifest, dict) else []
     manifest_ids: set[str] = set()
     if isinstance(manifest_entries, list):
@@ -134,6 +141,12 @@ def validate_lifecycle(
                     errors.append(f"manifest.entries[{index}]: canonical consumers must be a non-empty string array")
                 elif len(set(consumers)) != len(consumers):
                     errors.append(f"manifest.entries[{index}]: canonical consumers must be unique")
+                else:
+                    unknown_consumers = sorted(set(consumers) - ledger_unit_ids)
+                    if unknown_consumers:
+                        errors.append(
+                            f"manifest.entries[{index}]: canonical consumers are unknown: "
+                            + ", ".join(unknown_consumers))
     canonical_entries = {
         entry.get("id"): entry
         for entry in manifest_entries
