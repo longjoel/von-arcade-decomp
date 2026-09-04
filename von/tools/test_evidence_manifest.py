@@ -16,6 +16,9 @@ def main() -> int:
     root = Path.cwd()
     assert any("ledger must be an object" in error
                for error in validate({"schema_version": 1, "entries": []}, [], root))
+    assert not any("Traceback" in error for error in validate(
+        {"schema_version": 1, "entries": []},
+        {"images": [{"work_units": {}}]}, root))
     manifest = json.loads((root / "von/evidence/manifest.json").read_text(encoding="utf-8"))
     ledger = json.loads((root / "von/reconstruction_ledger.json").read_text(encoding="utf-8"))
     assert not validate(manifest, ledger, root)

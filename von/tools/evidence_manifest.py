@@ -46,7 +46,7 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
         errors.append("schema_version must be 1")
     unit_ids = {
         unit.get("id") for image in images if isinstance(image, dict)
-        for unit in image.get("work_units", [])
+        for unit in image.get("work_units", []) if isinstance(image.get("work_units", []), list)
         if isinstance(unit, dict) and isinstance(unit.get("id"), str)
     }
     ids: set[str] = set()

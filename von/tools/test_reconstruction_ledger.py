@@ -20,6 +20,11 @@ def main() -> int:
                for error in validate({"schema_version": 2, "images": {}}, Path.cwd()))
     assert any("ledger must be an object" in error
                for error in validate_lifecycle([], {"entries": []}))
+    malformed_shape = {"schema_version": 2, "images": [{"name": "maincpu", "work_units": {}}]}
+    assert any("work_units must be an array" in error for error in validate(malformed_shape))
+    malformed_shape["images"][0]["work_units"] = [{"id": "unit", "classification": "code",
+                                                     "stage": "planned", "sources": [], "ranges": {}}]
+    assert any("ranges must be an array" in error for error in validate(malformed_shape))
     old = {"schema_version": 1, "images": [{"name": "maincpu", "size": 256, "slices": [
         {"name": "outer", "start": "0x10", "end": "0x30", "classification": "code", "status": "provisional", "source": "notes.md", "evidence": []},
         {"name": "inner", "start": "0x18", "end": "0x20", "classification": "code", "status": "provisional", "source": "model.c", "evidence": ["von/i960/recovered_example.c"]},

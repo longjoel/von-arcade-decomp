@@ -145,7 +145,11 @@ def validate_lifecycle(
             errors.append("ledger images must contain objects")
             continue
         image_name = image.get("name", "?")
-        for index, unit in enumerate(image.get("work_units", [])):
+        work_units = image.get("work_units", [])
+        if not isinstance(work_units, list):
+            errors.append(f"images[{image_name}].work_units must be an array")
+            continue
+        for index, unit in enumerate(work_units):
             if not isinstance(unit, dict):
                 errors.append(f"images[{image_name}].work_units[{index}] must be an object")
                 continue
@@ -294,8 +298,15 @@ def validate(ledger: dict[str, Any], root: Path | None = None) -> list[str]:
         prefix = f"images[{image_index}]"
         size = image.get("size")
         previous_end = -1
-        for range_index, item in enumerate(image.get("physical_ranges", [])):
+        physical_ranges = image.get("physical_ranges", [])
+        if not isinstance(physical_ranges, list):
+            errors.append(f"{prefix}.physical_ranges must be an array")
+            physical_ranges = []
+        for range_index, item in enumerate(physical_ranges):
             where = f"{prefix}.physical_ranges[{range_index}]"
+            if not isinstance(item, dict):
+                errors.append(f"{where} must be an object")
+                continue
             classification = item.get("classification")
             if classification not in PHYSICAL_CLASSIFICATIONS:
                 errors.append(f"{where}: invalid physical classification {classification!r}")
@@ -313,7 +324,11 @@ def validate(ledger: dict[str, Any], root: Path | None = None) -> list[str]:
                 errors.append(f"{where}: exceeds image size")
             previous_end = max(previous_end, end)
 
-        for unit_index, unit in enumerate(image.get("work_units", [])):
+        work_units = image.get("work_units", [])
+        if not isinstance(work_units, list):
+            errors.append(f"{prefix}.work_units must be an array")
+            continue
+        for unit_index, unit in enumerate(work_units):
             where = f"{prefix}.work_units[{unit_index}]"
             unit_id = unit.get("id")
             if not isinstance(unit_id, str) or not unit_id:
@@ -332,6 +347,9 @@ def validate(ledger: dict[str, Any], root: Path | None = None) -> list[str]:
             if "source" in unit or "status" in unit:
                 errors.append(f"{where}: legacy source/status field is forbidden")
             ranges = unit.get("ranges", [])
+            if not isinstance(ranges, list):
+                errors.append(f"{where}: ranges must be an array")
+                ranges = []
             if unit.get("classification") == "behavior" and ranges:
                 errors.append(f"{where}: behavior units cannot claim physical bytes")
             for semantic_range in ranges:
