@@ -42,7 +42,7 @@ def main() -> int:
                 "unresolved_behavior": "bus timing"
             }},
             {"id": "integrated", "stage": "integrated", "integration": {
-                "checkpoint": "startup", "test": "test.py"
+                "image": "build/image.bin", "checkpoint": "startup", "test": "test.py"
             }},
             {"id": "trace", "stage": "trace-validated",
              "canonical_evidence_id": "capture-v1", "verifier": "verify.py"},
@@ -52,7 +52,8 @@ def main() -> int:
             }},
         ]}],
     }
-    manifest = {"entries": [{"id": "capture-v1", "canonical": True, "verifier": "verify.py"}]}
+    manifest = {"entries": [{"id": "capture-v1", "canonical": True, "verifier": "verify.py",
+                              "consumers": ["trace"]}]}
     assert not validate_lifecycle(lifecycle, manifest)
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][1]["active"] = True
@@ -68,11 +69,17 @@ def main() -> int:
     del broken["images"][0]["work_units"][2]["integration"]
     assert any("integrated requires" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
+    del broken["images"][0]["work_units"][2]["integration"]["image"]
+    assert any("integration.image" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][3]["canonical_evidence_id"] = "von/build/capture.log"
     assert any("canonical evidence id" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][3]["verifier"] = "other.py"
     assert any("differs from canonical" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][3]["id"] = "unregistered-consumer"
+    assert any("does not name this unit" in error for error in validate_lifecycle(broken, manifest))
     print("PASS: ledger v1 migration, schema-v2 validation, and union coverage")
     return 0
 

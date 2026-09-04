@@ -58,6 +58,8 @@ def validate_lifecycle(
                 if not isinstance(integration, dict):
                     errors.append(f"{where}: integrated requires integration evidence")
                     continue
+                if not integration.get("image"):
+                    errors.append(f"{where}: integrated requires integration.image")
                 if not integration.get("checkpoint"):
                     errors.append(f"{where}: integrated requires integration.checkpoint")
                 test = integration.get("test")
@@ -77,6 +79,9 @@ def validate_lifecycle(
                 registered_verifier = canonical_entries.get(evidence_id, {}).get("verifier")
                 if registered_verifier and registered_verifier != verifier:
                     errors.append(f"{where}: verifier differs from canonical evidence entry")
+                consumers = canonical_entries.get(evidence_id, {}).get("consumers", [])
+                if evidence_id in canonical_ids and unit.get("id") not in consumers:
+                    errors.append(f"{where}: canonical evidence does not name this unit as a consumer")
             elif stage == "byte-validated":
                 comparison = unit.get("byte_validation")
                 if not isinstance(comparison, dict) or not comparison.get("original_range"):
