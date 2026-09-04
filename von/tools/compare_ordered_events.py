@@ -56,6 +56,11 @@ def validate_event_shape(event: dict[str, Any], where: str) -> None:
         "exception": ("time", "frame", "cpu", "pc"),
         "reset": ("time", "frame", "cpu", "pc"),
         "checkpoint": ("time", "frame", "cpu", "name"),
+        "watched-ram-write": ("time", "frame", "cpu", "address", "value"),
+        "mmio-read": ("time", "frame", "cpu", "address", "value"),
+        "mmio-write": ("time", "frame", "cpu", "address", "value"),
+        "command": ("time", "frame", "cpu", "address", "value"),
+        "fifo-submission": ("time", "frame", "cpu", "address", "value"),
     }.get(event["kind"], ())
     for field in required_fields:
         if field not in event or event[field] is None or event[field] == "":

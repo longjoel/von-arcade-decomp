@@ -25,7 +25,7 @@ def main() -> int:
     original = [
         {"seq": 1, "time": 1.0, "frame": 1, "cpu": "maincpu", "kind": "checkpoint", "name": "reset"},
         {"seq": 2, "time": 1.0, "frame": 1, "cpu": "maincpu", "kind": "checkpoint", "name": "scheduler"},
-        {"seq": 3, "time": 1.1, "frame": 2, "kind": "mmio-write", "address": "0x4d", "value": 77},
+        {"seq": 3, "time": 1.1, "frame": 2, "cpu": "maincpu", "kind": "mmio-write", "address": "0x4d", "value": 77},
     ]
     reconstructed = copy.deepcopy(original)
     reconstructed[0]["seq"] = 100
@@ -172,6 +172,15 @@ def main() -> int:
             assert "frame must be a non-negative integer" in str(error)
         else:
             raise AssertionError("boolean checkpoint frame was accepted")
+        malformed.write_text(
+            '{"kind": "mmio-write", "seq": 1, "time": 1.0, "frame": 1, '
+            '"cpu": "maincpu", "address": "0x4d"}\n', encoding="utf-8")
+        try:
+            load_events(malformed)
+        except ValueError as error:
+            assert "mmio-write requires value" in str(error)
+        else:
+            raise AssertionError("incomplete MMIO event was accepted")
         compressed_original = Path(directory) / "original.ndjson.gz"
         compressed_reconstructed = Path(directory) / "reconstructed.ndjson.gz"
         payload = ('{"seq": 1, "time": 1.0, "frame": 1, "cpu": "maincpu", '
