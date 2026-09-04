@@ -129,14 +129,17 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
             except (OSError, json.JSONDecodeError) as exc:
                 errors.append(f"unable to read coverage report: {exc}")
             else:
-                if report.get("capture_id") != manifest.get("id"):
+                if not isinstance(report, dict):
+                    errors.append("coverage report must be an object")
+                elif report.get("capture_id") != manifest.get("id"):
                     errors.append("coverage report capture_id does not match sidecar id")
-                if report.get("tier") != "A":
+                if isinstance(report, dict) and report.get("tier") != "A":
                     errors.append("coverage report must be Tier A")
-                if report.get("edge_semantics") != "possible_static_edges":
+                if isinstance(report, dict) and report.get("edge_semantics") != "possible_static_edges":
                     errors.append("coverage report must use possible_static_edges semantics")
                 expected_phase = stimulus.get("phase")
-                if report.get("phase") is not None and report.get("phase") != expected_phase:
+                if (isinstance(report, dict) and report.get("phase") is not None
+                        and report.get("phase") != expected_phase):
                     errors.append("coverage report phase does not match sidecar stimulus phase")
     isolation = manifest.get("isolation", {})
     if not isinstance(isolation, dict):

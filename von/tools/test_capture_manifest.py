@@ -83,6 +83,8 @@ def main() -> int:
         broken["coverage_report"] = "coverage.json"
         report_path.write_text('{"capture_id": "other", "tier": "A"}\n', encoding="utf-8")
         assert any("capture_id" in error for error in validate(broken, root))
+        report_path.write_text('[]\n', encoding="utf-8")
+        assert any("coverage report must be an object" in error for error in validate(manifest, root))
         report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "executed_edges"}\n', encoding="utf-8")
         assert any("possible_static_edges" in error for error in validate(manifest, root))
         report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "possible_static_edges", "phase": "stable-attract"}\n', encoding="utf-8")
