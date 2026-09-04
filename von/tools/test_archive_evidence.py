@@ -52,6 +52,16 @@ def main() -> int:
         )
         assert poisoned.returncode != 0
         assert "payload mismatch" in poisoned.stderr
+        linked_archive = root / "linked-archive"
+        linked_archive.mkdir()
+        linked_target = linked_archive / f"{digest}.gz"
+        linked_target.symlink_to(target)
+        linked = subprocess.run(
+            [sys.executable, str(TOOL), str(source), "--archive", str(linked_archive)],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert linked.returncode != 0
+        assert "must not be a symlink" in linked.stderr
         wrong_target = archive / "not-content-addressed.gz"
         wrong_target.write_bytes(target.read_bytes())
         wrong_name = json.loads(json.dumps(record))
@@ -63,6 +73,12 @@ def main() -> int:
         malformed = {"schema_version": 1, "source": [], "archive": {}}
         assert any("source metadata must be an object" in error
                    for error in validate_metadata(malformed))
+        linked_source = root / "linked-source.ndjson"
+        linked_source.symlink_to(source)
+        linked_metadata = json.loads(json.dumps(record))
+        linked_metadata["source"]["path"] = str(linked_source)
+        assert any("source file must not be a symlink" in error
+                   for error in validate_metadata(linked_metadata))
     print("PASS: evidence archive emits reproducible source and blob metadata")
     return 0
 

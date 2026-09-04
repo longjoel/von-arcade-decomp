@@ -37,6 +37,9 @@ def validate_metadata(metadata: dict[str, Any]) -> list[str]:
             errors.append(f"missing {section} file {path_text}")
             continue
         path = Path(path_text)
+        if path.is_symlink():
+            errors.append(f"{section} file must not be a symlink")
+            continue
         if not path.is_file():
             errors.append(f"missing {section} file {item.get('path')}")
             continue
@@ -74,6 +77,9 @@ def main() -> int:
     digest = hashlib.sha256(payload).hexdigest()
     args.archive.mkdir(parents=True, exist_ok=True)
     target = args.archive / f"{digest}.gz"
+    if target.is_symlink():
+        print("Evidence archive: digest target must not be a symlink", file=sys.stderr)
+        return 1
     if target.exists():
         try:
             with gzip.open(target, "rb") as stream:
