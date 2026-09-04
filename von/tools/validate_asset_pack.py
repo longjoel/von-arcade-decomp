@@ -216,13 +216,29 @@ def main() -> int:
     parser.add_argument("--map-revision",
                         help="optional expected map revision")
     args = parser.parse_args()
-    for label, path in (("asset pack", args.manifest), ("evidence manifest", args.evidence_manifest)):
+    root = args.root.resolve()
+    paths = [("asset pack", args.manifest), ("evidence manifest", args.evidence_manifest)]
+    if args.rom_manifest:
+        paths.append(("ROM manifest", args.rom_manifest))
+    for label, path in paths:
         if path.is_symlink():
             print(f"Asset pack validation: {label} path must not be a symlink")
             return 1
-    pack = json.loads(args.manifest.read_text(encoding="utf-8"))
-    evidence = json.loads(args.evidence_manifest.read_text(encoding="utf-8"))
-    errors = validate(pack, evidence, args.root, args.rom_manifest,
+        try:
+            path.resolve().relative_to(root)
+        except (OSError, RuntimeError, ValueError):
+            print(f"Asset pack validation: {label} path escapes root: {path}")
+            return 1
+        if not path.is_file():
+            print(f"Asset pack validation: missing {label}: {path}")
+            return 1
+    try:
+        pack = json.loads(args.manifest.read_text(encoding="utf-8"))
+        evidence = json.loads(args.evidence_manifest.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as error:
+        print(f"Asset pack validation: unable to read validation document: {error}")
+        return 1
+    errors = validate(pack, evidence, root, args.rom_manifest,
                       args.tool_revision, args.map_revision)
     if errors:
         for error in errors:

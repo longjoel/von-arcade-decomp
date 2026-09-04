@@ -162,6 +162,24 @@ def main() -> int:
         )
         assert cli_result.returncode != 0
         assert "asset pack path must not be a symlink" in cli_result.stdout
+        malformed_evidence = root / "malformed-evidence.json"
+        malformed_evidence.write_text("{invalid\n", encoding="utf-8")
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--manifest", str(pack_document),
+             "--evidence-manifest", str(malformed_evidence), "--root", str(root)],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode != 0
+        assert "unable to read validation document" in cli_result.stdout
+        outside_pack = root.parent / "outside-pack.json"
+        outside_pack.write_text(json.dumps(pack), encoding="utf-8")
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--manifest", str(outside_pack),
+             "--evidence-manifest", str(evidence_document), "--root", str(root)],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode != 0
+        assert "asset pack path escapes root" in cli_result.stdout
         broken = copy.deepcopy(pack)
         broken["assets"][0]["verifier_results"]["stale-verifier"] = "pass"
         assert any("passing verifier_results" in error for error in validate(broken, evidence, root))
