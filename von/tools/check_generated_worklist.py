@@ -24,7 +24,12 @@ def normalized(document: dict[str, Any]) -> dict[str, Any]:
 
 def check(coverage: Path, ledger: Path, expected: Path, root: Path,
           expected_markdown: Path | None = None) -> list[str]:
-    coverage_document = json.loads(coverage.read_text(encoding="utf-8"))
+    try:
+        coverage_document = json.loads(coverage.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        return [f"unable to read coverage JSON: {error}"]
+    if not isinstance(coverage_document, dict):
+        return [f"invalid coverage JSON object: {coverage}"]
     if coverage_document.get("tier") != "A" or coverage_document.get("edge_semantics") != "possible_static_edges":
         return [f"stale or invalid Tier A coverage: {coverage}"]
     with tempfile.TemporaryDirectory() as directory:
@@ -36,8 +41,13 @@ def check(coverage: Path, ledger: Path, expected: Path, root: Path,
         )
         if result.returncode:
             return [f"worklist generator failed: {result.stderr.strip()}"]
-        actual = json.loads(expected.read_text(encoding="utf-8"))
-        generated_json = json.loads((generated / "worklist.json").read_text(encoding="utf-8"))
+        try:
+            actual = json.loads(expected.read_text(encoding="utf-8"))
+            generated_json = json.loads((generated / "worklist.json").read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            return [f"unable to read worklist JSON: {error}"]
+        if not isinstance(actual, dict) or not isinstance(generated_json, dict):
+            return [f"invalid worklist JSON object: {expected}"]
         if normalized(actual) != normalized(generated_json):
             return [f"stale worklist JSON: {expected}"]
         if expected_markdown is not None:

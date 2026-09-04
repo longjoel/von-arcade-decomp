@@ -37,6 +37,12 @@ def main() -> int:
                        cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
         expected.write_text(expected.read_text(encoding="utf-8").replace('"schema_version": 1', '"schema_version": 9', 1), encoding="utf-8")
         assert check(coverage_path, ledger_path, expected, ROOT)
+        coverage_path.write_text("[]", encoding="utf-8")
+        assert any("coverage JSON object" in error for error in
+                   check(coverage_path, ledger_path, expected, ROOT))
+        coverage_path.write_text("{invalid", encoding="utf-8")
+        assert any("unable to read coverage JSON" in error for error in
+                   check(coverage_path, ledger_path, expected, ROOT))
     print("PASS: worklist freshness checker detects stale generated output")
     return 0
 
