@@ -147,6 +147,11 @@ def main() -> int:
         broken = copy.deepcopy(manifest)
         broken["artifacts"] = [{"path": "loop-artifact.txt", "sha256": ""}]
         assert any("missing file" in error for error in validate(broken, root))
+        local_link = root / "local-link-artifact.txt"
+        local_link.symlink_to(artifact_path)
+        broken = copy.deepcopy(manifest)
+        broken["artifacts"] = [{"path": "local-link-artifact.txt", "sha256": "0" * 64}]
+        assert any("missing file" in error for error in validate(broken, root))
         isolation_link = root / "cfg" / "linked-outside.txt"
         isolation_link.symlink_to(outside)
         broken = copy.deepcopy(manifest)

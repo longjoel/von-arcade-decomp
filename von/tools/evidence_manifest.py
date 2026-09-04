@@ -179,7 +179,7 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                     errors.append(f"{where}: file is declared in multiple sections {artifact['path']}")
                     continue
                 all_declared_paths.add(resolved_path)
-                if not path.is_file():
+                if path.is_symlink() or not path.is_file():
                     errors.append(f"{where}: missing {section[:-1]} {artifact.get('path')}")
                     continue
                 if not isinstance(artifact.get("sha256"), str) or not SHA256_RE.fullmatch(artifact["sha256"]):

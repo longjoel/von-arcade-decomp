@@ -115,6 +115,12 @@ def main() -> int:
         looped["entries"][0]["artifacts"] = [{"path": "loop-artifact.json", "sha256": "0" * 64}]
         assert any("missing artifact" in error or "invalid artifact path" in error
                    for error in validate(looped, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
+        local_link = temp / "local-link-summary.json"
+        local_link.symlink_to(summary)
+        linked_artifact = json.loads(json.dumps(runtime))
+        linked_artifact["entries"][0]["artifacts"] = [{"path": "local-link-summary.json", "sha256": "0" * 64}]
+        assert any("missing artifact" in error for error in validate(
+            linked_artifact, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
         mismatched = json.loads(json.dumps(runtime))
         mismatched["entries"][0]["stimulus"]["kind"] = "causal-trace"
         assert any("stimulus kind" in error for error in validate(

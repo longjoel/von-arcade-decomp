@@ -199,7 +199,7 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
                 continue
             path_text = item.get("path")
             path = rooted(root, path_text)
-            if path is None or not path.is_file():
+            if path is None or path.is_symlink() or not path.is_file():
                 errors.append(f"{section}[{index}]: missing file {path_text}")
                 continue
             try:

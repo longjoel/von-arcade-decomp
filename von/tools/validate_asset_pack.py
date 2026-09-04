@@ -136,7 +136,7 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
             errors.append(f"{where}: invalid status {status!r}")
         payload_text = asset.get("payload")
         payload = rooted(root, payload_text)
-        if payload is None or not payload.is_file():
+        if payload is None or payload.is_symlink() or not payload.is_file():
             errors.append(f"{where}: missing payload {asset.get('payload')}")
         else:
             try:
