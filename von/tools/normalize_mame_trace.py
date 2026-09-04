@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import hashlib
 import json
 import re
 from collections import Counter
@@ -139,6 +140,8 @@ def summary(events: list[dict], source: Path, max_events: int | None = None,
 
 def load_provenance(manifest_path: Path, root: Path, source: Path) -> dict[str, Any]:
     """Validate and bind the normalized source to a canonical capture sidecar."""
+    if source.is_symlink():
+        raise ValueError(f"trace source must not be a symlink: {source}")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     errors = validate_capture(manifest, root)
     if errors:
@@ -152,12 +155,18 @@ def load_provenance(manifest_path: Path, root: Path, source: Path) -> dict[str, 
                      if isinstance(item, dict) and item.get("path") == source_relative), None)
     if artifact is None:
         raise ValueError(f"trace source is not declared as a capture artifact: {source_relative}")
+    if not source.is_file():
+        raise ValueError(f"trace source is missing: {source}")
+    artifact_digest = artifact.get("sha256")
+    if not isinstance(artifact_digest, str) or artifact_digest != hashlib.sha256(
+            source.read_bytes()).hexdigest():
+        raise ValueError(f"trace source artifact hash mismatch: {source_relative}")
     return {
         "capture_id": manifest["id"],
         "objective": manifest["objective"],
         "stimulus": manifest["stimulus"],
         "artifact": source_relative,
-        "artifact_sha256": artifact.get("sha256"),
+        "artifact_sha256": artifact_digest,
     }
 
 

@@ -49,6 +49,14 @@ def main() -> int:
         provenance = load_provenance(manifest_path, root, artifact_path)
         assert provenance["capture_id"] == "fixture-v1"
         assert provenance["artifact_sha256"] == manifest["artifacts"][0]["sha256"]
+        linked_trace = root / "linked-events.ndjson"
+        linked_trace.symlink_to(artifact_path)
+        try:
+            load_provenance(manifest_path, root, linked_trace)
+        except ValueError as error:
+            assert "must not be a symlink" in str(error)
+        else:
+            raise AssertionError("symlinked trace provenance was accepted")
         try:
             load_provenance(manifest_path, root, root / "unlisted.ndjson")
         except ValueError as error:
