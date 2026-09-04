@@ -2193,6 +2193,12 @@ ensure_function(0x00075424, "match_phase_selector_arm_3", 0x0007542c)
 ensure_function(0x0007542c, "match_phase_selector_arm_4", 0x00075434)
 ensure_function(0x00075434, "match_phase_selector_arm_5", 0x00075450)
 ensure_function(0x00075450, "match_phase_substate_dispatch", 0x00075474)
+ensure_function(0x000754ac, "match_phase_substate_arm_0", 0x000754b4)
+ensure_function(0x000754b4, "match_phase_substate_arm_1", 0x000754bc)
+ensure_function(0x000754bc, "match_phase_substate_arm_2", 0x000754c4)
+ensure_function(0x000754c4, "match_phase_substate_arm_3", 0x000754cc)
+ensure_function(0x000754cc, "match_phase_substate_arm_4", 0x000754e4)
+ensure_function(0x000754e4, "match_phase_substate_default", 0x000754e8)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2464,6 +2470,18 @@ label(0x00075434, "match_phase_selector_arm_5",
       "Nested phase-table arm: selects status value 17 and joins the common phase continuation.")
 label(0x00075450, "match_phase_substate_dispatch",
       "Normalizes the nested phase/substate index and dispatches through the 13-entry table at 0x75474.")
+label(0x000754ac, "match_phase_substate_arm_0",
+      "Substate-table arm: selects phase value 5 and joins the shared phase continuation.")
+label(0x000754b4, "match_phase_substate_arm_1",
+      "Substate-table arm: selects phase value 1 and joins the shared phase continuation.")
+label(0x000754bc, "match_phase_substate_arm_2",
+      "Substate-table arm: selects phase value 8 and joins the shared phase continuation.")
+label(0x000754c4, "match_phase_substate_arm_3",
+      "Substate-table arm: selects phase value 14 and joins the shared phase continuation.")
+label(0x000754cc, "match_phase_substate_arm_4",
+      "Substate-table arm: selects phase value 15, updates the secondary phase value, and returns.")
+label(0x000754e4, "match_phase_substate_default",
+      "Substate-table default arm: returns without changing the selected phase value.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",
