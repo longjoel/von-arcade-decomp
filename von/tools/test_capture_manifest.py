@@ -21,7 +21,7 @@ def main() -> int:
         input_path.write_text('{"rom": "fixture"}\n', encoding="utf-8")
         artifact_path.write_text('{"seq": 1}\n', encoding="utf-8")
         report_path = root / "coverage.json"
-        report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "phase": "stable-attract"}\n', encoding="utf-8")
+        report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "possible_static_edges", "phase": "stable-attract"}\n', encoding="utf-8")
         manifest = {
             "schema_version": 1, "id": "fixture-v1", "objective": "test-capture",
             "stimulus": {"kind": "input-free-attract", "seconds": 1, "phase": "stable-attract"},
@@ -51,6 +51,9 @@ def main() -> int:
         broken["coverage_report"] = "coverage.json"
         report_path.write_text('{"capture_id": "other", "tier": "A"}\n', encoding="utf-8")
         assert any("capture_id" in error for error in validate(broken, root))
+        report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "executed_edges"}\n', encoding="utf-8")
+        assert any("possible_static_edges" in error for error in validate(manifest, root))
+        report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "possible_static_edges", "phase": "stable-attract"}\n', encoding="utf-8")
         broken = copy.deepcopy(manifest)
         broken["artifacts"][0]["path"] = "../outside.log"
         assert any("missing file" in error for error in validate(broken, root))

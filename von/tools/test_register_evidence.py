@@ -18,7 +18,7 @@ def main() -> int:
         for name in ("cfg", "nvram", "state"):
             (root / name).mkdir()
         artifact = root / "summary.json"
-        artifact.write_text('{"capture_id":"capture-v1","tier":"A"}\n', encoding="utf-8")
+        artifact.write_text('{"capture_id":"capture-v1","tier":"A","edge_semantics":"possible_static_edges"}\n', encoding="utf-8")
         capture = {
             "schema_version": 1, "id": "capture-v1", "objective": "pilot",
             "stimulus": {"kind": "input-free-attract", "seconds": 1},

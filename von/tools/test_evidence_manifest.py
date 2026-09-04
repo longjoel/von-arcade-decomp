@@ -56,7 +56,7 @@ def main() -> int:
         for name in ("cfg", "nvram", "state"):
             (temp / name).mkdir()
         summary = temp / "summary.json"
-        summary.write_text('{"capture_id":"capture-v1","tier":"A"}\n', encoding="utf-8")
+        summary.write_text('{"capture_id":"capture-v1","tier":"A","edge_semantics":"possible_static_edges"}\n', encoding="utf-8")
         verifier = temp / "verify.py"
         verifier.write_text("# verifier\n", encoding="utf-8")
         capture = {

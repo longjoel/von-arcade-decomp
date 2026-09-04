@@ -105,6 +105,8 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
                     errors.append("coverage report capture_id does not match sidecar id")
                 if report.get("tier") != "A":
                     errors.append("coverage report must be Tier A")
+                if report.get("edge_semantics") != "possible_static_edges":
+                    errors.append("coverage report must use possible_static_edges semantics")
                 expected_phase = stimulus.get("phase")
                 if report.get("phase") is not None and report.get("phase") != expected_phase:
                     errors.append("coverage report phase does not match sidecar stimulus phase")
