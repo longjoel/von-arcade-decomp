@@ -132,6 +132,13 @@ def validate_lifecycle(
         if isinstance(image.get("work_units", []), list)
         and isinstance(unit, dict) and isinstance(unit.get("id"), str) and unit.get("id")
     }
+    ledger_units = {
+        unit.get("id"): unit
+        for image in images if isinstance(image, dict)
+        for unit in image.get("work_units", [])
+        if isinstance(image.get("work_units", []), list)
+        and isinstance(unit, dict) and isinstance(unit.get("id"), str) and unit.get("id")
+    }
     manifest_ids: set[str] = set()
     for index, entry in enumerate(manifest_entries):
         if not isinstance(entry, dict):
@@ -159,6 +166,11 @@ def validate_lifecycle(
                     errors.append(
                         f"manifest.entries[{index}]: canonical consumers are unknown: "
                         + ", ".join(unknown_consumers))
+                for consumer in consumers:
+                    unit = ledger_units.get(consumer)
+                    if isinstance(unit, dict):
+                        validate_unit_evidence(
+                            f"manifest.entries[{index}] consumer {consumer}", unit, evidence_id)
     canonical_entries = {
         entry.get("id"): entry
         for entry in manifest_entries
