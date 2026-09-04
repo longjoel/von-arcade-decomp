@@ -68,6 +68,10 @@ def main() -> int:
         assert register(broken, capture, capture_path, "duplicate", "verify.py", ["unit-1"], root)
         assert "unknown ledger consumers" in register({}, capture, root / "capture.json", "unknown", "verify.py", ["missing"], root, ledger)[0]
         assert "missing verifier" in register({}, capture, root / "capture.json", "unsafe", "../verify.py", ["unit-1"], root, ledger)[0]
+        outside = root.parent / "outside-verifier.py"
+        outside.write_text("# outside\n", encoding="utf-8")
+        (root / "linked-verify.py").symlink_to(outside)
+        assert "missing verifier" in register({}, capture, capture_path, "linked", "linked-verify.py", ["unit-1"], root, ledger)[0]
     print("PASS: canonical evidence registration validates and deduplicates")
     return 0
 

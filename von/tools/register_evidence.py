@@ -8,7 +8,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from capture_manifest import safe_path, validate as validate_capture
+from capture_manifest import rooted, safe_path, validate as validate_capture
 
 
 def sha256(path: Path) -> str:
@@ -38,7 +38,8 @@ def register(
     entries = manifest.setdefault("entries", [])
     if any(entry.get("id") == capture_id for entry in entries):
         return [f"duplicate evidence id {capture_id}"]
-    if not safe_path(verifier) or not (root / verifier).is_file():
+    verifier_path = rooted(root, verifier)
+    if verifier_path is None or not verifier_path.is_file():
         return [f"missing verifier {verifier}"]
     if not consumers:
         return ["at least one ledger consumer is required"]
