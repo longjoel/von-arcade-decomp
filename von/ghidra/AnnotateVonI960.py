@@ -2186,6 +2186,12 @@ ensure_function(0x00075134, "match_transition_common_update", 0x00075200)
 ensure_function(0x00075200, "match_geometry_range_update", 0x00075230)
 ensure_function(0x00075230, "match_result_phase_selector", 0x00075300)
 ensure_function(0x00075300, "match_phase_advance_update", 0x0007539c)
+ensure_function(0x00075404, "match_phase_selector_arm_0", 0x0007540c)
+ensure_function(0x0007540c, "match_phase_selector_arm_1", 0x00075414)
+ensure_function(0x00075414, "match_phase_selector_arm_2", 0x00075424)
+ensure_function(0x00075424, "match_phase_selector_arm_3", 0x0007542c)
+ensure_function(0x0007542c, "match_phase_selector_arm_4", 0x00075434)
+ensure_function(0x00075434, "match_phase_selector_arm_5", 0x00075450)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2443,6 +2449,18 @@ label(0x00075230, "match_result_phase_selector",
       "Selects a result phase through the compact table at 0x75294, publishes the selected status value, advances the shared phase counter, and returns.")
 label(0x00075300, "match_phase_advance_update",
       "Advances the phase index, classifies the selected coordinate, refreshes shared result fields, and returns at 0x75398.")
+label(0x00075404, "match_phase_selector_arm_0",
+      "Nested phase-table arm: selects status value 5 and joins the common phase continuation.")
+label(0x0007540c, "match_phase_selector_arm_1",
+      "Nested phase-table arm: selects status value 4 and joins the common phase continuation.")
+label(0x00075414, "match_phase_selector_arm_2",
+      "Nested phase-table arm: selects status value 10 and updates the shared phase fields.")
+label(0x00075424, "match_phase_selector_arm_3",
+      "Nested phase-table arm: selects status value 9 and joins the common phase continuation.")
+label(0x0007542c, "match_phase_selector_arm_4",
+      "Nested phase-table arm: selects status value 16 and joins the common phase continuation.")
+label(0x00075434, "match_phase_selector_arm_5",
+      "Nested phase-table arm: selects status value 17 and joins the common phase continuation.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",
