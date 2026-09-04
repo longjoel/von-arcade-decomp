@@ -33,6 +33,9 @@ def main() -> int:
         broken["basis"] = []
         assert any("basis must be an object" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
+        broken["id"] = ["pack-v1"]
+        assert any("missing pack id" in error for error in validate(broken, evidence, root))
+        broken = copy.deepcopy(pack)
         broken["basis"]["tool_revision"] = ["tool"]
         assert any("missing basis.tool_revision" in error for error in validate(broken, evidence, root))
         broken_evidence = {"entries": ["malformed"]}
@@ -82,6 +85,12 @@ def main() -> int:
         broken = copy.deepcopy(pack)
         broken["assets"][0]["evidence_ids"] = [{}]
         assert any("non-empty strings" in error for error in validate(broken, evidence, root))
+        broken = copy.deepcopy(pack)
+        broken["assets"][0]["evidence_ids"] = ["capture-v1", "capture-v1"]
+        assert any("evidence_ids must be unique" in error for error in validate(broken, evidence, root))
+        broken = copy.deepcopy(pack)
+        broken["assets"][0]["verifiers"] = ["verify-fighter", "verify-fighter"]
+        assert any("verifiers must be unique" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
         broken["basis"]["capture_id"] = "missing"
         assert any("basis capture id" in error for error in validate(broken, evidence, root))

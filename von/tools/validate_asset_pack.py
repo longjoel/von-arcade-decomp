@@ -59,7 +59,7 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         errors.append("schema_version must be 1")
     if pack.get("kind") != "von-evidence-asset-pack":
         errors.append("kind must be von-evidence-asset-pack")
-    if not pack.get("id"):
+    if not isinstance(pack.get("id"), str) or not pack.get("id"):
         errors.append("missing pack id")
     basis = pack.get("basis", {})
     if not isinstance(basis, dict):
@@ -150,6 +150,8 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         if not isinstance(evidence_ids, list):
             errors.append(f"{where}: evidence_ids must be an array")
             evidence_ids = []
+        elif all(isinstance(item, str) for item in evidence_ids) and len(set(evidence_ids)) != len(evidence_ids):
+            errors.append(f"{where}: evidence_ids must be unique")
         for evidence_id in evidence_ids:
             if not isinstance(evidence_id, str) or not evidence_id:
                 errors.append(f"{where}: evidence_ids must contain non-empty strings")
@@ -161,6 +163,8 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         if not isinstance(verifiers, list) or not verifiers or not all(isinstance(item, str) and item for item in verifiers):
             errors.append(f"{where}: verifiers must be a non-empty string array")
             verifiers = []
+        elif len(set(verifiers)) != len(verifiers):
+            errors.append(f"{where}: verifiers must be unique")
         if status in {"observed", "validated", "reference-capture"} and not evidence_ids:
             errors.append(f"{where}: {status} assets require evidence_ids")
         if status == "validated":
