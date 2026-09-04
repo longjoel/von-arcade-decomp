@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 from reconstruction_ledger import code_coverage, load, validate, validate_lifecycle
@@ -17,16 +18,31 @@ def main() -> int:
     parser.add_argument("--evidence-manifest", type=Path,
                         default=Path("von/evidence/manifest.json"))
     args = parser.parse_args()
-    for label, path in (("ledger", args.ledger), ("evidence manifest", args.evidence_manifest)):
+    root = Path.cwd().resolve()
+    paths = [("ledger", args.ledger)]
+    if args.strict_lifecycle:
+        paths.append(("evidence manifest", args.evidence_manifest))
+    for label, path in paths:
         if path.is_symlink():
             print(f"Ledger validation: {label} path must not be a symlink")
             return 1
-    ledger = load(args.ledger)
-    errors = validate(ledger, Path.cwd())
+        try:
+            path.resolve().relative_to(root)
+        except (OSError, RuntimeError, ValueError):
+            print(f"Ledger validation: {label} path escapes root: {path}")
+            return 1
+        if not path.is_file():
+            print(f"Ledger validation: missing {label}: {path}")
+            return 1
+    try:
+        ledger = load(args.ledger)
+        evidence = load(args.evidence_manifest) if args.strict_lifecycle else None
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as error:
+        print(f"Ledger validation: unable to read validation document: {error}")
+        return 1
+    errors = validate(ledger, root)
     if args.strict_lifecycle:
-        errors.extend(validate_lifecycle(
-            ledger, load(args.evidence_manifest), Path.cwd()
-        ))
+        errors.extend(validate_lifecycle(ledger, evidence, root))
     if errors:
         print(f"Ledger validation: {len(errors)} error(s)")
         for error in errors:

@@ -71,6 +71,14 @@ def main() -> int:
         )
         assert cli_result.returncode == 1
         assert "ledger path must not be a symlink" in cli_result.stdout
+        malformed_ledger = Path(directory) / "malformed-ledger.json"
+        malformed_ledger.write_text("{invalid\n", encoding="utf-8")
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), str(malformed_ledger)],
+            cwd=directory, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "unable to read validation document" in cli_result.stdout
     lifecycle = {
         "schema_version": 2,
         "images": [{"name": "maincpu", "work_units": [
