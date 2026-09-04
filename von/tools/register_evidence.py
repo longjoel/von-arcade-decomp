@@ -91,7 +91,9 @@ def register(
             for unit in image.get("work_units", []):
                 if unit.get("id") in consumers:
                     evidence = unit.get("evidence")
-                    if evidence is not None and not isinstance(evidence, list):
+                    if (evidence is not None
+                            and (not isinstance(evidence, list)
+                                 or not all(isinstance(item, str) and item for item in evidence))):
                         return [f"ledger consumer {unit['id']} has invalid evidence list"]
                     consumer_units.append((unit, evidence))
         for unit, evidence in consumer_units:

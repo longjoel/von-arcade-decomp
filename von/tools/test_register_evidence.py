@@ -85,6 +85,12 @@ def main() -> int:
             {"schema_version": 1, "entries": []}, capture, capture_path, "partial", "verify.py", ["unit-1", "unit-2"],
             root, partially_invalid))
         assert partially_invalid == before
+        malformed_evidence = {"images": [{"work_units": [
+            {"id": "unit-1", "evidence": [1]}
+        ]}]}
+        assert any("invalid evidence list" in error for error in register(
+            {"schema_version": 1, "entries": []}, capture, capture_path, "malformed", "verify.py",
+            ["unit-1"], root, malformed_evidence))
         assert any("consumers must be unique" in error for error in register(
             {"schema_version": 1, "entries": []}, capture, capture_path, "duplicate consumers", "verify.py",
             ["unit-1", "unit-1"], root, ledger))
