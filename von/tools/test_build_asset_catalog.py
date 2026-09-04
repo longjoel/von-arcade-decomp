@@ -14,10 +14,25 @@ def main():
         manifest = root / "manifest.json"; output = root / "catalog.json"
         manifest.write_text(json.dumps({"assets": [{"id": "model", "displayName": "Model", "category": "props",
             "status": "candidate", "path": "/assets/model.gltf", "sourceTrace": "trace"}]}))
-        subprocess.run(["python3", TOOL, "--manifest", manifest, "--asset-root", root / "public", "--output", output], check=True)
+        subprocess.run(["python3", TOOL, "--manifest", manifest, "--asset-root", root / "public",
+                        "--output", output, "--root", root], check=True)
         catalog = json.loads(output.read_text())
         assert catalog["counts"] == {"verified": 0, "candidate": 1, "rejected": 0}
         assert catalog["assets"][0]["geometry"] == {"nodes": 1, "meshes": 1, "materials": 0, "images": 0}
+        outside = root.parent / f"outside-catalog-{root.name}.json"
+        result = subprocess.run(
+            ["python3", TOOL, "--manifest", manifest, "--asset-root", root / "public",
+             "--output", outside, "--root", root], capture_output=True, text=True, check=False)
+        assert result.returncode == 1
+        assert "output path escapes root" in result.stdout
+        traversal = root / "traversal.json"
+        traversal.write_text(json.dumps({"assets": [{"path": "../escape.gltf"}]}))
+        result = subprocess.run(
+            ["python3", TOOL, "--manifest", traversal, "--asset-root", root / "public",
+             "--output", root / "bad.json", "--root", root],
+            capture_output=True, text=True, check=False)
+        assert result.returncode == 1
+        assert "escapes asset root" in result.stdout
     print("PASS: asset catalog build")
 
 
