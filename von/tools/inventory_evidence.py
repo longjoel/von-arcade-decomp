@@ -84,6 +84,26 @@ def apply_relations(records: list[dict[str, Any]], relations: dict[str, Any]) ->
             record["consumers"] = consumers
 
 
+def relation_errors(records: list[dict[str, Any]], relations: dict[str, Any],
+                    require_complete: bool = False) -> list[str]:
+    known = {record["path"] for record in records}
+    errors = [f"relation names unknown inventory path {path}"
+              for path in sorted(set(relations) - known)]
+    for record in records:
+        relation = relations.get(record["path"], {})
+        if not isinstance(relation, dict):
+            errors.append(f"{record['path']}: relation must be an object")
+            continue
+        producer = relation.get("producer")
+        consumers = relation.get("consumers")
+        if require_complete and (not isinstance(producer, str) or not producer):
+            errors.append(f"{record['path']}: relation requires producer")
+        if require_complete and (not isinstance(consumers, list) or not consumers
+                                  or not all(isinstance(item, str) and item for item in consumers)):
+            errors.append(f"{record['path']}: relation requires non-empty consumers")
+    return errors
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path.cwd())
@@ -92,6 +112,8 @@ def main() -> int:
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--relations", type=Path,
                         help="optional JSON map of relative paths to producer/consumers")
+    parser.add_argument("--require-complete-relations", action="store_true",
+                        help="fail unless every inventoried file has producer and consumers")
     args = parser.parse_args()
     root = args.root.resolve()
     tracked = tracked_files(root)
@@ -105,8 +127,16 @@ def main() -> int:
         else:
             parser.error(f"path does not exist: {requested}")
     records = [inventory_path(path, root, tracked) for path in files]
+    relations = json.loads(args.relations.read_text(encoding="utf-8")) if args.relations else {}
+    if not isinstance(relations, dict):
+        parser.error("relations must be a JSON object")
+    relation_validation = relation_errors(records, relations, args.require_complete_relations)
+    if relation_validation:
+        for error in relation_validation:
+            print(f"- {error}")
+        return 1
     if args.relations:
-        apply_relations(records, json.loads(args.relations.read_text(encoding="utf-8")))
+        apply_relations(records, relations)
     document = {
         "schema_version": 1,
         "root": str(root),

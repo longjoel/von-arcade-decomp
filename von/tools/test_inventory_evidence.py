@@ -6,7 +6,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from inventory_evidence import apply_relations, duplicate_groups, inventory_path
+from inventory_evidence import apply_relations, duplicate_groups, inventory_path, relation_errors
 
 
 def main() -> int:
@@ -34,6 +34,15 @@ def main() -> int:
         assert len(groups) == 1
         assert groups[0]["aliases"] == ["von/build/capture-copy.log"]
         assert all("sha256" in record for record in records)
+        complete = {record["path"]: {"producer": "producer.sh", "consumers": ["review.md"]}
+                    for record in records}
+        assert relation_errors(records, complete, require_complete=True) == []
+        assert any("unknown inventory path" in error for error in relation_errors(
+            records, {"missing.log": {}}, require_complete=True))
+        incomplete = dict(complete)
+        incomplete["old-output.log"] = {"producer": "capture.sh", "consumers": []}
+        assert any("non-empty consumers" in error for error in relation_errors(
+            records, incomplete, require_complete=True))
     print("PASS: evidence inventory records hashes and cleanup decisions")
     return 0
 
