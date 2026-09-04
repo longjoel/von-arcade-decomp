@@ -50,6 +50,10 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
              rom_manifest: Path | None = None, expected_tool_revision: str | None = None,
              expected_map_revision: str | None = None) -> list[str]:
     errors: list[str] = []
+    if not isinstance(pack, dict):
+        return ["asset pack must be an object"]
+    if not isinstance(evidence, dict):
+        return ["evidence manifest must be an object"]
     if pack.get("schema_version") != 1:
         errors.append("schema_version must be 1")
     if pack.get("kind") != "von-evidence-asset-pack":
@@ -57,6 +61,9 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
     if not pack.get("id"):
         errors.append("missing pack id")
     basis = pack.get("basis", {})
+    if not isinstance(basis, dict):
+        errors.append("basis must be an object")
+        basis = {}
     for field in ("romset_hash", "map_revision", "capture_id", "tool_revision"):
         if not basis.get(field):
             errors.append(f"missing basis.{field}")
@@ -71,9 +78,13 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
             errors.append(f"missing ROM manifest {rom_manifest}")
         elif basis.get("romset_hash") != sha256(rom_manifest):
             errors.append("basis.romset_hash does not match ROM manifest")
+    evidence_entries = evidence.get("entries", [])
+    if not isinstance(evidence_entries, list):
+        errors.append("evidence entries must be an array")
+        evidence_entries = []
     canonical_ids = {
-        item.get("id") for item in evidence.get("entries", [])
-        if item.get("canonical") and isinstance(item.get("id"), str)
+        item.get("id") for item in evidence_entries
+        if isinstance(item, dict) and item.get("canonical") and isinstance(item.get("id"), str)
     }
     if basis.get("capture_id") not in canonical_ids:
         errors.append(f"unknown canonical basis capture id {basis.get('capture_id')}")

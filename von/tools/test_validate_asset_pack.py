@@ -12,6 +12,8 @@ from validate_asset_pack import validate
 
 
 def main() -> int:
+    assert any("asset pack must be an object" in error for error in validate([], {}, Path.cwd()))
+    assert any("evidence manifest must be an object" in error for error in validate({}, [], Path.cwd()))
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
         payload = root / "fighter.glb"
@@ -27,6 +29,11 @@ def main() -> int:
         }
         evidence = {"entries": [{"id": "capture-v1", "canonical": True}]}
         assert not validate(pack, evidence, root)
+        broken = copy.deepcopy(pack)
+        broken["basis"] = []
+        assert any("basis must be an object" in error for error in validate(broken, evidence, root))
+        broken_evidence = {"entries": ["malformed"]}
+        assert any("unknown canonical basis" in error for error in validate(pack, broken_evidence, root))
         rom_manifest = root / "rom-manifest.json"
         rom_manifest.write_text('{"rom":"fixture"}\n', encoding="utf-8")
         pack["basis"]["romset_hash"] = hashlib.sha256(rom_manifest.read_bytes()).hexdigest()
