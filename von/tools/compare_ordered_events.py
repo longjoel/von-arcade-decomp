@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any
@@ -50,6 +51,17 @@ def validate_event_shape(event: dict[str, Any], where: str) -> None:
     for field in required_fields:
         if field not in event or event[field] is None or event[field] == "":
             raise ValueError(f"{where}: {event['kind']} requires {field}")
+    if not required_fields:
+        return
+    timestamp = event["time"]
+    if (not isinstance(timestamp, (int, float)) or isinstance(timestamp, bool)
+            or not math.isfinite(timestamp) or timestamp < 0):
+        raise ValueError(f"{where}: {event['kind']} time must be a finite non-negative number")
+    frame = event["frame"]
+    if not isinstance(frame, int) or isinstance(frame, bool) or frame < 0:
+        raise ValueError(f"{where}: {event['kind']} frame must be a non-negative integer")
+    if not isinstance(event["cpu"], str) or not event["cpu"].strip():
+        raise ValueError(f"{where}: {event['kind']} cpu must be a non-empty string")
 
 
 def validate_order(events: list[dict[str, Any]]) -> None:

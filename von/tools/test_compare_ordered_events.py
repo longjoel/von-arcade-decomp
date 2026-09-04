@@ -143,6 +143,24 @@ def main() -> int:
             assert "indirect-call requires pc" in str(error)
         else:
             raise AssertionError("incomplete indirect-call event was accepted")
+        malformed.write_text(
+            '{"kind": "checkpoint", "seq": 1, "time": "1.0", "frame": 1, '
+            '"cpu": "maincpu", "name": "x"}\n', encoding="utf-8")
+        try:
+            load_events(malformed)
+        except ValueError as error:
+            assert "time must be a finite non-negative number" in str(error)
+        else:
+            raise AssertionError("non-numeric checkpoint time was accepted")
+        malformed.write_text(
+            '{"kind": "checkpoint", "seq": 1, "time": 1.0, "frame": true, '
+            '"cpu": "maincpu", "name": "x"}\n', encoding="utf-8")
+        try:
+            load_events(malformed)
+        except ValueError as error:
+            assert "frame must be a non-negative integer" in str(error)
+        else:
+            raise AssertionError("boolean checkpoint frame was accepted")
     print("PASS: ordered event comparison identifies the first divergence")
     return 0
 
