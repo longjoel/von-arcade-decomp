@@ -43,7 +43,10 @@ def validate_lifecycle(
         return True
 
     def existing_reference(value: str) -> bool:
-        return root is None or (root / value).is_file()
+        if root is None:
+            return True
+        path = root / value
+        return not path.is_symlink() and path.is_file()
 
     def nonempty_text(value: Any) -> bool:
         return isinstance(value, str) and bool(value)
@@ -139,7 +142,7 @@ def validate_lifecycle(
                     errors.append(f"{where}: trace-validated requires verifier")
                 elif not safe_reference(verifier):
                     errors.append(f"{where}: verifier must be a safe relative path")
-                elif root is not None and not (root / verifier).is_file():
+                elif not existing_reference(verifier):
                     errors.append(f"{where}: missing verifier {verifier}")
                 registered_entry = canonical_entries.get(evidence_id, {}) if isinstance(evidence_id, str) else {}
                 registered_verifier = registered_entry.get("verifier")
