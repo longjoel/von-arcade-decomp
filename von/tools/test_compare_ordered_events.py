@@ -24,12 +24,15 @@ def main() -> int:
     reconstructed[0]["source_line"] = 900
     assert compare(original, reconstructed)["outcome"] == "pass"
     assert compare(original, reconstructed)["missed_checkpoints"] == []
-    context = {"id": "original-v1", "objective": "pilot", "stimulus": {"kind": "attract", "seconds": 1}}
-    reconstructed_context = {"id": "reconstructed-v1", "objective": "pilot", "stimulus": {"kind": "attract", "seconds": 1}}
+    context = {"schema_version": 1, "id": "original-v1", "objective": "pilot", "stimulus": {"kind": "attract", "seconds": 1}}
+    reconstructed_context = {"schema_version": 1, "id": "reconstructed-v1", "objective": "pilot", "stimulus": {"kind": "attract", "seconds": 1}}
     contextual = compare(original, reconstructed, context, reconstructed_context)
     assert contextual["context_compatible"] is True
     assert contextual["original_capture_id"] == "original-v1"
-    assert context_errors(context, {"objective": "other", "stimulus": context["stimulus"]}) == ["capture objectives differ"]
+    assert context_errors(context, {"schema_version": 1, "id": "other", "objective": "other", "stimulus": context["stimulus"]}) == ["capture objectives differ"]
+    malformed_context_errors = context_errors([], {})
+    assert "original capture manifest must be an object" in malformed_context_errors
+    assert "reconstructed capture manifest schema_version must be 1" in malformed_context_errors
     reconstructed[1]["value"] = 78
     result = compare(original, reconstructed)
     assert result["outcome"] == "divergence"

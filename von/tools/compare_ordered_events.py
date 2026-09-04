@@ -67,6 +67,16 @@ def checkpoints(events: list[dict[str, Any]]) -> list[str]:
 
 def context_errors(original: dict[str, Any], reconstructed: dict[str, Any]) -> list[str]:
     errors = []
+    for label, context in (("original", original), ("reconstructed", reconstructed)):
+        if not isinstance(context, dict):
+            errors.append(f"{label} capture manifest must be an object")
+            continue
+        if context.get("schema_version") != 1:
+            errors.append(f"{label} capture manifest schema_version must be 1")
+        if not isinstance(context.get("id"), str) or not context["id"]:
+            errors.append(f"{label} capture manifest requires id")
+    if not isinstance(original, dict) or not isinstance(reconstructed, dict):
+        return errors
     if original.get("objective") != reconstructed.get("objective"):
         errors.append("capture objectives differ")
     if original.get("stimulus") != reconstructed.get("stimulus"):
