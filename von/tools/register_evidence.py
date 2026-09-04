@@ -138,6 +138,10 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--ledger", type=Path, required=True)
     args = parser.parse_args()
+    for label, path in (("manifest", args.manifest), ("ledger", args.ledger)):
+        if path.is_symlink():
+            print(f"Evidence registration: {label} path must not be a symlink")
+            return 1
     root = args.root.resolve()
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     capture = json.loads(args.capture_manifest.read_text(encoding="utf-8"))

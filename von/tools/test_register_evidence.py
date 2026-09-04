@@ -6,11 +6,16 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 from capture_manifest import directory_sha256, entry
 from register_evidence import register
+
+
+TOOL = Path(__file__).resolve().parent / "register_evidence.py"
 
 
 def main() -> int:
@@ -83,6 +88,21 @@ def main() -> int:
         assert any("consumers must be unique" in error for error in register(
             {"schema_version": 1, "entries": []}, capture, capture_path, "duplicate consumers", "verify.py",
             ["unit-1", "unit-1"], root, ledger))
+        manifest_path = root / "manifest.json"
+        ledger_path = root / "ledger.json"
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        ledger_path.write_text(json.dumps(ledger), encoding="utf-8")
+        linked_manifest = root / "linked-manifest.json"
+        linked_manifest.symlink_to(manifest_path)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--manifest", str(linked_manifest),
+             "--capture-manifest", str(capture_path), "--verifier", "verify.py",
+             "--description", "description", "--consumer", "unit-1", "--root", str(root),
+             "--ledger", str(ledger_path)],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "manifest path must not be a symlink" in cli_result.stdout
         assert any("non-empty string array" in error for error in register(
             {"schema_version": 1, "entries": []}, capture, capture_path, "scalar consumer", "verify.py",
             "unit-1", root, ledger))
