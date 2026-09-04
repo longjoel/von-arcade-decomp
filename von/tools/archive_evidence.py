@@ -112,7 +112,15 @@ def main() -> int:
         if preserved.is_symlink():
             print("Evidence archive: quarantine target must not be a symlink", file=sys.stderr)
             return 1
-        if not preserved.exists():
+        if preserved.exists():
+            try:
+                if preserved.read_bytes() != payload:
+                    print("Evidence archive: quarantine target payload mismatch", file=sys.stderr)
+                    return 1
+            except OSError as error:
+                print(f"Evidence archive: quarantine target is unreadable: {error}", file=sys.stderr)
+                return 1
+        else:
             shutil.copy2(args.capture, preserved)
     if args.metadata:
         args.metadata.parent.mkdir(parents=True, exist_ok=True)

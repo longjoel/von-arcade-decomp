@@ -105,6 +105,21 @@ def main() -> int:
         )
         assert linked_metadata_run.returncode != 0
         assert "metadata path must not be a symlink" in linked_metadata_run.stderr
+        quarantine_root = root / "quarantine-collision-cwd"
+        collision_source = quarantine_root / "collision.ndjson"
+        collision_archive = quarantine_root / "archive"
+        collision_source.parent.mkdir(parents=True)
+        collision_source.write_bytes(b"new capture\n")
+        collision_target = quarantine_root / "von/build/evidence/quarantine/collision.ndjson"
+        collision_target.parent.mkdir(parents=True)
+        collision_target.write_bytes(b"old capture\n")
+        collision_run = subprocess.run(
+            [sys.executable, str(TOOL), str(collision_source), "--archive", str(collision_archive),
+             "--quarantine"],
+            cwd=quarantine_root, capture_output=True, text=True, check=False,
+        )
+        assert collision_run.returncode != 0
+        assert "quarantine target payload mismatch" in collision_run.stderr
     print("PASS: evidence archive emits reproducible source and blob metadata")
     return 0
 
