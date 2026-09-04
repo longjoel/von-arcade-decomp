@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import copy
+import tempfile
+from pathlib import Path
 
-from compare_ordered_events import compare, context_errors
+from compare_ordered_events import compare, context_errors, load_events
 
 
 def main() -> int:
@@ -37,6 +39,22 @@ def main() -> int:
     truncated = compare(original, original[:1])
     assert truncated["first_divergence_index"] == 1
     assert truncated["reconstructed_event"] is None
+    with tempfile.TemporaryDirectory() as directory:
+        malformed = Path(directory) / "malformed.ndjson"
+        malformed.write_text('{"seq": 0}\n', encoding="utf-8")
+        try:
+            load_events(malformed)
+        except ValueError as error:
+            assert "event kind" in str(error)
+        else:
+            raise AssertionError("malformed event was accepted")
+        malformed.write_text('{"kind": "checkpoint", "seq": -1}\n', encoding="utf-8")
+        try:
+            load_events(malformed)
+        except ValueError as error:
+            assert "event seq" in str(error)
+        else:
+            raise AssertionError("negative sequence was accepted")
     print("PASS: ordered event comparison identifies the first divergence")
     return 0
 

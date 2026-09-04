@@ -24,6 +24,11 @@ def load_events(path: Path) -> list[dict[str, Any]]:
             raise ValueError(f"{path}:{line_number}: invalid JSON: {exc.msg}") from exc
         if not isinstance(event, dict):
             raise ValueError(f"{path}:{line_number}: event must be an object")
+        if not isinstance(event.get("kind"), str) or not event["kind"]:
+            raise ValueError(f"{path}:{line_number}: event kind must be a non-empty string")
+        sequence = event.get("seq")
+        if not isinstance(sequence, int) or isinstance(sequence, bool) or sequence < 0:
+            raise ValueError(f"{path}:{line_number}: event seq must be a non-negative integer")
         events.append(event)
     return events
 
