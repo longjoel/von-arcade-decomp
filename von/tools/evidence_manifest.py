@@ -59,10 +59,30 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                         from capture_manifest import validate as validate_capture
 
                         capture_document = json.loads(sidecar_path.read_text(encoding="utf-8"))
-                        sidecar_errors = validate_capture(capture_document, root)
-                        if capture_document.get("id") != evidence_id:
-                            sidecar_errors.append("capture manifest id does not match evidence id")
-                    except (OSError, json.JSONDecodeError) as exc:
+                        if not isinstance(capture_document, dict):
+                            sidecar_errors = ["capture manifest must be an object"]
+                        else:
+                            sidecar_errors = validate_capture(capture_document, root)
+                            if capture_document.get("id") != evidence_id:
+                                sidecar_errors.append("capture manifest id does not match evidence id")
+                            capture_stimulus = capture_document.get("stimulus", {})
+                            if (isinstance(capture_stimulus, dict)
+                                    and capture_stimulus.get("kind") != stimulus.get("kind")):
+                                sidecar_errors.append("capture stimulus kind does not match evidence entry")
+                            if (isinstance(stimulus.get("seconds"), (int, float))
+                                    and capture_stimulus.get("seconds") != stimulus.get("seconds")):
+                                sidecar_errors.append("capture stimulus duration does not match evidence entry")
+                            capture_configuration = capture_document.get("configuration", {})
+                            if isinstance(capture_configuration, dict):
+                                for field, value in configuration_fields(entry).items():
+                                    if capture_configuration.get(field) != value:
+                                        sidecar_errors.append(
+                                            f"capture configuration.{field} does not match evidence entry")
+                            capture_artifacts = capture_document.get("artifacts", [])
+                            if isinstance(capture_artifacts, list) and isinstance(entry.get("artifacts"), list):
+                                if capture_artifacts != entry["artifacts"]:
+                                    sidecar_errors.append("capture artifacts do not match evidence entry")
+                    except (OSError, json.JSONDecodeError, TypeError) as exc:
                         sidecar_errors = [f"unable to read capture manifest: {exc}"]
                     errors.extend(f"{where}: {error}" for error in sidecar_errors)
         configuration = entry.get("configuration", {})
@@ -94,6 +114,16 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
             if digest != artifact.get("sha256"):
                 errors.append(f"{where}: hash mismatch for {artifact.get('path')}")
     return errors
+
+
+def configuration_fields(entry: dict) -> dict:
+    """Return sidecar-bound configuration fields declared by the evidence entry."""
+    configuration = entry.get("configuration", {})
+    if not isinstance(configuration, dict):
+        return {}
+    return {field: configuration[field] for field in
+            ("set", "mame_revision", "patch_profile", "execution_engine")
+            if field in configuration}
 
 
 def main() -> int:

@@ -60,6 +60,18 @@ def main() -> int:
                          "outcome": "pass", "consumers": ["unit"]}],
         }
         assert not validate(runtime, {"images": [{"work_units": [{"id": "unit"}]}]}, temp)
+        mismatched = json.loads(json.dumps(runtime))
+        mismatched["entries"][0]["stimulus"]["kind"] = "causal-trace"
+        assert any("stimulus kind" in error for error in validate(
+            mismatched, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
+        mismatched = json.loads(json.dumps(runtime))
+        mismatched["entries"][0]["configuration"]["patch_profile"] = "stale"
+        assert any("configuration.patch_profile" in error for error in validate(
+            mismatched, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
+        mismatched = json.loads(json.dumps(runtime))
+        mismatched["entries"][0]["artifacts"] = []
+        assert any("artifacts do not match" in error for error in validate(
+            mismatched, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
         capture["id"] = "other"
         (temp / "capture.json").write_text(json.dumps(capture), encoding="utf-8")
         assert any("does not match evidence id" in error for error in validate(runtime, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
