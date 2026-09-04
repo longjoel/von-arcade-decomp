@@ -49,6 +49,13 @@ def main() -> int:
     contextual = compare(original, reconstructed, context, reconstructed_context)
     assert contextual["context_compatible"] is True
     assert contextual["original_capture_id"] == "original-v1"
+    context["inputs"] = [{"path": "original-rom.json", "sha256": "a" * 64}]
+    reconstructed_context["inputs"] = [{"path": "isolated-rom.json", "sha256": "a" * 64}]
+    assert compare(original, reconstructed, context, reconstructed_context)["outcome"] == "pass"
+    mismatched_inputs = copy.deepcopy(reconstructed_context)
+    mismatched_inputs["inputs"][0]["sha256"] = "b" * 64
+    assert any("input inventories differ" in error
+               for error in context_errors(context, mismatched_inputs))
     try:
         compare(original, reconstructed, context,
                 {"schema_version": 1, "id": "reconstructed-v1", "objective": "other",
@@ -59,7 +66,8 @@ def main() -> int:
         raise AssertionError("incompatible capture contexts were accepted")
     assert context_errors(context, {"schema_version": 1, "id": "other", "objective": "other",
                                     "stimulus": context["stimulus"],
-                                    "configuration": reconstructed_context["configuration"]}) == ["capture objectives differ"]
+                                    "configuration": reconstructed_context["configuration"],
+                                    "inputs": reconstructed_context["inputs"]}) == ["capture objectives differ"]
     mismatched_configuration = copy.deepcopy(reconstructed_context)
     mismatched_configuration["configuration"]["mame_revision"] = "def"
     assert any("configuration.mame_revision differs" in error

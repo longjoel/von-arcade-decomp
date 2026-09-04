@@ -129,6 +129,17 @@ def context_errors(original: dict[str, Any], reconstructed: dict[str, Any]) -> l
         for field in ("set", "mame_revision", "execution_engine"):
             if original_configuration.get(field) != reconstructed_configuration.get(field):
                 errors.append(f"capture configuration.{field} differs")
+    original_inputs = original.get("inputs")
+    reconstructed_inputs = reconstructed.get("inputs")
+    if original_inputs is not None or reconstructed_inputs is not None:
+        if not isinstance(original_inputs, list) or not isinstance(reconstructed_inputs, list):
+            errors.append("capture input inventories must be arrays")
+        else:
+            def input_hashes(items: list[Any]) -> list[str]:
+                return sorted(item.get("sha256", "") for item in items
+                              if isinstance(item, dict))
+            if input_hashes(original_inputs) != input_hashes(reconstructed_inputs):
+                errors.append("capture input inventories differ")
     return errors
 
 
