@@ -103,6 +103,10 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
         report_path = rooted(root, report_path_text)
         if report_path is None or not report_path.is_file():
             errors.append(f"missing coverage report {report_path_text}")
+        elif not isinstance(artifacts, list) or not any(
+                isinstance(item, dict) and item.get("path") == report_path_text
+                for item in artifacts):
+            errors.append("coverage report must be a declared capture artifact")
         else:
             try:
                 report = json.loads(report_path.read_text(encoding="utf-8"))

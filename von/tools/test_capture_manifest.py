@@ -34,7 +34,8 @@ def main() -> int:
                          "-nvram_directory", str(root / "nvram"),
                          "-state_directory", str(root / "state")],
             "isolation": {"cfg_directory": "cfg", "nvram_directory": "nvram", "state_directory": "state"},
-            "inputs": [entry(input_path, root)], "artifacts": [entry(artifact_path, root)],
+            "inputs": [entry(input_path, root)],
+            "artifacts": [entry(artifact_path, root), entry(report_path, root)],
             "coverage_report": "coverage.json",
         }
         for field in ("cfg_directory", "nvram_directory", "state_directory"):
@@ -81,6 +82,9 @@ def main() -> int:
         broken = copy.deepcopy(manifest)
         broken["artifacts"] = []
         assert any("at least one artifact" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["artifacts"] = [entry(artifact_path, root)]
+        assert any("coverage report must be a declared" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
         broken.pop("coverage_report")
         assert any("requires coverage_report" in error for error in validate(broken, root))
