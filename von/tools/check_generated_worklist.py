@@ -28,7 +28,7 @@ def check(coverage: Path, ledger: Path, expected: Path, root: Path,
     if comparison is not None:
         try:
             comparison.resolve().relative_to(root.resolve())
-        except ValueError:
+        except (OSError, RuntimeError, ValueError):
             return [f"comparison path escapes root: {comparison}"]
         if not comparison.is_file():
             return [f"missing comparison input: {comparison}"]

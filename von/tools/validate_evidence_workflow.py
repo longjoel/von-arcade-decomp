@@ -62,7 +62,7 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
             for label, path in generated_paths:
                 try:
                     path.resolve().relative_to(root.resolve())
-                except ValueError:
+                except (OSError, RuntimeError, ValueError):
                     unsafe_paths.append(f"generated {label} path escapes root: {path}")
             if unsafe_paths:
                 errors.extend(unsafe_paths)

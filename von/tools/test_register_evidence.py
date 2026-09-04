@@ -89,6 +89,11 @@ def main() -> int:
         outside.write_text("# outside\n", encoding="utf-8")
         (root / "linked-verify.py").symlink_to(outside)
         assert "missing verifier" in register({"schema_version": 1, "entries": []}, capture, capture_path, "linked", "linked-verify.py", ["unit-1"], root, ledger)[0]
+        loop_capture = root / "loop-capture.json"
+        loop_capture.symlink_to(loop_capture)
+        assert "missing capture manifest" in register(
+            {"schema_version": 1, "entries": []}, capture, loop_capture,
+            "loop", "verify.py", ["unit-1"], root, ledger)[0]
     print("PASS: canonical evidence registration validates and deduplicates")
     return 0
 

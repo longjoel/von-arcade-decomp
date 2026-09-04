@@ -55,6 +55,16 @@ def main() -> int:
         generated_status_path=root / "von/generated-status.md",
     )
     assert any("coverage path escapes root" in error for error in errors)
+    with tempfile.TemporaryDirectory(dir=root) as directory:
+        loop = Path(directory) / "loop.json"
+        loop.symlink_to(loop)
+        errors = validate_workflow(
+            root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
+            check_generated=True, generated_coverage_path=loop,
+            generated_worklist_path=root / "von/attract_worklist.json",
+            generated_status_path=root / "von/generated-status.md",
+        )
+        assert any("unable to read coverage JSON" in error for error in errors)
     unsafe = {
         "schema_version": 1,
         "entries": [{"id": "unsafe", "canonical": True, "verifier": "/tmp/not-a-verifier.py"}],

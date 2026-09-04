@@ -41,7 +41,7 @@ def register(
     capture_id = capture.get("id")
     try:
         capture_relative = str(capture_path.resolve().relative_to(root.resolve()))
-    except ValueError:
+    except (OSError, RuntimeError, ValueError):
         capture_relative = ""
     if not safe_path(capture_relative) or not capture_path.is_file():
         return [f"missing capture manifest {capture_path}"]
