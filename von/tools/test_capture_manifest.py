@@ -38,6 +38,9 @@ def main() -> int:
         broken["artifacts"][0]["sha256"] = "0" * 64
         assert any("hash mismatch" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
+        broken["artifacts"][0]["sha256"] = "invalid"
+        assert any("must be a SHA-256" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
         broken["command"] = []
         assert any("command" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)

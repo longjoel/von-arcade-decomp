@@ -6,8 +6,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any
+
+
+SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
 def sha256(path: Path) -> str:
@@ -121,6 +125,9 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
             path = rooted(root, path_text)
             if path is None or not path.is_file():
                 errors.append(f"{section}[{index}]: missing file {path_text}")
+                continue
+            if not isinstance(item.get("sha256"), str) or not SHA256_RE.fullmatch(item["sha256"]):
+                errors.append(f"{section}[{index}]: sha256 must be a SHA-256 digest")
                 continue
             if item.get("sha256") != sha256(path):
                 errors.append(f"{section}[{index}]: hash mismatch for {path_text}")
