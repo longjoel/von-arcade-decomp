@@ -4,9 +4,15 @@
 from __future__ import annotations
 
 import tempfile
+import subprocess
+import sys
 from pathlib import Path
 
 from inventory_evidence import apply_relations, duplicate_groups, inventory_path, relation_errors
+
+
+ROOT = Path(__file__).resolve().parents[2]
+TOOL = Path(__file__).resolve().parent / "inventory_evidence.py"
 
 
 def main() -> int:
@@ -68,6 +74,19 @@ def main() -> int:
             assert "must not be a symlink" in str(error)
         else:
             raise AssertionError("internal inventory symlink was accepted")
+    with tempfile.TemporaryDirectory(dir=ROOT) as directory:
+        temp_root = Path(directory)
+        target = temp_root / "output.json"
+        target.write_text("existing\n", encoding="utf-8")
+        linked_output = temp_root / "linked-output.json"
+        linked_output.symlink_to(target)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--root", str(ROOT), "--path",
+             "von/tools/test_inventory_evidence.py", "--output", str(linked_output)],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "output path must not be a symlink" in cli_result.stdout
     print("PASS: evidence inventory records hashes and cleanup decisions")
     return 0
 

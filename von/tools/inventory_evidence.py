@@ -122,6 +122,10 @@ def main() -> int:
     parser.add_argument("--require-complete-relations", action="store_true",
                         help="fail unless every inventoried file has producer and consumers")
     args = parser.parse_args()
+    for label, path in (("output", args.output), ("relations", args.relations)):
+        if path is not None and path.is_symlink():
+            print(f"Evidence inventory: {label} path must not be a symlink")
+            return 1
     root = args.root.resolve()
     tracked = tracked_files(root)
     files: list[Path] = []
