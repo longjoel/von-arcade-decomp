@@ -82,6 +82,10 @@ def plan(document: dict[str, Any], source_sha256: str) -> dict[str, Any]:
         raise ValueError("; ".join(errors))
     actions: list[dict[str, Any]] = []
     totals: dict[str, dict[str, int]] = defaultdict(lambda: {"files": 0, "bytes": 0})
+    dispositions: dict[str, dict[str, int]] = {
+        key: {"files": 0, "bytes": 0}
+        for key in ("retained", "compressed", "quarantined", "eligible_for_deletion")
+    }
     incomplete: list[str] = []
     for record in sorted(document["files"], key=lambda item: item["path"]):
         classification = record["classification"]
@@ -101,6 +105,14 @@ def plan(document: dict[str, Any], source_sha256: str) -> dict[str, Any]:
         actions.append(item)
         totals[action]["files"] += 1
         totals[action]["bytes"] += record["bytes"]
+        disposition = {
+            "retain": "retained",
+            "retain-private": "retained",
+            "quarantine-after-review": "quarantined",
+            "remove-after-review": "eligible_for_deletion",
+        }[action]
+        dispositions[disposition]["files"] += 1
+        dispositions[disposition]["bytes"] += record["bytes"]
     duplicate_groups = document.get("duplicate_groups", [])
     if not isinstance(duplicate_groups, list):
         raise ValueError("inventory duplicate_groups must be an array")
@@ -112,6 +124,7 @@ def plan(document: dict[str, Any], source_sha256: str) -> dict[str, Any]:
         "review_required": True,
         "incomplete_provenance_paths": incomplete,
         "summary": {key: totals[key] for key in sorted(totals)},
+        "disposition_summary": dispositions,
         "duplicate_groups": duplicate_groups,
         "actions": actions,
     }

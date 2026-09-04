@@ -36,6 +36,12 @@ def main() -> int:
     assert result["review_required"] is True
     assert result["incomplete_provenance_paths"] == ["old/capture.log"]
     assert result["summary"]["remove-after-review"] == {"files": 1, "bytes": 20}
+    assert result["disposition_summary"] == {
+        "retained": {"files": 1, "bytes": 10},
+        "compressed": {"files": 0, "bytes": 0},
+        "quarantined": {"files": 1, "bytes": 30},
+        "eligible_for_deletion": {"files": 1, "bytes": 20},
+    }
     assert [item["action"] for item in result["actions"]] == [
         "quarantine-after-review", "remove-after-review", "retain"
     ]
