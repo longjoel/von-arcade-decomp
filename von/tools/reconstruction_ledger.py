@@ -66,8 +66,13 @@ def validate_lifecycle(
                 if not isinstance(integration, dict):
                     errors.append(f"{where}: integrated requires integration evidence")
                     continue
-                if not integration.get("image"):
+                image = integration.get("image")
+                if not isinstance(image, str) or not image:
                     errors.append(f"{where}: integrated requires integration.image")
+                elif Path(image).is_absolute() or ".." in Path(image).parts:
+                    errors.append(f"{where}: integration.image must be a safe relative path")
+                elif root is not None and not (root / image).is_file():
+                    errors.append(f"{where}: missing integration image {image}")
                 if not integration.get("checkpoint"):
                     errors.append(f"{where}: integrated requires integration.checkpoint")
                 test = integration.get("test")
