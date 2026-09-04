@@ -111,6 +111,9 @@ def main() -> int:
         broken["stimulus"]["seconds"] = -1
         assert any("numeric seconds" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
+        broken["stimulus"]["seconds"] = float("inf")
+        assert any("numeric seconds" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
         broken["artifacts"] = ["malformed"]
         assert any("must be an object" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)

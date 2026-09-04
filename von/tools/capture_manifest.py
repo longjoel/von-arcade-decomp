@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import re
 from pathlib import Path
 from typing import Any
@@ -69,9 +70,10 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
     stimulus = manifest.get("stimulus", {})
     if not isinstance(stimulus, dict):
         stimulus = {}
-    if not isinstance(stimulus, dict) or not isinstance(stimulus.get("kind"), str) \
-            or not stimulus.get("kind") or not isinstance(stimulus.get("seconds"), (int, float)) \
-            or isinstance(stimulus.get("seconds"), bool) or stimulus.get("seconds") < 0:
+    seconds = stimulus.get("seconds")
+    if (not isinstance(stimulus, dict) or not isinstance(stimulus.get("kind"), str)
+            or not stimulus.get("kind") or not isinstance(seconds, (int, float))
+            or isinstance(seconds, bool) or not math.isfinite(seconds) or seconds < 0):
         errors.append("stimulus requires kind and numeric seconds")
     if not isinstance(manifest.get("objective"), str) or not manifest.get("objective"):
         errors.append("missing capture objective")
@@ -169,7 +171,8 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
         errors.append("command must contain -seconds_to_run only once")
     else:
         try:
-            if float(seconds_argument) != float(stimulus.get("seconds")):
+            command_seconds = float(seconds_argument)
+            if not math.isfinite(command_seconds) or command_seconds != float(seconds):
                 errors.append("command -seconds_to_run does not match stimulus seconds")
         except (TypeError, ValueError):
             errors.append("command -seconds_to_run must be numeric")
