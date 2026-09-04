@@ -186,6 +186,18 @@ def load_provenance(manifest_path: Path, root: Path, source: Path) -> dict[str, 
     }
 
 
+def path_error(label: str, path: Path, root: Path, *, output: bool = False) -> str | None:
+    if path.is_symlink():
+        return f"{label} path must not be a symlink: {path}"
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, RuntimeError, ValueError):
+        return f"{label} path escapes capture root: {path}"
+    if not output and not path.is_file():
+        return f"missing {label}: {path}"
+    return None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("trace", type=Path)
@@ -204,7 +216,7 @@ def main() -> int:
     parser.add_argument("--capture-manifest", type=Path,
                         help="canonical sidecar that declares the input trace artifact")
     parser.add_argument("--capture-root", type=Path,
-                        help="root used to resolve paths in --capture-manifest (defaults to its parent)")
+                        help="root used to resolve paths (defaults to the trace or manifest parent)")
     args = parser.parse_args()
     if args.max_events is not None and args.max_events < 0:
         parser.error("--max-events must be non-negative")
@@ -216,15 +228,21 @@ def main() -> int:
         parser.error("--window-events must be non-negative")
     if args.trigger_kind is not None and args.window_events is None:
         parser.error("--trigger-kind requires --window-events")
-    for label, path in (("trace", args.trace), ("capture manifest", args.capture_manifest),
-                        ("normalized output", args.ndjson), ("summary output", args.summary)):
-        if path is not None and path.is_symlink():
-            print(f"Trace provenance: {label} path must not be a symlink")
+    capture_root = (args.capture_root or
+                    (args.capture_manifest.parent if args.capture_manifest else args.trace.parent)).resolve()
+    for label, path, output in (("trace", args.trace, False),
+                                ("capture manifest", args.capture_manifest, False),
+                                ("normalized output", args.ndjson, True),
+                                ("summary output", args.summary, True)):
+        if path is None:
+            continue
+        error = path_error(label, path, capture_root, output=output)
+        if error:
+            print(f"Trace provenance: {error}")
             return 1
 
     provenance = None
     if args.capture_manifest:
-        capture_root = (args.capture_root or args.capture_manifest.parent).resolve()
         try:
             provenance = load_provenance(args.capture_manifest, capture_root, args.trace)
         except (OSError, json.JSONDecodeError, ValueError) as error:

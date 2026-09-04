@@ -80,6 +80,14 @@ def main() -> int:
         )
         assert cli_result.returncode == 1
         assert "trace path must not be a symlink" in cli_result.stdout
+        outside_summary = Path(directory).parent / "outside-normalized-summary.json"
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), str(path), "--capture-root", directory,
+             "--summary", str(outside_summary)],
+            cwd=directory, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "summary output path escapes capture root" in cli_result.stdout
     print("PASS: MAME trace normalizer emits ordered NDJSON events")
     return 0
 
