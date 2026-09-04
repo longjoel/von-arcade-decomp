@@ -220,6 +220,7 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--ledger", type=Path, required=True)
     parser.add_argument("--worklist", type=Path)
     parser.add_argument("--coverage", type=Path)
@@ -228,14 +229,29 @@ def main() -> int:
     parser.add_argument("--as-of", help="UTC ISO timestamp used for declared unit age metrics")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    root = args.root.resolve()
+    paths = [("ledger", args.ledger), ("output", args.output)]
+    paths.extend((label, path) for label, path in (
+        ("worklist", args.worklist), ("coverage", args.coverage),
+        ("comparison", args.comparison), ("experiments", args.experiments),
+    ) if path is not None)
+    for label, path in paths:
+        if path.is_symlink():
+            print(f"Evidence metrics: {label} path must not be a symlink: {path}")
+            return 1
+        try:
+            path.resolve().relative_to(root)
+        except (OSError, RuntimeError, ValueError):
+            print(f"Evidence metrics: {label} path escapes root: {path}")
+            return 1
+        if label != "output" and not path.is_file():
+            print(f"Evidence metrics: missing {label}: {path}")
+            return 1
     try:
         report = metrics(load(args.ledger), load(args.worklist), load(args.coverage),
                          load(args.comparison), load(args.experiments), args.as_of)
     except (OSError, json.JSONDecodeError, ValueError) as error:
         print(f"Evidence metrics: {error}")
-        return 1
-    if args.output.is_symlink():
-        print(f"Evidence metrics: output must not be a symlink: {args.output}")
         return 1
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

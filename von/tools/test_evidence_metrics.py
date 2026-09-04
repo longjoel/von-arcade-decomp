@@ -4,9 +4,15 @@
 from __future__ import annotations
 
 import tempfile
+import subprocess
+import sys
 from pathlib import Path
 
 from evidence_metrics import load, metrics
+
+
+ROOT = Path(__file__).resolve().parents[2]
+TOOL = Path(__file__).resolve().parent / "evidence_metrics.py"
 
 
 def main() -> int:
@@ -150,6 +156,25 @@ def main() -> int:
         assert "worklist.units" in str(error)
     else:
         raise AssertionError("metrics accepted malformed worklist units")
+    with tempfile.TemporaryDirectory(dir=ROOT) as directory:
+        temp = Path(directory)
+        malformed = temp / "malformed-ledger.json"
+        malformed.write_text("{invalid\n", encoding="utf-8")
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--root", str(ROOT), "--ledger", str(malformed),
+             "--output", str(temp / "metrics.json")],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "Expecting property name" in cli_result.stdout
+        outside_output = ROOT.parent / "outside-metrics.json"
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--root", str(ROOT), "--ledger", str(malformed),
+             "--output", str(outside_output)],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "output path escapes root" in cli_result.stdout
     try:
         metrics({"images": [{"work_units": [{"stage": "planned", "created_at": "bad"}]}]},
                 {"discovered_units": 0, "modeled_units": 0, "integrated_units": 0},
