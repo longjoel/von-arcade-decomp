@@ -82,6 +82,19 @@ def main() -> int:
         errors = validate_workflow(root, root / "von/reconstruction_ledger.json", unsafe_path,
                                    run_verifiers=True)
         assert any("skipped: unsafe" in error for error in errors)
+    with tempfile.TemporaryDirectory(dir=root) as directory:
+        linked_verifier = Path(directory) / "linked-verifier.py"
+        linked_verifier.symlink_to(root / "von/tools/test_validate_evidence_workflow.py")
+        symlinked = {
+            "schema_version": 1,
+            "entries": [{"id": "symlinked", "canonical": True,
+                          "verifier": str(linked_verifier.relative_to(root))}],
+        }
+        symlinked_path = Path(directory) / "symlinked-evidence.json"
+        symlinked_path.write_text(json.dumps(symlinked), encoding="utf-8")
+        errors = validate_workflow(root, root / "von/reconstruction_ledger.json", symlinked_path,
+                                   run_verifiers=True)
+        assert any("skipped: unsafe" in error for error in errors)
     missing_pack = root / "von/build/missing-pack.json"
     errors = validate_workflow(
         root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",

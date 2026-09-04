@@ -32,7 +32,7 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
             if not entry.get("canonical") or not entry.get("verifier"):
                 continue
             verifier = rooted(root, entry["verifier"])
-            if verifier is None or not verifier.is_file():
+            if verifier is None or verifier.is_symlink() or not verifier.is_file():
                 errors.append(f"verifier {entry.get('id', '?')} skipped: unsafe or missing path")
                 continue
             completed = subprocess.run([sys.executable, str(verifier)], cwd=root,
