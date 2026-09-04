@@ -26,6 +26,13 @@ def register(
     entries = manifest.get("entries")
     if not isinstance(entries, list):
         return ["evidence manifest entries must be an array"]
+    existing_ids: set[str] = set()
+    for index, existing in enumerate(entries):
+        if not isinstance(existing, dict) or not isinstance(existing.get("id"), str) or not existing.get("id"):
+            return [f"evidence manifest entries[{index}] must have a stable id"]
+        if existing["id"] in existing_ids:
+            return [f"duplicate evidence id {existing['id']}"]
+        existing_ids.add(existing["id"])
     errors = validate_capture(capture, root)
     if errors:
         return [f"capture: {error}" for error in errors]

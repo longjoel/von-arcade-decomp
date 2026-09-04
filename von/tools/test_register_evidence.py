@@ -47,6 +47,11 @@ def main() -> int:
                                               capture_path, "bad", "verify.py", ["unit-1"], root, ledger)[0]
         assert "entries" in register({"schema_version": 1, "entries": {}}, capture,
                                        capture_path, "bad", "verify.py", ["unit-1"], root, ledger)[0]
+        assert "stable id" in register({"schema_version": 1, "entries": [{}]}, capture,
+                                         capture_path, "bad", "verify.py", ["unit-1"], root, ledger)[0]
+        assert "duplicate evidence id" in register(
+            {"schema_version": 1, "entries": [{"id": "old"}, {"id": "old"}]},
+            capture, capture_path, "bad", "verify.py", ["unit-1"], root, ledger)[0]
         assert not register(manifest, capture, capture_path, "pilot capture", "verify.py", ["unit-1"], root, ledger)
         assert manifest["entries"][0]["canonical"] is True
         assert manifest["entries"][0]["capture_manifest"] == "capture.json"
