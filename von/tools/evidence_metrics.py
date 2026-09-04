@@ -108,6 +108,13 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
         for unit in image.get("work_units", [])
         if isinstance(unit, dict)
     )
+    active_modeled_units = sorted(
+        str(unit.get("id", "?"))
+        for image in images
+        for unit in image.get("work_units", [])
+        if isinstance(unit, dict) and unit.get("stage") == "modeled"
+        and unit.get("active") is True
+    )
     discovered = worklist["discovered_units"]
     modeled = stages.get("modeled", 0)
     integrated = stages.get("integrated", 0) + stages.get("trace-validated", 0) + stages.get("byte-validated", 0)
@@ -129,7 +136,7 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
             "modeled_conversion_percent": percentage(modeled, discovered),
             "integrated_conversion_percent": percentage(integrated, discovered),
             "stage_conversion_percent": stage_conversion,
-            "active_modeled_units": worklist.get("active_modeled_units", []),
+            "active_modeled_units": active_modeled_units,
             "modeled_wip_limit": worklist.get("modeled_wip_limit", 1),
             "newly_discovered_dynamic_targets": worklist.get("dynamic_targets_added", 0),
         },

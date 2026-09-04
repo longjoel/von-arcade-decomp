@@ -21,7 +21,8 @@ def main() -> int:
         raise AssertionError("incomplete metric inputs were accepted")
     report = metrics(
         {"images": [{"work_units": [
-            {"id": "m", "stage": "modeled", "created_at": "2026-09-04T14:00:00Z"},
+            {"id": "m", "stage": "modeled", "active": True,
+             "created_at": "2026-09-04T14:00:00Z"},
             {"stage": "integrated"}, {"stage": "trace-validated"},
         ]}]},
         {"discovered_units": 4, "active_modeled_units": ["unit-1"], "modeled_wip_limit": 1,
@@ -44,6 +45,7 @@ def main() -> int:
         "trace-validated": 25.0, "byte-validated": 0.0,
     }
     assert report["discovery"]["newly_discovered_dynamic_targets"] == 2
+    assert report["discovery"]["active_modeled_units"] == ["m"]
     assert report["coverage"]["possible_static_edges"] == 7
     assert report["coverage"]["confirmed_dynamic_edges"] == 2
     assert report["comparison"]["checkpoints_passed"] == ["reset"]
