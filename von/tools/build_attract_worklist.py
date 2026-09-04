@@ -49,6 +49,12 @@ def main() -> int:
     parser.add_argument("--json", required=True, type=Path)
     parser.add_argument("--markdown", required=True, type=Path)
     args = parser.parse_args()
+    for label, path in (("coverage", args.coverage), ("ledger", args.ledger),
+                        ("comparison", args.comparison), ("JSON output", args.json),
+                        ("Markdown output", args.markdown)):
+        if path is not None and path.is_symlink():
+            print(f"Worklist: {label} path must not be a symlink")
+            return 1
 
     coverage = json.loads(args.coverage.read_text(encoding="utf-8"))
     ledger = json.loads(args.ledger.read_text(encoding="utf-8"))

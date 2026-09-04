@@ -51,6 +51,16 @@ def main() -> int:
         assert output["active_modeled_units"] == []
         assert output["units"][0]["possible_static_edges"] == 1
         assert "observed_call_edges" not in output["units"][0]
+        linked_json = work / "linked-worklist.json"
+        linked_json.symlink_to(work / "worklist.json")
+        linked_result = subprocess.run(
+            [sys.executable, str(TOOL), "--coverage", str(work / "coverage.json"),
+             "--ledger", str(work / "ledger.json"), "--json", str(linked_json),
+             "--markdown", str(work / "worklist-linked.md")],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert linked_result.returncode == 1
+        assert "JSON output path must not be a symlink" in linked_result.stdout
         comparison = {"missing_dynamic_edges": [["0x200", "0x100"], ["0x300", "0x400"]],
                       "missed_checkpoints": ["scheduler"], "first_divergence_index": 12}
         result = run(coverage, ledger, work, comparison)
