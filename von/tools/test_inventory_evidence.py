@@ -57,9 +57,17 @@ def main() -> int:
         try:
             inventory_path(escaped, root, set())
         except ValueError as error:
-            assert "escapes root" in str(error)
+            assert "must not be a symlink" in str(error)
         else:
             raise AssertionError("external inventory symlink was accepted")
+        local_link = root / "local-link.log"
+        local_link.symlink_to(generated)
+        try:
+            inventory_path(local_link, root, set())
+        except ValueError as error:
+            assert "must not be a symlink" in str(error)
+        else:
+            raise AssertionError("internal inventory symlink was accepted")
     print("PASS: evidence inventory records hashes and cleanup decisions")
     return 0
 

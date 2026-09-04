@@ -38,6 +38,8 @@ def classify(path: str, tracked: bool) -> tuple[str, str]:
 
 
 def inventory_path(path: Path, root: Path, tracked_paths: set[str]) -> dict[str, Any]:
+    if path.is_symlink():
+        raise ValueError(f"inventory path must not be a symlink: {path}")
     try:
         relative = str(path.resolve().relative_to(root.resolve()))
     except (OSError, RuntimeError, ValueError) as exc:
