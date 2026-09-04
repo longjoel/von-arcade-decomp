@@ -22,11 +22,20 @@ def sha256(path: Path) -> str:
 
 def validate_metadata(metadata: dict[str, Any]) -> list[str]:
     errors: list[str] = []
+    if not isinstance(metadata, dict):
+        return ["metadata must be an object"]
     if metadata.get("schema_version") != 1:
         errors.append("schema_version must be 1")
     for section in ("source", "archive"):
         item = metadata.get(section, {})
-        path = Path(item.get("path", ""))
+        if not isinstance(item, dict):
+            errors.append(f"{section} metadata must be an object")
+            continue
+        path_text = item.get("path", "")
+        if not isinstance(path_text, str) or not path_text:
+            errors.append(f"missing {section} file {path_text}")
+            continue
+        path = Path(path_text)
         if not path.is_file():
             errors.append(f"missing {section} file {item.get('path')}")
             continue
@@ -34,8 +43,10 @@ def validate_metadata(metadata: dict[str, Any]) -> list[str]:
             errors.append(f"{section} byte count mismatch")
         if item.get("sha256") != sha256(path):
             errors.append(f"{section} hash mismatch")
-    source = Path(metadata.get("source", {}).get("path", ""))
-    archive = Path(metadata.get("archive", {}).get("path", ""))
+    source_item = metadata.get("source", {})
+    archive_item = metadata.get("archive", {})
+    source = Path(source_item.get("path", "")) if isinstance(source_item, dict) else Path()
+    archive = Path(archive_item.get("path", "")) if isinstance(archive_item, dict) else Path()
     if source.is_file() and archive.is_file():
         try:
             with gzip.open(archive, "rb") as stream:

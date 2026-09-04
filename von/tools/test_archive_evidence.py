@@ -46,6 +46,9 @@ def main() -> int:
         assert any("decompressed payload mismatch" in error for error in validate_metadata(record))
         with gzip.open(target, "rb") as stream:
             assert stream.read() == b'{"wrong":true}\n'
+        malformed = {"schema_version": 1, "source": [], "archive": {}}
+        assert any("source metadata must be an object" in error
+                   for error in validate_metadata(malformed))
     print("PASS: evidence archive emits reproducible source and blob metadata")
     return 0
 
