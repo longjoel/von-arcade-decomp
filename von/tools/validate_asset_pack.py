@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,7 @@ CLAIM_NAMES = {
     "geometry", "source_ranges", "transform_association", "identity", "textures",
     "hierarchy", "animation", "audio_descriptor", "audio_sequence", "source_bytes",
 }
+SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
 def safe_path(path_text: Any) -> bool:
@@ -58,6 +60,8 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
     for field in ("romset_hash", "map_revision", "capture_id", "tool_revision"):
         if not basis.get(field):
             errors.append(f"missing basis.{field}")
+    if basis.get("romset_hash") and not SHA256_RE.fullmatch(str(basis["romset_hash"])):
+        errors.append("basis.romset_hash must be a SHA-256 digest")
     if expected_tool_revision is not None and basis.get("tool_revision") != expected_tool_revision:
         errors.append("basis.tool_revision does not match expected tool revision")
     if expected_map_revision is not None and basis.get("map_revision") != expected_map_revision:
