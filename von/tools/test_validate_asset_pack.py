@@ -37,6 +37,14 @@ def main() -> int:
         assert any("missing basis.tool_revision" in error for error in validate(broken, evidence, root))
         broken_evidence = {"entries": ["malformed"]}
         assert any("unknown canonical basis" in error for error in validate(pack, broken_evidence, root))
+        malformed_entry_errors = validate(pack, broken_evidence, root)
+        assert any("entry must be an object" in error for error in malformed_entry_errors)
+        duplicate_evidence = {"entries": [
+            {"id": "capture-v1", "canonical": True, "outcome": "pass"},
+            {"id": "capture-v1", "canonical": True, "outcome": "pass"},
+        ]}
+        assert any("duplicate evidence id" in error for error in validate(
+            pack, duplicate_evidence, root))
         rom_manifest = root / "rom-manifest.json"
         rom_manifest.write_text('{"rom":"fixture"}\n', encoding="utf-8")
         pack["basis"]["romset_hash"] = hashlib.sha256(rom_manifest.read_bytes()).hexdigest()

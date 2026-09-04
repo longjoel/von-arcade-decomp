@@ -83,6 +83,19 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
     if not isinstance(evidence_entries, list):
         errors.append("evidence entries must be an array")
         evidence_entries = []
+    evidence_ids: set[str] = set()
+    for index, entry in enumerate(evidence_entries):
+        where = f"evidence.entries[{index}]"
+        if not isinstance(entry, dict):
+            errors.append(f"{where}: entry must be an object")
+            continue
+        evidence_id = entry.get("id")
+        if not isinstance(evidence_id, str) or not evidence_id:
+            errors.append(f"{where}: id must be a non-empty string")
+        elif evidence_id in evidence_ids:
+            errors.append(f"{where}: duplicate evidence id {evidence_id}")
+        else:
+            evidence_ids.add(evidence_id)
     canonical_ids = {
         item.get("id") for item in evidence_entries
         if isinstance(item, dict) and item.get("canonical") and isinstance(item.get("id"), str)
