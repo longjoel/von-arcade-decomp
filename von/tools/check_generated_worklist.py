@@ -25,6 +25,13 @@ def normalized(document: dict[str, Any]) -> dict[str, Any]:
 def check(coverage: Path, ledger: Path, expected: Path, root: Path,
           expected_markdown: Path | None = None,
           comparison: Path | None = None) -> list[str]:
+    if comparison is not None:
+        try:
+            comparison.resolve().relative_to(root.resolve())
+        except ValueError:
+            return [f"comparison path escapes root: {comparison}"]
+        if not comparison.is_file():
+            return [f"missing comparison input: {comparison}"]
     try:
         coverage_document = json.loads(coverage.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:

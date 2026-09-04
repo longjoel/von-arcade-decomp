@@ -31,7 +31,7 @@ def main() -> int:
         generated_status_path=root / "von/generated-status.md",
     )
     assert any("generated:" in error for error in errors)
-    with tempfile.TemporaryDirectory() as directory:
+    with tempfile.TemporaryDirectory(dir=root) as directory:
         comparison = Path(directory) / "comparison.json"
         comparison.write_text(json.dumps({"missing_dynamic_edges": [],
                                           "missed_checkpoints": []}), encoding="utf-8")

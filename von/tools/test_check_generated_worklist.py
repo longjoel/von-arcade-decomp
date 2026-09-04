@@ -38,11 +38,14 @@ def main() -> int:
                         "--ledger", str(ledger_path), "--comparison", str(comparison),
                         "--json", str(causal_expected), "--markdown", str(work / "causal-worklist.md")],
                        cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
-        assert not check(coverage_path, ledger_path, causal_expected, ROOT,
+        assert not check(coverage_path, ledger_path, causal_expected, work,
                          work / "causal-worklist.md", comparison)
         comparison.write_text(json.dumps({"missing_dynamic_edges": [["0x300", "0x100"]],
                                           "missed_checkpoints": ["scheduler"]}), encoding="utf-8")
         assert any("stale worklist JSON" in error for error in
+                   check(coverage_path, ledger_path, causal_expected, work,
+                         comparison=comparison))
+        assert any("comparison path escapes root" in error for error in
                    check(coverage_path, ledger_path, causal_expected, ROOT,
                          comparison=comparison))
         markdown.write_text(markdown.read_text(encoding="utf-8") + "stale\n", encoding="utf-8")
