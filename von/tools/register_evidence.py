@@ -74,6 +74,7 @@ def register(
             "description": description,
             "seconds": capture["stimulus"]["seconds"],
         },
+        "checkpoints": capture["checkpoints"],
         "configuration": capture["configuration"],
         "inputs": capture.get("inputs", []),
         "artifacts": capture.get("artifacts", []),

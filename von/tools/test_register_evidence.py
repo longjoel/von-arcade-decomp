@@ -43,6 +43,7 @@ def main() -> int:
         assert not register(manifest, capture, capture_path, "pilot capture", "verify.py", ["unit-1"], root, ledger)
         assert manifest["entries"][0]["canonical"] is True
         assert manifest["entries"][0]["capture_manifest"] == "capture.json"
+        assert manifest["entries"][0]["checkpoints"] == capture["checkpoints"]
         assert manifest["entries"][0]["capture_manifest_sha256"] == hashlib.sha256(
             capture_path.read_bytes()).hexdigest()
         assert ledger["images"][0]["work_units"][0]["evidence"] == ["capture-v1"]

@@ -79,6 +79,7 @@ def main() -> int:
             "schema_version": 1,
             "entries": [{"id": "capture-v1", "canonical": True,
                          "stimulus": {"kind": "input-free-attract", "description": "pilot"},
+                         "checkpoints": capture["checkpoints"],
                          "configuration": capture["configuration"], "artifacts": capture["artifacts"],
                          "capture_manifest": "capture.json",
                          "capture_manifest_sha256": hashlib.sha256(
@@ -105,6 +106,10 @@ def main() -> int:
         mismatched = json.loads(json.dumps(runtime))
         mismatched["entries"][0]["configuration"]["patch_profile"] = "stale"
         assert any("configuration.patch_profile" in error for error in validate(
+            mismatched, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
+        mismatched = json.loads(json.dumps(runtime))
+        mismatched["entries"][0]["checkpoints"] = ["reset"]
+        assert any("checkpoints" in error for error in validate(
             mismatched, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
         mismatched = json.loads(json.dumps(runtime))
         mismatched["entries"][0]["artifacts"] = []

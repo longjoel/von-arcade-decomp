@@ -98,6 +98,8 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                             if (isinstance(stimulus.get("seconds"), (int, float))
                                     and capture_stimulus.get("seconds") != stimulus.get("seconds")):
                                 sidecar_errors.append("capture stimulus duration does not match evidence entry")
+                            if capture_document.get("checkpoints") != entry.get("checkpoints"):
+                                sidecar_errors.append("capture checkpoints do not match evidence entry")
                             capture_configuration = capture_document.get("configuration", {})
                             if isinstance(capture_configuration, dict):
                                 for field, value in configuration_fields(entry).items():
