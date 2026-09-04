@@ -40,6 +40,14 @@ def main() -> int:
         else:
             raise AssertionError("mismatched descriptor was accepted")
         broken = copy.deepcopy(catalog)
+        broken["sample_rom_bytes"] = len(sample) + 2
+        try:
+            validate(broken, sample, root)
+        except ValueError as error:
+            assert "sample_rom_bytes" in str(error)
+        else:
+            raise AssertionError("mismatched ROM size was accepted")
+        broken = copy.deepcopy(catalog)
         broken["entries"][0]["lsa"] = 5
         try:
             validate(broken, sample, root)

@@ -52,6 +52,8 @@ def validate(catalog: Any, sample: bytes, root: Path) -> list[dict[str, Any]]:
         raise ValueError("catalog rate must be a positive integer")
     if not isinstance(entries, list) or not entries:
         raise ValueError("catalog entries must be a non-empty array")
+    if catalog.get("sample_rom_bytes") is not None and catalog.get("sample_rom_bytes") != len(sample):
+        raise ValueError("catalog sample_rom_bytes does not match supplied ROMs")
     results: list[dict[str, Any]] = []
     for index, entry in enumerate(entries):
         if not isinstance(entry, dict):
@@ -98,10 +100,14 @@ def main() -> int:
     try:
         catalog_bytes = args.catalog.read_bytes()
         catalog = json.loads(catalog_bytes)
-        sample = swap_words(b"".join(path.read_bytes() for path in args.sample_rom))
+        physical_roms = [path.read_bytes() for path in args.sample_rom]
+        sample = swap_words(b"".join(physical_roms))
         entries = validate(catalog, sample, args.catalog.parent)
         report = {"schema_version": 1, "status": "validated", "catalog_sha256": sha256(catalog_bytes),
-                  "sample_rom_sha256": sha256(sample), "entries": entries}
+                  "sample_rom_sha256": sha256(sample),
+                  "sample_roms": [{"path": str(path), "sha256": sha256(data), "bytes": len(data)}
+                                  for path, data in zip(args.sample_rom, physical_roms)],
+                  "entries": entries}
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     except (OSError, json.JSONDecodeError, ValueError, wave.Error) as error:
