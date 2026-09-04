@@ -92,8 +92,14 @@ def validate_lifecycle(
                     errors.append(f"{where}: canonical evidence does not name this unit as a consumer")
             elif stage == "byte-validated":
                 comparison = unit.get("byte_validation")
-                if not isinstance(comparison, dict) or not comparison.get("original_range"):
-                    errors.append(f"{where}: byte-validated requires byte_validation.original_range")
+                if not isinstance(comparison, dict):
+                    errors.append(f"{where}: byte-validated requires byte validation evidence")
+                else:
+                    for field in ("original_range", "reconstructed_range", "comparison"):
+                        if not comparison.get(field):
+                            errors.append(f"{where}: byte-validated requires byte_validation.{field}")
+                    if comparison.get("comparison") != "match":
+                        errors.append(f"{where}: byte validation comparison must be match")
             elif stage == "blocked":
                 blocked = unit.get("blocked")
                 required = ("missing_fact", "failed_discriminator", "next_experiment")
