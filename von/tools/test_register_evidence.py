@@ -89,6 +89,12 @@ def main() -> int:
         assert any("non-empty string array" in error for error in register(
             {"schema_version": 1, "entries": []}, capture, capture_path, "empty consumer", "verify.py",
             [""], root, ledger))
+        assert any("ledger must be an object" in error for error in register(
+            {"schema_version": 1, "entries": []}, capture, capture_path, "bad ledger", "verify.py",
+            ["unit-1"], root, []))
+        assert any("work_units must be an array" in error for error in register(
+            {"schema_version": 1, "entries": []}, capture, capture_path, "bad units", "verify.py",
+            ["unit-1"], root, {"images": [{"work_units": {}}]}))
         broken = copy.deepcopy(manifest)
         assert register(broken, capture, capture_path, "duplicate", "verify.py", ["unit-1"], root)
         assert "unknown ledger consumers" in register({"schema_version": 1, "entries": []}, capture, root / "capture.json", "unknown", "verify.py", ["missing"], root, ledger)[0]

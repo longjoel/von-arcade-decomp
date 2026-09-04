@@ -65,6 +65,20 @@ def register(
     if len(set(consumers)) != len(consumers):
         return ["ledger consumers must be unique"]
     if ledger is not None:
+        if not isinstance(ledger, dict):
+            return ["ledger must be an object"]
+        images = ledger.get("images")
+        if not isinstance(images, list):
+            return ["ledger images must be an array"]
+        for image_index, image in enumerate(images):
+            if not isinstance(image, dict):
+                return [f"ledger images[{image_index}] must be an object"]
+            work_units = image.get("work_units")
+            if not isinstance(work_units, list):
+                return [f"ledger images[{image_index}] work_units must be an array"]
+            for unit_index, unit in enumerate(work_units):
+                if not isinstance(unit, dict) or not isinstance(unit.get("id"), str) or not unit.get("id"):
+                    return [f"ledger images[{image_index}] work_units[{unit_index}] must have a stable id"]
         unit_ids = {
             unit.get("id") for image in ledger.get("images", [])
             for unit in image.get("work_units", [])
