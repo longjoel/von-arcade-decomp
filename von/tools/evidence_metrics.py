@@ -92,6 +92,10 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
             value = document.get(field)
             if not isinstance(value, int) or isinstance(value, bool) or value < 0:
                 raise ValueError(f"metrics {name}.{field} must be a nonnegative integer")
+    for name, value in (("worklist.checkpoint_distance", worklist.get("checkpoint_distance")),
+                        ("comparison.first_divergence_index", comparison.get("first_divergence_index"))):
+        if value is not None and (not isinstance(value, int) or isinstance(value, bool) or value < 0):
+            raise ValueError(f"metrics {name} must be a nonnegative integer")
     if "dynamic_targets_added" in worklist:
         value = worklist["dynamic_targets_added"]
         if not isinstance(value, int) or isinstance(value, bool) or value < 0:
@@ -149,6 +153,7 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
             "active_modeled_units": active_modeled_units,
             "modeled_wip_limit": worklist.get("modeled_wip_limit", 1),
             "newly_discovered_dynamic_targets": worklist.get("dynamic_targets_added", 0),
+            "checkpoint_distance": worklist.get("checkpoint_distance", 0),
         },
         "coverage": {
             "tier": coverage.get("tier"),
@@ -172,6 +177,7 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
             "unexpected_checkpoints": comparison.get("unexpected_checkpoints", []),
             "missing_original_checkpoints": comparison.get("missing_original_checkpoints", []),
             "missing_reconstructed_checkpoints": comparison.get("missing_reconstructed_checkpoints", []),
+            "first_divergence_index": comparison.get("first_divergence_index"),
         },
         "experiments": {
             "changed_decision": (experiments or {}).get("changed_decision", 0),

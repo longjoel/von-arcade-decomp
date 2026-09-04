@@ -26,14 +26,15 @@ def main() -> int:
             {"stage": "integrated"}, {"stage": "trace-validated"},
         ]}]},
         {"discovered_units": 4, "active_modeled_units": ["unit-1"], "modeled_wip_limit": 1,
-         "dynamic_targets_added": 2},
+         "dynamic_targets_added": 2, "checkpoint_distance": 3},
         {"tier": "A", "possible_static_edge_count": 7, "confirmed_dynamic_edge_count": 2,
          "observed_entry_point_count": 3},
         {"compared_events": 10, "matched_prefix_events": 8,
          "confirmed_dynamic_edge_count": 2, "observed_indirect_target_count": 1,
          "original_checkpoints": ["reset", "audio"], "missed_checkpoints": ["audio"],
          "unexpected_checkpoints": [], "checkpoint_outcome": "divergence",
-         "missing_original_checkpoints": [], "missing_reconstructed_checkpoints": ["audio"]},
+         "missing_original_checkpoints": [], "missing_reconstructed_checkpoints": ["audio"],
+         "first_divergence_index": 8},
         {"changed_decision": 3, "quarantined": 1},
         "2026-09-04T15:00:00Z",
     )
@@ -45,6 +46,7 @@ def main() -> int:
         "trace-validated": 25.0, "byte-validated": 0.0,
     }
     assert report["discovery"]["newly_discovered_dynamic_targets"] == 2
+    assert report["discovery"]["checkpoint_distance"] == 3
     assert report["discovery"]["active_modeled_units"] == ["m"]
     assert report["coverage"]["possible_static_edges"] == 7
     assert report["coverage"]["confirmed_dynamic_edges"] == 2
@@ -55,6 +57,7 @@ def main() -> int:
     assert report["comparison"]["confirmed_dynamic_edges"] == 2
     assert report["comparison"]["original_events"] == 0
     assert report["comparison"]["reconstructed_events"] == 0
+    assert report["comparison"]["first_divergence_index"] == 8
     assert report["comparison"]["observed_indirect_targets"] == 1
     assert report["experiments"] == {"changed_decision": 3, "quarantined": 1}
     assert report["age"]["modeled"]["median_age_seconds"] == 3600.0
