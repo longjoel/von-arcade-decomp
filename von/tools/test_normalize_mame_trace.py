@@ -27,6 +27,11 @@ def main() -> int:
     assert report["event_counts"] == {"vonj_copro_fifo": 1}
     assert report["first_event"]["kind"] == "vonj_copro_fifo"
     assert report["filters"]["event_kinds"] == ["vonj_copro_fifo"]
+    report = summary([event], Path("trace.log"), provenance={
+        "capture_id": "capture-v1", "objective": "pilot",
+        "stimulus": {"kind": "bounded-trace", "seconds": 1}, "artifact": "trace.log",
+    })
+    assert report["provenance"]["capture_id"] == "capture-v1"
     with tempfile.TemporaryDirectory() as directory:
         path = Path(directory) / "events.ndjson"
         path.write_text(json.dumps(event) + "\n", encoding="utf-8")

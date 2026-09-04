@@ -8,6 +8,9 @@ import json
 import re
 from collections import Counter
 from pathlib import Path
+from typing import Any
+
+from capture_manifest import validate as validate_capture
 
 
 EVENT_RE = re.compile(r"^\[[^]]+\]\s+(?P<event>\w+):\s+(?P<body>.*)$")
@@ -72,10 +75,10 @@ def select_events(events: list[dict], max_events: int | None = None,
 
 def summary(events: list[dict], source: Path, max_events: int | None = None,
             event_kinds: set[str] | None = None, pc_min: int | None = None,
-            pc_max: int | None = None) -> dict:
+            pc_max: int | None = None, provenance: dict[str, Any] | None = None) -> dict:
     selected = select_events(events, max_events, event_kinds, pc_min, pc_max)
     counts = Counter(event.get("kind") for event in selected)
-    return {
+    result = {
         "schema_version": 1,
         "source": str(source),
         "event_count": len(selected),
@@ -88,6 +91,31 @@ def summary(events: list[dict], source: Path, max_events: int | None = None,
             "pc_min": pc_min,
             "pc_max": pc_max,
         },
+    }
+    if provenance is not None:
+        result["provenance"] = provenance
+    return result
+
+
+def load_provenance(manifest_path: Path, root: Path, source: Path) -> dict[str, Any]:
+    """Validate and bind the normalized source to a canonical capture sidecar."""
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    errors = validate_capture(manifest, root)
+    if errors:
+        raise ValueError("capture manifest: " + "; ".join(errors))
+    try:
+        source_relative = str(source.resolve().relative_to(root.resolve()))
+    except ValueError as error:
+        raise ValueError("trace source escapes capture root") from error
+    artifacts = manifest.get("artifacts", [])
+    artifact_paths = {item.get("path") for item in artifacts if isinstance(item, dict)}
+    if source_relative not in artifact_paths:
+        raise ValueError(f"trace source is not declared as a capture artifact: {source_relative}")
+    return {
+        "capture_id": manifest["id"],
+        "objective": manifest["objective"],
+        "stimulus": manifest["stimulus"],
+        "artifact": source_relative,
     }
 
 
@@ -102,7 +130,20 @@ def main() -> int:
     parser.add_argument("--event-kind", action="append", default=[])
     parser.add_argument("--pc-min", type=lambda value: int(value, 0))
     parser.add_argument("--pc-max", type=lambda value: int(value, 0))
+    parser.add_argument("--capture-manifest", type=Path,
+                        help="canonical sidecar that declares the input trace artifact")
+    parser.add_argument("--capture-root", type=Path,
+                        help="root used to resolve paths in --capture-manifest (defaults to its parent)")
     args = parser.parse_args()
+
+    provenance = None
+    if args.capture_manifest:
+        capture_root = (args.capture_root or args.capture_manifest.parent).resolve()
+        try:
+            provenance = load_provenance(args.capture_manifest, capture_root, args.trace)
+        except (OSError, json.JSONDecodeError, ValueError) as error:
+            print(f"Trace provenance: {error}")
+            return 1
 
     counts: Counter[str] = Counter()
     fifo: list[tuple[int, str, str]] = []
@@ -161,7 +202,7 @@ def main() -> int:
         args.summary.parent.mkdir(parents=True, exist_ok=True)
         args.summary.write_text(json.dumps(
             summary(all_normalized, args.trace, args.max_events, event_kinds,
-                    args.pc_min, args.pc_max), indent=2
+                    args.pc_min, args.pc_max, provenance), indent=2
         ) + "\n", encoding="utf-8")
         print(f"Event summary: {args.summary}")
     return 0

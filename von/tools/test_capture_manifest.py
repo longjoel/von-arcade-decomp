@@ -4,10 +4,12 @@
 from __future__ import annotations
 
 import copy
+import json
 import tempfile
 from pathlib import Path
 
 from capture_manifest import directory_sha256, entry, validate
+from normalize_mame_trace import load_provenance
 
 
 def main() -> int:
@@ -35,6 +37,16 @@ def main() -> int:
         for field in ("cfg_directory", "nvram_directory", "state_directory"):
             manifest["isolation"][f"{field}_sha256"] = directory_sha256(root / manifest["isolation"][field])
         assert not validate(manifest, root)
+        manifest_path = root / "capture.json"
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        provenance = load_provenance(manifest_path, root, artifact_path)
+        assert provenance["capture_id"] == "fixture-v1"
+        try:
+            load_provenance(manifest_path, root, root / "unlisted.ndjson")
+        except ValueError as error:
+            assert "not declared" in str(error)
+        else:
+            raise AssertionError("undeclared trace artifact was accepted")
         broken = copy.deepcopy(manifest)
         broken["artifacts"][0]["sha256"] = "0" * 64
         assert any("hash mismatch" in error for error in validate(broken, root))
