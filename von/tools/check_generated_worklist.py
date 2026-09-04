@@ -23,7 +23,8 @@ def normalized(document: dict[str, Any]) -> dict[str, Any]:
 
 
 def check(coverage: Path, ledger: Path, expected: Path, root: Path,
-          expected_markdown: Path | None = None) -> list[str]:
+          expected_markdown: Path | None = None,
+          comparison: Path | None = None) -> list[str]:
     try:
         coverage_document = json.loads(coverage.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
@@ -34,9 +35,12 @@ def check(coverage: Path, ledger: Path, expected: Path, root: Path,
         return [f"stale or invalid Tier A coverage: {coverage}"]
     with tempfile.TemporaryDirectory() as directory:
         generated = Path(directory)
+        command = [sys.executable, str(GENERATOR), "--coverage", str(coverage), "--ledger", str(ledger),
+                   "--json", str(generated / "worklist.json"), "--markdown", str(generated / "worklist.md")]
+        if comparison is not None:
+            command.extend(["--comparison", str(comparison)])
         result = subprocess.run(
-            [sys.executable, str(GENERATOR), "--coverage", str(coverage), "--ledger", str(ledger),
-             "--json", str(generated / "worklist.json"), "--markdown", str(generated / "worklist.md")],
+            command,
             cwd=root, capture_output=True, text=True, check=False,
         )
         if result.returncode:
@@ -64,8 +68,11 @@ def main() -> int:
     parser.add_argument("--worklist", type=Path, required=True)
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--markdown", type=Path)
+    parser.add_argument("--comparison", type=Path,
+                        help="optional comparison input used by the worklist generator")
     args = parser.parse_args()
-    errors = check(args.coverage, args.ledger, args.worklist, args.root, args.markdown)
+    errors = check(args.coverage, args.ledger, args.worklist, args.root, args.markdown,
+                   args.comparison)
     if errors:
         for error in errors:
             print(f"- {error}")

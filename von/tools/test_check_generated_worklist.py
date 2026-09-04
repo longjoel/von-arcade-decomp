@@ -30,6 +30,21 @@ def main() -> int:
                        cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
         markdown = work / "worklist.md"
         assert not check(coverage_path, ledger_path, expected, ROOT, markdown)
+        comparison = work / "comparison.json"
+        comparison.write_text(json.dumps({"missing_dynamic_edges": [["0x200", "0x100"]],
+                                          "missed_checkpoints": ["scheduler"]}), encoding="utf-8")
+        causal_expected = work / "causal-worklist.json"
+        subprocess.run([sys.executable, str(GENERATOR), "--coverage", str(coverage_path),
+                        "--ledger", str(ledger_path), "--comparison", str(comparison),
+                        "--json", str(causal_expected), "--markdown", str(work / "causal-worklist.md")],
+                       cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
+        assert not check(coverage_path, ledger_path, causal_expected, ROOT,
+                         work / "causal-worklist.md", comparison)
+        comparison.write_text(json.dumps({"missing_dynamic_edges": [["0x300", "0x100"]],
+                                          "missed_checkpoints": ["scheduler"]}), encoding="utf-8")
+        assert any("stale worklist JSON" in error for error in
+                   check(coverage_path, ledger_path, causal_expected, ROOT,
+                         comparison=comparison))
         markdown.write_text(markdown.read_text(encoding="utf-8") + "stale\n", encoding="utf-8")
         assert any("Markdown" in error for error in check(coverage_path, ledger_path, expected, ROOT, markdown))
         subprocess.run([sys.executable, str(GENERATOR), "--coverage", str(coverage_path), "--ledger", str(ledger_path),

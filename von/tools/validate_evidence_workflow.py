@@ -21,7 +21,8 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
                       check_generated: bool = False,
                       generated_coverage_path: Path | None = None,
                       generated_worklist_path: Path | None = None,
-                      generated_status_path: Path | None = None) -> list[str]:
+                      generated_status_path: Path | None = None,
+                      generated_comparison_path: Path | None = None) -> list[str]:
     ledger = load(ledger_path)
     evidence = load(evidence_path)
     errors = [f"ledger: {error}" for error in validate_ledger(ledger, root)]
@@ -69,7 +70,8 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
 
             errors.extend(f"generated: {error}" for error in check_status(root, generated_status_path))
             errors.extend(f"generated: {error}" for error in check_worklist(
-                generated_coverage_path, ledger_path, generated_worklist_path, root))
+                generated_coverage_path, ledger_path, generated_worklist_path, root,
+                comparison=generated_comparison_path))
     return errors
 
 
@@ -94,12 +96,14 @@ def main() -> int:
                         help="generated worklist for --check-generated")
     parser.add_argument("--status", type=Path,
                         help="generated status Markdown for --check-generated")
+    parser.add_argument("--comparison", type=Path,
+                        help="optional comparison input used by the generated worklist")
     parser.add_argument("--run-verifiers", action="store_true")
     args = parser.parse_args()
     errors = validate_workflow(args.root, args.ledger, args.evidence, args.strict_lifecycle,
                                args.asset_pack, args.run_verifiers, args.rom_manifest,
                                args.tool_revision, args.map_revision, args.check_generated,
-                               args.coverage, args.worklist, args.status)
+                               args.coverage, args.worklist, args.status, args.comparison)
     if errors:
         print(f"Evidence workflow validation: {len(errors)} error(s)")
         for error in errors:
