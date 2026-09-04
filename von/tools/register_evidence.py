@@ -30,6 +30,8 @@ def register(
     for index, existing in enumerate(entries):
         if not isinstance(existing, dict) or not isinstance(existing.get("id"), str) or not existing.get("id"):
             return [f"evidence manifest entries[{index}] must have a stable id"]
+        if not isinstance(existing.get("canonical"), bool):
+            return [f"evidence manifest entries[{index}] canonical must be boolean"]
         if existing["id"] in existing_ids:
             return [f"duplicate evidence id {existing['id']}"]
         existing_ids.add(existing["id"])

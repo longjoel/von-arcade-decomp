@@ -49,8 +49,13 @@ def main() -> int:
                                        capture_path, "bad", "verify.py", ["unit-1"], root, ledger)[0]
         assert "stable id" in register({"schema_version": 1, "entries": [{}]}, capture,
                                          capture_path, "bad", "verify.py", ["unit-1"], root, ledger)[0]
+        malformed_manifest = {"schema_version": 1, "entries": [{"id": "old", "canonical": "true"}]}
+        assert "canonical must be boolean" in register(
+            malformed_manifest, capture, capture_path, "bad", "verify.py", ["unit-1"], root, ledger)[0]
+        assert malformed_manifest["entries"] == [{"id": "old", "canonical": "true"}]
         assert "duplicate evidence id" in register(
-            {"schema_version": 1, "entries": [{"id": "old"}, {"id": "old"}]},
+            {"schema_version": 1, "entries": [{"id": "old", "canonical": True},
+                                                 {"id": "old", "canonical": True}]},
             capture, capture_path, "bad", "verify.py", ["unit-1"], root, ledger)[0]
         assert not register(manifest, capture, capture_path, "pilot capture", "verify.py", ["unit-1"], root, ledger)
         assert manifest["entries"][0]["canonical"] is True
