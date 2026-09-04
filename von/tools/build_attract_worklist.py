@@ -23,6 +23,8 @@ def main() -> int:
 
     coverage = json.loads(args.coverage.read_text(encoding="utf-8"))
     ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
+    if coverage.get("tier") != "A" or coverage.get("edge_semantics") != "possible_static_edges":
+        raise SystemExit("coverage must be a Tier A possible_static_edges report")
     work_units = []
     milestone_units = {}
     for image in ledger.get("images", []):
@@ -38,10 +40,10 @@ def main() -> int:
                 work_units.append((number(semantic_range["start"]), number(semantic_range["end"]), entry))
 
     edge_counts = Counter(
-        number(edge["target"]) for edge in coverage.get("executed_direct_edges", [])
+        number(edge["target"]) for edge in coverage.get("possible_static_edges", [])
     )
     units = []
-    for target_text in coverage.get("executed_direct_targets", []):
+    for target_text in coverage.get("observed_entry_points", []):
         target = number(target_text)
         # Explicit milestone membership is authoritative. This avoids a newly
         # nested semantic helper silently changing the closure denominator.
@@ -51,7 +53,7 @@ def main() -> int:
         units.append(
             {
                 "entry": f"0x{target:08x}",
-                "observed_call_edges": edge_counts[target],
+                "possible_static_edges": edge_counts[target],
                 "triage": "modeled-integration-queue" if stage == "modeled" else ("integrated-validation-queue" if represented else "untriaged"),
                 "stage": stage or "planned",
                 "priority": 0 if stage == "modeled" else (1 if represented else 2),
@@ -65,14 +67,25 @@ def main() -> int:
     represented_count = sum(unit["priority"] < 2 for unit in units)
     modeled_count = sum(unit["stage"] == "modeled" for unit in units)
     integrated_count = sum(unit["stage"] in {"integrated", "trace-validated", "byte-validated"} for unit in units)
+    active_modeled = [
+        entry["id"] for image in ledger.get("images", [])
+        for entry in image.get("work_units", [])
+        if entry.get("stage") == "modeled" and entry.get("active") is True
+    ]
+    if len(active_modeled) > 1:
+        raise SystemExit("modeled work-in-progress limit exceeded: more than one active unit")
     output = {
         "schema_version": 1,
+        "coverage_tier": coverage["tier"],
+        "edge_semantics": coverage["edge_semantics"],
         "coverage_source": str(args.coverage),
         "discovered_units": len(units),
         "represented_units": represented_count,
         "modeled_units": modeled_count,
         "integrated_units": integrated_count,
         "untriaged_units": len(units) - represented_count,
+        "modeled_wip_limit": 1,
+        "active_modeled_units": active_modeled,
         "ordering": "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality",
         "units": units,
     }
@@ -82,7 +95,7 @@ def main() -> int:
     lines = [
         "# Attract Reconstruction Worklist",
         "",
-        f"- Observed direct-call units: {len(units)}",
+        f"- Observed entry-point units: {len(units)}",
         f"- Modeled integration queue: {modeled_count}",
         f"- Integrated or validated: {integrated_count}",
         f"- Untriaged: {len(units) - represented_count}",
@@ -92,7 +105,7 @@ def main() -> int:
     ]
     for unit in units:
         lines.append(
-            f"| `{unit['entry']}` | {unit['observed_call_edges']} | "
+            f"| `{unit['entry']}` | {unit['possible_static_edges']} | "
             f"{unit['triage']} | {unit['work_unit'] or ''} |"
         )
     args.markdown.write_text("\n".join(lines) + "\n", encoding="utf-8")

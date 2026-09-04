@@ -87,12 +87,13 @@ void i960_reconstructed_main(void)
 
     recovered_text_startup_asset_transfer(0U);
     recovered_geometry_pipeline_startup(0);
+    /* The SCSP FIFO is part of the board's host-visible audio boundary.  Its
+     * initializer emits the observed 0xff startup command and arms the
+     * generated consumer path below. */
+    recovered_audio_initialize_scsp();
     recovered_text_video_control_bootstrap(0U);
     recovered_text_font_asset_initialize();
     recovered_text_video_upload();
-    /* vonjdev does not map the recovered SCSP control window. Keep the
-     * recovered routine linked for oracle work, but skip its MMIO writes in
-     * this development image so the attract-state adapter can run. */
     state[7] = recovered_object_state_runtime_tick();
     recovered_text_palette_initialize();
     /* The recovered texture loader is retained for offline analysis, but its

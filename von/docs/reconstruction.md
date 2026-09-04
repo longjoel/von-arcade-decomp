@@ -41,6 +41,30 @@ Before selecting more work, run the live status and regenerate stale reports:
 ./scripts/status.sh --write-markdown
 ```
 
+Treat the generated reports as a snapshot of the machine-readable state, not
+as a second plan. A large modeled queue is not parallel work in progress: the
+active limit remains one integration unit and one supporting experiment.
+
+## Checkpoint contract
+
+The milestone is a sequence of observable gates. A later gate must not be used
+to justify work while an earlier gate is failing.
+
+| Order | Checkpoint | Minimum observation |
+| --- | --- | --- |
+| 1 | generated reset | reset and initial register/stack setup execute from generated code |
+| 2 | hardware initialization | board, texture, palette, tile/text, geometry, SHARC, and audio setup complete |
+| 3 | attract scheduler | the input-free scheduler reaches its attract state transition |
+| 4 | legal/title output | title or legal presentation produces the expected watched video/text effects |
+| 5 | audio activity | the original and generated paths emit comparable audio commands |
+| 6 | sustained attract | geometry/video state continues changing through the 60-second run |
+| 7 | clean execution | no exception, stall, or executed i960 PC outside generated code |
+
+For every failed gate, record the last matching ordered event and the first
+divergent event. The first divergence, rather than the largest coverage gap,
+selects the next work unit. Coverage-only edges remain possible static edges
+until a causal trace observes the call.
+
 ## Lifecycle
 
 | Stage | Meaning |
@@ -75,6 +99,17 @@ Keep one active integration unit and at most one supporting experiment:
 Use the queue-item, capture, evidence, and promotion templates in
 [Evidence and assets plan](evidence-and-assets-plan.md).
 
+The active unit must name the checkpoint it is expected to advance. Its
+working record includes one falsifiable hypothesis, one discriminator, the
+dynamic caller or entry evidence, the relevant inputs and outputs, and the
+smallest fixture that can reproduce the decision. If the discriminator does
+not change the queue, implementation, confidence, or verifier, stop the
+experiment and quarantine its output instead of expanding the capture.
+
+Do not open a second modeled implementation unit while the active unit is
+awaiting integration or comparison. A supporting experiment is allowed only
+when it resolves a named uncertainty in that unit.
+
 ## Validation commands
 
 ```sh
@@ -95,6 +130,11 @@ make check
 `smoke` checks a short clean-image boot. `attract` owns the complete milestone
 and must reject execution outside generated code.
 
+The required validation order is `unit`, `contract`, `trace`, `smoke`, then
+`attract`. A changed producer, test manifest, capture recipe, or ledger makes
+the corresponding generated result stale; report the stale state rather than
+copying an old result into this document.
+
 ## Engineering order
 
 1. Establish a clean baseline by running the currently stale trace, smoke, and
@@ -105,6 +145,14 @@ and must reject execution outside generated code.
 5. Advance through scheduler, title/UI, audio commands, and sustained geometry
    activity in checkpoint order.
 6. Calibrate byte reproduction separately with the pinned Intel CTOOLS track.
+
+At each step, preserve the earlier checkpoint fixtures and rerun them after an
+integration change. Promote a unit only when its lifecycle evidence is
+complete: readable bounded behavior and a focused test for `modeled`, generated
+image invocation and earlier-gate stability for `integrated`, and a registered
+canonical original/reconstructed event comparison with a passing verifier for
+`trace-validated`. Byte similarity is an independent claim and never replaces
+behavioral evidence.
 
 The broad SHARC probe campaign is frozen. New SHARC work requires a named host
 integration failure that existing evidence cannot discriminate.

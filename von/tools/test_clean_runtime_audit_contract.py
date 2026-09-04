@@ -10,6 +10,7 @@ import tempfile
 def main() -> int:
     script = Path("scripts/audit-i960-clean-runtime.sh").read_text(encoding="utf-8")
     lua = Path("von/tools/trace_i960_attract_coverage.lua").read_text(encoding="utf-8")
+    capture = Path("scripts/trace-i960-attract-coverage.sh").read_text(encoding="utf-8")
     required = (
         "MAME_STATUS=$?",
         "AUDIT_STATUS=0",
@@ -23,6 +24,9 @@ def main() -> int:
     missing = [fragment for fragment in required if fragment not in script]
     if missing:
         raise SystemExit(f"clean runtime audit contract missing: {missing}")
+    for fragment in ("capture_manifest.py", "-cfg_directory", "-nvram_directory", "-state_directory"):
+        if fragment not in capture:
+            raise SystemExit(f"attract capture provenance contract missing: {fragment}")
     assert script.index("MAME_STATUS=$?") < script.index("audit_clean_i960_coverage.py")
     assert "manager.machine:exit()" in lua
     assert "emu.exit()" not in lua

@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 
 from migrate_reconstruction_ledger import migrate
-from reconstruction_ledger import code_coverage, validate
+from reconstruction_ledger import code_coverage, validate, validate_lifecycle
 
 
 def main() -> int:
@@ -33,6 +33,46 @@ def main() -> int:
         path = Path(directory) / "roundtrip.json"
         path.write_text(json.dumps(ledger), encoding="utf-8")
         assert json.loads(path.read_text(encoding="utf-8"))["schema_version"] == 2
+    lifecycle = {
+        "schema_version": 2,
+        "images": [{"name": "maincpu", "work_units": [
+            {"id": "planned", "stage": "planned", "notes": "may matter"},
+            {"id": "modeled", "stage": "modeled", "modeling": {
+                "boundary": "MMIO inputs/outputs", "test": "test.py",
+                "unresolved_behavior": "bus timing"
+            }},
+            {"id": "integrated", "stage": "integrated", "integration": {
+                "checkpoint": "startup", "test": "test.py"
+            }},
+            {"id": "trace", "stage": "trace-validated",
+             "canonical_evidence_id": "capture-v1", "verifier": "verify.py"},
+            {"id": "blocked", "stage": "blocked", "blocked": {
+                "missing_fact": "target", "failed_discriminator": "no event",
+                "next_experiment": "capture call window"
+            }},
+        ]}],
+    }
+    manifest = {"entries": [{"id": "capture-v1", "canonical": True, "verifier": "verify.py"}]}
+    assert not validate_lifecycle(lifecycle, manifest)
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][1]["active"] = True
+    broken["images"][0]["work_units"].append({
+        "id": "another-modeled", "stage": "modeled", "active": True,
+        "modeling": {"boundary": "RAM", "test": "test.py", "unresolved_behavior": "timing"},
+    })
+    assert any("work-in-progress limit" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][1]["modeling"].pop("boundary")
+    assert any("modeled requires modeling.boundary" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    del broken["images"][0]["work_units"][2]["integration"]
+    assert any("integrated requires" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][3]["canonical_evidence_id"] = "von/build/capture.log"
+    assert any("canonical evidence id" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][3]["verifier"] = "other.py"
+    assert any("differs from canonical" in error for error in validate_lifecycle(broken, manifest))
     print("PASS: ledger v1 migration, schema-v2 validation, and union coverage")
     return 0
 

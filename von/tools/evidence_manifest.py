@@ -26,6 +26,25 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
         stimulus = entry.get("stimulus", {})
         if not stimulus.get("kind") or not stimulus.get("description"):
             errors.append(f"{where}: canonical stimulus is incomplete")
+        if stimulus.get("kind") in {"input-free-attract", "bounded-trace", "causal-trace"}:
+            sidecar = entry.get("capture_manifest")
+            if not isinstance(sidecar, str) or not sidecar:
+                errors.append(f"{where}: runtime evidence requires capture_manifest")
+            else:
+                sidecar_path = root / sidecar
+                if not sidecar_path.is_file():
+                    errors.append(f"{where}: missing capture manifest {sidecar}")
+                else:
+                    try:
+                        from capture_manifest import validate as validate_capture
+
+                        capture_document = json.loads(sidecar_path.read_text(encoding="utf-8"))
+                        sidecar_errors = validate_capture(capture_document, root)
+                        if capture_document.get("id") != evidence_id:
+                            sidecar_errors.append("capture manifest id does not match evidence id")
+                    except (OSError, json.JSONDecodeError) as exc:
+                        sidecar_errors = [f"unable to read capture manifest: {exc}"]
+                    errors.extend(f"{where}: {error}" for error in sidecar_errors)
         configuration = entry.get("configuration", {})
         for field in ("mame_revision", "patch_profile", "execution_engine"):
             if not configuration.get(field):

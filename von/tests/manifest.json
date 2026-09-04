@@ -29,7 +29,19 @@
         ["python3", "von/tools/test_patchset_manifest.py"],
         ["python3", "von/tools/test_project_status.py"],
         ["python3", "von/tools/test_mame_von_subtarget.py"],
-        ["python3", "von/tools/test_analyze_match_geometry.py"]
+        ["python3", "von/tools/test_analyze_match_geometry.py"],
+        ["python3", "von/tools/test_analyze_attract_coverage.py"],
+        ["python3", "von/tools/test_capture_manifest.py"],
+        ["python3", "von/tools/test_compare_ordered_events.py"],
+        ["python3", "von/tools/test_inventory_evidence.py"],
+        ["python3", "von/tools/test_build_attract_worklist.py"],
+        ["python3", "von/tools/test_validate_asset_pack.py"],
+        ["python3", "von/tools/test_normalize_mame_trace.py"],
+        ["python3", "von/tools/test_register_evidence.py"],
+        ["python3", "von/tools/test_archive_evidence.py"],
+        ["python3", "von/tools/test_evidence_metrics.py"],
+        ["python3", "von/tools/test_validate_evidence_workflow.py"],
+        ["python3", "von/tools/test_check_generated_worklist.py"]
       ]
     },
     "trace": {

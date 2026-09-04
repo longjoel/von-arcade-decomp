@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""Contract tests for Tier A worklist admission and WIP limits."""
+
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[2]
+TOOL = ROOT / "von/tools/build_attract_worklist.py"
+
+
+def run(coverage: dict, ledger: dict, work: Path) -> subprocess.CompletedProcess[str]:
+    coverage_path = work / "coverage.json"
+    ledger_path = work / "ledger.json"
+    output_path = work / "worklist.json"
+    markdown_path = work / "worklist.md"
+    coverage_path.write_text(json.dumps(coverage), encoding="utf-8")
+    ledger_path.write_text(json.dumps(ledger), encoding="utf-8")
+    return subprocess.run(
+        [sys.executable, str(TOOL), "--coverage", str(coverage_path), "--ledger", str(ledger_path),
+         "--json", str(output_path), "--markdown", str(markdown_path)],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+
+
+def main() -> int:
+    coverage = {"schema_version": 1, "tier": "A", "edge_semantics": "possible_static_edges",
+                "observed_entry_points": ["0x100"],
+                "possible_static_edges": [{"target": "0x100"}]}
+    ledger = {"images": [{"name": "maincpu", "work_units": []}]}
+    with tempfile.TemporaryDirectory() as directory:
+        work = Path(directory)
+        result = run(coverage, ledger, work)
+        assert result.returncode == 0, result.stderr
+        output = json.loads((work / "worklist.json").read_text(encoding="utf-8"))
+        assert output["coverage_tier"] == "A"
+        assert output["edge_semantics"] == "possible_static_edges"
+        assert output["modeled_wip_limit"] == 1
+        assert output["active_modeled_units"] == []
+        assert output["units"][0]["possible_static_edges"] == 1
+        assert "observed_call_edges" not in output["units"][0]
+        invalid = dict(coverage)
+        invalid["edge_semantics"] = "executed_direct_edges"
+        assert run(invalid, ledger, work).returncode != 0
+        over_limit = {"images": [{"name": "maincpu", "work_units": [
+            {"id": "one", "stage": "modeled", "active": True},
+            {"id": "two", "stage": "modeled", "active": True},
+        ]}]}
+        assert "work-in-progress limit" in run(coverage, over_limit, work).stderr
+    print("PASS: worklist admits Tier A and enforces one active modeled unit")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -15,6 +15,84 @@ STAGES = {
 }
 
 
+def validate_lifecycle(
+    ledger: dict[str, Any], manifest: dict[str, Any], root: Path | None = None
+) -> list[str]:
+    """Validate stage-specific promotion evidence.
+
+    This is intentionally separate from schema validation: existing ledgers can
+    be inspected for structural problems while migration debt is made explicit
+    with the strict lifecycle check.
+    """
+    errors: list[str] = []
+    active_modeled: list[str] = []
+    canonical_entries = {
+        entry.get("id"): entry
+        for entry in manifest.get("entries", [])
+        if entry.get("canonical") and isinstance(entry.get("id"), str)
+    }
+    canonical_ids = set(canonical_entries)
+    for image in ledger.get("images", []):
+        image_name = image.get("name", "?")
+        for index, unit in enumerate(image.get("work_units", [])):
+            where = f"images[{image_name}].work_units[{index}]"
+            stage = unit.get("stage")
+            if stage == "modeled" and unit.get("active") is True:
+                active_modeled.append(str(unit.get("id", "<missing>")))
+            if stage == "planned":
+                if not unit.get("notes"):
+                    errors.append(f"{where}: planned requires a reason in notes")
+            elif stage == "modeled":
+                modeling = unit.get("modeling")
+                if not isinstance(modeling, dict):
+                    errors.append(f"{where}: modeled requires modeling evidence")
+                    continue
+                for field in ("boundary", "test", "unresolved_behavior"):
+                    if not modeling.get(field):
+                        errors.append(f"{where}: modeled requires modeling.{field}")
+                test = modeling.get("test")
+                if isinstance(test, str) and root is not None and not (root / test).is_file():
+                    errors.append(f"{where}: missing modeling test {test}")
+            elif stage == "integrated":
+                integration = unit.get("integration")
+                if not isinstance(integration, dict):
+                    errors.append(f"{where}: integrated requires integration evidence")
+                    continue
+                if not integration.get("checkpoint"):
+                    errors.append(f"{where}: integrated requires integration.checkpoint")
+                test = integration.get("test")
+                if not isinstance(test, str) or not test:
+                    errors.append(f"{where}: integrated requires integration.test")
+                elif root is not None and not (root / test).is_file():
+                    errors.append(f"{where}: missing integration test {test}")
+            elif stage == "trace-validated":
+                evidence_id = unit.get("canonical_evidence_id")
+                if evidence_id not in canonical_ids:
+                    errors.append(f"{where}: trace-validated requires canonical evidence id")
+                verifier = unit.get("verifier")
+                if not isinstance(verifier, str) or not verifier:
+                    errors.append(f"{where}: trace-validated requires verifier")
+                elif root is not None and not (root / verifier).is_file():
+                    errors.append(f"{where}: missing verifier {verifier}")
+                registered_verifier = canonical_entries.get(evidence_id, {}).get("verifier")
+                if registered_verifier and registered_verifier != verifier:
+                    errors.append(f"{where}: verifier differs from canonical evidence entry")
+            elif stage == "byte-validated":
+                comparison = unit.get("byte_validation")
+                if not isinstance(comparison, dict) or not comparison.get("original_range"):
+                    errors.append(f"{where}: byte-validated requires byte_validation.original_range")
+            elif stage == "blocked":
+                blocked = unit.get("blocked")
+                required = ("missing_fact", "failed_discriminator", "next_experiment")
+                if not isinstance(blocked, dict) or any(not blocked.get(field) for field in required):
+                    errors.append(f"{where}: blocked requires missing fact, discriminator, and next experiment")
+    if len(active_modeled) > 1:
+        errors.append(
+            "modeled work-in-progress limit exceeded: " + ", ".join(active_modeled)
+        )
+    return errors
+
+
 def number(value: str | int) -> int:
     return int(value, 0) if isinstance(value, str) else value
 

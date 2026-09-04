@@ -69,6 +69,9 @@ def main() -> int:
     parser.add_argument("--listing", required=True, type=Path)
     parser.add_argument("--json", required=True, type=Path)
     parser.add_argument("--markdown", required=True, type=Path)
+    parser.add_argument("--capture-id", required=True,
+                        help="stable identity for this bounded capture")
+    parser.add_argument("--phase", default="stable-attract")
     parser.add_argument("--annotations", type=Path,
                         help="Ghidra annotation source to resolve labels in the report")
     args = parser.parse_args()
@@ -77,33 +80,39 @@ def main() -> int:
     instructions, callers = listing_data(args.listing)
     visited = pcs & instructions
     unknown = pcs - instructions
-    executed_edges = sorted(
+    possible_static_edges = sorted(
         (caller, target)
         for target, target_callers in callers.items()
         if target in visited
         for caller in target_callers
         if caller in visited
     )
-    executed_targets = sorted({target for _, target in executed_edges})
+    observed_entries = sorted({target for _, target in possible_static_edges})
     annotations = load_annotations(args.annotations)
     ranges = contiguous_ranges(visited)
     report = {
         "schema_version": 1,
+        "tier": "A",
+        "edge_semantics": "possible_static_edges",
+        "canonical": False,
+        "registration": "discovery-only",
+        "capture_id": args.capture_id,
+        "phase": args.phase,
         "pc_log": str(args.pcs),
         "visited_instruction_count": len(visited),
         "visited_instruction_bytes": len(visited) * 4,
         "visited_contiguous_ranges": len(ranges),
         "known_direct_call_targets": len(callers),
-        "visited_direct_call_targets": len(executed_targets),
-        "visited_direct_call_edges": len(executed_edges),
+        "observed_entry_point_count": len(observed_entries),
+        "possible_static_edge_count": len(possible_static_edges),
         "unknown_pc_count": len(unknown),
         "minimum_pc": f"0x{min(visited):08x}" if visited else None,
         "maximum_pc": f"0x{max(visited):08x}" if visited else None,
-        "executed_direct_targets": [f"0x{target:08x}" for target in executed_targets],
-        "executed_direct_edges": [
+        "observed_entry_points": [f"0x{target:08x}" for target in observed_entries],
+        "possible_static_edges": [
             {"caller": f"0x{caller:08x}", "caller_label": annotations.get(caller),
              "target": f"0x{target:08x}", "target_label": annotations.get(target)}
-            for caller, target in executed_edges
+            for caller, target in possible_static_edges
         ],
         "executed_annotations": [
             {"address": f"0x{address:08x}", "label": annotations[address]}
@@ -119,15 +128,15 @@ def main() -> int:
     markdown = (
         "# i960 Attract Coverage\n\n"
         f"- Visited instructions: {len(visited):,} ({len(visited) * 4:,} bytes)\n"
-        f"- Visited direct call targets: {len(executed_targets):,} / {len(callers):,}\n"
-        f"- Visited direct call edges: {len(executed_edges):,}\n"
+        f"- Observed entry points: {len(observed_entries):,} / {len(callers):,}\n"
+        f"- Possible static edges: {len(possible_static_edges):,}\n"
         f"- Contiguous visited ranges: {len(ranges):,}\n"
         f"- PCs absent from decoded listing: {len(unknown):,}\n"
-        f"- Executed annotated PCs: {len(visited & annotations.keys()):,}\n"
+        f"- Annotated PCs in discovery set: {len(visited & annotations.keys()):,}\n"
         f"- Observed ROM span: {report['minimum_pc']}–{report['maximum_pc']}\n"
     )
     if annotations:
-        markdown += "\n## Executed semantic annotations\n\n"
+        markdown += "\n## Annotations in discovery set\n\n"
         markdown += "| Address | Label |\n| --- | --- |\n"
         for address in sorted(visited & annotations.keys()):
             markdown += f"| `0x{address:08x}` | `{annotations[address]}` |\n"

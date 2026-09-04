@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+"""Contract tests for zero-trust evidence inventory records."""
+
+from __future__ import annotations
+
+import tempfile
+from pathlib import Path
+
+from inventory_evidence import apply_relations, duplicate_groups, inventory_path
+
+
+def main() -> int:
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        generated = root / "von/build/capture.log"
+        generated_copy = root / "von/build/capture-copy.log"
+        source = root / "von/tools/producer.py"
+        ambiguous = root / "old-output.log"
+        for path in (generated, source, ambiguous):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(path.name, encoding="utf-8")
+        generated_copy.write_text(generated.read_text(encoding="utf-8"), encoding="utf-8")
+        tracked = {"von/tools/producer.py"}
+        assert inventory_path(generated, root, tracked)["classification"] == "reproducible-generated"
+        source_record = inventory_path(source, root, tracked)
+        assert source_record["tracked"] is True
+        assert source_record["decision"] == "keep"
+        assert inventory_path(ambiguous, root, tracked)["decision"] == "quarantine-after-review"
+        records = [inventory_path(path, root, tracked) for path in (generated, generated_copy, source, ambiguous)]
+        apply_relations(records, {"old-output.log": {"producer": "capture.sh", "consumers": ["review.md"]}})
+        assert records[-1]["producer"] == "capture.sh"
+        assert records[-1]["consumers"] == ["review.md"]
+        groups = duplicate_groups(records)
+        assert len(groups) == 1
+        assert groups[0]["aliases"] == ["von/build/capture-copy.log"]
+        assert all("sha256" in record for record in records)
+    print("PASS: evidence inventory records hashes and cleanup decisions")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
