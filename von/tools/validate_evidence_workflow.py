@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -24,12 +25,27 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
                       generated_worklist_path: Path | None = None,
                       generated_status_path: Path | None = None,
                       generated_comparison_path: Path | None = None) -> list[str]:
-    ledger = load(ledger_path)
-    evidence = load(evidence_path)
-    errors = [f"ledger: {error}" for error in validate_ledger(ledger, root)]
+    def read_document(path: Path, label: str) -> tuple[object, list[str]]:
+        if path.is_symlink():
+            return {}, [f"{label}: document path must not be a symlink: {path}"]
+        try:
+            path.resolve().relative_to(root.resolve())
+        except (OSError, RuntimeError, ValueError):
+            return {}, [f"{label}: document path escapes root: {path}"]
+        if not path.is_file():
+            return {}, [f"{label}: missing document: {path}"]
+        try:
+            return load(path), []
+        except (OSError, json.JSONDecodeError, TypeError, ValueError) as error:
+            return {}, [f"{label}: unable to read document {path}: {error}"]
+
+    ledger, ledger_errors = read_document(ledger_path, "ledger")
+    evidence, evidence_errors = read_document(evidence_path, "evidence")
+    errors = ledger_errors + evidence_errors
+    errors.extend(f"ledger: {error}" for error in validate_ledger(ledger, root))
     errors.extend(f"evidence: {error}" for error in validate_evidence(evidence, ledger, root))
     if run_verifiers:
-        for entry in evidence.get("entries", []):
+        for entry in evidence.get("entries", []) if isinstance(evidence, dict) else []:
             if not entry.get("canonical") or not entry.get("verifier"):
                 continue
             verifier = rooted(root, entry["verifier"])
@@ -66,7 +82,8 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
                         errors.append(f"asset-pack: unable to read pack manifest: {error}")
                     else:
                         errors.extend(f"asset-pack: {error}" for error in validate_pack(
-                            pack, evidence, root, rom_manifest_path, expected_tool_revision,
+                            pack, evidence if isinstance(evidence, dict) else {}, root,
+                            rom_manifest_path, expected_tool_revision,
                             expected_map_revision))
     if check_generated:
         if not all((generated_coverage_path, generated_worklist_path, generated_status_path)):

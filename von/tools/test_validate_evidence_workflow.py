@@ -31,6 +31,17 @@ def main() -> int:
             root, malformed_ledger, root / "von/evidence/manifest.json", strict_lifecycle=True)
         assert any("ledger: ledger must be an object" in error for error in errors)
         assert any("evidence: ledger must be an object" in error for error in errors)
+    with tempfile.TemporaryDirectory(dir=root) as directory:
+        missing_ledger = Path(directory) / "missing-ledger.json"
+        errors = validate_workflow(
+            root, missing_ledger, root / "von/evidence/manifest.json", run_verifiers=True)
+        assert any("ledger: missing document" in error for error in errors)
+    with tempfile.TemporaryDirectory(dir=root) as directory:
+        linked_evidence = Path(directory) / "linked-evidence.json"
+        linked_evidence.symlink_to(root / "von/evidence/manifest.json")
+        errors = validate_workflow(
+            root, root / "von/reconstruction_ledger.json", linked_evidence, run_verifiers=True)
+        assert any("evidence: document path must not be a symlink" in error for error in errors)
     errors = validate_workflow(
         root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
         check_generated=True, generated_coverage_path=root / "von/build/attract-coverage/vonj-attract-60s.json",
@@ -76,12 +87,12 @@ def main() -> int:
         "schema_version": 1,
         "entries": [{"id": "unsafe", "canonical": True, "verifier": "/tmp/not-a-verifier.py"}],
     }
-    with tempfile.TemporaryDirectory() as directory:
+    with tempfile.TemporaryDirectory(dir=root) as directory:
         unsafe_path = Path(directory) / "unsafe-evidence.json"
         unsafe_path.write_text(json.dumps(unsafe), encoding="utf-8")
         errors = validate_workflow(root, root / "von/reconstruction_ledger.json", unsafe_path,
                                    run_verifiers=True)
-        assert any("skipped: unsafe" in error for error in errors)
+        assert any("verifier" in error and "unsafe" in error for error in errors)
     with tempfile.TemporaryDirectory(dir=root) as directory:
         linked_verifier = Path(directory) / "linked-verifier.py"
         linked_verifier.symlink_to(root / "von/tools/test_validate_evidence_workflow.py")
