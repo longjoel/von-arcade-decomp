@@ -63,6 +63,7 @@ def main() -> int:
         capture = {
             "schema_version": 1, "id": "capture-v1", "objective": "pilot",
             "stimulus": {"kind": "input-free-attract", "seconds": 1},
+            "checkpoints": ["reset", "scheduler"],
             "configuration": {"set": "vonj", "mame_revision": "abc", "patch_profile": "none", "execution_engine": "interpreter"},
             "command": ["mame", "vonj", "-cfg_directory", str(temp / "cfg"),
                          "-nvram_directory", str(temp / "nvram"),

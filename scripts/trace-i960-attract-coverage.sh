@@ -41,6 +41,8 @@ python3 "$ROOT_DIR/von/tools/capture_manifest.py" \
     --output "$CAPTURE_MANIFEST" --root "$ROOT_DIR" \
     --id "$CAPTURE_ID" --objective "c-only-i960-attract-60s" \
     --seconds "$SECONDS_TO_RUN" --phase stable-attract --set vonj \
+    --checkpoint reset --checkpoint hardware-init --checkpoint scheduler \
+    --checkpoint attract-entry --checkpoint duration-complete \
     --mame-revision "$(git -C "$ROOT_DIR/third_party/mame-master" rev-parse HEAD)" \
     --patch-profile "${VON_MAME_PATCH_SET:-default}" --execution-engine interpreter \
     --command "$MAME_BIN" --command vonj --command -rompath --command "$ROM_PATH" \

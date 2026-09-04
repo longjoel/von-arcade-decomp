@@ -27,6 +27,7 @@ def main() -> int:
         manifest = {
             "schema_version": 1, "id": "fixture-v1", "objective": "test-capture",
             "stimulus": {"kind": "input-free-attract", "seconds": 1, "phase": "stable-attract"},
+            "checkpoints": ["reset", "scheduler"],
             "configuration": {"set": "fixture", "mame_revision": "abc",
                                "patch_profile": "none", "execution_engine": "interpreter"},
             "command": ["mame", "vonj", "-video", "none",
@@ -99,6 +100,12 @@ def main() -> int:
         broken = copy.deepcopy(manifest)
         broken["objective"] = ""
         assert any("objective" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["checkpoints"] = ["reset", "reset"]
+        assert any("checkpoints" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken.pop("checkpoints")
+        assert any("checkpoints" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
         broken["stimulus"]["seconds"] = -1
         assert any("numeric seconds" in error for error in validate(broken, root))

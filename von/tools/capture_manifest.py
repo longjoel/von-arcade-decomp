@@ -75,6 +75,11 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
         errors.append("stimulus requires kind and numeric seconds")
     if not isinstance(manifest.get("objective"), str) or not manifest.get("objective"):
         errors.append("missing capture objective")
+    checkpoints = manifest.get("checkpoints")
+    if (not isinstance(checkpoints, list) or not checkpoints
+            or not all(isinstance(item, str) and item for item in checkpoints)
+            or len(set(checkpoints)) != len(checkpoints)):
+        errors.append("capture checkpoints must be a non-empty unique string array")
     artifacts = manifest.get("artifacts")
     if not isinstance(artifacts, list) or not artifacts:
         errors.append("capture requires at least one artifact")
@@ -207,6 +212,8 @@ def main() -> int:
     parser.add_argument("--stimulus-kind", choices=("input-free-attract", "bounded-trace", "causal-trace"),
                         default="input-free-attract")
     parser.add_argument("--phase", default="stable-attract")
+    parser.add_argument("--checkpoint", action="append", required=True,
+                        help="ordered checkpoint name; may be repeated")
     parser.add_argument("--set", required=True)
     parser.add_argument("--mame-revision", required=True)
     parser.add_argument("--patch-profile", required=True)
@@ -225,6 +232,7 @@ def main() -> int:
         "id": args.id,
         "objective": args.objective,
         "stimulus": {"kind": args.stimulus_kind, "seconds": args.seconds, "phase": args.phase},
+        "checkpoints": args.checkpoint,
         "configuration": {
             "set": args.set, "mame_revision": args.mame_revision,
             "patch_profile": args.patch_profile, "execution_engine": args.execution_engine,
