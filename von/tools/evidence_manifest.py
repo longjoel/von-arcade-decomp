@@ -78,10 +78,17 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                         from capture_manifest import validate as validate_capture
 
                         capture_document = json.loads(sidecar_path.read_text(encoding="utf-8"))
-                        if not isinstance(capture_document, dict):
-                            sidecar_errors = ["capture manifest must be an object"]
+                        capture_digest = entry.get("capture_manifest_sha256")
+                        if not isinstance(capture_digest, str) or not SHA256_RE.fullmatch(capture_digest):
+                            sidecar_errors = ["capture_manifest_sha256 must be a SHA-256 digest"]
+                        elif capture_digest != hashlib.sha256(sidecar_path.read_bytes()).hexdigest():
+                            sidecar_errors = ["capture manifest hash mismatch"]
                         else:
-                            sidecar_errors = validate_capture(capture_document, root)
+                            sidecar_errors = []
+                        if not isinstance(capture_document, dict):
+                            sidecar_errors.append("capture manifest must be an object")
+                        else:
+                            sidecar_errors.extend(validate_capture(capture_document, root))
                             if capture_document.get("id") != evidence_id:
                                 sidecar_errors.append("capture manifest id does not match evidence id")
                             capture_stimulus = capture_document.get("stimulus", {})

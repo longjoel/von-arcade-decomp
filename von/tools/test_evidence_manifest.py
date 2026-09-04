@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import tempfile
 from pathlib import Path
 
@@ -77,7 +78,10 @@ def main() -> int:
             "entries": [{"id": "capture-v1", "canonical": True,
                          "stimulus": {"kind": "input-free-attract", "description": "pilot"},
                          "configuration": capture["configuration"], "artifacts": capture["artifacts"],
-                         "capture_manifest": "capture.json", "verifier": "verify.py",
+                         "capture_manifest": "capture.json",
+                         "capture_manifest_sha256": hashlib.sha256(
+                             (temp / "capture.json").read_bytes()).hexdigest(),
+                         "verifier": "verify.py",
                          "outcome": "pass", "consumers": ["unit"]}],
         }
         assert not validate(runtime, {"images": [{"work_units": [{"id": "unit"}]}]}, temp)
@@ -107,6 +111,10 @@ def main() -> int:
         capture["id"] = "other"
         (temp / "capture.json").write_text(json.dumps(capture), encoding="utf-8")
         assert any("does not match evidence id" in error for error in validate(runtime, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
+        stale_hash = json.loads(json.dumps(runtime))
+        stale_hash["entries"][0]["capture_manifest_sha256"] = "0" * 64
+        assert any("capture manifest hash mismatch" in error for error in validate(
+            stale_hash, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
     print("PASS: canonical evidence manifest contract")
     return 0
 

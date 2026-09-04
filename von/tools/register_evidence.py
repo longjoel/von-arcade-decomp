@@ -4,10 +4,15 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
 from capture_manifest import safe_path, validate as validate_capture
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def register(
@@ -73,6 +78,7 @@ def register(
         "inputs": capture.get("inputs", []),
         "artifacts": capture.get("artifacts", []),
         "capture_manifest": capture_relative,
+        "capture_manifest_sha256": sha256(capture_path),
         "verifier": verifier,
         "outcome": "pass",
         "consumers": consumers,
