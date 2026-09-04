@@ -28,7 +28,7 @@ def rooted(root: Path, path_text: object) -> Path | None:
     candidate = root / path_text
     try:
         candidate.resolve().relative_to(root.resolve())
-    except ValueError:
+    except (OSError, RuntimeError, ValueError):
         return None
     return candidate
 

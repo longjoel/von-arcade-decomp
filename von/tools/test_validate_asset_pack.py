@@ -113,6 +113,11 @@ def main() -> int:
         broken = copy.deepcopy(pack)
         broken["assets"][0]["payload"] = "../outside.glb"
         assert any("missing payload" in error for error in validate(broken, evidence, root))
+        loop = root / "loop.glb"
+        loop.symlink_to(loop)
+        broken = copy.deepcopy(pack)
+        broken["assets"][0]["payload"] = "loop.glb"
+        assert any("missing payload" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
         broken["assets"][0]["verifier_results"]["stale-verifier"] = "pass"
         assert any("passing verifier_results" in error for error in validate(broken, evidence, root))

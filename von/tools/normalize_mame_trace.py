@@ -114,7 +114,7 @@ def load_provenance(manifest_path: Path, root: Path, source: Path) -> dict[str, 
         raise ValueError("capture manifest: " + "; ".join(errors))
     try:
         source_relative = str(source.resolve().relative_to(root.resolve()))
-    except ValueError as error:
+    except (OSError, RuntimeError, ValueError) as error:
         raise ValueError("trace source escapes capture root") from error
     artifacts = manifest.get("artifacts", [])
     artifact = next((item for item in artifacts
