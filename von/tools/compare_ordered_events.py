@@ -84,6 +84,33 @@ def context_errors(original: dict[str, Any], reconstructed: dict[str, Any]) -> l
     return errors
 
 
+def capture_provenance_errors(context: Any, event_path: Path, root: Path,
+                              label: str) -> list[str]:
+    """Require a CLI comparison context to be a valid sidecar for its stream."""
+    errors: list[str] = []
+    if not isinstance(context, dict):
+        return [f"{label} capture manifest must be an object"]
+    try:
+        from capture_manifest import validate as validate_capture
+
+        errors.extend(f"{label} capture: {error}" for error in validate_capture(context, root))
+    except (ImportError, TypeError) as error:
+        errors.append(f"{label} capture validation failed: {error}")
+    try:
+        relative_event = str(event_path.resolve().relative_to(root.resolve()))
+    except ValueError:
+        errors.append(f"{label} event stream escapes capture root")
+        return errors
+    artifacts = context.get("artifacts", [])
+    artifact_paths = {
+        item.get("path") for item in artifacts
+        if isinstance(item, dict) and isinstance(item.get("path"), str)
+    } if isinstance(artifacts, list) else set()
+    if relative_event not in artifact_paths:
+        errors.append(f"{label} event stream is not a declared capture artifact: {relative_event}")
+    return errors
+
+
 def compare(original: list[dict[str, Any]], reconstructed: list[dict[str, Any]],
             original_context: dict[str, Any] | None = None,
             reconstructed_context: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -142,6 +169,8 @@ def main() -> int:
     parser.add_argument("--summary", type=Path)
     parser.add_argument("--original-manifest", type=Path)
     parser.add_argument("--reconstructed-manifest", type=Path)
+    parser.add_argument("--capture-root", type=Path, default=Path.cwd(),
+                        help="root used to validate capture manifests and artifact paths")
     args = parser.parse_args()
     try:
         original_context = json.loads(args.original_manifest.read_text(encoding="utf-8")) if args.original_manifest else None
@@ -152,6 +181,12 @@ def main() -> int:
             errors = context_errors(original_context, reconstructed_context)
             if errors:
                 raise ValueError("; ".join(errors))
+            provenance_errors = capture_provenance_errors(
+                original_context, args.original, args.capture_root, "original")
+            provenance_errors.extend(capture_provenance_errors(
+                reconstructed_context, args.reconstructed, args.capture_root, "reconstructed"))
+            if provenance_errors:
+                raise ValueError("; ".join(provenance_errors))
         result = compare(load_events(args.original), load_events(args.reconstructed), original_context, reconstructed_context)
     except ValueError as error:
         print(f"event comparison: {error}", file=sys.stderr)

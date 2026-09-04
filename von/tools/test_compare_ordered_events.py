@@ -7,7 +7,7 @@ import copy
 import tempfile
 from pathlib import Path
 
-from compare_ordered_events import compare, context_errors, load_events
+from compare_ordered_events import capture_provenance_errors, compare, context_errors, load_events
 
 
 def main() -> int:
@@ -41,6 +41,8 @@ def main() -> int:
     malformed_context_errors = context_errors([], {})
     assert "original capture manifest must be an object" in malformed_context_errors
     assert "reconstructed capture manifest schema_version must be 1" in malformed_context_errors
+    provenance_errors = capture_provenance_errors({}, Path("events.ndjson"), Path.cwd(), "original")
+    assert any("missing stable capture id" in error for error in provenance_errors)
     reconstructed[1]["value"] = 78
     result = compare(original, reconstructed)
     assert result["outcome"] == "divergence"
