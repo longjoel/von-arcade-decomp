@@ -47,11 +47,34 @@ def analyze(pcs: set[int]) -> dict[str, object]:
     }
 
 
+def path_error(label: str, path: Path, root: Path, *, output: bool = False) -> str | None:
+    if path.is_symlink():
+        return f"{label} path must not be a symlink: {path}"
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, RuntimeError, ValueError):
+        return f"{label} path escapes root: {path}"
+    if not output and not path.is_file():
+        return f"missing {label}: {path}"
+    return None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("pcs", type=Path)
     parser.add_argument("--json", type=Path)
+    parser.add_argument("--root", type=Path, default=Path.cwd(),
+                        help="root that coverage input and output must remain within")
     args = parser.parse_args()
+
+    root = args.root.resolve()
+    for label, path, output in (("PC log", args.pcs, False), ("JSON output", args.json, True)):
+        if path is None:
+            continue
+        error = path_error(label, path, root, output=output)
+        if error:
+            print(f"Object-state coverage: {error}")
+            return 1
 
     report = analyze(read_pcs(args.pcs))
     if args.json:

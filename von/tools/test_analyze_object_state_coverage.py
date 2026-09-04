@@ -27,7 +27,7 @@ def main() -> int:
         report_path = Path(directory) / "report.json"
         pcs_path.write_text(pcs, encoding="utf-8")
         result = subprocess.run(
-            ["python3", TOOL, pcs_path, "--json", report_path],
+            ["python3", TOOL, pcs_path, "--json", report_path, "--root", directory],
             check=True,
             capture_output=True,
             text=True,
@@ -39,6 +39,13 @@ def main() -> int:
             raise SystemExit(f"unexpected unvisited states: {report}")
         if "visited states: 0, 5, 8, 9" not in result.stdout:
             raise SystemExit(f"unexpected CLI output: {result.stdout!r}")
+        outside = Path(directory).parent / "outside-object-state.json"
+        result = subprocess.run(
+            ["python3", TOOL, pcs_path, "--json", outside, "--root", directory],
+            capture_output=True, text=True, check=False,
+        )
+        assert result.returncode == 1
+        assert "JSON output path escapes root" in result.stdout
     print("PASS: object-state helper state-entry coverage")
     return 0
 
