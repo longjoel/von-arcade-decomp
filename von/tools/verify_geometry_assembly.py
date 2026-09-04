@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 OBJECT = re.compile(
-    r"vonj_geometry_object: time=([0-9.e+-]+) tpa=([0-9a-f]+) tha=([0-9a-f]+) "
+    r"vonj_geometry_object: (?:seq=(\d+) )?time=([0-9.e+-]+) tpa=([0-9a-f]+) tha=([0-9a-f]+) "
     r"oba=([0-9a-f]+) count=([0-9a-f]+) mode=(\d+) source=([^ ]+)(?: opcode=([0-9a-f]+))?"
 )
 
@@ -20,12 +20,13 @@ def frames(trace: Path) -> dict[float, list[dict[str, object]]]:
         match = OBJECT.search(line)
         if not match:
             continue
-        time = float(match[1])
+        time = float(match[2])
         result.setdefault(time, []).append({
-            "tpa": int(match[2], 16), "tha": int(match[3], 16),
-            "oba": int(match[4], 16), "count": int(match[5], 16),
-            "mode": int(match[6]), "source": match[7],
-            "opcode": int(match[8], 16) if match[8] else None,
+            "seq": int(match[1]) if match[1] is not None else None,
+            "tpa": int(match[3], 16), "tha": int(match[4], 16),
+            "oba": int(match[5], 16), "count": int(match[6], 16),
+            "mode": int(match[7]), "source": match[8],
+            "opcode": int(match[9], 16) if match[9] else None,
         })
     return result
 
@@ -39,6 +40,8 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--tolerance", type=float, default=.02)
     parser.add_argument("--minimum-stable-frames", type=int, default=3)
+    parser.add_argument("--require-ordered-sequence", action="store_true",
+                        help="require strictly increasing seq values for selected submissions")
     parser.add_argument("--expected-opcode", type=lambda value: int(value, 0), default=0x00800101)
     parser.add_argument("--snapshot-directory", type=Path,
                         help="optional emulator snapshot directory recorded as evidence")
@@ -55,10 +58,17 @@ def main() -> int:
     if len(selected) != args.object_count:
         raise SystemExit("selected frame does not contain the requested assembly")
     signature = [entry["oba"] for entry in selected]
+    def ordered(entries: list[dict[str, object]]) -> bool:
+        sequences = [entry.get("seq") for entry in entries]
+        return (all(isinstance(sequence, int) for sequence in sequences)
+                and all(sequences[index] < sequences[index + 1]
+                        for index in range(len(sequences) - 1)))
+
     valid = lambda entries: (len(entries) == args.object_count and
         [entry["oba"] for entry in entries] == signature and
         all(entry["mode"] == 3 and entry["source"] == "polygon-rom" and
-            entry["opcode"] == args.expected_opcode for entry in entries))
+            entry["opcode"] == args.expected_opcode for entry in entries) and
+        (not args.require_ordered_sequence or ordered(entries)))
     stable_times = [time for time, entries in sorted(all_frames.items())
                     if valid(entries[args.start_slot:args.start_slot + args.object_count])]
     if not valid(selected):
@@ -69,6 +79,7 @@ def main() -> int:
         "status": "verified", "trace": str(args.trace), "trace_time": selected_time,
         "start_slot": args.start_slot, "object_count": args.object_count,
         "obas": [f"{value:08x}" for value in signature],
+        "sequence_validated": args.require_ordered_sequence,
         "mode": 3, "source": "polygon-rom", "opcode": f"{args.expected_opcode:08x}",
         "stable_frame_count": len(stable_times), "stable_times": stable_times,
         "part_labels": [{"part": index, "slot": args.start_slot + index,
