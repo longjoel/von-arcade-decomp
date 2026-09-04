@@ -75,7 +75,7 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                 errors.append(f"{where}: runtime evidence requires capture_manifest")
             else:
                 sidecar_path = rooted(root, sidecar)
-                if sidecar_path is None or not sidecar_path.is_file():
+                if sidecar_path is None or sidecar_path.is_symlink() or not sidecar_path.is_file():
                     errors.append(f"{where}: missing capture manifest {sidecar}")
                 else:
                     try:

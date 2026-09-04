@@ -96,6 +96,11 @@ def main() -> int:
         assert "missing capture manifest" in register(
             {"schema_version": 1, "entries": []}, capture, loop_capture,
             "loop", "verify.py", ["unit-1"], root, ledger)[0]
+        linked_capture = root / "linked-capture.json"
+        linked_capture.symlink_to(capture_path)
+        assert "missing capture manifest" in register(
+            {"schema_version": 1, "entries": []}, capture, linked_capture,
+            "linked", "verify.py", ["unit-1"], root, ledger)[0]
     print("PASS: canonical evidence registration validates and deduplicates")
     return 0
 

@@ -117,6 +117,12 @@ def main() -> int:
         escaped["entries"][0]["capture_manifest"] = "linked-capture.json"
         assert any("missing capture manifest" in error for error in validate(
             escaped, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
+        linked_local_capture = temp / "linked-local-capture.json"
+        linked_local_capture.symlink_to(temp / "capture.json")
+        linked_runtime = json.loads(json.dumps(runtime))
+        linked_runtime["entries"][0]["capture_manifest"] = "linked-local-capture.json"
+        assert any("missing capture manifest" in error for error in validate(
+            linked_runtime, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
         loop_artifact = temp / "loop-artifact.json"
         loop_artifact.symlink_to(loop_artifact)
         looped = json.loads(json.dumps(runtime))

@@ -43,7 +43,7 @@ def register(
         capture_relative = str(capture_path.resolve().relative_to(root.resolve()))
     except (OSError, RuntimeError, ValueError):
         capture_relative = ""
-    if not safe_path(capture_relative) or not capture_path.is_file():
+    if not safe_path(capture_relative) or capture_path.is_symlink() or not capture_path.is_file():
         return [f"missing capture manifest {capture_path}"]
     try:
         stored_capture = json.loads(capture_path.read_text(encoding="utf-8"))
