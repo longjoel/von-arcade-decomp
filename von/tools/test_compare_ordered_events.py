@@ -39,20 +39,31 @@ def main() -> int:
     assert edge_delta["missing_indirect_targets"] == ["0x20"]
     assert edge_delta["unexpected_indirect_targets"] == ["0x30"]
     assert compare(original, reconstructed)["missed_checkpoints"] == []
-    context = {"schema_version": 1, "id": "original-v1", "objective": "pilot", "stimulus": {"kind": "attract", "seconds": 1}}
-    reconstructed_context = {"schema_version": 1, "id": "reconstructed-v1", "objective": "pilot", "stimulus": {"kind": "attract", "seconds": 1}}
+    configuration = {"set": "vonj", "mame_revision": "abc", "execution_engine": "interpreter",
+                    "patch_profile": "original"}
+    context = {"schema_version": 1, "id": "original-v1", "objective": "pilot",
+               "stimulus": {"kind": "attract", "seconds": 1}, "configuration": configuration}
+    reconstructed_context = {"schema_version": 1, "id": "reconstructed-v1", "objective": "pilot",
+                             "stimulus": {"kind": "attract", "seconds": 1},
+                             "configuration": {**configuration, "patch_profile": "reconstructed"}}
     contextual = compare(original, reconstructed, context, reconstructed_context)
     assert contextual["context_compatible"] is True
     assert contextual["original_capture_id"] == "original-v1"
     try:
         compare(original, reconstructed, context,
                 {"schema_version": 1, "id": "reconstructed-v1", "objective": "other",
-                 "stimulus": context["stimulus"]})
+                 "stimulus": context["stimulus"], "configuration": reconstructed_context["configuration"]})
     except ValueError as error:
         assert "objectives differ" in str(error)
     else:
         raise AssertionError("incompatible capture contexts were accepted")
-    assert context_errors(context, {"schema_version": 1, "id": "other", "objective": "other", "stimulus": context["stimulus"]}) == ["capture objectives differ"]
+    assert context_errors(context, {"schema_version": 1, "id": "other", "objective": "other",
+                                    "stimulus": context["stimulus"],
+                                    "configuration": reconstructed_context["configuration"]}) == ["capture objectives differ"]
+    mismatched_configuration = copy.deepcopy(reconstructed_context)
+    mismatched_configuration["configuration"]["mame_revision"] = "def"
+    assert any("configuration.mame_revision differs" in error
+               for error in context_errors(context, mismatched_configuration))
     malformed_context_errors = context_errors([], {})
     assert "original capture manifest must be an object" in malformed_context_errors
     assert "reconstructed capture manifest schema_version must be 1" in malformed_context_errors

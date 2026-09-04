@@ -103,6 +103,16 @@ def context_errors(original: dict[str, Any], reconstructed: dict[str, Any]) -> l
         errors.append("capture objectives differ")
     if original.get("stimulus") != reconstructed.get("stimulus"):
         errors.append("capture stimuli differ")
+    original_configuration = original.get("configuration")
+    reconstructed_configuration = reconstructed.get("configuration")
+    if not isinstance(original_configuration, dict):
+        errors.append("original capture configuration must be an object")
+    if not isinstance(reconstructed_configuration, dict):
+        errors.append("reconstructed capture configuration must be an object")
+    if isinstance(original_configuration, dict) and isinstance(reconstructed_configuration, dict):
+        for field in ("set", "mame_revision", "execution_engine"):
+            if original_configuration.get(field) != reconstructed_configuration.get(field):
+                errors.append(f"capture configuration.{field} differs")
     return errors
 
 
