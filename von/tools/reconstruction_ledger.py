@@ -133,6 +133,10 @@ def validate_lifecycle(
         for index, unit in enumerate(image.get("work_units", [])):
             where = f"images[{image_name}].work_units[{index}]"
             stage = unit.get("stage")
+            if "active" in unit and not isinstance(unit.get("active"), bool):
+                errors.append(f"{where}: active must be boolean")
+            if unit.get("active") is True and stage != "modeled":
+                errors.append(f"{where}: active work-in-progress must be modeled")
             if stage == "modeled" and unit.get("active") is True:
                 active_modeled.append(str(unit.get("id", "<missing>")))
             stage_rank = STAGE_ORDER.get(stage, -1)

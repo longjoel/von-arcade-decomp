@@ -103,6 +103,14 @@ def main() -> int:
     })
     assert any("work-in-progress limit" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][2]["active"] = True
+    assert any("active work-in-progress must be modeled" in error
+               for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][1]["active"] = "true"
+    assert any("active must be boolean" in error
+               for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][1]["modeling"].pop("boundary")
     assert any("modeled requires modeling.boundary" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
