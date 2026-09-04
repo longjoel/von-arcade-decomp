@@ -267,6 +267,7 @@ def compare(original: list[dict[str, Any]], reconstructed: list[dict[str, Any]],
         "outcome": "pass" if divergence is None else "divergence",
         "original_checkpoints": checkpoints(original),
         "reconstructed_checkpoints": checkpoints(reconstructed),
+        "checkpoint_order_match": checkpoints(original) == checkpoints(reconstructed),
         "confirmed_dynamic_edge_count": len(original_edges),
         "observed_indirect_targets": sorted(original_indirect),
         "observed_indirect_target_count": len(original_indirect),
@@ -310,6 +311,7 @@ def compare(original: list[dict[str, Any]], reconstructed: list[dict[str, Any]],
     result["checkpoint_outcome"] = (
         "pass" if not result["missed_checkpoints"]
         and not result["unexpected_checkpoints"]
+        and result["checkpoint_order_match"]
         and not result["missing_original_checkpoints"]
         and not result["missing_reconstructed_checkpoints"] else "divergence"
     )

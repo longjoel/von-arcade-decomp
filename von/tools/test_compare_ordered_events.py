@@ -53,6 +53,16 @@ def main() -> int:
     assert edge_delta["missing_indirect_targets"] == ["0x20"]
     assert edge_delta["unexpected_indirect_targets"] == ["0x30"]
     assert compare(original, reconstructed)["missed_checkpoints"] == []
+    reordered = [original[1], original[0], original[2]]
+    reordered[0] = copy.deepcopy(reordered[0])
+    reordered[1] = copy.deepcopy(reordered[1])
+    reordered[0]["seq"] = 1
+    reordered[1]["seq"] = 2
+    reordered[2] = copy.deepcopy(reordered[2])
+    reordered[2]["seq"] = 3
+    reordered_report = compare(original, reordered)
+    assert reordered_report["checkpoint_order_match"] is False
+    assert reordered_report["checkpoint_outcome"] == "divergence"
     configuration = {"set": "vonj", "mame_revision": "abc", "execution_engine": "interpreter",
                     "patch_profile": "original"}
     context = {"schema_version": 1, "id": "original-v1", "objective": "pilot",
