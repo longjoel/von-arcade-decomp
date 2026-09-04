@@ -93,7 +93,7 @@ def validate_lifecycle(
                     errors.append(f"{where}: integration.image must be a safe relative path")
                 elif root is not None and not existing_reference(image):
                     errors.append(f"{where}: missing integration image {image}")
-                if not integration.get("checkpoint"):
+                if not isinstance(integration.get("checkpoint"), str) or not integration.get("checkpoint"):
                     errors.append(f"{where}: integrated requires integration.checkpoint")
                 test = integration.get("test")
                 if not isinstance(test, str) or not test:

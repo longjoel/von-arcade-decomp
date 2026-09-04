@@ -94,6 +94,9 @@ def main() -> int:
     broken["images"][0]["work_units"][2]["integration"]["image"] = "../outside.bin"
     assert any("safe relative path" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][2]["integration"]["checkpoint"] = ["startup"]
+    assert any("integration.checkpoint" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][3]["canonical_evidence_id"] = "von/build/capture.log"
     assert any("canonical evidence id" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
