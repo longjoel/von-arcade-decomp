@@ -96,13 +96,15 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
             errors.append(f"{where}: duplicate evidence id {evidence_id}")
         else:
             evidence_ids.add(evidence_id)
+        if not isinstance(entry.get("canonical"), bool):
+            errors.append(f"{where}: canonical must be boolean")
     canonical_ids = {
         item.get("id") for item in evidence_entries
-        if isinstance(item, dict) and item.get("canonical") and isinstance(item.get("id"), str)
+        if isinstance(item, dict) and item.get("canonical") is True and isinstance(item.get("id"), str)
     }
     canonical_entries = {
         item.get("id"): item for item in evidence_entries
-        if isinstance(item, dict) and item.get("canonical") and isinstance(item.get("id"), str)
+        if isinstance(item, dict) and item.get("canonical") is True and isinstance(item.get("id"), str)
     }
     if basis.get("capture_id") not in canonical_ids:
         errors.append(f"unknown canonical basis capture id {basis.get('capture_id')}")

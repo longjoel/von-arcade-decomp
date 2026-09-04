@@ -45,6 +45,10 @@ def main() -> int:
         ]}
         assert any("duplicate evidence id" in error for error in validate(
             pack, duplicate_evidence, root))
+        malformed_canonical = copy.deepcopy(evidence)
+        malformed_canonical["entries"][0]["canonical"] = "true"
+        assert any("canonical must be boolean" in error for error in validate(
+            pack, malformed_canonical, root))
         rom_manifest = root / "rom-manifest.json"
         rom_manifest.write_text('{"rom":"fixture"}\n', encoding="utf-8")
         pack["basis"]["romset_hash"] = hashlib.sha256(rom_manifest.read_bytes()).hexdigest()
