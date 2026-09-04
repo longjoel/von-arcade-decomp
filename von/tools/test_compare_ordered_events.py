@@ -29,6 +29,14 @@ def main() -> int:
     contextual = compare(original, reconstructed, context, reconstructed_context)
     assert contextual["context_compatible"] is True
     assert contextual["original_capture_id"] == "original-v1"
+    try:
+        compare(original, reconstructed, context,
+                {"schema_version": 1, "id": "reconstructed-v1", "objective": "other",
+                 "stimulus": context["stimulus"]})
+    except ValueError as error:
+        assert "objectives differ" in str(error)
+    else:
+        raise AssertionError("incompatible capture contexts were accepted")
     assert context_errors(context, {"schema_version": 1, "id": "other", "objective": "other", "stimulus": context["stimulus"]}) == ["capture objectives differ"]
     malformed_context_errors = context_errors([], {})
     assert "original capture manifest must be an object" in malformed_context_errors

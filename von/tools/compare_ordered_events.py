@@ -87,6 +87,12 @@ def context_errors(original: dict[str, Any], reconstructed: dict[str, Any]) -> l
 def compare(original: list[dict[str, Any]], reconstructed: list[dict[str, Any]],
             original_context: dict[str, Any] | None = None,
             reconstructed_context: dict[str, Any] | None = None) -> dict[str, Any]:
+    if (original_context is None) != (reconstructed_context is None):
+        raise ValueError("both capture contexts are required for provenance comparison")
+    if original_context is not None and reconstructed_context is not None:
+        context_problems = context_errors(original_context, reconstructed_context)
+        if context_problems:
+            raise ValueError("; ".join(context_problems))
     validate_order(original)
     validate_order(reconstructed)
     common = min(len(original), len(reconstructed))
