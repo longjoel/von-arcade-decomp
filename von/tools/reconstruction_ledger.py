@@ -117,6 +117,9 @@ def validate_lifecycle(
                 registered_verifier = registered_entry.get("verifier")
                 if isinstance(evidence_id, str) and evidence_id in canonical_ids and registered_verifier != verifier:
                     errors.append(f"{where}: verifier differs from canonical evidence entry")
+                if (isinstance(evidence_id, str) and evidence_id in canonical_ids
+                        and registered_entry.get("outcome") != "pass"):
+                    errors.append(f"{where}: canonical evidence outcome must be pass")
                 verification = unit.get("verification")
                 if not isinstance(verification, dict) or verification.get("result") != "pass":
                     errors.append(f"{where}: trace-validated requires verification.result=pass")

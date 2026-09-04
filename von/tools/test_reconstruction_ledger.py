@@ -67,7 +67,7 @@ def main() -> int:
             }},
         ]}],
     }
-    manifest = {"entries": [{"id": "capture-v1", "canonical": True, "verifier": "verify.py",
+    manifest = {"entries": [{"id": "capture-v1", "canonical": True, "verifier": "verify.py", "outcome": "pass",
                               "consumers": ["trace"]}]}
     assert not validate_lifecycle(lifecycle, manifest)
     broken = copy.deepcopy(lifecycle)
@@ -116,6 +116,9 @@ def main() -> int:
     missing_verifier = copy.deepcopy(manifest)
     del missing_verifier["entries"][0]["verifier"]
     assert any("differs from canonical" in error for error in validate_lifecycle(lifecycle, missing_verifier))
+    missing_outcome = copy.deepcopy(manifest)
+    del missing_outcome["entries"][0]["outcome"]
+    assert any("outcome must be pass" in error for error in validate_lifecycle(lifecycle, missing_outcome))
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][3]["canonical_evidence_id"] = {}
     assert any("canonical evidence id" in error for error in validate_lifecycle(broken, manifest))
