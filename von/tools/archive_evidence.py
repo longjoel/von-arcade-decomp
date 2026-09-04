@@ -48,6 +48,10 @@ def validate_metadata(metadata: dict[str, Any]) -> list[str]:
     archive_item = metadata.get("archive", {})
     source = Path(source_item.get("path", "")) if isinstance(source_item, dict) else Path()
     archive = Path(archive_item.get("path", "")) if isinstance(archive_item, dict) else Path()
+    source_digest = source_item.get("sha256") if isinstance(source_item, dict) else None
+    if archive.is_file() and isinstance(source_digest, str):
+        if archive.suffix != ".gz" or archive.name != f"{source_digest}.gz":
+            errors.append("archive filename must be the source SHA-256 with .gz suffix")
     if source.is_file() and archive.is_file():
         try:
             with gzip.open(archive, "rb") as stream:

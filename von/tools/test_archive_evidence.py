@@ -52,6 +52,14 @@ def main() -> int:
         )
         assert poisoned.returncode != 0
         assert "payload mismatch" in poisoned.stderr
+        wrong_target = archive / "not-content-addressed.gz"
+        wrong_target.write_bytes(target.read_bytes())
+        wrong_name = json.loads(json.dumps(record))
+        wrong_name["archive"] = {
+            "path": str(wrong_target), "bytes": wrong_target.stat().st_size,
+            "sha256": hashlib.sha256(wrong_target.read_bytes()).hexdigest(),
+        }
+        assert any("archive filename" in error for error in validate_metadata(wrong_name))
         malformed = {"schema_version": 1, "source": [], "archive": {}}
         assert any("source metadata must be an object" in error
                    for error in validate_metadata(malformed))
