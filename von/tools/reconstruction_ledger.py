@@ -122,6 +122,13 @@ def validate_lifecycle(
                 manifest_ids.add(evidence_id)
             if not isinstance(entry.get("canonical"), bool):
                 errors.append(f"manifest.entries[{index}]: canonical must be boolean")
+            elif entry.get("canonical") is True:
+                consumers = entry.get("consumers")
+                if (not isinstance(consumers, list) or not consumers
+                        or not all(isinstance(consumer, str) and consumer for consumer in consumers)):
+                    errors.append(f"manifest.entries[{index}]: canonical consumers must be a non-empty string array")
+                elif len(set(consumers)) != len(consumers):
+                    errors.append(f"manifest.entries[{index}]: canonical consumers must be unique")
     canonical_entries = {
         entry.get("id"): entry
         for entry in manifest_entries
@@ -185,9 +192,11 @@ def validate_lifecycle(
                     errors.append(f"{where}: byte-validated requires preceding canonical evidence id")
                 else:
                     registered_entry = canonical_entries[evidence_id]
+                    registered_consumers = registered_entry.get("consumers")
                     if registered_entry.get("outcome") != "pass":
                         errors.append(f"{where}: byte-validated requires passing canonical evidence")
-                    if unit.get("id") not in registered_entry.get("consumers", []):
+                    if (not isinstance(registered_consumers, list)
+                            or unit.get("id") not in registered_consumers):
                         errors.append(f"{where}: canonical evidence does not name this byte-validation consumer")
                     validate_evidence_checkpoint(where, unit, registered_entry)
                     if registered_entry.get("verifier") != unit.get("verifier"):

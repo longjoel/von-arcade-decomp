@@ -174,6 +174,10 @@ def main() -> int:
     malformed_canonical["entries"][0]["canonical"] = "true"
     assert any("canonical must be boolean" in error for error in validate_lifecycle(
         lifecycle, malformed_canonical))
+    malformed_consumers = copy.deepcopy(manifest)
+    malformed_consumers["entries"][0]["consumers"] = None
+    assert any("canonical consumers must be a non-empty string array" in error
+               for error in validate_lifecycle(lifecycle, malformed_consumers))
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][3]["canonical_evidence_id"] = {}
     assert any("canonical evidence id" in error for error in validate_lifecycle(broken, manifest))
