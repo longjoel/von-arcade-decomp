@@ -224,12 +224,17 @@ def capture_provenance_errors(context: Any, event_path: Path, root: Path,
 def event_artifact_provenance(context: dict[str, Any], event_path: Path,
                               root: Path) -> dict[str, str]:
     """Return the declared path/hash binding for a validated event stream."""
+    if not isinstance(context, dict):
+        raise ValueError("capture context must be an object")
+    artifacts = context.get("artifacts")
+    if not isinstance(artifacts, list):
+        raise ValueError("capture artifacts must be an array")
     if event_path.is_symlink():
         raise ValueError(f"event stream must not be a symlink: {event_path}")
     if not event_path.is_file():
         raise ValueError(f"event stream is missing: {event_path}")
     relative_event = str(event_path.resolve().relative_to(root.resolve()))
-    for artifact in context.get("artifacts", []):
+    for artifact in artifacts:
         if isinstance(artifact, dict) and artifact.get("path") == relative_event:
             digest = artifact.get("sha256")
             if isinstance(digest, str):
