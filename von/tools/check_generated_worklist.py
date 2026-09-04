@@ -45,10 +45,11 @@ def check(coverage: Path, ledger: Path, expected: Path, root: Path,
         return [f"invalid coverage JSON object: {coverage}"]
     if coverage_document.get("tier") != "A" or coverage_document.get("edge_semantics") != "possible_static_edges":
         return [f"stale or invalid Tier A coverage: {coverage}"]
-    with tempfile.TemporaryDirectory() as directory:
+    with tempfile.TemporaryDirectory(dir=root) as directory:
         generated = Path(directory)
         command = [sys.executable, str(GENERATOR), "--coverage", str(coverage), "--ledger", str(ledger),
-                   "--json", str(generated / "worklist.json"), "--markdown", str(generated / "worklist.md")]
+                   "--json", str(generated / "worklist.json"), "--markdown", str(generated / "worklist.md"),
+                   "--root", str(root)]
         if comparison is not None:
             command.extend(["--comparison", str(comparison)])
         result = subprocess.run(

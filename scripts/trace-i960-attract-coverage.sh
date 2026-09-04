@@ -62,7 +62,7 @@ python3 "$ROOT_DIR/von/tools/capture_manifest.py" \
     --artifact "$PC_LOG" --artifact "$JSON_REPORT"
 python3 "$ROOT_DIR/von/tools/build_attract_worklist.py" \
     --coverage "$JSON_REPORT" --ledger "$ROOT_DIR/von/reconstruction_ledger.json" \
-    --json "$WORKLIST_JSON" --markdown "$WORKLIST_MARKDOWN"
+    --json "$WORKLIST_JSON" --markdown "$WORKLIST_MARKDOWN" --root "$ROOT_DIR"
 
 printf 'PC coverage: %s\n' "$PC_LOG"
 printf 'Coverage report: %s\n' "$MARKDOWN_REPORT"

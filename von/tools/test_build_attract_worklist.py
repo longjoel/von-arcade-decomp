@@ -26,7 +26,7 @@ def run(coverage: dict, ledger: dict, work: Path,
     if comparison is not None:
         comparison_path.write_text(json.dumps(comparison), encoding="utf-8")
     command = [sys.executable, str(TOOL), "--coverage", str(coverage_path), "--ledger", str(ledger_path),
-               "--json", str(output_path), "--markdown", str(markdown_path)]
+               "--json", str(output_path), "--markdown", str(markdown_path), "--root", str(work)]
     if comparison is not None:
         command.extend(["--comparison", str(comparison_path)])
     return subprocess.run(
@@ -56,11 +56,20 @@ def main() -> int:
         linked_result = subprocess.run(
             [sys.executable, str(TOOL), "--coverage", str(work / "coverage.json"),
              "--ledger", str(work / "ledger.json"), "--json", str(linked_json),
-             "--markdown", str(work / "worklist-linked.md")],
+             "--markdown", str(work / "worklist-linked.md"), "--root", str(work)],
             cwd=ROOT, capture_output=True, text=True, check=False,
         )
         assert linked_result.returncode == 1
         assert "JSON output path must not be a symlink" in linked_result.stdout
+        outside_output = work.parent / f"outside-worklist-{work.name}.json"
+        outside_result = subprocess.run(
+            [sys.executable, str(TOOL), "--coverage", str(work / "coverage.json"),
+             "--ledger", str(work / "ledger.json"), "--json", str(outside_output),
+             "--markdown", str(work / "outside-worklist.md"), "--root", str(work)],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert outside_result.returncode == 1
+        assert "JSON output path escapes root" in outside_result.stdout
         comparison = {"missing_dynamic_edges": [["0x200", "0x100"], ["0x300", "0x400"]],
                       "missed_checkpoints": ["scheduler"], "first_divergence_index": 12}
         result = run(coverage, ledger, work, comparison)

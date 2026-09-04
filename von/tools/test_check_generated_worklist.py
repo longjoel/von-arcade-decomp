@@ -26,17 +26,19 @@ def main() -> int:
         ledger_path.write_text(json.dumps(ledger), encoding="utf-8")
         expected = work / "worklist.json"
         subprocess.run([sys.executable, str(GENERATOR), "--coverage", str(coverage_path), "--ledger", str(ledger_path),
-                        "--json", str(expected), "--markdown", str(work / "worklist.md")],
+                        "--json", str(expected), "--markdown", str(work / "worklist.md"),
+                        "--root", str(work)],
                        cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
         markdown = work / "worklist.md"
-        assert not check(coverage_path, ledger_path, expected, ROOT, markdown)
+        assert not check(coverage_path, ledger_path, expected, work, markdown)
         comparison = work / "comparison.json"
         comparison.write_text(json.dumps({"missing_dynamic_edges": [["0x200", "0x100"]],
                                           "missed_checkpoints": ["scheduler"]}), encoding="utf-8")
         causal_expected = work / "causal-worklist.json"
         subprocess.run([sys.executable, str(GENERATOR), "--coverage", str(coverage_path),
                         "--ledger", str(ledger_path), "--comparison", str(comparison),
-                        "--json", str(causal_expected), "--markdown", str(work / "causal-worklist.md")],
+                        "--json", str(causal_expected), "--markdown", str(work / "causal-worklist.md"),
+                        "--root", str(work)],
                        cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
         assert not check(coverage_path, ledger_path, causal_expected, work,
                          work / "causal-worklist.md", comparison)
@@ -49,26 +51,26 @@ def main() -> int:
                    check(coverage_path, ledger_path, causal_expected, ROOT,
                          comparison=comparison))
         markdown.write_text(markdown.read_text(encoding="utf-8") + "stale\n", encoding="utf-8")
-        assert any("Markdown" in error for error in check(coverage_path, ledger_path, expected, ROOT, markdown))
+        assert any("Markdown" in error for error in check(coverage_path, ledger_path, expected, work, markdown))
         subprocess.run([sys.executable, str(GENERATOR), "--coverage", str(coverage_path), "--ledger", str(ledger_path),
-                        "--json", str(expected), "--markdown", str(markdown)],
+                        "--json", str(expected), "--markdown", str(markdown), "--root", str(work)],
                        cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
         expected.write_text(expected.read_text(encoding="utf-8").replace('"schema_version": 1', '"schema_version": 9', 1), encoding="utf-8")
-        assert check(coverage_path, ledger_path, expected, ROOT)
+        assert check(coverage_path, ledger_path, expected, work)
         linked_coverage = work / "linked-coverage.json"
         linked_coverage.symlink_to(coverage_path)
         assert any("coverage path must not be a symlink" in error for error in
-                   check(linked_coverage, ledger_path, expected, ROOT))
+                   check(linked_coverage, ledger_path, expected, work))
         linked_expected = work / "linked-worklist.json"
         linked_expected.symlink_to(expected)
         assert any("worklist path must not be a symlink" in error for error in
-                   check(coverage_path, ledger_path, linked_expected, ROOT))
+                   check(coverage_path, ledger_path, linked_expected, work))
         coverage_path.write_text("[]", encoding="utf-8")
         assert any("coverage JSON object" in error for error in
-                   check(coverage_path, ledger_path, expected, ROOT))
+                   check(coverage_path, ledger_path, expected, work))
         coverage_path.write_text("{invalid", encoding="utf-8")
         assert any("unable to read coverage JSON" in error for error in
-                   check(coverage_path, ledger_path, expected, ROOT))
+                   check(coverage_path, ledger_path, expected, work))
     print("PASS: worklist freshness checker detects stale generated output")
     return 0
 
