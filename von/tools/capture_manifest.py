@@ -90,6 +90,14 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
     command = manifest.get("command")
     if not isinstance(command, list) or not command or not all(isinstance(item, str) and item for item in command):
         errors.append("command must be a non-empty string array")
+    def command_argument(flag: str) -> str | None:
+        if not isinstance(command, list):
+            return None
+        try:
+            index = command.index(flag)
+        except ValueError:
+            return None
+        return command[index + 1] if index + 1 < len(command) else None
     report_path_text = manifest.get("coverage_report")
     if report_path_text:
         report_path = rooted(root, report_path_text)
@@ -127,6 +135,19 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
             isolation_resolved[field] = rooted(root, path).resolve()
     if len(set(isolation_resolved.values())) != len(isolation_resolved):
         errors.append("isolation directories must be distinct")
+    for flag, field in (("-cfg_directory", "cfg_directory"),
+                        ("-nvram_directory", "nvram_directory"),
+                        ("-state_directory", "state_directory")):
+        argument = command_argument(flag)
+        expected = isolation_resolved.get(field)
+        if argument is None:
+            errors.append(f"command must declare {flag}")
+        elif expected is not None:
+            try:
+                if Path(argument).resolve() != expected:
+                    errors.append(f"command {flag} does not match isolation.{field}")
+            except (OSError, RuntimeError):
+                errors.append(f"command {flag} has an invalid path")
     for section in ("inputs", "artifacts"):
         items = manifest.get(section, [])
         if not isinstance(items, list):

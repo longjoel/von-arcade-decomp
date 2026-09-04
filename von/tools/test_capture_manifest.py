@@ -29,7 +29,10 @@ def main() -> int:
             "stimulus": {"kind": "input-free-attract", "seconds": 1, "phase": "stable-attract"},
             "configuration": {"set": "fixture", "mame_revision": "abc",
                                "patch_profile": "none", "execution_engine": "interpreter"},
-            "command": ["mame", "vonj", "-video", "none"],
+            "command": ["mame", "vonj", "-video", "none",
+                         "-cfg_directory", str(root / "cfg"),
+                         "-nvram_directory", str(root / "nvram"),
+                         "-state_directory", str(root / "state")],
             "isolation": {"cfg_directory": "cfg", "nvram_directory": "nvram", "state_directory": "state"},
             "inputs": [entry(input_path, root)], "artifacts": [entry(artifact_path, root)],
             "coverage_report": "coverage.json",
@@ -56,6 +59,9 @@ def main() -> int:
         broken = copy.deepcopy(manifest)
         broken["command"] = []
         assert any("command" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["command"][broken["command"].index("-cfg_directory") + 1] = str(root / "nvram")
+        assert any("does not match isolation.cfg_directory" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
         broken["stimulus"]["phase"] = "startup"
         assert any("phase" in error for error in validate(broken, root))

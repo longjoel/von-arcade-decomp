@@ -23,7 +23,9 @@ def main() -> int:
             "schema_version": 1, "id": "capture-v1", "objective": "pilot",
             "stimulus": {"kind": "input-free-attract", "seconds": 1},
             "configuration": {"set": "vonj", "mame_revision": "abc", "patch_profile": "none", "execution_engine": "interpreter"},
-            "command": ["mame", "vonj"],
+            "command": ["mame", "vonj", "-cfg_directory", str(root / "cfg"),
+                         "-nvram_directory", str(root / "nvram"),
+                         "-state_directory", str(root / "state")],
             "isolation": {"cfg_directory": "cfg", "nvram_directory": "nvram", "state_directory": "state"},
             "coverage_report": "summary.json", "inputs": [], "artifacts": [entry(artifact, root)],
         }

@@ -44,9 +44,13 @@ python3 "$ROOT_DIR/von/tools/capture_manifest.py" \
     --mame-revision "$(git -C "$ROOT_DIR/third_party/mame-master" rev-parse HEAD)" \
     --patch-profile "${VON_MAME_PATCH_SET:-default}" --execution-engine interpreter \
     --command "$MAME_BIN" --command vonj --command -rompath --command "$ROM_PATH" \
-    --command -video --command none --command -sound --command none \
-    --command -nothrottle --command -autoboot_script \
-    --command "$ROOT_DIR/von/tools/trace_i960_attract_coverage.lua" \
+    --command -debug --command -debugger --command none --command -video --command none \
+    --command -sound --command none --command -skip_gameinfo --command -nothrottle \
+    --command -cfg_directory --command "$RUN_DIR/cfg" \
+    --command -nvram_directory --command "$RUN_DIR/nvram" \
+    --command -state_directory --command "$RUN_DIR/state" \
+    --command -autoboot_script --command "$ROOT_DIR/von/tools/trace_i960_attract_coverage.lua" \
+    --command -seconds_to_run --command "$SECONDS_TO_RUN" \
     --coverage-report "$JSON_REPORT" \
     --cfg-directory "$RUN_DIR/cfg" --nvram-directory "$RUN_DIR/nvram" \
     --state-directory "$RUN_DIR/state" \
