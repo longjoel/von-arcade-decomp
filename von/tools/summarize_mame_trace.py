@@ -123,16 +123,38 @@ def archive(path: Path) -> Path:
     return target
 
 
+def path_error(label: str, path: Path, root: Path, *, output: bool = False) -> str | None:
+    if path.is_symlink():
+        return f"{label} path must not be a symlink: {path}"
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, RuntimeError, ValueError):
+        return f"{label} path escapes root: {path}"
+    if not output and not path.is_file():
+        return f"missing {label}: {path}"
+    return None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("trace", type=Path)
     parser.add_argument("--json", dest="json_path", type=Path)
     parser.add_argument("--markdown", dest="markdown_path", type=Path)
+    parser.add_argument("--root", type=Path,
+                        help="root that trace and summary paths must remain within (defaults to trace parent)")
     parser.add_argument("--archive", action="store_true", help="replace raw trace with a gzip archive")
     args = parser.parse_args()
-    report = summarize(args.trace)
+    root = (args.root or args.trace.parent).resolve()
     json_path = args.json_path or args.trace.with_suffix(args.trace.suffix + ".summary.json")
     markdown_path = args.markdown_path or args.trace.with_suffix(args.trace.suffix + ".summary.md")
+    for label, path, output in (("trace", args.trace, False),
+                                ("JSON output", json_path, True),
+                                ("Markdown output", markdown_path, True)):
+        error = path_error(label, path, root, output=output)
+        if error:
+            print(f"Trace summary: {error}")
+            return 1
+    report = summarize(args.trace)
     json_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     markdown_path.write_text(markdown(report), encoding="utf-8")
     if args.archive:

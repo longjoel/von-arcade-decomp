@@ -35,6 +35,14 @@ def main() -> int:
         archive = Path(str(trace) + ".gz")
         if trace.exists() or gzip.open(archive, "rb").read() != original:
             raise SystemExit("gzip archive did not preserve raw trace")
+        outside = Path(directory).parent / "outside-trace-summary.json"
+        trace = archive
+        result = subprocess.run(
+            ["python3", TOOL, trace, "--root", directory, "--json", outside],
+            capture_output=True, text=True, check=False,
+        )
+        if result.returncode != 1 or "JSON output path escapes root" not in result.stdout:
+            raise SystemExit(f"out-of-root summary was accepted: {result.stdout}")
     print("PASS: streaming trace summary, run collapse, checksum metadata, and gzip archive")
     return 0
 
