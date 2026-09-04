@@ -168,6 +168,19 @@ def main() -> int:
     parser.add_argument("--inventory", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    root = Path.cwd().resolve()
+    for label, path in (("inventory", args.inventory), ("output", args.output)):
+        if path.is_symlink():
+            print(f"Evidence cleanup plan: {label} path must not be a symlink")
+            return 1
+        try:
+            path.resolve().relative_to(root)
+        except (OSError, RuntimeError, ValueError):
+            print(f"Evidence cleanup plan: {label} path escapes root: {path}")
+            return 1
+        if label == "inventory" and not path.is_file():
+            print(f"Evidence cleanup plan: missing inventory: {path}")
+            return 1
     try:
         source = args.inventory.read_bytes()
         document = json.loads(source)

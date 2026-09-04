@@ -3,7 +3,17 @@
 
 from __future__ import annotations
 
+import json
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
 from plan_evidence_cleanup import plan, validate_inventory
+
+
+ROOT = Path(__file__).resolve().parents[2]
+TOOL = Path(__file__).resolve().parent / "plan_evidence_cleanup.py"
 
 
 def record(path: str, classification: str, size: int, producer: str | None = "capture.sh",
@@ -62,6 +72,35 @@ def main() -> int:
     broken = dict(inventory, files=[record("bad", "legacy-or-ambiguous", 1)])
     broken["files"][0]["sha256"] = "A" * 64
     assert any("lowercase" in error for error in validate_inventory(broken))
+    with tempfile.TemporaryDirectory(dir=ROOT) as directory:
+        temp = Path(directory)
+        inventory_path = temp / "inventory.json"
+        inventory_path.write_text(json.dumps(inventory), encoding="utf-8")
+        output_path = temp / "plan.json"
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--inventory", str(inventory_path),
+             "--output", str(output_path)],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 0
+        linked_output = temp / "linked-plan.json"
+        linked_output.symlink_to(output_path)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--inventory", str(inventory_path),
+             "--output", str(linked_output)],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "output path must not be a symlink" in cli_result.stdout
+        malformed_inventory = temp / "malformed.json"
+        malformed_inventory.write_text("{invalid\n", encoding="utf-8")
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--inventory", str(malformed_inventory),
+             "--output", str(temp / "malformed-plan.json")],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "Expecting property name" in cli_result.stdout
     print("PASS: evidence cleanup planner emits reviewed non-destructive actions")
     return 0
 
