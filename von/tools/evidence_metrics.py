@@ -119,10 +119,26 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
             if not isinstance(value, int) or isinstance(value, bool) or value < 0:
                 raise ValueError(f"metrics experiments.{field} must be a nonnegative integer")
     worklist_entries = worklist.get("units")
-    worklist_ids = {
-        entry.get("work_unit") for entry in worklist_entries
-        if isinstance(entry, dict) and isinstance(entry.get("work_unit"), str)
-    } if isinstance(worklist_entries, list) else set()
+    if worklist_entries is None:
+        worklist_ids: set[str] = set()
+    elif not isinstance(worklist_entries, list) or any(
+            not isinstance(entry, dict)
+            or not isinstance(entry.get("work_unit"), str)
+            or not entry.get("work_unit")
+            for entry in worklist_entries):
+        raise ValueError("metrics worklist.units must be an array of work_unit strings")
+    else:
+        worklist_ids = {entry["work_unit"] for entry in worklist_entries}
+        if len(worklist_ids) != len(worklist_entries):
+            raise ValueError("metrics worklist.units must be unique")
+        ledger_ids = {
+            unit["id"] for image in images for unit in image.get("work_units", [])
+            if isinstance(unit.get("id"), str) and unit.get("id")
+        }
+        unknown = sorted(worklist_ids - ledger_ids)
+        if unknown:
+            raise ValueError("metrics worklist.units reference unknown ledger ids: "
+                             + ", ".join(unknown))
     def in_cohort(unit: dict[str, Any]) -> bool:
         return not worklist_ids or unit.get("id") in worklist_ids
     stages = Counter(

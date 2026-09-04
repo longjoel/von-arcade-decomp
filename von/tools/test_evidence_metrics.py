@@ -115,6 +115,27 @@ def main() -> int:
     assert cohort_report["stages"]["trace-validated"] == 0
     assert cohort_report["discovery"]["modeled_conversion_percent"] == 100.0
     try:
+        metrics({"images": [{"work_units": [{"id": "known", "stage": "modeled"}]}]},
+                {"discovered_units": 1, "units": [{"work_unit": "missing"}]},
+                {"possible_static_edge_count": 0, "confirmed_dynamic_edge_count": 0,
+                 "observed_entry_point_count": 0},
+                {"compared_events": 0, "matched_prefix_events": 0,
+                 "original_checkpoints": [], "missed_checkpoints": [], "unexpected_checkpoints": []})
+    except ValueError as error:
+        assert "unknown ledger ids" in str(error)
+    else:
+        raise AssertionError("metrics accepted an unknown worklist unit")
+    try:
+        metrics({"images": []}, {"discovered_units": 0, "units": {}},
+                {"possible_static_edge_count": 0, "confirmed_dynamic_edge_count": 0,
+                 "observed_entry_point_count": 0},
+                {"compared_events": 0, "matched_prefix_events": 0,
+                 "original_checkpoints": [], "missed_checkpoints": [], "unexpected_checkpoints": []})
+    except ValueError as error:
+        assert "worklist.units" in str(error)
+    else:
+        raise AssertionError("metrics accepted malformed worklist units")
+    try:
         metrics({"images": [{"work_units": [{"stage": "planned", "created_at": "bad"}]}]},
                 {"discovered_units": 0, "modeled_units": 0, "integrated_units": 0},
                 {"possible_static_edge_count": 0, "confirmed_dynamic_edge_count": 0,
