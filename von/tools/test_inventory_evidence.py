@@ -87,6 +87,24 @@ def main() -> int:
         )
         assert cli_result.returncode == 1
         assert "output path must not be a symlink" in cli_result.stdout
+        malformed_relations = temp_root / "malformed-relations.json"
+        malformed_relations.write_text("{invalid\n", encoding="utf-8")
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--root", str(ROOT), "--path",
+             "von/tools/test_inventory_evidence.py", "--output", str(target),
+             "--relations", str(malformed_relations)],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "unable to read relations" in cli_result.stdout
+        outside_output = ROOT.parent / "outside-inventory.json"
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--root", str(ROOT), "--path",
+             "von/tools/test_inventory_evidence.py", "--output", str(outside_output)],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "output path escapes root" in cli_result.stdout
     print("PASS: evidence inventory records hashes and cleanup decisions")
     return 0
 

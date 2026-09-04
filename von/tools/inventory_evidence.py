@@ -122,11 +122,20 @@ def main() -> int:
     parser.add_argument("--require-complete-relations", action="store_true",
                         help="fail unless every inventoried file has producer and consumers")
     args = parser.parse_args()
+    root = args.root.resolve()
     for label, path in (("output", args.output), ("relations", args.relations)):
         if path is not None and path.is_symlink():
             print(f"Evidence inventory: {label} path must not be a symlink")
             return 1
-    root = args.root.resolve()
+        if path is not None:
+            try:
+                path.resolve().relative_to(root)
+            except (OSError, RuntimeError, ValueError):
+                print(f"Evidence inventory: {label} path escapes root: {path}")
+                return 1
+            if label == "relations" and not path.is_file():
+                print(f"Evidence inventory: missing relations: {path}")
+                return 1
     tracked = tracked_files(root)
     files: list[Path] = []
     for requested in args.path:
@@ -142,7 +151,11 @@ def main() -> int:
     except ValueError as error:
         print(f"- {error}")
         return 1
-    relations = json.loads(args.relations.read_text(encoding="utf-8")) if args.relations else {}
+    try:
+        relations = json.loads(args.relations.read_text(encoding="utf-8")) if args.relations else {}
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as error:
+        print(f"Evidence inventory: unable to read relations: {error}")
+        return 1
     if not isinstance(relations, dict):
         parser.error("relations must be a JSON object")
     relation_validation = relation_errors(records, relations, args.require_complete_relations)
