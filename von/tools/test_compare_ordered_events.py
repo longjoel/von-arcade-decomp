@@ -182,6 +182,25 @@ def main() -> int:
             assert "mmio-write requires value" in str(error)
         else:
             raise AssertionError("incomplete MMIO event was accepted")
+        malformed.write_text(
+            '{"kind": "direct-call", "seq": 1, "time": 1.0, "frame": 1, '
+            '"cpu": "maincpu", "pc": {}, "next_pc": "0x20", "target": "0x20"}\n',
+            encoding="utf-8")
+        try:
+            load_events(malformed)
+        except ValueError as error:
+            assert "direct-call pc must be a scalar address" in str(error)
+        else:
+            raise AssertionError("non-scalar PC was accepted")
+        malformed.write_text(
+            '{"kind": "checkpoint", "seq": 1, "time": 1.0, "frame": 1, '
+            '"cpu": "maincpu", "name": {}}\n', encoding="utf-8")
+        try:
+            load_events(malformed)
+        except ValueError as error:
+            assert "checkpoint name must be a non-empty string" in str(error)
+        else:
+            raise AssertionError("non-string checkpoint name was accepted")
         compressed_original = Path(directory) / "original.ndjson.gz"
         compressed_reconstructed = Path(directory) / "reconstructed.ndjson.gz"
         payload = ('{"seq": 1, "time": 1.0, "frame": 1, "cpu": "maincpu", '

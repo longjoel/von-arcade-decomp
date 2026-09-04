@@ -77,6 +77,16 @@ def validate_event_shape(event: dict[str, Any], where: str) -> None:
         raise ValueError(f"{where}: {event['kind']} frame must be a non-negative integer")
     if not isinstance(event["cpu"], str) or not event["cpu"].strip():
         raise ValueError(f"{where}: {event['kind']} cpu must be a non-empty string")
+    if event["kind"] == "checkpoint" and not isinstance(event["name"], str):
+        raise ValueError(f"{where}: checkpoint name must be a non-empty string")
+    scalar_fields = {"pc", "next_pc", "target", "address"}
+    for field in required_fields:
+        if field not in scalar_fields:
+            continue
+        value = event[field]
+        if (not isinstance(value, (str, int)) or isinstance(value, bool)
+                or (isinstance(value, str) and not value.strip())):
+            raise ValueError(f"{where}: {event['kind']} {field} must be a scalar address")
 
 
 def validate_order(events: list[dict[str, Any]]) -> None:
