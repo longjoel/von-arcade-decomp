@@ -126,6 +126,8 @@ def main() -> int:
     parser.add_argument("--id", required=True)
     parser.add_argument("--objective", required=True)
     parser.add_argument("--seconds", required=True, type=float)
+    parser.add_argument("--stimulus-kind", choices=("input-free-attract", "bounded-trace", "causal-trace"),
+                        default="input-free-attract")
     parser.add_argument("--phase", default="stable-attract")
     parser.add_argument("--set", required=True)
     parser.add_argument("--mame-revision", required=True)
@@ -144,7 +146,7 @@ def main() -> int:
         "schema_version": 1,
         "id": args.id,
         "objective": args.objective,
-        "stimulus": {"kind": "input-free-attract", "seconds": args.seconds, "phase": args.phase},
+        "stimulus": {"kind": args.stimulus_kind, "seconds": args.seconds, "phase": args.phase},
         "configuration": {
             "set": args.set, "mame_revision": args.mame_revision,
             "patch_profile": args.patch_profile, "execution_engine": args.execution_engine,

@@ -68,6 +68,10 @@ def main() -> int:
         broken = copy.deepcopy(manifest)
         broken["inputs"] = {"path": "rom-manifest.json"}
         assert any("inputs must be an array" in error for error in validate(broken, root))
+        causal = copy.deepcopy(manifest)
+        causal["stimulus"]["kind"] = "causal-trace"
+        causal.pop("coverage_report")
+        assert not validate(causal, root)
     print("PASS: capture sidecar manifest hashes and provenance")
     return 0
 
