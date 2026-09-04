@@ -64,6 +64,8 @@ def main() -> int:
         assert manifest["entries"][0]["hypothesis"] == capture["hypothesis"]
         assert manifest["entries"][0]["capture_manifest_sha256"] == hashlib.sha256(
             capture_path.read_bytes()).hexdigest()
+        assert manifest["entries"][0]["verifier_sha256"] == hashlib.sha256(
+            verifier.read_bytes()).hexdigest()
         assert ledger["images"][0]["work_units"][0]["evidence"] == ["capture-v1"]
         mismatched_capture = copy.deepcopy(capture)
         mismatched_capture["objective"] = "different"

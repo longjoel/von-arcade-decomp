@@ -140,8 +140,14 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
             errors.append(f"{where}: canonical outcome must be pass")
         verifier = entry.get("verifier")
         verifier_path = rooted(root, verifier)
-        if verifier_path is None or not verifier_path.is_file():
+        if verifier_path is None or verifier_path.is_symlink() or not verifier_path.is_file():
             errors.append(f"{where}: verifier is missing")
+        else:
+            verifier_digest = entry.get("verifier_sha256")
+            if not isinstance(verifier_digest, str) or not SHA256_RE.fullmatch(verifier_digest):
+                errors.append(f"{where}: verifier_sha256 must be a SHA-256 digest")
+            elif verifier_digest != hashlib.sha256(verifier_path.read_bytes()).hexdigest():
+                errors.append(f"{where}: verifier hash mismatch")
         consumers = entry.get("consumers", [])
         if (not isinstance(consumers, list) or not consumers
                 or not all(isinstance(consumer, str) for consumer in consumers)

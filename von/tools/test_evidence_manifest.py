@@ -35,6 +35,12 @@ def main() -> int:
     broken["entries"][0]["verifier"] = "/tmp/verify.py"
     assert any("verifier" in error for error in validate(broken, ledger, root))
     broken = json.loads(json.dumps(manifest))
+    broken["entries"][0]["verifier_sha256"] = "0" * 64
+    assert any("verifier hash mismatch" in error for error in validate(broken, ledger, root))
+    broken = json.loads(json.dumps(manifest))
+    del broken["entries"][0]["verifier_sha256"]
+    assert any("verifier_sha256 must be" in error for error in validate(broken, ledger, root))
+    broken = json.loads(json.dumps(manifest))
     broken["entries"][0]["artifacts"][0]["path"] = "../outside.json"
     assert any("artifact path" in error for error in validate(broken, ledger, root))
     broken = json.loads(json.dumps(manifest))
@@ -95,6 +101,8 @@ def main() -> int:
                          "capture_manifest_sha256": hashlib.sha256(
                              (temp / "capture.json").read_bytes()).hexdigest(),
                          "verifier": "verify.py",
+                         "verifier_sha256": hashlib.sha256(
+                             (temp / "verify.py").read_bytes()).hexdigest(),
                          "outcome": "pass", "consumers": ["unit"]}],
         }
         assert not validate(runtime, {"images": [{"work_units": [{"id": "unit"}]}]}, temp)

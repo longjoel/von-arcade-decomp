@@ -27,6 +27,7 @@
         }
       ],
       "verifier": "von/tools/test_sharc_precision_fixtures.py",
+      "verifier_sha256": "15124c87d38d357d0d33ba31ff23a8d33f913de7e12d4b0b6e67d5e5b76a6000",
       "outcome": "pass",
       "consumers": ["maincpu.opcode-0b-vector-service"]
     }

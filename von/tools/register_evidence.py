@@ -54,7 +54,7 @@ def register(
     if any(entry.get("id") == capture_id for entry in entries):
         return [f"duplicate evidence id {capture_id}"]
     verifier_path = rooted(root, verifier)
-    if verifier_path is None or not verifier_path.is_file():
+    if verifier_path is None or verifier_path.is_symlink() or not verifier_path.is_file():
         return [f"missing verifier {verifier}"]
     if not consumers:
         return ["at least one ledger consumer is required"]
@@ -102,6 +102,7 @@ def register(
         "capture_manifest": capture_relative,
         "capture_manifest_sha256": sha256(capture_path),
         "verifier": verifier,
+        "verifier_sha256": sha256(verifier_path),
         "outcome": "pass",
         "consumers": consumers,
     }
