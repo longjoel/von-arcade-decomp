@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 from collections import Counter
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -19,8 +20,54 @@ def load(path: Path | None) -> dict[str, Any]:
     return document
 
 
+def age_report(ledger: dict[str, Any], as_of: str | None = None) -> dict[str, Any]:
+    """Report age only from declared unit timestamps, never filesystem mtimes."""
+    reference = datetime.fromisoformat(as_of.replace("Z", "+00:00")) if as_of else None
+    if reference is not None:
+        if reference.tzinfo is None:
+            raise ValueError("metrics as_of must include a timezone")
+        reference = reference.astimezone(timezone.utc)
+    ages: dict[str, list[tuple[float, str]]] = {}
+    for image in ledger.get("images", []):
+        for unit in image.get("work_units", []):
+            created = unit.get("created_at")
+            if created is None:
+                continue
+            if not isinstance(created, str) or reference is None:
+                raise ValueError("metrics unit created_at requires an ISO timestamp and --as-of")
+            try:
+                timestamp = datetime.fromisoformat(created.replace("Z", "+00:00"))
+            except ValueError as error:
+                raise ValueError(f"metrics unit created_at is invalid: {created}") from error
+            if timestamp.tzinfo is None:
+                raise ValueError("metrics unit created_at must include a timezone")
+            age = (reference - timestamp.astimezone(timezone.utc)).total_seconds()
+            if age < 0:
+                raise ValueError("metrics unit created_at cannot be in the future")
+            stage = unit.get("stage")
+            if isinstance(stage, str):
+                ages.setdefault(stage, []).append((age, str(unit.get("id", "?"))))
+    result: dict[str, Any] = {}
+    for stage in ("planned", "modeled", "integrated", "trace-validated", "byte-validated", "blocked"):
+        values = sorted(ages.get(stage, []))
+        if not values:
+            result[stage] = {"timestamped_items": 0, "median_age_seconds": None,
+                             "oldest_age_seconds": None, "oldest_unit_id": None}
+            continue
+        age_values = [value[0] for value in values]
+        middle = len(age_values) // 2
+        median = age_values[middle] if len(age_values) % 2 else (age_values[middle - 1] + age_values[middle]) / 2
+        oldest_age, oldest_id = max(values)
+        result[stage] = {"timestamped_items": len(values),
+                         "median_age_seconds": median,
+                         "oldest_age_seconds": oldest_age,
+                         "oldest_unit_id": oldest_id}
+    return result
+
+
 def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str, Any],
-            comparison: dict[str, Any], experiments: dict[str, Any] | None = None) -> dict[str, Any]:
+            comparison: dict[str, Any], experiments: dict[str, Any] | None = None,
+            as_of: str | None = None) -> dict[str, Any]:
     for name, document in (("ledger", ledger), ("worklist", worklist),
                            ("coverage", coverage), ("comparison", comparison)):
         if not isinstance(document, dict):
@@ -40,6 +87,7 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
         "schema_version": 1,
         "stages": {stage: stages.get(stage, 0) for stage in
                    ("planned", "modeled", "integrated", "trace-validated", "byte-validated", "blocked")},
+        "age": age_report(ledger, as_of),
         "discovery": {
             "units": discovered,
             "modeled_conversion_percent": percentage(modeled, discovered),
@@ -75,11 +123,12 @@ def main() -> int:
     parser.add_argument("--coverage", type=Path)
     parser.add_argument("--comparison", type=Path)
     parser.add_argument("--experiments", type=Path)
+    parser.add_argument("--as-of", help="UTC ISO timestamp used for declared unit age metrics")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
         report = metrics(load(args.ledger), load(args.worklist), load(args.coverage),
-                         load(args.comparison), load(args.experiments))
+                         load(args.comparison), load(args.experiments), args.as_of)
     except (OSError, json.JSONDecodeError, ValueError) as error:
         print(f"Evidence metrics: {error}")
         return 1

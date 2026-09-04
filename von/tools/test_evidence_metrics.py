@@ -15,7 +15,8 @@ def main() -> int:
         raise AssertionError("malformed ledger input was accepted")
     report = metrics(
         {"images": [{"work_units": [
-            {"stage": "modeled"}, {"stage": "integrated"}, {"stage": "trace-validated"},
+            {"id": "m", "stage": "modeled", "created_at": "2026-09-04T14:00:00Z"},
+            {"stage": "integrated"}, {"stage": "trace-validated"},
         ]}]},
         {"discovered_units": 4, "active_modeled_units": ["unit-1"], "modeled_wip_limit": 1},
         {"tier": "A", "possible_static_edge_count": 7, "confirmed_dynamic_edge_count": 2,
@@ -24,6 +25,7 @@ def main() -> int:
          "original_checkpoints": ["reset", "audio"], "missed_checkpoints": ["audio"],
          "unexpected_checkpoints": []},
         {"changed_decision": 3, "quarantined": 1},
+        "2026-09-04T15:00:00Z",
     )
     assert report["stages"]["modeled"] == 1
     assert report["discovery"]["modeled_conversion_percent"] == 25.0
@@ -33,6 +35,15 @@ def main() -> int:
     assert report["comparison"]["checkpoints_passed"] == ["reset"]
     assert report["comparison"]["missed_checkpoints"] == ["audio"]
     assert report["experiments"] == {"changed_decision": 3, "quarantined": 1}
+    assert report["age"]["modeled"]["median_age_seconds"] == 3600.0
+    assert report["age"]["modeled"]["oldest_unit_id"] == "m"
+    try:
+        metrics({"images": [{"work_units": [{"stage": "planned", "created_at": "bad"}]}]},
+                {}, {}, {}, as_of="2026-09-04T15:00:00Z")
+    except ValueError as error:
+        assert "created_at is invalid" in str(error)
+    else:
+        raise AssertionError("invalid unit timestamp was accepted")
     print("PASS: evidence metrics report authoritative workflow measures")
     return 0
 
