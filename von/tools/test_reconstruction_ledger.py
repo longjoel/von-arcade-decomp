@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import tempfile
 from pathlib import Path
@@ -69,6 +70,7 @@ def main() -> int:
         ]}],
     }
     manifest = {"entries": [{"id": "capture-v1", "canonical": True, "verifier": "verify.py", "outcome": "pass",
+                              "verifier_sha256": "a" * 64,
                               "checkpoints": ["startup"], "consumers": ["trace", "bytes"]}]}
     assert not validate_lifecycle(lifecycle, manifest)
     with tempfile.TemporaryDirectory() as directory:
@@ -77,15 +79,22 @@ def main() -> int:
         (lifecycle_root / "build/image.bin").write_bytes(b"image")
         (lifecycle_root / "test.py").write_text("# test\n", encoding="utf-8")
         (lifecycle_root / "verify.py").write_text("# verifier\n", encoding="utf-8")
-        assert not validate_lifecycle(lifecycle, manifest, lifecycle_root)
+        rooted_manifest = copy.deepcopy(manifest)
+        rooted_manifest["entries"][0]["verifier_sha256"] = hashlib.sha256(
+            (lifecycle_root / "verify.py").read_bytes()).hexdigest()
+        assert not validate_lifecycle(lifecycle, rooted_manifest, lifecycle_root)
         linked_verifier = lifecycle_root / "verify-link.py"
         linked_verifier.symlink_to(lifecycle_root / "verify.py")
         linked_lifecycle = copy.deepcopy(lifecycle)
         linked_lifecycle["images"][0]["work_units"][3]["verifier"] = "verify-link.py"
-        linked_manifest = copy.deepcopy(manifest)
+        linked_manifest = copy.deepcopy(rooted_manifest)
         linked_manifest["entries"][0]["verifier"] = "verify-link.py"
         assert any("missing verifier" in error for error in validate_lifecycle(
             linked_lifecycle, linked_manifest, lifecycle_root))
+        stale_manifest = copy.deepcopy(rooted_manifest)
+        stale_manifest["entries"][0]["verifier_sha256"] = "0" * 64
+        assert any("verifier hash mismatch" in error for error in validate_lifecycle(
+            lifecycle, stale_manifest, lifecycle_root))
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][1]["active"] = True
     broken["images"][0]["work_units"].append({

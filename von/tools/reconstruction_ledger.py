@@ -3,7 +3,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -16,6 +18,7 @@ STAGES = {
 STAGE_ORDER = {stage: index for index, stage in enumerate(
     ("planned", "modeled", "integrated", "trace-validated", "byte-validated")
 )}
+SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
 def validate_lifecycle(
@@ -47,6 +50,17 @@ def validate_lifecycle(
             return True
         path = root / value
         return not path.is_symlink() and path.is_file()
+
+    def verifier_hash_errors(where: str, entry: dict[str, Any]) -> None:
+        digest = entry.get("verifier_sha256")
+        if not isinstance(digest, str) or not SHA256_RE.fullmatch(digest):
+            errors.append(f"{where}: canonical evidence requires verifier_sha256")
+            return
+        verifier = entry.get("verifier")
+        if root is not None and isinstance(verifier, str) and existing_reference(verifier):
+            actual = hashlib.sha256((root / verifier).read_bytes()).hexdigest()
+            if actual != digest:
+                errors.append(f"{where}: canonical verifier hash mismatch")
 
     def nonempty_text(value: Any) -> bool:
         return isinstance(value, str) and bool(value)
@@ -152,6 +166,7 @@ def validate_lifecycle(
                         and registered_entry.get("outcome") != "pass"):
                     errors.append(f"{where}: canonical evidence outcome must be pass")
                 if isinstance(evidence_id, str) and evidence_id in canonical_ids:
+                    verifier_hash_errors(where, registered_entry)
                     validate_evidence_checkpoint(where, unit, registered_entry)
                 verification = unit.get("verification")
                 if not isinstance(verification, dict) or verification.get("result") != "pass":
@@ -173,6 +188,7 @@ def validate_lifecycle(
                     validate_evidence_checkpoint(where, unit, registered_entry)
                     if registered_entry.get("verifier") != unit.get("verifier"):
                         errors.append(f"{where}: verifier differs from canonical evidence entry")
+                    verifier_hash_errors(where, registered_entry)
                 verifier = unit.get("verifier")
                 if not isinstance(verifier, str) or not verifier:
                     errors.append(f"{where}: byte-validated requires verifier")
