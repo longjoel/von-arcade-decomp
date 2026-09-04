@@ -24,7 +24,8 @@ def main() -> int:
             {"id": "m", "stage": "modeled", "created_at": "2026-09-04T14:00:00Z"},
             {"stage": "integrated"}, {"stage": "trace-validated"},
         ]}]},
-        {"discovered_units": 4, "active_modeled_units": ["unit-1"], "modeled_wip_limit": 1},
+        {"discovered_units": 4, "active_modeled_units": ["unit-1"], "modeled_wip_limit": 1,
+         "dynamic_targets_added": 2},
         {"tier": "A", "possible_static_edge_count": 7, "confirmed_dynamic_edge_count": 2,
          "observed_entry_point_count": 3},
         {"compared_events": 10, "matched_prefix_events": 8,
@@ -38,6 +39,7 @@ def main() -> int:
     assert report["stages"]["modeled"] == 1
     assert report["discovery"]["modeled_conversion_percent"] == 25.0
     assert report["discovery"]["integrated_conversion_percent"] == 50.0
+    assert report["discovery"]["newly_discovered_dynamic_targets"] == 2
     assert report["coverage"]["possible_static_edges"] == 7
     assert report["coverage"]["confirmed_dynamic_edges"] == 2
     assert report["comparison"]["checkpoints_passed"] == ["reset"]
