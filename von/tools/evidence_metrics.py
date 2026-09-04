@@ -137,6 +137,12 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
         if isinstance(unit, dict) and unit.get("stage") == "modeled"
         and unit.get("active") is True and in_cohort(unit)
     )
+    modeled_wip_limit = worklist.get("modeled_wip_limit", 1)
+    if (not isinstance(modeled_wip_limit, int) or isinstance(modeled_wip_limit, bool)
+            or modeled_wip_limit < 1):
+        raise ValueError("metrics worklist.modeled_wip_limit must be a positive integer")
+    if len(active_modeled_units) > modeled_wip_limit:
+        raise ValueError("metrics modeled WIP limit exceeded")
     discovered = worklist["discovered_units"]
     modeled = stages.get("modeled", 0)
     integrated = stages.get("integrated", 0) + stages.get("trace-validated", 0) + stages.get("byte-validated", 0)
@@ -159,7 +165,7 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
             "integrated_conversion_percent": percentage(integrated, discovered),
             "stage_conversion_percent": stage_conversion,
             "active_modeled_units": active_modeled_units,
-            "modeled_wip_limit": worklist.get("modeled_wip_limit", 1),
+            "modeled_wip_limit": modeled_wip_limit,
             "newly_discovered_dynamic_targets": worklist.get("dynamic_targets_added", 0),
             "checkpoint_distance": worklist.get("checkpoint_distance", 0),
         },

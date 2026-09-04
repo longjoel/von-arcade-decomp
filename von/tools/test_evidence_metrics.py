@@ -62,6 +62,30 @@ def main() -> int:
     assert report["experiments"] == {"changed_decision": 3, "quarantined": 1}
     assert report["age"]["modeled"]["median_age_seconds"] == 3600.0
     assert report["age"]["modeled"]["oldest_unit_id"] == "m"
+    over_limit_ledger = {"images": [{"work_units": [
+        {"id": "one", "stage": "modeled", "active": True},
+        {"id": "two", "stage": "modeled", "active": True},
+    ]}]}
+    try:
+        metrics(over_limit_ledger, {"discovered_units": 2, "modeled_wip_limit": 1},
+                {"possible_static_edge_count": 0, "confirmed_dynamic_edge_count": 0,
+                 "observed_entry_point_count": 0},
+                {"compared_events": 0, "matched_prefix_events": 0,
+                 "original_checkpoints": [], "missed_checkpoints": [], "unexpected_checkpoints": []})
+    except ValueError as error:
+        assert "WIP limit exceeded" in str(error)
+    else:
+        raise AssertionError("metrics accepted over-limit modeled WIP")
+    try:
+        metrics({"images": []}, {"discovered_units": 0, "modeled_wip_limit": 0},
+                {"possible_static_edge_count": 0, "confirmed_dynamic_edge_count": 0,
+                 "observed_entry_point_count": 0},
+                {"compared_events": 0, "matched_prefix_events": 0,
+                 "original_checkpoints": [], "missed_checkpoints": [], "unexpected_checkpoints": []})
+    except ValueError as error:
+        assert "positive integer" in str(error)
+    else:
+        raise AssertionError("metrics accepted invalid modeled WIP limit")
     inconsistent_worklist = {
         "discovered_units": 4, "checkpoint_distance": 2,
     }
