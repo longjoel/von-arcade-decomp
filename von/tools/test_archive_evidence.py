@@ -71,6 +71,13 @@ def main() -> int:
         )
         assert linked_source_run.returncode != 0
         assert "capture source must not be a symlink" in linked_source_run.stderr
+        missing_source_run = subprocess.run(
+            [sys.executable, str(TOOL), str(root / "missing-events.ndjson"),
+             "--archive", str(root / "missing-source-archive")],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert missing_source_run.returncode != 0
+        assert "missing capture source" in missing_source_run.stderr
         archive_directory_link = root / "archive-directory-link"
         archive_directory_link.symlink_to(archive, target_is_directory=True)
         linked_directory_run = subprocess.run(

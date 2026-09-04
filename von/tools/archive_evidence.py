@@ -76,6 +76,9 @@ def main() -> int:
     if args.capture.is_symlink():
         print("Evidence archive: capture source must not be a symlink", file=sys.stderr)
         return 1
+    if not args.capture.is_file():
+        print(f"Evidence archive: missing capture source: {args.capture}", file=sys.stderr)
+        return 1
     if args.archive.is_symlink():
         print("Evidence archive: archive directory must not be a symlink", file=sys.stderr)
         return 1
@@ -86,7 +89,11 @@ def main() -> int:
     if args.quarantine and quarantine.is_symlink():
         print("Evidence archive: quarantine directory must not be a symlink", file=sys.stderr)
         return 1
-    payload = args.capture.read_bytes()
+    try:
+        payload = args.capture.read_bytes()
+    except OSError as error:
+        print(f"Evidence archive: unable to read capture source: {error}", file=sys.stderr)
+        return 1
     digest = hashlib.sha256(payload).hexdigest()
     args.archive.mkdir(parents=True, exist_ok=True)
     target = args.archive / f"{digest}.gz"
