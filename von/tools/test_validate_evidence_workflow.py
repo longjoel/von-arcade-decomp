@@ -82,7 +82,7 @@ def main() -> int:
             generated_worklist_path=root / "von/attract_worklist.json",
             generated_status_path=root / "von/generated-status.md",
         )
-        assert any("unable to read coverage JSON" in error for error in errors)
+        assert any("generated coverage path must not be a symlink" in error for error in errors)
     unsafe = {
         "schema_version": 1,
         "entries": [{"id": "unsafe", "canonical": True, "verifier": "/tmp/not-a-verifier.py"}],

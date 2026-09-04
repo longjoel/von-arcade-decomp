@@ -98,6 +98,9 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
                 generated_paths.append(("comparison", generated_comparison_path))
             unsafe_paths = []
             for label, path in generated_paths:
+                if path.is_symlink():
+                    unsafe_paths.append(f"generated {label} path must not be a symlink: {path}")
+                    continue
                 try:
                     path.resolve().relative_to(root.resolve())
                 except (OSError, RuntimeError, ValueError):
