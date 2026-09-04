@@ -25,6 +25,11 @@ def normalized(document: dict[str, Any]) -> dict[str, Any]:
 def check(coverage: Path, ledger: Path, expected: Path, root: Path,
           expected_markdown: Path | None = None,
           comparison: Path | None = None) -> list[str]:
+    for label, path in (("coverage", coverage), ("ledger", ledger),
+                        ("worklist", expected), ("Markdown", expected_markdown),
+                        ("comparison", comparison)):
+        if path is not None and path.is_symlink():
+            return [f"{label} path must not be a symlink: {path}"]
     if comparison is not None:
         try:
             comparison.resolve().relative_to(root.resolve())

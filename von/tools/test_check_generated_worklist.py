@@ -55,6 +55,14 @@ def main() -> int:
                        cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
         expected.write_text(expected.read_text(encoding="utf-8").replace('"schema_version": 1', '"schema_version": 9', 1), encoding="utf-8")
         assert check(coverage_path, ledger_path, expected, ROOT)
+        linked_coverage = work / "linked-coverage.json"
+        linked_coverage.symlink_to(coverage_path)
+        assert any("coverage path must not be a symlink" in error for error in
+                   check(linked_coverage, ledger_path, expected, ROOT))
+        linked_expected = work / "linked-worklist.json"
+        linked_expected.symlink_to(expected)
+        assert any("worklist path must not be a symlink" in error for error in
+                   check(coverage_path, ledger_path, linked_expected, ROOT))
         coverage_path.write_text("[]", encoding="utf-8")
         assert any("coverage JSON object" in error for error in
                    check(coverage_path, ledger_path, expected, ROOT))
