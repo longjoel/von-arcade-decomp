@@ -157,6 +157,8 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
     seconds_argument = command_argument("-seconds_to_run")
     if seconds_argument is None:
         errors.append("command must declare -seconds_to_run")
+    elif isinstance(command, list) and command.count("-seconds_to_run") > 1:
+        errors.append("command must contain -seconds_to_run only once")
     else:
         try:
             if float(seconds_argument) != float(stimulus.get("seconds")):
