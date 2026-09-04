@@ -14,6 +14,8 @@ from typing import Any
 def load(path: Path | None) -> dict[str, Any]:
     if path is None:
         return {}
+    if path.is_symlink():
+        raise ValueError(f"metrics input must not be a symlink: {path}")
     document = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(document, dict):
         raise ValueError(f"metrics input must be an object: {path}")
@@ -231,6 +233,9 @@ def main() -> int:
                          load(args.comparison), load(args.experiments), args.as_of)
     except (OSError, json.JSONDecodeError, ValueError) as error:
         print(f"Evidence metrics: {error}")
+        return 1
+    if args.output.is_symlink():
+        print(f"Evidence metrics: output must not be a symlink: {args.output}")
         return 1
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

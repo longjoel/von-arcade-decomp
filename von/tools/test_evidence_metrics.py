@@ -3,10 +3,25 @@
 
 from __future__ import annotations
 
-from evidence_metrics import metrics
+import tempfile
+from pathlib import Path
+
+from evidence_metrics import load, metrics
 
 
 def main() -> int:
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        source = root / "source.json"
+        source.write_text("{}\n", encoding="utf-8")
+        linked = root / "linked.json"
+        linked.symlink_to(source)
+        try:
+            load(linked)
+        except ValueError as error:
+            assert "must not be a symlink" in str(error)
+        else:
+            raise AssertionError("metrics accepted a symlinked input")
     try:
         metrics([], {}, {}, {})
     except ValueError as error:
