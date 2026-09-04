@@ -2185,6 +2185,7 @@ ensure_function(0x0007510c, "match_transition_counter_clamp", 0x00075134)
 ensure_function(0x00075134, "match_transition_common_update", 0x00075200)
 ensure_function(0x00075200, "match_geometry_range_update", 0x00075230)
 ensure_function(0x00075230, "match_result_phase_selector", 0x00075300)
+ensure_function(0x00075300, "match_phase_advance_update", 0x0007539c)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2440,6 +2441,8 @@ label(0x00075200, "match_geometry_range_update",
       "Updates the match geometry range state by classifying the object coordinate, then returns immediately for the zero classification.")
 label(0x00075230, "match_result_phase_selector",
       "Selects a result phase through the compact table at 0x75294, publishes the selected status value, advances the shared phase counter, and returns.")
+label(0x00075300, "match_phase_advance_update",
+      "Advances the phase index, classifies the selected coordinate, refreshes shared result fields, and returns at 0x75398.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",
