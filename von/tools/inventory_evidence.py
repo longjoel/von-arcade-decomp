@@ -38,7 +38,10 @@ def classify(path: str, tracked: bool) -> tuple[str, str]:
 
 
 def inventory_path(path: Path, root: Path, tracked_paths: set[str]) -> dict[str, Any]:
-    relative = str(path.resolve().relative_to(root.resolve()))
+    try:
+        relative = str(path.resolve().relative_to(root.resolve()))
+    except ValueError as exc:
+        raise ValueError(f"inventory path escapes root: {path}") from exc
     tracked = relative in tracked_paths
     classification, decision = classify(relative, tracked)
     return {
@@ -126,7 +129,11 @@ def main() -> int:
             files.extend(item for item in sorted(target.rglob("*")) if item.is_file())
         else:
             parser.error(f"path does not exist: {requested}")
-    records = [inventory_path(path, root, tracked) for path in files]
+    try:
+        records = [inventory_path(path, root, tracked) for path in files]
+    except ValueError as error:
+        print(f"- {error}")
+        return 1
     relations = json.loads(args.relations.read_text(encoding="utf-8")) if args.relations else {}
     if not isinstance(relations, dict):
         parser.error("relations must be a JSON object")

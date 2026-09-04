@@ -43,6 +43,16 @@ def main() -> int:
         incomplete["old-output.log"] = {"producer": "capture.sh", "consumers": []}
         assert any("non-empty consumers" in error for error in relation_errors(
             records, incomplete, require_complete=True))
+        outside = root.parent / "outside-inventory-fixture.log"
+        outside.write_text("outside", encoding="utf-8")
+        escaped = root / "linked.log"
+        escaped.symlink_to(outside)
+        try:
+            inventory_path(escaped, root, set())
+        except ValueError as error:
+            assert "escapes root" in str(error)
+        else:
+            raise AssertionError("external inventory symlink was accepted")
     print("PASS: evidence inventory records hashes and cleanup decisions")
     return 0
 
