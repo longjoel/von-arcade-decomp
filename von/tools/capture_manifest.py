@@ -262,6 +262,9 @@ def main() -> int:
     parser.add_argument("--input", action="append", default=[], type=Path)
     parser.add_argument("--artifact", action="append", default=[], type=Path)
     args = parser.parse_args()
+    if args.output.is_symlink():
+        print("Capture manifest: output path must not be a symlink")
+        return 1
     root = args.root.resolve()
     manifest = {
         "schema_version": 1,

@@ -5,11 +5,16 @@ from __future__ import annotations
 
 import copy
 import json
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 from capture_manifest import directory_sha256, entry, validate
 from normalize_mame_trace import load_provenance
+
+
+TOOL = Path(__file__).resolve().parent / "capture_manifest.py"
 
 
 def main() -> int:
@@ -198,6 +203,20 @@ def main() -> int:
         causal["stimulus"]["kind"] = "causal-trace"
         causal.pop("coverage_report")
         assert not validate(causal, root)
+        linked_output = root / "linked-output.json"
+        linked_output.symlink_to(manifest_path)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--output", str(linked_output), "--root", str(root),
+             "--id", "cli-v1", "--objective", "objective", "--hypothesis", "hypothesis",
+             "--expected-discriminator", "discriminator", "--seconds", "1",
+             "--checkpoint", "reset", "--set", "fixture", "--mame-revision", "abc",
+             "--patch-profile", "none", "--execution-engine", "interpreter",
+             "--command", "mame", "--cfg-directory", str(root / "cfg"),
+             "--nvram-directory", str(root / "nvram"), "--state-directory", str(root / "state")],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "output path must not be a symlink" in cli_result.stdout
     print("PASS: capture sidecar manifest hashes and provenance")
     return 0
 
