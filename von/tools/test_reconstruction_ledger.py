@@ -14,6 +14,12 @@ from reconstruction_ledger import code_coverage, validate, validate_lifecycle
 
 
 def main() -> int:
+    assert any("ledger must be an object" in error
+               for error in validate([], Path.cwd()))
+    assert any("images must be an array" in error
+               for error in validate({"schema_version": 2, "images": {}}, Path.cwd()))
+    assert any("ledger must be an object" in error
+               for error in validate_lifecycle([], {"entries": []}))
     old = {"schema_version": 1, "images": [{"name": "maincpu", "size": 256, "slices": [
         {"name": "outer", "start": "0x10", "end": "0x30", "classification": "code", "status": "provisional", "source": "notes.md", "evidence": []},
         {"name": "inner", "start": "0x18", "end": "0x20", "classification": "code", "status": "provisional", "source": "model.c", "evidence": ["von/i960/recovered_example.c"]},

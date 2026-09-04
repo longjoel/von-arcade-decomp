@@ -24,6 +24,13 @@ def main() -> int:
         strict_lifecycle=True,
     )
     assert any("lifecycle:" in error for error in errors)
+    with tempfile.TemporaryDirectory(dir=root) as directory:
+        malformed_ledger = Path(directory) / "ledger.json"
+        malformed_ledger.write_text("[]\n", encoding="utf-8")
+        errors = validate_workflow(
+            root, malformed_ledger, root / "von/evidence/manifest.json", strict_lifecycle=True)
+        assert any("ledger: ledger must be an object" in error for error in errors)
+        assert any("evidence: ledger must be an object" in error for error in errors)
     errors = validate_workflow(
         root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
         check_generated=True, generated_coverage_path=root / "von/build/attract-coverage/vonj-attract-60s.json",

@@ -37,10 +37,15 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
     errors: list[str] = []
     if not isinstance(manifest, dict):
         return ["evidence manifest must be an object"]
+    if not isinstance(ledger, dict):
+        return ["ledger must be an object"]
+    images = ledger.get("images")
+    if not isinstance(images, list):
+        return ["ledger images must be an array"]
     if manifest.get("schema_version") != 1:
         errors.append("schema_version must be 1")
     unit_ids = {
-        unit.get("id") for image in ledger.get("images", [])
+        unit.get("id") for image in images if isinstance(image, dict)
         for unit in image.get("work_units", [])
         if isinstance(unit, dict) and isinstance(unit.get("id"), str)
     }

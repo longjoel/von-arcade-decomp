@@ -30,6 +30,11 @@ def validate_lifecycle(
     be inspected for structural problems while migration debt is made explicit
     with the strict lifecycle check.
     """
+    if not isinstance(ledger, dict):
+        return ["ledger must be an object"]
+    images = ledger.get("images")
+    if not isinstance(images, list):
+        return ["ledger images must be an array"]
     errors: list[str] = []
 
     def safe_reference(value: Any) -> bool:
@@ -135,9 +140,15 @@ def validate_lifecycle(
         if isinstance(entry, dict) and entry.get("canonical") is True and isinstance(entry.get("id"), str)
     } if isinstance(manifest_entries, list) else {}
     canonical_ids = set(canonical_entries)
-    for image in ledger.get("images", []):
+    for image in images:
+        if not isinstance(image, dict):
+            errors.append("ledger images must contain objects")
+            continue
         image_name = image.get("name", "?")
         for index, unit in enumerate(image.get("work_units", [])):
+            if not isinstance(unit, dict):
+                errors.append(f"images[{image_name}].work_units[{index}] must be an object")
+                continue
             where = f"images[{image_name}].work_units[{index}]"
             stage = unit.get("stage")
             if "active" in unit and not isinstance(unit.get("active"), bool):
@@ -266,11 +277,20 @@ def code_coverage(ledger: dict[str, Any]) -> dict[str, int]:
 
 
 def validate(ledger: dict[str, Any], root: Path | None = None) -> list[str]:
+    if not isinstance(ledger, dict):
+        return ["ledger must be an object"]
     errors: list[str] = []
     if ledger.get("schema_version") != 2:
         errors.append("schema_version must be 2")
+    images = ledger.get("images")
+    if not isinstance(images, list):
+        errors.append("images must be an array")
+        return errors
     seen_ids: set[str] = set()
-    for image_index, image in enumerate(ledger.get("images", [])):
+    for image_index, image in enumerate(images):
+        if not isinstance(image, dict):
+            errors.append(f"images[{image_index}] must be an object")
+            continue
         prefix = f"images[{image_index}]"
         size = image.get("size")
         previous_end = -1
@@ -328,6 +348,4 @@ def validate(ledger: dict[str, Any], root: Path | None = None) -> list[str]:
                     if source.startswith("von/") or source.startswith("scripts/"):
                         if not (root / source).exists():
                             errors.append(f"{where}: missing source {source}")
-    if not isinstance(ledger.get("images"), list):
-        errors.append("images must be an array")
     return errors
