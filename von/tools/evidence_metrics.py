@@ -104,6 +104,8 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
         "comparison": {
             "events_compared": comparison.get("compared_events", 0),
             "matched_prefix_events": comparison.get("matched_prefix_events", 0),
+            "confirmed_dynamic_edges": comparison.get("confirmed_dynamic_edge_count", 0),
+            "observed_indirect_targets": comparison.get("observed_indirect_target_count", 0),
             "checkpoints_passed": [name for name in comparison.get("original_checkpoints", [])
                                    if name not in comparison.get("missed_checkpoints", [])],
             "missed_checkpoints": comparison.get("missed_checkpoints", []),

@@ -23,6 +23,13 @@ def main() -> int:
     reconstructed[0]["time"] = 9.0
     reconstructed[0]["source_line"] = 900
     assert compare(original, reconstructed)["outcome"] == "pass"
+    calls = original + [
+        {"seq": 4, "kind": "indirect-call", "pc": "0x10", "target": "0x20"},
+        {"seq": 5, "kind": "indirect-call", "pc": "0x10", "target": "0x20"},
+    ]
+    call_report = compare(calls, copy.deepcopy(calls))
+    assert call_report["confirmed_dynamic_edge_count"] == 1
+    assert call_report["observed_indirect_targets"] == ["0x20"]
     assert compare(original, reconstructed)["missed_checkpoints"] == []
     context = {"schema_version": 1, "id": "original-v1", "objective": "pilot", "stimulus": {"kind": "attract", "seconds": 1}}
     reconstructed_context = {"schema_version": 1, "id": "reconstructed-v1", "objective": "pilot", "stimulus": {"kind": "attract", "seconds": 1}}

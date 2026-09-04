@@ -65,6 +65,23 @@ def checkpoints(events: list[dict[str, Any]]) -> list[str]:
     return result
 
 
+def dynamic_edges(events: list[dict[str, Any]]) -> set[tuple[str, str]]:
+    """Extract edges only from ordered call events, never from PC-set coverage."""
+    edges: set[tuple[str, str]] = set()
+    for event in events:
+        if event.get("kind") not in {"direct-call", "indirect-call"}:
+            continue
+        caller, target = event.get("pc"), event.get("target")
+        if caller is not None and target is not None:
+            edges.add((str(caller), str(target)))
+    return edges
+
+
+def indirect_targets(events: list[dict[str, Any]]) -> set[str]:
+    return {str(event["target"]) for event in events
+            if event.get("kind") == "indirect-call" and event.get("target") is not None}
+
+
 def context_errors(original: dict[str, Any], reconstructed: dict[str, Any]) -> list[str]:
     errors = []
     for label, context in (("original", original), ("reconstructed", reconstructed)):
@@ -137,6 +154,9 @@ def compare(original: list[dict[str, Any]], reconstructed: list[dict[str, Any]],
         "outcome": "pass" if divergence is None else "divergence",
         "original_checkpoints": checkpoints(original),
         "reconstructed_checkpoints": checkpoints(reconstructed),
+        "confirmed_dynamic_edge_count": len(dynamic_edges(original)),
+        "observed_indirect_targets": sorted(indirect_targets(original)),
+        "observed_indirect_target_count": len(indirect_targets(original)),
     }
     if original_context is not None and reconstructed_context is not None:
         result["original_capture_id"] = original_context.get("id")

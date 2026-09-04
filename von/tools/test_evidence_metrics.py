@@ -22,6 +22,7 @@ def main() -> int:
         {"tier": "A", "possible_static_edge_count": 7, "confirmed_dynamic_edge_count": 2,
          "observed_entry_point_count": 3},
         {"compared_events": 10, "matched_prefix_events": 8,
+         "confirmed_dynamic_edge_count": 2, "observed_indirect_target_count": 1,
          "original_checkpoints": ["reset", "audio"], "missed_checkpoints": ["audio"],
          "unexpected_checkpoints": []},
         {"changed_decision": 3, "quarantined": 1},
@@ -34,6 +35,8 @@ def main() -> int:
     assert report["coverage"]["confirmed_dynamic_edges"] == 2
     assert report["comparison"]["checkpoints_passed"] == ["reset"]
     assert report["comparison"]["missed_checkpoints"] == ["audio"]
+    assert report["comparison"]["confirmed_dynamic_edges"] == 2
+    assert report["comparison"]["observed_indirect_targets"] == 1
     assert report["experiments"] == {"changed_decision": 3, "quarantined": 1}
     assert report["age"]["modeled"]["median_age_seconds"] == 3600.0
     assert report["age"]["modeled"]["oldest_unit_id"] == "m"
