@@ -39,8 +39,13 @@ def main() -> int:
         assert not validate_metadata(record)
         record["archive"]["sha256"] = "0" * 64
         assert any("archive hash mismatch" in error for error in validate_metadata(record))
+        record["archive"]["sha256"] = hashlib.sha256(target.read_bytes()).hexdigest()
+        with gzip.open(target, "wb") as stream:
+            stream.write(b'{"wrong":true}\n')
+        record["archive"]["sha256"] = hashlib.sha256(target.read_bytes()).hexdigest()
+        assert any("decompressed payload mismatch" in error for error in validate_metadata(record))
         with gzip.open(target, "rb") as stream:
-            assert stream.read() == payload
+            assert stream.read() == b'{"wrong":true}\n'
     print("PASS: evidence archive emits reproducible source and blob metadata")
     return 0
 

@@ -34,6 +34,15 @@ def validate_metadata(metadata: dict[str, Any]) -> list[str]:
             errors.append(f"{section} byte count mismatch")
         if item.get("sha256") != sha256(path):
             errors.append(f"{section} hash mismatch")
+    source = Path(metadata.get("source", {}).get("path", ""))
+    archive = Path(metadata.get("archive", {}).get("path", ""))
+    if source.is_file() and archive.is_file():
+        try:
+            with gzip.open(archive, "rb") as stream:
+                if stream.read() != source.read_bytes():
+                    errors.append("archive decompressed payload mismatch")
+        except (OSError, EOFError):
+            errors.append("archive is not a readable gzip payload")
     return errors
 
 
