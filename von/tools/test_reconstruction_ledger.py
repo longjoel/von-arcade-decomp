@@ -107,6 +107,12 @@ def main() -> int:
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][3]["verifier"] = "../verify.py"
     assert any("safe relative path" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][1]["modeling"]["test"] = "../test.py"
+    assert any("modeling.test must be a safe" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][2]["integration"]["test"] = "../test.py"
+    assert any("integration.test must be a safe" in error for error in validate_lifecycle(broken, manifest))
     missing_verifier = copy.deepcopy(manifest)
     del missing_verifier["entries"][0]["verifier"]
     assert any("differs from canonical" in error for error in validate_lifecycle(lifecycle, missing_verifier))

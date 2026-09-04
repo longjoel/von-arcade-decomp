@@ -28,6 +28,23 @@ def validate_lifecycle(
     with the strict lifecycle check.
     """
     errors: list[str] = []
+
+    def safe_reference(value: Any) -> bool:
+        if not isinstance(value, str) or not value:
+            return False
+        path = Path(value)
+        if path.is_absolute() or ".." in path.parts:
+            return False
+        if root is not None:
+            try:
+                (root / path).resolve().relative_to(root.resolve())
+            except ValueError:
+                return False
+        return True
+
+    def existing_reference(value: str) -> bool:
+        return root is None or (root / value).is_file()
+
     active_modeled: list[str] = []
     canonical_entries = {
         entry.get("id"): entry
@@ -59,7 +76,9 @@ def validate_lifecycle(
                     if not modeling.get(field):
                         errors.append(f"{where}: modeled requires modeling.{field}")
                 test = modeling.get("test")
-                if isinstance(test, str) and root is not None and not (root / test).is_file():
+                if test and not safe_reference(test):
+                    errors.append(f"{where}: modeling.test must be a safe relative path")
+                elif isinstance(test, str) and not existing_reference(test):
                     errors.append(f"{where}: missing modeling test {test}")
             elif stage == "integrated":
                 integration = unit.get("integration")
@@ -69,16 +88,18 @@ def validate_lifecycle(
                 image = integration.get("image")
                 if not isinstance(image, str) or not image:
                     errors.append(f"{where}: integrated requires integration.image")
-                elif Path(image).is_absolute() or ".." in Path(image).parts:
+                elif not safe_reference(image):
                     errors.append(f"{where}: integration.image must be a safe relative path")
-                elif root is not None and not (root / image).is_file():
+                elif root is not None and not existing_reference(image):
                     errors.append(f"{where}: missing integration image {image}")
                 if not integration.get("checkpoint"):
                     errors.append(f"{where}: integrated requires integration.checkpoint")
                 test = integration.get("test")
                 if not isinstance(test, str) or not test:
                     errors.append(f"{where}: integrated requires integration.test")
-                elif root is not None and not (root / test).is_file():
+                elif not safe_reference(test):
+                    errors.append(f"{where}: integration.test must be a safe relative path")
+                elif not existing_reference(test):
                     errors.append(f"{where}: missing integration test {test}")
             elif stage == "trace-validated":
                 evidence_id = unit.get("canonical_evidence_id")
@@ -87,7 +108,7 @@ def validate_lifecycle(
                 verifier = unit.get("verifier")
                 if not isinstance(verifier, str) or not verifier:
                     errors.append(f"{where}: trace-validated requires verifier")
-                elif Path(verifier).is_absolute() or ".." in Path(verifier).parts:
+                elif not safe_reference(verifier):
                     errors.append(f"{where}: verifier must be a safe relative path")
                 elif root is not None and not (root / verifier).is_file():
                     errors.append(f"{where}: missing verifier {verifier}")
