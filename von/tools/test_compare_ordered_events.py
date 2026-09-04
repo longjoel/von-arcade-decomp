@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import gzip
 import tempfile
 from pathlib import Path
 
@@ -161,6 +162,21 @@ def main() -> int:
             assert "frame must be a non-negative integer" in str(error)
         else:
             raise AssertionError("boolean checkpoint frame was accepted")
+        compressed_original = Path(directory) / "original.ndjson.gz"
+        compressed_reconstructed = Path(directory) / "reconstructed.ndjson.gz"
+        payload = ('{"seq": 1, "time": 1.0, "frame": 1, "cpu": "maincpu", '
+                   '"kind": "checkpoint", "name": "reset"}\n').encode()
+        for compressed in (compressed_original, compressed_reconstructed):
+            with gzip.open(compressed, "wb") as stream:
+                stream.write(payload)
+        assert compare(load_events(compressed_original), load_events(compressed_reconstructed))["outcome"] == "pass"
+        compressed_original.write_bytes(b"not gzip")
+        try:
+            load_events(compressed_original)
+        except ValueError as error:
+            assert "unable to read event stream" in str(error)
+        else:
+            raise AssertionError("invalid gzip stream was accepted")
     print("PASS: ordered event comparison identifies the first divergence")
     return 0
 

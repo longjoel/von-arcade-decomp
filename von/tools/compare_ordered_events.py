@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import math
 import sys
@@ -17,7 +18,15 @@ VOLATILE_FIELDS = {"seq", "time", "frame", "source_line"}
 def load_events(path: Path) -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = []
     previous_sequence: int | None = None
-    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+    try:
+        if path.suffix == ".gz":
+            with gzip.open(path, "rt", encoding="utf-8") as stream:
+                lines = stream.read().splitlines()
+        else:
+            lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeError) as error:
+        raise ValueError(f"{path}: unable to read event stream: {error}") from error
+    for line_number, line in enumerate(lines, 1):
         if not line.strip():
             continue
         try:
