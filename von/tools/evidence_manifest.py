@@ -35,6 +35,10 @@ def rooted(root: Path, path_text: object) -> Path | None:
 
 def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
     errors: list[str] = []
+    if not isinstance(manifest, dict):
+        return ["evidence manifest must be an object"]
+    if manifest.get("schema_version") != 1:
+        errors.append("schema_version must be 1")
     unit_ids = {
         unit.get("id") for image in ledger.get("images", [])
         for unit in image.get("work_units", [])

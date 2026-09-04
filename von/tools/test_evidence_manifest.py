@@ -17,6 +17,9 @@ def main() -> int:
     ledger = json.loads((root / "von/reconstruction_ledger.json").read_text(encoding="utf-8"))
     assert not validate(manifest, ledger, root)
     broken = json.loads(json.dumps(manifest))
+    broken["schema_version"] = 2
+    assert any("schema_version" in error for error in validate(broken, ledger, root))
+    broken = json.loads(json.dumps(manifest))
     broken["entries"][0]["outcome"] = "incomplete"
     assert any("outcome" in error for error in validate(broken, ledger, root))
     runtime = json.loads(json.dumps(manifest))
@@ -56,6 +59,7 @@ def main() -> int:
             capture["isolation"][f"{field}_sha256"] = directory_sha256(temp / capture["isolation"][field])
         (temp / "capture.json").write_text(json.dumps(capture), encoding="utf-8")
         runtime = {
+            "schema_version": 1,
             "entries": [{"id": "capture-v1", "canonical": True,
                          "stimulus": {"kind": "input-free-attract", "description": "pilot"},
                          "configuration": capture["configuration"], "artifacts": capture["artifacts"],
