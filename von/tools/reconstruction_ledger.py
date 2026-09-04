@@ -119,6 +119,11 @@ def validate_lifecycle(
         if not isinstance(checkpoints, list) or checkpoint not in checkpoints:
             errors.append(f"{where}: canonical evidence does not declare integration checkpoint")
 
+    def validate_unit_evidence(where: str, unit: dict[str, Any], evidence_id: str) -> None:
+        evidence = unit.get("evidence")
+        if not isinstance(evidence, list) or evidence_id not in evidence:
+            errors.append(f"{where}: ledger evidence does not include canonical evidence id")
+
     active_modeled: list[str] = []
     ledger_unit_ids = {
         unit.get("id")
@@ -216,6 +221,7 @@ def validate_lifecycle(
                 if isinstance(evidence_id, str) and evidence_id in canonical_ids:
                     verifier_hash_errors(where, registered_entry)
                     validate_evidence_checkpoint(where, unit, registered_entry)
+                    validate_unit_evidence(where, unit, evidence_id)
                 verification = unit.get("verification")
                 if not isinstance(verification, dict) or verification.get("result") != "pass":
                     errors.append(f"{where}: trace-validated requires verification.result=pass")
@@ -239,6 +245,7 @@ def validate_lifecycle(
                     if registered_entry.get("verifier") != unit.get("verifier"):
                         errors.append(f"{where}: verifier differs from canonical evidence entry")
                     verifier_hash_errors(where, registered_entry)
+                    validate_unit_evidence(where, unit, evidence_id)
                 verifier = unit.get("verifier")
                 if not isinstance(verifier, str) or not verifier:
                     errors.append(f"{where}: byte-validated requires verifier")

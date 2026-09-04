@@ -84,13 +84,14 @@ def main() -> int:
             }, "integration": {
                 "image": "build/image.bin", "checkpoint": "startup", "test": "test.py"
             },
-             "canonical_evidence_id": "capture-v1", "verifier": "verify.py",
+             "canonical_evidence_id": "capture-v1", "evidence": ["capture-v1"],
+             "verifier": "verify.py",
              "verification": {"result": "pass"}},
             {"id": "bytes", "stage": "byte-validated", "modeling": {
                 "boundary": "ROM", "test": "test.py", "unresolved_behavior": "none"
             }, "integration": {
                 "image": "build/image.bin", "checkpoint": "startup", "test": "test.py"
-            }, "byte_validation": {
+             }, "evidence": ["capture-v1"], "byte_validation": {
                 "original_range": "0x100-0x110", "reconstructed_range": "0x20-0x30",
                 "comparison": "match"
             }, "canonical_evidence_id": "capture-v1", "verifier": "verify.py",
@@ -221,6 +222,10 @@ def main() -> int:
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][3]["canonical_evidence_id"] = {}
     assert any("canonical evidence id" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][3].pop("evidence")
+    assert any("ledger evidence does not include canonical evidence id" in error
+               for error in validate_lifecycle(broken, manifest))
     assert any("canonical evidence id" in error for error in validate_lifecycle(
         lifecycle, {"entries": ["malformed"]}))
     broken = copy.deepcopy(lifecycle)
