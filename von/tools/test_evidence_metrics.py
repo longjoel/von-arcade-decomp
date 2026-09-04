@@ -13,6 +13,12 @@ def main() -> int:
         assert "ledger input" in str(error)
     else:
         raise AssertionError("malformed ledger input was accepted")
+    try:
+        metrics({"images": []}, {}, {}, {})
+    except ValueError as error:
+        assert "worklist.discovered_units" in str(error)
+    else:
+        raise AssertionError("incomplete metric inputs were accepted")
     report = metrics(
         {"images": [{"work_units": [
             {"id": "m", "stage": "modeled", "created_at": "2026-09-04T14:00:00Z"},
@@ -42,7 +48,12 @@ def main() -> int:
     assert report["age"]["modeled"]["oldest_unit_id"] == "m"
     try:
         metrics({"images": [{"work_units": [{"stage": "planned", "created_at": "bad"}]}]},
-                {}, {}, {}, as_of="2026-09-04T15:00:00Z")
+                {"discovered_units": 0, "modeled_units": 0, "integrated_units": 0},
+                {"possible_static_edge_count": 0, "confirmed_dynamic_edge_count": 0,
+                 "observed_entry_point_count": 0},
+                {"compared_events": 0, "matched_prefix_events": 0,
+                 "original_checkpoints": [], "missed_checkpoints": [], "unexpected_checkpoints": []},
+                as_of="2026-09-04T15:00:00Z")
     except ValueError as error:
         assert "created_at is invalid" in str(error)
     else:

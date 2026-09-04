@@ -74,11 +74,35 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
             raise ValueError(f"metrics {name} input must be an object")
     if experiments is not None and not isinstance(experiments, dict):
         raise ValueError("metrics experiments input must be an object")
+    images = ledger.get("images")
+    if not isinstance(images, list) or any(
+            not isinstance(image, dict) or not isinstance(image.get("work_units", []), list)
+            or any(not isinstance(unit, dict) for unit in image.get("work_units", []))
+            for image in images):
+        raise ValueError("metrics ledger images/work_units must be arrays")
+    for name, document, fields in (
+            ("worklist", worklist, ("discovered_units",)),
+            ("coverage", coverage, ("possible_static_edge_count", "confirmed_dynamic_edge_count",
+                                    "observed_entry_point_count")),
+            ("comparison", comparison, ("compared_events", "matched_prefix_events"))):
+        for field in fields:
+            value = document.get(field)
+            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+                raise ValueError(f"metrics {name}.{field} must be a nonnegative integer")
+    for field in ("original_checkpoints", "missed_checkpoints", "unexpected_checkpoints"):
+        if not isinstance(comparison.get(field), list) or not all(isinstance(item, str) for item in comparison[field]):
+            raise ValueError(f"metrics comparison.{field} must be a string array")
+    if experiments is not None:
+        for field in ("changed_decision", "quarantined"):
+            value = experiments.get(field, 0)
+            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+                raise ValueError(f"metrics experiments.{field} must be a nonnegative integer")
     stages = Counter(
-        unit.get("stage") for image in ledger.get("images", [])
+        unit.get("stage") for image in images
         for unit in image.get("work_units", [])
+        if isinstance(unit, dict)
     )
-    discovered = worklist.get("discovered_units", 0)
+    discovered = worklist["discovered_units"]
     modeled = stages.get("modeled", 0)
     integrated = stages.get("integrated", 0) + stages.get("trace-validated", 0) + stages.get("byte-validated", 0)
     def percentage(value: int, total: int) -> float | None:
