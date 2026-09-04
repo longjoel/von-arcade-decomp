@@ -5,10 +5,16 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import json
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 from validate_asset_pack import validate
+
+
+TOOL = Path(__file__).resolve().parent / "validate_asset_pack.py"
 
 
 def main() -> int:
@@ -143,6 +149,19 @@ def main() -> int:
         broken = copy.deepcopy(pack)
         broken["assets"][0]["payload"] = "local-link.glb"
         assert any("missing payload" in error for error in validate(broken, evidence, root))
+        pack_document = root / "pack.json"
+        evidence_document = root / "evidence.json"
+        pack_document.write_text(json.dumps(pack), encoding="utf-8")
+        evidence_document.write_text(json.dumps(evidence), encoding="utf-8")
+        linked_pack = root / "linked-pack.json"
+        linked_pack.symlink_to(pack_document)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--manifest", str(linked_pack),
+             "--evidence-manifest", str(evidence_document), "--root", str(root)],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode != 0
+        assert "asset pack path must not be a symlink" in cli_result.stdout
         broken = copy.deepcopy(pack)
         broken["assets"][0]["verifier_results"]["stale-verifier"] = "pass"
         assert any("passing verifier_results" in error for error in validate(broken, evidence, root))

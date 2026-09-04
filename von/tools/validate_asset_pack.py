@@ -216,6 +216,10 @@ def main() -> int:
     parser.add_argument("--map-revision",
                         help="optional expected map revision")
     args = parser.parse_args()
+    for label, path in (("asset pack", args.manifest), ("evidence manifest", args.evidence_manifest)):
+        if path.is_symlink():
+            print(f"Asset pack validation: {label} path must not be a symlink")
+            return 1
     pack = json.loads(args.manifest.read_text(encoding="utf-8"))
     evidence = json.loads(args.evidence_manifest.read_text(encoding="utf-8"))
     errors = validate(pack, evidence, args.root, args.rom_manifest,
