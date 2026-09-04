@@ -92,6 +92,8 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
     artifacts = manifest.get("artifacts")
     if not isinstance(artifacts, list) or not artifacts:
         errors.append("capture requires at least one artifact")
+    if not isinstance(manifest.get("inputs"), list):
+        errors.append("capture inputs must be an array")
     if stimulus.get("kind") == "input-free-attract" and not manifest.get("coverage_report"):
         errors.append("input-free-attract capture requires coverage_report")
     configuration = manifest.get("configuration", {})
