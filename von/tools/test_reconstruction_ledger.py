@@ -29,6 +29,10 @@ def main() -> int:
                for error in validate_lifecycle({"images": []}, []))
     assert any("evidence manifest entries must be an array" in error
                for error in validate_lifecycle({"images": []}, {}))
+    assert any("manifest.entries[0]: entry must be an object" in error
+               for error in validate_lifecycle({"images": []}, {"entries": ["bad"]}))
+    assert any("stable id must be a non-empty string" in error
+               for error in validate_lifecycle({"images": []}, {"entries": [{}]}))
     malformed_shape = {"schema_version": 2, "images": [{"name": "maincpu", "work_units": {}}]}
     assert any("work_units must be an array" in error for error in validate(malformed_shape))
     malformed_shape["images"][0]["work_units"] = [{"id": "unit", "classification": "code",

@@ -130,9 +130,12 @@ def validate_lifecycle(
     manifest_ids: set[str] = set()
     for index, entry in enumerate(manifest_entries):
         if not isinstance(entry, dict):
+            errors.append(f"manifest.entries[{index}]: entry must be an object")
             continue
         evidence_id = entry.get("id")
-        if isinstance(evidence_id, str) and evidence_id:
+        if not isinstance(evidence_id, str) or not evidence_id:
+            errors.append(f"manifest.entries[{index}]: stable id must be a non-empty string")
+        else:
             if evidence_id in manifest_ids:
                 errors.append(f"manifest.entries[{index}]: duplicate stable id")
             manifest_ids.add(evidence_id)
