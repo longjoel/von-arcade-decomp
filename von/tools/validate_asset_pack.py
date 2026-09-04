@@ -139,7 +139,11 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         if payload is None or not payload.is_file():
             errors.append(f"{where}: missing payload {asset.get('payload')}")
         else:
-            resolved_payload = payload.resolve()
+            try:
+                resolved_payload = payload.resolve()
+            except (OSError, RuntimeError) as error:
+                errors.append(f"{where}: invalid payload path {asset.get('payload')}: {error}")
+                continue
             if resolved_payload in payload_paths:
                 errors.append(f"{where}: payload is shared by multiple assets")
             else:

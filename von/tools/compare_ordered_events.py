@@ -183,7 +183,7 @@ def capture_provenance_errors(context: Any, event_path: Path, root: Path,
         errors.append(f"{label} capture validation failed: {error}")
     try:
         relative_event = str(event_path.resolve().relative_to(root.resolve()))
-    except ValueError:
+    except (OSError, RuntimeError, ValueError):
         errors.append(f"{label} event stream escapes capture root")
         return errors
     artifacts = context.get("artifacts", [])

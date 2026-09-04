@@ -202,7 +202,11 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
             if path is None or not path.is_file():
                 errors.append(f"{section}[{index}]: missing file {path_text}")
                 continue
-            resolved_path = path.resolve()
+            try:
+                resolved_path = path.resolve()
+            except (OSError, RuntimeError) as error:
+                errors.append(f"{section}[{index}]: invalid file path {path_text}: {error}")
+                continue
             if resolved_path in paths:
                 errors.append(f"{section}[{index}]: duplicate file {path_text}")
                 continue

@@ -109,6 +109,12 @@ def main() -> int:
         escaped["entries"][0]["capture_manifest"] = "linked-capture.json"
         assert any("missing capture manifest" in error for error in validate(
             escaped, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
+        loop_artifact = temp / "loop-artifact.json"
+        loop_artifact.symlink_to(loop_artifact)
+        looped = json.loads(json.dumps(runtime))
+        looped["entries"][0]["artifacts"] = [{"path": "loop-artifact.json", "sha256": "0" * 64}]
+        assert any("missing artifact" in error or "invalid artifact path" in error
+                   for error in validate(looped, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
         mismatched = json.loads(json.dumps(runtime))
         mismatched["entries"][0]["stimulus"]["kind"] = "causal-trace"
         assert any("stimulus kind" in error for error in validate(

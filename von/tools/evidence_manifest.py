@@ -166,7 +166,11 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                 if path is None:
                     errors.append(f"{where}: invalid {section[:-1]} path")
                     continue
-                resolved_path = path.resolve()
+                try:
+                    resolved_path = path.resolve()
+                except (OSError, RuntimeError) as error:
+                    errors.append(f"{where}: invalid {section[:-1]} path {artifact['path']}: {error}")
+                    continue
                 if resolved_path in seen_paths:
                     errors.append(f"{where}: duplicate {section[:-1]} {artifact['path']}")
                     continue

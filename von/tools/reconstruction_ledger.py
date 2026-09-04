@@ -38,7 +38,7 @@ def validate_lifecycle(
         if root is not None:
             try:
                 (root / path).resolve().relative_to(root.resolve())
-            except ValueError:
+            except (OSError, RuntimeError, ValueError):
                 return False
         return True
 

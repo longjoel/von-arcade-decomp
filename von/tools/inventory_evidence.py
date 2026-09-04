@@ -40,7 +40,7 @@ def classify(path: str, tracked: bool) -> tuple[str, str]:
 def inventory_path(path: Path, root: Path, tracked_paths: set[str]) -> dict[str, Any]:
     try:
         relative = str(path.resolve().relative_to(root.resolve()))
-    except ValueError as exc:
+    except (OSError, RuntimeError, ValueError) as exc:
         raise ValueError(f"inventory path escapes root: {path}") from exc
     tracked = relative in tracked_paths
     classification, decision = classify(relative, tracked)
