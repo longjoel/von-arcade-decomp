@@ -68,7 +68,7 @@ def duplicate_groups(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     for record in records:
         by_hash[record["sha256"]].append(record["path"])
     return [
-        {"sha256": digest, "paths": paths, "aliases": paths[1:]}
+        {"sha256": digest, "paths": sorted(paths), "aliases": sorted(paths)[1:]}
         for digest, paths in sorted(by_hash.items()) if len(paths) > 1
     ]
 
@@ -104,6 +104,8 @@ def relation_errors(records: list[dict[str, Any]], relations: dict[str, Any],
         if require_complete and (not isinstance(consumers, list) or not consumers
                                   or not all(isinstance(item, str) and item for item in consumers)):
             errors.append(f"{record['path']}: relation requires non-empty consumers")
+        elif isinstance(consumers, list) and len(set(consumers)) != len(consumers):
+            errors.append(f"{record['path']}: relation consumers must be unique")
     return errors
 
 

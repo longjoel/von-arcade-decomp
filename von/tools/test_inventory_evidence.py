@@ -32,7 +32,9 @@ def main() -> int:
         assert records[-1]["consumers"] == ["review.md"]
         groups = duplicate_groups(records)
         assert len(groups) == 1
-        assert groups[0]["aliases"] == ["von/build/capture-copy.log"]
+        assert groups[0]["paths"] == ["von/build/capture-copy.log", "von/build/capture.log"]
+        assert groups[0]["aliases"] == ["von/build/capture.log"]
+        assert duplicate_groups(list(reversed(records))) == groups
         assert all("sha256" in record for record in records)
         complete = {record["path"]: {"producer": "producer.sh", "consumers": ["review.md"]}
                     for record in records}
@@ -43,6 +45,11 @@ def main() -> int:
         incomplete["old-output.log"] = {"producer": "capture.sh", "consumers": []}
         assert any("non-empty consumers" in error for error in relation_errors(
             records, incomplete, require_complete=True))
+        duplicate_consumers = dict(complete)
+        duplicate_consumers["old-output.log"] = {
+            "producer": "capture.sh", "consumers": ["review.md", "review.md"]}
+        assert any("consumers must be unique" in error for error in relation_errors(
+            records, duplicate_consumers, require_complete=True))
         outside = root.parent / "outside-inventory-fixture.log"
         outside.write_text("outside", encoding="utf-8")
         escaped = root / "linked.log"
