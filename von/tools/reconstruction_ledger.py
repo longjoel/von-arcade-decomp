@@ -87,10 +87,12 @@ def validate_lifecycle(
                 verifier = unit.get("verifier")
                 if not isinstance(verifier, str) or not verifier:
                     errors.append(f"{where}: trace-validated requires verifier")
+                elif Path(verifier).is_absolute() or ".." in Path(verifier).parts:
+                    errors.append(f"{where}: verifier must be a safe relative path")
                 elif root is not None and not (root / verifier).is_file():
                     errors.append(f"{where}: missing verifier {verifier}")
                 registered_verifier = canonical_entries.get(evidence_id, {}).get("verifier")
-                if registered_verifier and registered_verifier != verifier:
+                if evidence_id in canonical_ids and registered_verifier != verifier:
                     errors.append(f"{where}: verifier differs from canonical evidence entry")
                 verification = unit.get("verification")
                 if not isinstance(verification, dict) or verification.get("result") != "pass":

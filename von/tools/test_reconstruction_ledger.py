@@ -105,6 +105,12 @@ def main() -> int:
     broken["images"][0]["work_units"][3]["verification"]["result"] = "fail"
     assert any("verification.result=pass" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][3]["verifier"] = "../verify.py"
+    assert any("safe relative path" in error for error in validate_lifecycle(broken, manifest))
+    missing_verifier = copy.deepcopy(manifest)
+    del missing_verifier["entries"][0]["verifier"]
+    assert any("differs from canonical" in error for error in validate_lifecycle(lifecycle, missing_verifier))
+    broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][4]["byte_validation"]["comparison"] = "mismatch"
     assert any("must be match" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
