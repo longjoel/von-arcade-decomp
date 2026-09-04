@@ -176,6 +176,7 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
                 errors.append("command -seconds_to_run does not match stimulus seconds")
         except (TypeError, ValueError):
             errors.append("command -seconds_to_run must be numeric")
+    all_declared_paths: set[Path] = set()
     for section in ("inputs", "artifacts"):
         items = manifest.get(section, [])
         if not isinstance(items, list):
@@ -196,6 +197,10 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
                 errors.append(f"{section}[{index}]: duplicate file {path_text}")
                 continue
             paths.add(resolved_path)
+            if resolved_path in all_declared_paths:
+                errors.append(f"{section}[{index}]: file is declared in multiple sections {path_text}")
+                continue
+            all_declared_paths.add(resolved_path)
             if not isinstance(item.get("sha256"), str) or not SHA256_RE.fullmatch(item["sha256"]):
                 errors.append(f"{section}[{index}]: sha256 must be a SHA-256 digest")
                 continue

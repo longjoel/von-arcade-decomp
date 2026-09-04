@@ -123,6 +123,9 @@ def main() -> int:
         broken["artifacts"].append(copy.deepcopy(broken["artifacts"][0]))
         assert any("duplicate file" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
+        broken["inputs"] = [entry(artifact_path, root)]
+        assert any("multiple sections" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
         broken["isolation"]["nvram_directory"] = "cfg"
         broken["isolation"]["nvram_directory_sha256"] = broken["isolation"]["cfg_directory_sha256"]
         assert any("directories must be distinct" in error for error in validate(broken, root))
