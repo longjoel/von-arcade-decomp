@@ -58,7 +58,11 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
             errors.append(f"{where}: missing or duplicate stable id")
         elif evidence_id:
             ids.add(evidence_id)
-        if not entry.get("canonical"):
+        canonical = entry.get("canonical")
+        if not isinstance(canonical, bool):
+            errors.append(f"{where}: canonical must be boolean")
+            continue
+        if not canonical:
             continue
         stimulus = entry.get("stimulus", {})
         if not isinstance(stimulus, dict):

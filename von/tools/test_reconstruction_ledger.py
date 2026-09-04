@@ -126,6 +126,10 @@ def main() -> int:
     missing_outcome = copy.deepcopy(manifest)
     del missing_outcome["entries"][0]["outcome"]
     assert any("outcome must be pass" in error for error in validate_lifecycle(lifecycle, missing_outcome))
+    malformed_canonical = copy.deepcopy(manifest)
+    malformed_canonical["entries"][0]["canonical"] = "true"
+    assert any("canonical must be boolean" in error for error in validate_lifecycle(
+        lifecycle, malformed_canonical))
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][3]["canonical_evidence_id"] = {}
     assert any("canonical evidence id" in error for error in validate_lifecycle(broken, manifest))

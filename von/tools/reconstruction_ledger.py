@@ -50,10 +50,22 @@ def validate_lifecycle(
 
     active_modeled: list[str] = []
     manifest_entries = manifest.get("entries", []) if isinstance(manifest, dict) else []
+    manifest_ids: set[str] = set()
+    if isinstance(manifest_entries, list):
+        for index, entry in enumerate(manifest_entries):
+            if not isinstance(entry, dict):
+                continue
+            evidence_id = entry.get("id")
+            if isinstance(evidence_id, str) and evidence_id:
+                if evidence_id in manifest_ids:
+                    errors.append(f"manifest.entries[{index}]: duplicate stable id")
+                manifest_ids.add(evidence_id)
+            if not isinstance(entry.get("canonical"), bool):
+                errors.append(f"manifest.entries[{index}]: canonical must be boolean")
     canonical_entries = {
         entry.get("id"): entry
         for entry in manifest_entries
-        if isinstance(entry, dict) and entry.get("canonical") and isinstance(entry.get("id"), str)
+        if isinstance(entry, dict) and entry.get("canonical") is True and isinstance(entry.get("id"), str)
     } if isinstance(manifest_entries, list) else {}
     canonical_ids = set(canonical_entries)
     for image in ledger.get("images", []):

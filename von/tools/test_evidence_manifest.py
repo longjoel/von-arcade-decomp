@@ -21,6 +21,9 @@ def main() -> int:
     broken["schema_version"] = 2
     assert any("schema_version" in error for error in validate(broken, ledger, root))
     broken = json.loads(json.dumps(manifest))
+    broken["entries"][0]["canonical"] = "true"
+    assert any("canonical must be boolean" in error for error in validate(broken, ledger, root))
+    broken = json.loads(json.dumps(manifest))
     broken["entries"][0]["outcome"] = "incomplete"
     assert any("outcome" in error for error in validate(broken, ledger, root))
     runtime = json.loads(json.dumps(manifest))
