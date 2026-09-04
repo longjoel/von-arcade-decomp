@@ -148,6 +148,10 @@ def summary(events: list[dict], source: Path, max_events: int | None = None,
 
 def load_provenance(manifest_path: Path, root: Path, source: Path) -> dict[str, Any]:
     """Validate and bind the normalized source to a canonical capture sidecar."""
+    if manifest_path.is_symlink():
+        raise ValueError(f"capture manifest must not be a symlink: {manifest_path}")
+    if not manifest_path.is_file():
+        raise ValueError(f"capture manifest is missing: {manifest_path}")
     if source.is_symlink():
         raise ValueError(f"trace source must not be a symlink: {source}")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))

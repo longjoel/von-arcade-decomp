@@ -57,6 +57,14 @@ def main() -> int:
             assert "must not be a symlink" in str(error)
         else:
             raise AssertionError("symlinked trace provenance was accepted")
+        linked_manifest = root / "linked-capture.json"
+        linked_manifest.symlink_to(manifest_path)
+        try:
+            load_provenance(linked_manifest, root, artifact_path)
+        except ValueError as error:
+            assert "manifest must not be a symlink" in str(error)
+        else:
+            raise AssertionError("symlinked capture provenance was accepted")
         try:
             load_provenance(manifest_path, root, root / "unlisted.ndjson")
         except ValueError as error:
