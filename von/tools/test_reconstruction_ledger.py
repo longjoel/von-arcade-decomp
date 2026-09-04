@@ -6,11 +6,16 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 from migrate_reconstruction_ledger import migrate
 from reconstruction_ledger import code_coverage, validate, validate_lifecycle
+
+
+TOOL = Path(__file__).resolve().parent / "validate_reconstruction_ledger.py"
 
 
 def main() -> int:
@@ -45,6 +50,14 @@ def main() -> int:
         path = Path(directory) / "roundtrip.json"
         path.write_text(json.dumps(ledger), encoding="utf-8")
         assert json.loads(path.read_text(encoding="utf-8"))["schema_version"] == 2
+        linked_ledger = Path(directory) / "linked-ledger.json"
+        linked_ledger.symlink_to(path)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), str(linked_ledger)],
+            cwd=directory, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "ledger path must not be a symlink" in cli_result.stdout
     lifecycle = {
         "schema_version": 2,
         "images": [{"name": "maincpu", "work_units": [

@@ -17,6 +17,10 @@ def main() -> int:
     parser.add_argument("--evidence-manifest", type=Path,
                         default=Path("von/evidence/manifest.json"))
     args = parser.parse_args()
+    for label, path in (("ledger", args.ledger), ("evidence manifest", args.evidence_manifest)):
+        if path.is_symlink():
+            print(f"Ledger validation: {label} path must not be a symlink")
+            return 1
     ledger = load(args.ledger)
     errors = validate(ledger, Path.cwd())
     if args.strict_lifecycle:
