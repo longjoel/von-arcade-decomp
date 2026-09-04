@@ -31,6 +31,15 @@ def main() -> int:
         generated_status_path=root / "von/generated-status.md",
     )
     assert any("generated:" in error for error in errors)
+    outside = Path(tempfile.gettempdir()) / "von-generated-status-outside.md"
+    errors = validate_workflow(
+        root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
+        check_generated=True,
+        generated_coverage_path=outside,
+        generated_worklist_path=root / "von/attract_worklist.json",
+        generated_status_path=root / "von/generated-status.md",
+    )
+    assert any("coverage path escapes root" in error for error in errors)
     unsafe = {
         "schema_version": 1,
         "entries": [{"id": "unsafe", "canonical": True, "verifier": "/tmp/not-a-verifier.py"}],

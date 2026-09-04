@@ -50,6 +50,20 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
         if not all((generated_coverage_path, generated_worklist_path, generated_status_path)):
             errors.append("generated checks require coverage, worklist, and status paths")
         else:
+            generated_paths = (
+                ("coverage", generated_coverage_path),
+                ("worklist", generated_worklist_path),
+                ("status", generated_status_path),
+            )
+            unsafe_paths = []
+            for label, path in generated_paths:
+                try:
+                    path.resolve().relative_to(root.resolve())
+                except ValueError:
+                    unsafe_paths.append(f"generated {label} path escapes root: {path}")
+            if unsafe_paths:
+                errors.extend(unsafe_paths)
+                return errors
             from check_generated_status import check as check_status
             from check_generated_worklist import check as check_worklist
 
