@@ -46,11 +46,12 @@ def validate_lifecycle(
         return root is None or (root / value).is_file()
 
     active_modeled: list[str] = []
+    manifest_entries = manifest.get("entries", []) if isinstance(manifest, dict) else []
     canonical_entries = {
         entry.get("id"): entry
-        for entry in manifest.get("entries", [])
-        if entry.get("canonical") and isinstance(entry.get("id"), str)
-    }
+        for entry in manifest_entries
+        if isinstance(entry, dict) and entry.get("canonical") and isinstance(entry.get("id"), str)
+    } if isinstance(manifest_entries, list) else {}
     canonical_ids = set(canonical_entries)
     for image in ledger.get("images", []):
         image_name = image.get("name", "?")
@@ -103,7 +104,7 @@ def validate_lifecycle(
                     errors.append(f"{where}: missing integration test {test}")
             elif stage == "trace-validated":
                 evidence_id = unit.get("canonical_evidence_id")
-                if evidence_id not in canonical_ids:
+                if not isinstance(evidence_id, str) or evidence_id not in canonical_ids:
                     errors.append(f"{where}: trace-validated requires canonical evidence id")
                 verifier = unit.get("verifier")
                 if not isinstance(verifier, str) or not verifier:
@@ -112,14 +113,16 @@ def validate_lifecycle(
                     errors.append(f"{where}: verifier must be a safe relative path")
                 elif root is not None and not (root / verifier).is_file():
                     errors.append(f"{where}: missing verifier {verifier}")
-                registered_verifier = canonical_entries.get(evidence_id, {}).get("verifier")
-                if evidence_id in canonical_ids and registered_verifier != verifier:
+                registered_entry = canonical_entries.get(evidence_id, {}) if isinstance(evidence_id, str) else {}
+                registered_verifier = registered_entry.get("verifier")
+                if isinstance(evidence_id, str) and evidence_id in canonical_ids and registered_verifier != verifier:
                     errors.append(f"{where}: verifier differs from canonical evidence entry")
                 verification = unit.get("verification")
                 if not isinstance(verification, dict) or verification.get("result") != "pass":
                     errors.append(f"{where}: trace-validated requires verification.result=pass")
-                consumers = canonical_entries.get(evidence_id, {}).get("consumers", [])
-                if evidence_id in canonical_ids and unit.get("id") not in consumers:
+                consumers = registered_entry.get("consumers", [])
+                if (isinstance(evidence_id, str) and evidence_id in canonical_ids
+                        and (not isinstance(consumers, list) or unit.get("id") not in consumers)):
                     errors.append(f"{where}: canonical evidence does not name this unit as a consumer")
             elif stage == "byte-validated":
                 comparison = unit.get("byte_validation")

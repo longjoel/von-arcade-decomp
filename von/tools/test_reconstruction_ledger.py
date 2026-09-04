@@ -117,6 +117,11 @@ def main() -> int:
     del missing_verifier["entries"][0]["verifier"]
     assert any("differs from canonical" in error for error in validate_lifecycle(lifecycle, missing_verifier))
     broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][3]["canonical_evidence_id"] = {}
+    assert any("canonical evidence id" in error for error in validate_lifecycle(broken, manifest))
+    assert any("canonical evidence id" in error for error in validate_lifecycle(
+        lifecycle, {"entries": ["malformed"]}))
+    broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][4]["byte_validation"]["comparison"] = "mismatch"
     assert any("must be match" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
