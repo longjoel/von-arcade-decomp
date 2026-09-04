@@ -20,7 +20,8 @@ def load(path: Path | None) -> dict[str, Any]:
     return document
 
 
-def age_report(ledger: dict[str, Any], as_of: str | None = None) -> dict[str, Any]:
+def age_report(ledger: dict[str, Any], as_of: str | None = None,
+               unit_ids: set[str] | None = None) -> dict[str, Any]:
     """Report age only from declared unit timestamps, never filesystem mtimes."""
     reference = datetime.fromisoformat(as_of.replace("Z", "+00:00")) if as_of else None
     if reference is not None:
@@ -30,6 +31,8 @@ def age_report(ledger: dict[str, Any], as_of: str | None = None) -> dict[str, An
     ages: dict[str, list[tuple[float, str]]] = {}
     for image in ledger.get("images", []):
         for unit in image.get("work_units", []):
+            if unit_ids and unit.get("id") not in unit_ids:
+                continue
             created = unit.get("created_at")
             if created is None:
                 continue
@@ -103,17 +106,24 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
             value = experiments.get(field, 0)
             if not isinstance(value, int) or isinstance(value, bool) or value < 0:
                 raise ValueError(f"metrics experiments.{field} must be a nonnegative integer")
+    worklist_entries = worklist.get("units")
+    worklist_ids = {
+        entry.get("work_unit") for entry in worklist_entries
+        if isinstance(entry, dict) and isinstance(entry.get("work_unit"), str)
+    } if isinstance(worklist_entries, list) else set()
+    def in_cohort(unit: dict[str, Any]) -> bool:
+        return not worklist_ids or unit.get("id") in worklist_ids
     stages = Counter(
         unit.get("stage") for image in images
         for unit in image.get("work_units", [])
-        if isinstance(unit, dict)
+        if isinstance(unit, dict) and in_cohort(unit)
     )
     active_modeled_units = sorted(
         str(unit.get("id", "?"))
         for image in images
         for unit in image.get("work_units", [])
         if isinstance(unit, dict) and unit.get("stage") == "modeled"
-        and unit.get("active") is True
+        and unit.get("active") is True and in_cohort(unit)
     )
     discovered = worklist["discovered_units"]
     modeled = stages.get("modeled", 0)
@@ -130,7 +140,7 @@ def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str
         "schema_version": 1,
         "stages": {stage: stages.get(stage, 0) for stage in
                    ("planned", "modeled", "integrated", "trace-validated", "byte-validated", "blocked")},
-        "age": age_report(ledger, as_of),
+        "age": age_report(ledger, as_of, worklist_ids or None),
         "discovery": {
             "units": discovered,
             "modeled_conversion_percent": percentage(modeled, discovered),

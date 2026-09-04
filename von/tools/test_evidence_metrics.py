@@ -59,6 +59,20 @@ def main() -> int:
     assert report["experiments"] == {"changed_decision": 3, "quarantined": 1}
     assert report["age"]["modeled"]["median_age_seconds"] == 3600.0
     assert report["age"]["modeled"]["oldest_unit_id"] == "m"
+    cohort_report = metrics(
+        {"images": [{"work_units": [
+            {"id": "cohort-modeled", "stage": "modeled"},
+            {"id": "unrelated", "stage": "trace-validated"},
+        ]}]},
+        {"discovered_units": 1, "units": [{"work_unit": "cohort-modeled"}]},
+        {"possible_static_edge_count": 0, "confirmed_dynamic_edge_count": 0,
+         "observed_entry_point_count": 0},
+        {"compared_events": 0, "matched_prefix_events": 0,
+         "original_checkpoints": [], "missed_checkpoints": [], "unexpected_checkpoints": []},
+    )
+    assert cohort_report["stages"]["modeled"] == 1
+    assert cohort_report["stages"]["trace-validated"] == 0
+    assert cohort_report["discovery"]["modeled_conversion_percent"] == 100.0
     try:
         metrics({"images": [{"work_units": [{"stage": "planned", "created_at": "bad"}]}]},
                 {"discovered_units": 0, "modeled_units": 0, "integrated_units": 0},
