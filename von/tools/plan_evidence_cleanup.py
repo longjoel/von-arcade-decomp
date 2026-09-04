@@ -41,6 +41,7 @@ def validate_inventory(document: Any) -> list[str]:
         return ["inventory files must be an array"]
     errors: list[str] = []
     seen: set[str] = set()
+    path_hashes: dict[str, str] = {}
     for index, record in enumerate(files):
         where = f"files[{index}]"
         if not isinstance(record, dict):
@@ -54,6 +55,7 @@ def validate_inventory(document: Any) -> list[str]:
             errors.append(f"{where}: duplicate path {path}")
         else:
             seen.add(path)
+            path_hashes[path] = record.get("sha256", "")
         size = record.get("bytes")
         if not isinstance(size, int) or isinstance(size, bool) or size < 0:
             errors.append(f"{where}: bytes must be a nonnegative integer")
@@ -73,6 +75,37 @@ def validate_inventory(document: Any) -> list[str]:
         decision = record.get("decision")
         if classification in CLASS_ACTIONS and decision != CLASS_ACTIONS[classification][1]:
             errors.append(f"{where}: decision does not match classification")
+    groups = document.get("duplicate_groups")
+    if not isinstance(groups, list):
+        errors.append("inventory duplicate_groups must be an array")
+    else:
+        grouped_paths: set[str] = set()
+        for index, group in enumerate(groups):
+            where = f"duplicate_groups[{index}]"
+            if not isinstance(group, dict):
+                errors.append(f"{where}: group must be an object")
+                continue
+            digest = group.get("sha256")
+            paths = group.get("paths")
+            aliases = group.get("aliases")
+            if not _valid_digest(digest):
+                errors.append(f"{where}: sha256 must be a lowercase SHA-256 digest")
+            if (not isinstance(paths, list) or len(paths) < 2
+                    or not all(isinstance(path, str) and path for path in paths)
+                    or len(set(paths)) != len(paths)):
+                errors.append(f"{where}: paths must be a unique list of at least two paths")
+                paths = []
+            if not isinstance(aliases, list) or aliases != paths[1:]:
+                errors.append(f"{where}: aliases must equal paths after the canonical path")
+                aliases = []
+            for path in paths:
+                if path not in path_hashes:
+                    errors.append(f"{where}: unknown inventory path {path}")
+                elif path_hashes[path] != digest:
+                    errors.append(f"{where}: path hash differs from group sha256 for {path}")
+                if path in grouped_paths:
+                    errors.append(f"{where}: path appears in multiple duplicate groups {path}")
+                grouped_paths.add(path)
     return errors
 
 

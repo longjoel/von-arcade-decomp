@@ -42,6 +42,18 @@ def main() -> int:
         "quarantined": {"files": 1, "bytes": 30},
         "eligible_for_deletion": {"files": 1, "bytes": 20},
     }
+    broken = dict(inventory, duplicate_groups=[{"sha256": "b" * 64,
+                                                "paths": ["missing", "old/capture.log"],
+                                                "aliases": ["old/capture.log"]}])
+    assert any("unknown inventory path" in error for error in validate_inventory(broken))
+    broken = dict(inventory, duplicate_groups=[{"sha256": "b" * 64,
+                                                "paths": ["old/capture.log", "von/build/output.bin"],
+                                                "aliases": ["von/build/output.bin"]}])
+    assert any("path hash differs" in error for error in validate_inventory(broken))
+    broken = dict(inventory, duplicate_groups=[{"sha256": "a" * 64,
+                                                "paths": ["von/build/output.bin", "old/capture.log"],
+                                                "aliases": []}])
+    assert any("aliases must equal" in error for error in validate_inventory(broken))
     assert [item["action"] for item in result["actions"]] == [
         "quarantine-after-review", "remove-after-review", "retain"
     ]
