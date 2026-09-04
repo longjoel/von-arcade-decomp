@@ -91,6 +91,19 @@ def validate(catalog: Any, sample: bytes, root: Path) -> list[dict[str, Any]]:
     return results
 
 
+def validate_rom_inputs(catalog: dict[str, Any], paths: list[Path], data: list[bytes]) -> None:
+    declared = catalog.get("sample_roms")
+    if declared is None:
+        return
+    if not isinstance(declared, list) or len(declared) != len(paths):
+        raise ValueError("catalog sample_roms does not match supplied ROM count")
+    for index, (item, path, payload) in enumerate(zip(declared, paths, data)):
+        if not isinstance(item, dict) or item.get("path") != path.name:
+            raise ValueError(f"sample ROM {index} path does not match catalog")
+        if item.get("bytes") != len(payload) or item.get("sha256") != sha256(payload):
+            raise ValueError(f"sample ROM {index} hash or size does not match catalog")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--catalog", type=Path, required=True)
@@ -101,11 +114,12 @@ def main() -> int:
         catalog_bytes = args.catalog.read_bytes()
         catalog = json.loads(catalog_bytes)
         physical_roms = [path.read_bytes() for path in args.sample_rom]
+        validate_rom_inputs(catalog, args.sample_rom, physical_roms)
         sample = swap_words(b"".join(physical_roms))
         entries = validate(catalog, sample, args.catalog.parent)
         report = {"schema_version": 1, "status": "validated", "catalog_sha256": sha256(catalog_bytes),
                   "sample_rom_sha256": sha256(sample),
-                  "sample_roms": [{"path": str(path), "sha256": sha256(data), "bytes": len(data)}
+                  "sample_roms": [{"path": path.name, "sha256": sha256(data), "bytes": len(data)}
                                   for path, data in zip(args.sample_rom, physical_roms)],
                   "entries": entries}
         args.output.parent.mkdir(parents=True, exist_ok=True)

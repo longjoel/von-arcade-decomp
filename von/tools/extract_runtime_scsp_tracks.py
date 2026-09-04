@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import wave
@@ -41,6 +42,10 @@ def write_wav(path: Path, pcm: bytes, rate: int) -> None:
         output.writeframes(pcm)
 
 
+def sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("trace", type=Path, help="filtered vonj_scsp_reg log")
@@ -53,7 +58,9 @@ def main() -> int:
     if args.rate <= 0:
         parser.error("--rate must be positive")
 
-    sample = swap_words(b"".join(path.read_bytes() for path in args.sample_roms))
+    trace_bytes = args.trace.read_bytes()
+    physical_roms = [path.read_bytes() for path in args.sample_roms]
+    sample = swap_words(b"".join(physical_roms))
     descriptors = []
     register_state: dict[int, dict[int, int]] = {}
     active_events: dict[int, dict] = {}
@@ -146,7 +153,11 @@ def main() -> int:
         entries.append(item)
 
     report = {"format": "runtime-scsp", "rate": args.rate,
-              "sample_rom_bytes": len(sample), "entries": entries,
+              "sample_rom_bytes": len(sample), "trace_bytes": len(trace_bytes),
+              "trace_sha256": sha256(trace_bytes),
+              "sample_roms": [{"path": path.name, "bytes": len(data), "sha256": sha256(data)}
+                              for path, data in zip(args.sample_roms, physical_roms)],
+              "entries": entries,
               "notes": [
                   "Descriptors are taken from SCSP register writes immediately before key-on.",
                   "SA and LEA are recorded as SCSP byte addresses; lengths are authoritative for the runtime voice.",

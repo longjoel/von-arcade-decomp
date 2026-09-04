@@ -10,7 +10,7 @@ import tempfile
 import wave
 from pathlib import Path
 
-from verify_scsp_descriptor import pcm8_to_pcm16, swap_words, validate
+from verify_scsp_descriptor import pcm8_to_pcm16, swap_words, validate, validate_rom_inputs
 
 
 def main() -> int:
@@ -28,6 +28,18 @@ def main() -> int:
             "status": "extracted", "wav": "sample.wav", "slot": 2,
             "sa": 0, "lsa": 0, "lea": 4, "pcm8": 1,
         }]}
+        catalog["sample_roms"] = [
+            {"path": "a.bin", "bytes": 4, "sha256": hashlib.sha256(rom_a.read_bytes()).hexdigest()},
+            {"path": "b.bin", "bytes": 4, "sha256": hashlib.sha256(rom_b.read_bytes()).hexdigest()},
+        ]
+        validate_rom_inputs(catalog, [rom_a, rom_b], [rom_a.read_bytes(), rom_b.read_bytes()])
+        bad_roms = [rom_a.read_bytes(), b"wrong!"]
+        try:
+            validate_rom_inputs(catalog, [rom_a, rom_b], bad_roms)
+        except ValueError as error:
+            assert "hash or size" in str(error)
+        else:
+            raise AssertionError("mismatched physical ROM was accepted")
         result = validate(catalog, sample, root)
         assert result[0]["claims"]["audio_descriptor"] == "validated"
         assert result[0]["pcm_sha256"] == hashlib.sha256(pcm).hexdigest()
