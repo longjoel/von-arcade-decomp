@@ -69,9 +69,12 @@ def main() -> int:
     edge_counts = Counter(
         number(edge["target"]) for edge in coverage.get("possible_static_edges", [])
     )
+    tier_a_targets = {number(target) for target in coverage.get("observed_entry_points", [])}
+    candidate_targets = set(tier_a_targets)
+    if comparison is not None:
+        candidate_targets.update(callee for _, callee in causal_edges)
     units = []
-    for target_text in coverage.get("observed_entry_points", []):
-        target = number(target_text)
+    for target in sorted(candidate_targets):
         # Explicit milestone membership is authoritative. This avoids a newly
         # nested semantic helper silently changing the closure denominator.
         matched = milestone_units.get(target)
@@ -82,6 +85,7 @@ def main() -> int:
         units.append(
             {
                 "entry": f"0x{target:08x}",
+                "discovery": "tier-a-entry" if target in tier_a_targets else "tier-b-dynamic-target",
                 "possible_static_edges": edge_counts[target],
                 "dynamic_dependencies": dependencies,
                 "causal_priority": 0 if dependencies else 1,
@@ -127,6 +131,8 @@ def main() -> int:
     if comparison is not None:
         output["comparison_source"] = str(args.comparison)
         output["missing_dynamic_edge_count"] = len(causal_edges)
+        output["dynamic_targets_added"] = len({target for _, target in causal_edges}
+                                               - tier_a_targets)
         output["missed_checkpoints"] = comparison.get("missed_checkpoints", [])
     args.json.parent.mkdir(parents=True, exist_ok=True)
     args.json.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")

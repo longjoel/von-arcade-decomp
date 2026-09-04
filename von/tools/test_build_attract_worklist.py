@@ -60,6 +60,10 @@ def main() -> int:
         assert causal["missed_checkpoints"] == ["scheduler"]
         assert causal["units"][0]["causal_priority"] == 0
         assert causal["units"][0]["dynamic_dependencies"] == [["0x00000200", "0x00000100"]]
+        assert causal["dynamic_targets_added"] == 1
+        dynamic_target = next(unit for unit in causal["units"] if unit["entry"] == "0x00000400")
+        assert dynamic_target["discovery"] == "tier-b-dynamic-target"
+        assert dynamic_target["stage"] == "planned"
         invalid_comparison = {"missing_dynamic_edges": ["malformed"]}
         assert run(coverage, ledger, work, invalid_comparison).returncode != 0
         invalid = dict(coverage)
