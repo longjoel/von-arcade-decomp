@@ -32,9 +32,24 @@ def load_events(path: Path) -> list[dict[str, Any]]:
             raise ValueError(f"{path}:{line_number}: event seq must be a non-negative integer")
         if previous_sequence is not None and sequence <= previous_sequence:
             raise ValueError(f"{path}:{line_number}: event seq must increase strictly")
+        validate_event_shape(event, f"{path}:{line_number}")
         previous_sequence = sequence
         events.append(event)
     return events
+
+
+def validate_event_shape(event: dict[str, Any], where: str) -> None:
+    required_fields = {
+        "direct-call": ("pc", "target"),
+        "indirect-call": ("pc", "target"),
+        "return": ("pc", "next_pc"),
+        "exception": ("pc",),
+        "reset": ("pc",),
+        "checkpoint": ("name",),
+    }.get(event["kind"], ())
+    for field in required_fields:
+        if field not in event or event[field] is None or event[field] == "":
+            raise ValueError(f"{where}: {event['kind']} requires {field}")
 
 
 def validate_order(events: list[dict[str, Any]]) -> None:
@@ -47,6 +62,7 @@ def validate_order(events: list[dict[str, Any]]) -> None:
             raise ValueError(f"event {index}: seq must be a non-negative integer")
         if previous_sequence is not None and sequence <= previous_sequence:
             raise ValueError(f"event {index}: seq must increase strictly")
+        validate_event_shape(event, f"event {index}")
         previous_sequence = sequence
 
 

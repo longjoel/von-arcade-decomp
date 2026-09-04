@@ -97,7 +97,8 @@ def main() -> int:
         else:
             raise AssertionError("negative sequence was accepted")
         malformed.write_text(
-            '{"kind": "checkpoint", "seq": 1}\n{"kind": "checkpoint", "seq": 1}\n',
+            '{"kind": "checkpoint", "name": "x", "seq": 1}\n'
+            '{"kind": "checkpoint", "name": "x", "seq": 1}\n',
             encoding="utf-8")
         try:
             load_events(malformed)
@@ -105,6 +106,13 @@ def main() -> int:
             assert "increase strictly" in str(error)
         else:
             raise AssertionError("duplicate sequence was accepted")
+        malformed.write_text('{"kind": "indirect-call", "seq": 1}\n', encoding="utf-8")
+        try:
+            load_events(malformed)
+        except ValueError as error:
+            assert "indirect-call requires pc" in str(error)
+        else:
+            raise AssertionError("incomplete indirect-call event was accepted")
     print("PASS: ordered event comparison identifies the first divergence")
     return 0
 
