@@ -42,6 +42,18 @@ def safe_path(path_text: Any) -> bool:
     return not path.is_absolute() and ".." not in path.parts
 
 
+def rooted(root: Path, path_text: Any) -> Path | None:
+    """Resolve a manifest path only when it remains inside the capture root."""
+    if not safe_path(path_text):
+        return None
+    candidate = root / path_text
+    try:
+        candidate.resolve().relative_to(root.resolve())
+    except ValueError:
+        return None
+    return candidate
+
+
 def validate(manifest: dict[str, Any], root: Path) -> list[str]:
     errors: list[str] = []
     if manifest.get("schema_version") != 1:
@@ -71,7 +83,7 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
         errors.append("command must be a non-empty string array")
     report_path_text = manifest.get("coverage_report")
     if report_path_text:
-        report_path = root / report_path_text if safe_path(report_path_text) else None
+        report_path = rooted(root, report_path_text)
         if report_path is None or not report_path.is_file():
             errors.append(f"missing coverage report {report_path_text}")
         else:
@@ -92,9 +104,9 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
         path = isolation.get(field)
         if not safe_path(path) or not path:
             errors.append(f"missing isolation.{field}")
-        elif not (root / path).is_dir():
+        elif rooted(root, path) is None or not rooted(root, path).is_dir():
             errors.append(f"missing isolation directory {path}")
-        elif isolation.get(f"{field}_sha256") != directory_sha256(root / path):
+        elif isolation.get(f"{field}_sha256") != directory_sha256(rooted(root, path)):
             errors.append(f"hash mismatch for isolation.{field}")
     for section in ("inputs", "artifacts"):
         items = manifest.get(section, [])
@@ -106,7 +118,7 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
                 errors.append(f"{section}[{index}] must be an object")
                 continue
             path_text = item.get("path")
-            path = root / path_text if safe_path(path_text) else None
+            path = rooted(root, path_text)
             if path is None or not path.is_file():
                 errors.append(f"{section}[{index}]: missing file {path_text}")
                 continue
