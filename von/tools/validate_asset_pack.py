@@ -111,6 +111,17 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         item.get("id"): item for item in evidence_entries
         if isinstance(item, dict) and item.get("canonical") is True and isinstance(item.get("id"), str)
     }
+    for evidence_id, entry in canonical_entries.items():
+        verifier = entry.get("verifier")
+        verifier_path = rooted(root, verifier)
+        if verifier_path is None or verifier_path.is_symlink() or not verifier_path.is_file():
+            errors.append(f"canonical evidence {evidence_id} has missing verifier")
+            continue
+        verifier_digest = entry.get("verifier_sha256")
+        if not isinstance(verifier_digest, str) or not SHA256_RE.fullmatch(verifier_digest):
+            errors.append(f"canonical evidence {evidence_id} requires verifier_sha256")
+        elif verifier_digest != sha256(verifier_path):
+            errors.append(f"canonical evidence {evidence_id} verifier hash mismatch")
     if basis.get("capture_id") not in canonical_ids:
         errors.append(f"unknown canonical basis capture id {basis.get('capture_id')}")
     elif canonical_entries[basis["capture_id"]].get("outcome") != "pass":

@@ -18,6 +18,8 @@ def main() -> int:
         root = Path(directory)
         payload = root / "fighter.glb"
         payload.write_bytes(b"fixture-payload")
+        verifier = root / "verify-fighter.py"
+        verifier.write_text("# verifier\n", encoding="utf-8")
         pack = {
             "schema_version": 1, "kind": "von-evidence-asset-pack", "id": "pack-v1",
             "basis": {"romset_hash": "a" * 64, "map_revision": "map", "capture_id": "capture-v1", "tool_revision": "tool"},
@@ -27,7 +29,9 @@ def main() -> int:
                         "evidence_ids": ["capture-v1"], "verifiers": ["verify-fighter"],
                         "verifier_results": {"verify-fighter": "pass"}}],
         }
-        evidence = {"entries": [{"id": "capture-v1", "canonical": True, "outcome": "pass"}]}
+        evidence = {"entries": [{"id": "capture-v1", "canonical": True, "outcome": "pass",
+                                  "verifier": "verify-fighter.py",
+                                  "verifier_sha256": hashlib.sha256(verifier.read_bytes()).hexdigest()}]}
         assert not validate(pack, evidence, root)
         broken = copy.deepcopy(pack)
         broken["basis"] = []
@@ -52,6 +56,14 @@ def main() -> int:
         malformed_canonical["entries"][0]["canonical"] = "true"
         assert any("canonical must be boolean" in error for error in validate(
             pack, malformed_canonical, root))
+        missing_verifier_hash = copy.deepcopy(evidence)
+        del missing_verifier_hash["entries"][0]["verifier_sha256"]
+        assert any("requires verifier_sha256" in error for error in validate(
+            pack, missing_verifier_hash, root))
+        stale_verifier_hash = copy.deepcopy(evidence)
+        stale_verifier_hash["entries"][0]["verifier_sha256"] = "0" * 64
+        assert any("verifier hash mismatch" in error for error in validate(
+            pack, stale_verifier_hash, root))
         rom_manifest = root / "rom-manifest.json"
         rom_manifest.write_text('{"rom":"fixture"}\n', encoding="utf-8")
         pack["basis"]["romset_hash"] = hashlib.sha256(rom_manifest.read_bytes()).hexdigest()
