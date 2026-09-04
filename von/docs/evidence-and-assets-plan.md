@@ -104,11 +104,20 @@ A capture used for integration or validation needs a sidecar manifest:
     "execution_engine": "interpreter",
     "arguments": ["-video","none","-sound","none","-nothrottle"]
   },
-  "inputs": {
-    "rom_manifest_sha256": "<sha256>",
-    "cfg_sha256": "<sha256>",
-    "nvram_sha256": "<sha256-or-empty-state-id>"
+  "command": ["mame", "vonj", "-video", "none", "-sound", "none",
+    "-cfg_directory", "cfg", "-nvram_directory", "nvram",
+    "-state_directory", "state", "-seconds_to_run", "8"],
+  "isolation": {
+    "cfg_directory": "cfg",
+    "cfg_directory_sha256": "<sha256>",
+    "nvram_directory": "nvram",
+    "nvram_directory_sha256": "<sha256>",
+    "state_directory": "state",
+    "state_directory_sha256": "<sha256>"
   },
+  "inputs": [
+    {"path":"inputs/rom-manifest.json","sha256":"<sha256>"}
+  ],
   "artifacts": [
     {"path":"events.ndjson.gz","sha256":"<sha256>"},
     {"path":"summary.json","sha256":"<sha256>"}
