@@ -24,6 +24,15 @@ def main() -> int:
         "kind": "input-free-attract", "description": "runtime fixture"
     }
     assert any("capture_manifest" in error for error in validate(runtime, ledger, root))
+    broken = json.loads(json.dumps(manifest))
+    broken["entries"][0]["verifier"] = "/tmp/verify.py"
+    assert any("verifier" in error for error in validate(broken, ledger, root))
+    broken = json.loads(json.dumps(manifest))
+    broken["entries"][0]["artifacts"][0]["path"] = "../outside.json"
+    assert any("artifact path" in error for error in validate(broken, ledger, root))
+    broken = json.loads(json.dumps(manifest))
+    broken["entries"] = ["malformed"]
+    assert any("entry must be an object" in error for error in validate(broken, ledger, root))
     with tempfile.TemporaryDirectory() as directory:
         temp = Path(directory)
         for name in ("cfg", "nvram", "state"):

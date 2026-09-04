@@ -11,24 +11,44 @@ import sys
 from pathlib import Path
 
 
+def safe_path(path_text: object) -> bool:
+    if not isinstance(path_text, str):
+        return False
+    path = Path(path_text)
+    return not path.is_absolute() and ".." not in path.parts
+
+
 def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
     errors: list[str] = []
-    unit_ids = {unit["id"] for image in ledger.get("images", []) for unit in image.get("work_units", [])}
+    unit_ids = {
+        unit.get("id") for image in ledger.get("images", [])
+        for unit in image.get("work_units", [])
+        if isinstance(unit, dict) and isinstance(unit.get("id"), str)
+    }
     ids: set[str] = set()
-    for index, entry in enumerate(manifest.get("entries", [])):
+    entries = manifest.get("entries", [])
+    if not isinstance(entries, list):
+        return ["entries must be an array"]
+    for index, entry in enumerate(entries):
         where = f"entries[{index}]"
+        if not isinstance(entry, dict):
+            errors.append(f"{where}: entry must be an object")
+            continue
         evidence_id = entry.get("id")
-        if not evidence_id or evidence_id in ids:
+        if not isinstance(evidence_id, str) or not evidence_id or evidence_id in ids:
             errors.append(f"{where}: missing or duplicate stable id")
-        ids.add(evidence_id)
+        elif evidence_id:
+            ids.add(evidence_id)
         if not entry.get("canonical"):
             continue
         stimulus = entry.get("stimulus", {})
-        if not stimulus.get("kind") or not stimulus.get("description"):
+        if not isinstance(stimulus, dict):
+            stimulus = {}
+        if not isinstance(stimulus, dict) or not stimulus.get("kind") or not stimulus.get("description"):
             errors.append(f"{where}: canonical stimulus is incomplete")
         if stimulus.get("kind") in {"input-free-attract", "bounded-trace", "causal-trace"}:
             sidecar = entry.get("capture_manifest")
-            if not isinstance(sidecar, str) or not sidecar:
+            if not safe_path(sidecar):
                 errors.append(f"{where}: runtime evidence requires capture_manifest")
             else:
                 sidecar_path = root / sidecar
@@ -52,16 +72,21 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
         if entry.get("outcome") != "pass":
             errors.append(f"{where}: canonical outcome must be pass")
         verifier = entry.get("verifier")
-        if not verifier or not (root / verifier).is_file():
+        if not safe_path(verifier) or not (root / verifier).is_file():
             errors.append(f"{where}: verifier is missing")
         consumers = entry.get("consumers", [])
-        if not consumers or any(consumer not in unit_ids for consumer in consumers):
+        if (not isinstance(consumers, list) or not consumers
+                or not all(isinstance(consumer, str) for consumer in consumers)
+                or any(consumer not in unit_ids for consumer in consumers)):
             errors.append(f"{where}: must name existing ledger consumers")
         artifacts = entry.get("artifacts", [])
-        if not artifacts:
+        if not isinstance(artifacts, list) or not artifacts:
             errors.append(f"{where}: no artifacts")
-        for artifact in artifacts:
-            path = root / artifact.get("path", "")
+        for artifact in artifacts if isinstance(artifacts, list) else []:
+            if not isinstance(artifact, dict) or not safe_path(artifact.get("path")):
+                errors.append(f"{where}: invalid artifact path")
+                continue
+            path = root / artifact["path"]
             if not path.is_file():
                 errors.append(f"{where}: missing artifact {artifact.get('path')}")
                 continue
