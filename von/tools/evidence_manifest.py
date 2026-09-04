@@ -155,7 +155,7 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                 errors.append(f"{where}: verifier hash mismatch")
         consumers = entry.get("consumers", [])
         if (not isinstance(consumers, list) or not consumers
-                or not all(isinstance(consumer, str) for consumer in consumers)
+                or not all(isinstance(consumer, str) and consumer for consumer in consumers)
                 or len(set(consumers)) != len(consumers)
                 or any(consumer not in unit_ids for consumer in consumers)):
             errors.append(f"{where}: must name existing ledger consumers")
