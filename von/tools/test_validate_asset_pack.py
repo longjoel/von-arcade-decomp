@@ -92,6 +92,11 @@ def main() -> int:
         broken["assets"][0]["verifiers"] = ["verify-fighter", "verify-fighter"]
         assert any("verifiers must be unique" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
+        shared = copy.deepcopy(broken["assets"][0])
+        shared["id"] = "fighter-alias"
+        broken["assets"].append(shared)
+        assert any("payload is shared" in error for error in validate(broken, evidence, root))
+        broken = copy.deepcopy(pack)
         broken["basis"]["capture_id"] = "missing"
         assert any("basis capture id" in error for error in validate(broken, evidence, root))
         failed_evidence = {"entries": [{"id": "capture-v1", "canonical": True, "outcome": "fail"}]}

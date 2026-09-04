@@ -115,6 +115,7 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         errors.append("assets must be a non-empty array")
         return errors
     seen: set[str] = set()
+    payload_paths: set[Path] = set()
     for index, asset in enumerate(assets):
         where = f"assets[{index}]"
         if not isinstance(asset, dict):
@@ -137,8 +138,14 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         payload = rooted(root, payload_text)
         if payload is None or not payload.is_file():
             errors.append(f"{where}: missing payload {asset.get('payload')}")
-        elif asset.get("sha256") != sha256(payload):
-            errors.append(f"{where}: payload hash mismatch")
+        else:
+            resolved_payload = payload.resolve()
+            if resolved_payload in payload_paths:
+                errors.append(f"{where}: payload is shared by multiple assets")
+            else:
+                payload_paths.add(resolved_payload)
+            if asset.get("sha256") != sha256(payload):
+                errors.append(f"{where}: payload hash mismatch")
         claims = asset.get("claims")
         if not isinstance(claims, dict) or not claims:
             errors.append(f"{where}: claims must be a non-empty object")
