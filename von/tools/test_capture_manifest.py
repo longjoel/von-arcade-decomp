@@ -11,6 +11,7 @@ from capture_manifest import directory_sha256, entry, validate
 
 
 def main() -> int:
+    assert any("capture manifest must be an object" in error for error in validate([], Path.cwd()))
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
         for name in ("cfg", "nvram", "state"):
@@ -78,6 +79,12 @@ def main() -> int:
         broken["isolation"]["nvram_directory"] = "cfg"
         broken["isolation"]["nvram_directory_sha256"] = broken["isolation"]["cfg_directory_sha256"]
         assert any("directories must be distinct" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["configuration"] = []
+        assert any("configuration must be an object" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["isolation"] = []
+        assert any("isolation must be an object" in error for error in validate(broken, root))
         outside = root.parent / "outside-capture-fixture.txt"
         outside.write_text("outside\n", encoding="utf-8")
         link = root / "linked-artifact.txt"

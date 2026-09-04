@@ -60,6 +60,8 @@ def rooted(root: Path, path_text: Any) -> Path | None:
 
 def validate(manifest: dict[str, Any], root: Path) -> list[str]:
     errors: list[str] = []
+    if not isinstance(manifest, dict):
+        return ["capture manifest must be an object"]
     if manifest.get("schema_version") != 1:
         errors.append("schema_version must be 1")
     if not isinstance(manifest.get("id"), str) or not manifest.get("id"):
@@ -79,6 +81,9 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
     if stimulus.get("kind") == "input-free-attract" and not manifest.get("coverage_report"):
         errors.append("input-free-attract capture requires coverage_report")
     configuration = manifest.get("configuration", {})
+    if not isinstance(configuration, dict):
+        errors.append("configuration must be an object")
+        configuration = {}
     for field in ("set", "mame_revision", "patch_profile", "execution_engine"):
         if not configuration.get(field):
             errors.append(f"missing configuration.{field}")
@@ -104,6 +109,9 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
                 if report.get("phase") is not None and report.get("phase") != expected_phase:
                     errors.append("coverage report phase does not match sidecar stimulus phase")
     isolation = manifest.get("isolation", {})
+    if not isinstance(isolation, dict):
+        errors.append("isolation must be an object")
+        isolation = {}
     isolation_resolved: dict[str, Path] = {}
     for field in ("cfg_directory", "nvram_directory", "state_directory"):
         path = isolation.get(field)
