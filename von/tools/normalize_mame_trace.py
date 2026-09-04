@@ -62,9 +62,33 @@ def read_trace(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
+def trigger_window(events: list[dict], trigger_kind: str | None = None,
+                   trigger_name: str | None = None,
+                   window_events: int | None = None) -> tuple[list[dict], bool]:
+    """Return a bounded window beginning at the first matching event."""
+    if trigger_kind is None:
+        return events, False
+    if window_events is None:
+        raise ValueError("trigger windows require window_events")
+    trigger_index = next(
+        (index for index, event in enumerate(events)
+         if event.get("kind") == trigger_kind
+         and (trigger_name is None
+              or event.get("name") == trigger_name
+              or event.get("checkpoint") == trigger_name)),
+        None,
+    )
+    if trigger_index is None:
+        return [], False
+    return events[trigger_index:trigger_index + window_events], True
+
+
 def select_events(events: list[dict], max_events: int | None = None,
                   event_kinds: set[str] | None = None,
-                  pc_min: int | None = None, pc_max: int | None = None) -> list[dict]:
+                  pc_min: int | None = None, pc_max: int | None = None,
+                  trigger_kind: str | None = None, trigger_name: str | None = None,
+                  window_events: int | None = None) -> list[dict]:
+    events, _ = trigger_window(events, trigger_kind, trigger_name, window_events)
     selected = []
     for event in events:
         if event_kinds and event.get("kind") not in event_kinds:
@@ -84,8 +108,11 @@ def select_events(events: list[dict], max_events: int | None = None,
 
 def summary(events: list[dict], source: Path, max_events: int | None = None,
             event_kinds: set[str] | None = None, pc_min: int | None = None,
-            pc_max: int | None = None, provenance: dict[str, Any] | None = None) -> dict:
-    selected = select_events(events, max_events, event_kinds, pc_min, pc_max)
+            pc_max: int | None = None, provenance: dict[str, Any] | None = None,
+            trigger_kind: str | None = None, trigger_name: str | None = None,
+            window_events: int | None = None) -> dict:
+    selected, trigger_found = trigger_window(events, trigger_kind, trigger_name, window_events)
+    selected = select_events(selected, max_events, event_kinds, pc_min, pc_max)
     counts = Counter(event.get("kind") for event in selected)
     result = {
         "schema_version": 1,
@@ -99,6 +126,10 @@ def summary(events: list[dict], source: Path, max_events: int | None = None,
             "event_kinds": sorted(event_kinds or set()),
             "pc_min": pc_min,
             "pc_max": pc_max,
+            "trigger_kind": trigger_kind,
+            "trigger_name": trigger_name,
+            "window_events": window_events,
+            "trigger_found": trigger_found,
         },
     }
     if provenance is not None:
@@ -141,6 +172,10 @@ def main() -> int:
     parser.add_argument("--event-kind", action="append", default=[])
     parser.add_argument("--pc-min", type=lambda value: int(value, 0))
     parser.add_argument("--pc-max", type=lambda value: int(value, 0))
+    parser.add_argument("--trigger-kind", help="begin a bounded window at the first event kind")
+    parser.add_argument("--trigger-name", help="optional name/checkpoint required on the trigger event")
+    parser.add_argument("--window-events", type=int,
+                        help="number of raw events to retain from the trigger, including it")
     parser.add_argument("--capture-manifest", type=Path,
                         help="canonical sidecar that declares the input trace artifact")
     parser.add_argument("--capture-root", type=Path,
@@ -150,6 +185,12 @@ def main() -> int:
         parser.error("--max-events must be non-negative")
     if args.pc_min is not None and args.pc_max is not None and args.pc_min > args.pc_max:
         parser.error("--pc-min cannot exceed --pc-max")
+    if args.trigger_name is not None and args.trigger_kind is None:
+        parser.error("--trigger-name requires --trigger-kind")
+    if args.window_events is not None and args.window_events < 0:
+        parser.error("--window-events must be non-negative")
+    if args.trigger_kind is not None and args.window_events is None:
+        parser.error("--trigger-kind requires --window-events")
 
     provenance = None
     if args.capture_manifest:
@@ -205,7 +246,8 @@ def main() -> int:
     event_kinds = set(args.event_kind)
     all_normalized = normalized
     if args.ndjson or args.summary:
-        normalized = select_events(normalized, args.max_events, event_kinds, args.pc_min, args.pc_max)
+        normalized = select_events(normalized, args.max_events, event_kinds, args.pc_min, args.pc_max,
+                                   args.trigger_kind, args.trigger_name, args.window_events)
     if args.ndjson:
         args.ndjson.parent.mkdir(parents=True, exist_ok=True)
         args.ndjson.write_text(
@@ -217,7 +259,8 @@ def main() -> int:
         args.summary.parent.mkdir(parents=True, exist_ok=True)
         args.summary.write_text(json.dumps(
             summary(all_normalized, args.trace, args.max_events, event_kinds,
-                    args.pc_min, args.pc_max, provenance), indent=2
+                    args.pc_min, args.pc_max, provenance, args.trigger_kind,
+                    args.trigger_name, args.window_events), indent=2
         ) + "\n", encoding="utf-8")
         print(f"Event summary: {args.summary}")
     return 0
