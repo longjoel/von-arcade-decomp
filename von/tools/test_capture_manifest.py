@@ -229,6 +229,19 @@ def main() -> int:
         )
         assert cli_result.returncode == 1
         assert "output path must not be a symlink" in cli_result.stdout
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--output", str(root / "outside-input.json"),
+             "--root", str(root), "--id", "cli-v2", "--objective", "objective",
+             "--hypothesis", "hypothesis", "--expected-discriminator", "discriminator",
+             "--seconds", "1", "--checkpoint", "reset", "--set", "fixture",
+             "--mame-revision", "abc", "--patch-profile", "none",
+             "--execution-engine", "interpreter", "--command", "mame",
+             "--cfg-directory", str(root / "cfg"), "--nvram-directory", str(root / "nvram"),
+             "--state-directory", str(root / "state"), "--artifact", str(outside)],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "artifact path escapes root" in cli_result.stdout
     print("PASS: capture sidecar manifest hashes and provenance")
     return 0
 

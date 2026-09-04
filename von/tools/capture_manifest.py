@@ -267,10 +267,32 @@ def main() -> int:
     parser.add_argument("--input", action="append", default=[], type=Path)
     parser.add_argument("--artifact", action="append", default=[], type=Path)
     args = parser.parse_args()
-    if args.output.is_symlink():
-        print("Capture manifest: output path must not be a symlink")
-        return 1
     root = args.root.resolve()
+    path_specs = [("output", args.output, False)]
+    if args.coverage_report:
+        path_specs.append(("coverage report", args.coverage_report, False))
+    path_specs.extend(("input", path, False) for path in args.input)
+    path_specs.extend(("artifact", path, False) for path in args.artifact)
+    path_specs.extend((label, path, True) for label, path in (
+        ("cfg directory", args.cfg_directory),
+        ("nvram directory", args.nvram_directory),
+        ("state directory", args.state_directory),
+    ))
+    for label, path, directory in path_specs:
+        if path.is_symlink():
+            print(f"Capture manifest: {label} path must not be a symlink: {path}")
+            return 1
+        try:
+            path.resolve().relative_to(root)
+        except (OSError, RuntimeError, ValueError):
+            print(f"Capture manifest: {label} path escapes root: {path}")
+            return 1
+        if directory and not path.is_dir():
+            print(f"Capture manifest: missing {label}: {path}")
+            return 1
+        if not directory and label != "output" and not path.is_file():
+            print(f"Capture manifest: missing {label}: {path}")
+            return 1
     manifest = {
         "schema_version": 1,
         "id": args.id,
