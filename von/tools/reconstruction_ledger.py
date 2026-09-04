@@ -128,6 +128,19 @@ def validate_lifecycle(
                         and (not isinstance(consumers, list) or unit.get("id") not in consumers)):
                     errors.append(f"{where}: canonical evidence does not name this unit as a consumer")
             elif stage == "byte-validated":
+                evidence_id = unit.get("canonical_evidence_id")
+                if not isinstance(evidence_id, str) or evidence_id not in canonical_ids:
+                    errors.append(f"{where}: byte-validated requires preceding canonical evidence id")
+                else:
+                    registered_entry = canonical_entries[evidence_id]
+                    if registered_entry.get("outcome") != "pass":
+                        errors.append(f"{where}: byte-validated requires passing canonical evidence")
+                    if unit.get("id") not in registered_entry.get("consumers", []):
+                        errors.append(f"{where}: canonical evidence does not name this byte-validation consumer")
+                if not isinstance(unit.get("verifier"), str) or not unit.get("verifier"):
+                    errors.append(f"{where}: byte-validated requires verifier")
+                if not isinstance(unit.get("verification"), dict) or unit["verification"].get("result") != "pass":
+                    errors.append(f"{where}: byte-validated requires verification.result=pass")
                 comparison = unit.get("byte_validation")
                 if not isinstance(comparison, dict):
                     errors.append(f"{where}: byte-validated requires byte validation evidence")

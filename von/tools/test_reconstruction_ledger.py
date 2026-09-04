@@ -60,7 +60,8 @@ def main() -> int:
             }, "byte_validation": {
                 "original_range": "0x100-0x110", "reconstructed_range": "0x20-0x30",
                 "comparison": "match"
-            }},
+            }, "canonical_evidence_id": "capture-v1", "verifier": "verify.py",
+             "verification": {"result": "pass"}},
             {"id": "blocked", "stage": "blocked", "blocked": {
                 "missing_fact": "target", "failed_discriminator": "no event",
                 "next_experiment": "capture call window"
@@ -68,7 +69,7 @@ def main() -> int:
         ]}],
     }
     manifest = {"entries": [{"id": "capture-v1", "canonical": True, "verifier": "verify.py", "outcome": "pass",
-                              "consumers": ["trace"]}]}
+                              "consumers": ["trace", "bytes"]}]}
     assert not validate_lifecycle(lifecycle, manifest)
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][1]["active"] = True
@@ -130,6 +131,11 @@ def main() -> int:
     broken = copy.deepcopy(lifecycle)
     del broken["images"][0]["work_units"][4]["byte_validation"]["reconstructed_range"]
     assert any("reconstructed_range" in error for error in validate_lifecycle(broken, manifest))
+    bypass = copy.deepcopy(lifecycle)
+    for field in ("canonical_evidence_id", "verifier", "verification"):
+        bypass["images"][0]["work_units"][4].pop(field)
+    assert any("byte-validated requires preceding canonical evidence" in error
+               for error in validate_lifecycle(bypass, manifest))
     print("PASS: ledger v1 migration, schema-v2 validation, and union coverage")
     return 0
 
