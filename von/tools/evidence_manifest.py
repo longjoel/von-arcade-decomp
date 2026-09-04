@@ -6,9 +6,13 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
+
+
+SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
 def safe_path(path_text: object) -> bool:
@@ -124,6 +128,9 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                 continue
             if not path.is_file():
                 errors.append(f"{where}: missing artifact {artifact.get('path')}")
+                continue
+            if not isinstance(artifact.get("sha256"), str) or not SHA256_RE.fullmatch(artifact["sha256"]):
+                errors.append(f"{where}: artifact sha256 must be a SHA-256 digest")
                 continue
             digest = hashlib.sha256(path.read_bytes()).hexdigest()
             if digest != artifact.get("sha256"):
