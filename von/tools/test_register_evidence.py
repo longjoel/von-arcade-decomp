@@ -26,7 +26,8 @@ def main() -> int:
             "configuration": {"set": "vonj", "mame_revision": "abc", "patch_profile": "none", "execution_engine": "interpreter"},
             "command": ["mame", "vonj", "-cfg_directory", str(root / "cfg"),
                          "-nvram_directory", str(root / "nvram"),
-                         "-state_directory", str(root / "state")],
+                         "-state_directory", str(root / "state"),
+                         "-seconds_to_run", "1"],
             "isolation": {"cfg_directory": "cfg", "nvram_directory": "nvram", "state_directory": "state"},
             "coverage_report": "summary.json", "inputs": [], "artifacts": [entry(artifact, root)],
         }

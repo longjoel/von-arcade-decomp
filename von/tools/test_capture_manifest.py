@@ -32,7 +32,8 @@ def main() -> int:
             "command": ["mame", "vonj", "-video", "none",
                          "-cfg_directory", str(root / "cfg"),
                          "-nvram_directory", str(root / "nvram"),
-                         "-state_directory", str(root / "state")],
+                         "-state_directory", str(root / "state"),
+                         "-seconds_to_run", "1"],
             "isolation": {"cfg_directory": "cfg", "nvram_directory": "nvram", "state_directory": "state"},
             "inputs": [entry(input_path, root)],
             "artifacts": [entry(artifact_path, root), entry(report_path, root)],
@@ -61,6 +62,9 @@ def main() -> int:
         broken = copy.deepcopy(manifest)
         broken["command"] = []
         assert any("command" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["command"][broken["command"].index("-seconds_to_run") + 1] = "2"
+        assert any("seconds_to_run" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
         broken["command"][broken["command"].index("-cfg_directory") + 1] = str(root / "nvram")
         assert any("does not match isolation.cfg_directory" in error for error in validate(broken, root))

@@ -66,7 +66,8 @@ def main() -> int:
             "configuration": {"set": "vonj", "mame_revision": "abc", "patch_profile": "none", "execution_engine": "interpreter"},
             "command": ["mame", "vonj", "-cfg_directory", str(temp / "cfg"),
                          "-nvram_directory", str(temp / "nvram"),
-                         "-state_directory", str(temp / "state")],
+                         "-state_directory", str(temp / "state"),
+                         "-seconds_to_run", "1"],
             "isolation": {"cfg_directory": "cfg", "nvram_directory": "nvram", "state_directory": "state"},
             "coverage_report": "summary.json", "inputs": [], "artifacts": [entry(summary, temp)],
         }

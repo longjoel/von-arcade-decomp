@@ -154,6 +154,15 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
                     errors.append(f"command {flag} does not match isolation.{field}")
             except (OSError, RuntimeError):
                 errors.append(f"command {flag} has an invalid path")
+    seconds_argument = command_argument("-seconds_to_run")
+    if seconds_argument is None:
+        errors.append("command must declare -seconds_to_run")
+    else:
+        try:
+            if float(seconds_argument) != float(stimulus.get("seconds")):
+                errors.append("command -seconds_to_run does not match stimulus seconds")
+        except (TypeError, ValueError):
+            errors.append("command -seconds_to_run must be numeric")
     for section in ("inputs", "artifacts"):
         items = manifest.get(section, [])
         if not isinstance(items, list):
