@@ -26,10 +26,14 @@ def sha256(path: Path) -> str:
 def directory_sha256(path: Path) -> str:
     """Hash directory contents by sorted relative names and file bytes."""
     digest = hashlib.sha256()
-    for child in sorted(item for item in path.rglob("*") if item.is_file()):
+    for child in sorted(path.rglob("*")):
+        if child.is_symlink():
+            raise ValueError(f"directory entry must not be a symlink: {child}")
+        if not child.is_file():
+            continue
         try:
             child.resolve().relative_to(path.resolve())
-        except ValueError as exc:
+        except (OSError, RuntimeError, ValueError) as exc:
             raise ValueError(f"directory entry escapes root: {child}") from exc
         digest.update(relative(child, path).encode("utf-8"))
         digest.update(b"\0")

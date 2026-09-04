@@ -162,6 +162,10 @@ def main() -> int:
         broken = copy.deepcopy(manifest)
         assert any("invalid isolation.cfg_directory" in error for error in validate(broken, root))
         isolation_link.unlink()
+        isolation_loop = root / "cfg" / "loop"
+        isolation_loop.symlink_to(isolation_loop)
+        assert any("invalid isolation.cfg_directory" in error for error in validate(manifest, root))
+        isolation_loop.unlink()
         causal = copy.deepcopy(manifest)
         causal["stimulus"]["kind"] = "causal-trace"
         causal.pop("coverage_report")
