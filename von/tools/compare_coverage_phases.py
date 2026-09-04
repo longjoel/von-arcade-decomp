@@ -10,6 +10,8 @@ from typing import Any
 
 
 def load_report(path: Path) -> dict[str, Any]:
+    if path.is_symlink():
+        raise ValueError(f"coverage report must not be a symlink: {path}")
     document = json.loads(path.read_text(encoding="utf-8"))
     validate_report(document, str(path))
     return document
@@ -78,10 +80,24 @@ def compare(before: dict[str, Any], after: dict[str, Any]) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--before", type=Path, required=True)
     parser.add_argument("--after", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    root = args.root.resolve()
+    for label, path in (("before", args.before), ("after", args.after), ("output", args.output)):
+        if path.is_symlink():
+            print(f"coverage phase comparison: {label} path must not be a symlink: {path}")
+            return 1
+        try:
+            path.resolve().relative_to(root)
+        except (OSError, RuntimeError, ValueError):
+            print(f"coverage phase comparison: {label} path escapes root: {path}")
+            return 1
+        if label != "output" and not path.is_file():
+            print(f"coverage phase comparison: missing {label} report: {path}")
+            return 1
     try:
         result = compare(load_report(args.before), load_report(args.after))
     except (OSError, json.JSONDecodeError, ValueError) as error:
