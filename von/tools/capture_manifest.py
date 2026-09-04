@@ -27,6 +27,10 @@ def directory_sha256(path: Path) -> str:
     """Hash directory contents by sorted relative names and file bytes."""
     digest = hashlib.sha256()
     for child in sorted(item for item in path.rglob("*") if item.is_file()):
+        try:
+            child.resolve().relative_to(path.resolve())
+        except ValueError as exc:
+            raise ValueError(f"directory entry escapes root: {child}") from exc
         digest.update(relative(child, path).encode("utf-8"))
         digest.update(b"\0")
         with child.open("rb") as stream:
@@ -143,10 +147,16 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
             errors.append(f"missing isolation.{field}")
         elif rooted(root, path) is None or not rooted(root, path).is_dir():
             errors.append(f"missing isolation directory {path}")
-        elif isolation.get(f"{field}_sha256") != directory_sha256(rooted(root, path)):
-            errors.append(f"hash mismatch for isolation.{field}")
         else:
-            isolation_resolved[field] = rooted(root, path).resolve()
+            try:
+                directory_digest = directory_sha256(rooted(root, path))
+            except (OSError, ValueError) as exc:
+                errors.append(f"invalid isolation.{field}: {exc}")
+            else:
+                if isolation.get(f"{field}_sha256") != directory_digest:
+                    errors.append(f"hash mismatch for isolation.{field}")
+                else:
+                    isolation_resolved[field] = rooted(root, path).resolve()
     if len(set(isolation_resolved.values())) != len(isolation_resolved):
         errors.append("isolation directories must be distinct")
     for flag, field in (("-cfg_directory", "cfg_directory"),

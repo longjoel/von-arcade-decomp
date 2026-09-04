@@ -142,6 +142,11 @@ def main() -> int:
         broken = copy.deepcopy(manifest)
         broken["artifacts"] = [{"path": "linked-artifact.txt", "sha256": ""}]
         assert any("missing file" in error for error in validate(broken, root))
+        isolation_link = root / "cfg" / "linked-outside.txt"
+        isolation_link.symlink_to(outside)
+        broken = copy.deepcopy(manifest)
+        assert any("invalid isolation.cfg_directory" in error for error in validate(broken, root))
+        isolation_link.unlink()
         causal = copy.deepcopy(manifest)
         causal["stimulus"]["kind"] = "causal-trace"
         causal.pop("coverage_report")
