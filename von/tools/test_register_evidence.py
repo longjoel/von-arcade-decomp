@@ -125,6 +125,17 @@ def main() -> int:
         )
         assert cli_result.returncode == 1
         assert "manifest path escapes root" in cli_result.stdout
+        malformed_capture = root / "malformed-capture.json"
+        malformed_capture.write_text("{invalid\n", encoding="utf-8")
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--manifest", str(manifest_path),
+             "--capture-manifest", str(malformed_capture), "--verifier", "verify.py",
+             "--description", "description", "--consumer", "unit-1", "--root", str(root),
+             "--ledger", str(ledger_path)],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "unable to read registration document" in cli_result.stdout
         assert any("non-empty string array" in error for error in register(
             {"schema_version": 1, "entries": []}, capture, capture_path, "scalar consumer", "verify.py",
             "unit-1", root, ledger))

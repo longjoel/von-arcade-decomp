@@ -153,9 +153,13 @@ def main() -> int:
         if not path.is_file():
             print(f"Evidence registration: missing {label}: {path}")
             return 1
-    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-    capture = json.loads(args.capture_manifest.read_text(encoding="utf-8"))
-    ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
+    try:
+        manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+        capture = json.loads(args.capture_manifest.read_text(encoding="utf-8"))
+        ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as error:
+        print(f"Evidence registration: unable to read registration document: {error}")
+        return 1
     errors = register(
         manifest, capture, args.capture_manifest, args.description,
         args.verifier, args.consumer, root, ledger,
