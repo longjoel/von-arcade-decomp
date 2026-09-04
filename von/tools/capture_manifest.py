@@ -105,8 +105,8 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
         errors.append("configuration must be an object")
         configuration = {}
     for field in ("set", "mame_revision", "patch_profile", "execution_engine"):
-        if not configuration.get(field):
-            errors.append(f"missing configuration.{field}")
+        if not isinstance(configuration.get(field), str) or not configuration.get(field):
+            errors.append(f"configuration.{field} must be a non-empty string")
     command = manifest.get("command")
     if not isinstance(command, list) or not command or not all(isinstance(item, str) and item for item in command):
         errors.append("command must be a non-empty string array")

@@ -146,6 +146,10 @@ def main() -> int:
         broken["configuration"] = []
         assert any("configuration must be an object" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
+        broken["configuration"]["mame_revision"] = ["abc"]
+        assert any("configuration.mame_revision must be a non-empty string" in error
+                   for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
         broken["isolation"] = []
         assert any("isolation must be an object" in error for error in validate(broken, root))
         outside = root.parent / "outside-capture-fixture.txt"
