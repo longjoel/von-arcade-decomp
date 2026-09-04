@@ -199,6 +199,12 @@ def main() -> int:
         isolation_loop.symlink_to(isolation_loop)
         assert any("invalid isolation.cfg_directory" in error for error in validate(manifest, root))
         isolation_loop.unlink()
+        isolation_directory_link = root / "linked-cfg-directory"
+        isolation_directory_link.symlink_to(root / "cfg", target_is_directory=True)
+        broken = copy.deepcopy(manifest)
+        broken["isolation"]["cfg_directory"] = "linked-cfg-directory"
+        assert any("missing isolation directory" in error
+                   for error in validate(broken, root))
         causal = copy.deepcopy(manifest)
         causal["stimulus"]["kind"] = "causal-trace"
         causal.pop("coverage_report")

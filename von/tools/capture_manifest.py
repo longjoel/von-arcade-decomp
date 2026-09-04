@@ -152,20 +152,22 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
     isolation_resolved: dict[str, Path] = {}
     for field in ("cfg_directory", "nvram_directory", "state_directory"):
         path = isolation.get(field)
+        resolved_path = rooted(root, path) if safe_path(path) else None
         if not safe_path(path) or not path:
             errors.append(f"missing isolation.{field}")
-        elif rooted(root, path) is None or not rooted(root, path).is_dir():
+        elif (resolved_path is None or resolved_path.is_symlink()
+              or not resolved_path.is_dir()):
             errors.append(f"missing isolation directory {path}")
         else:
             try:
-                directory_digest = directory_sha256(rooted(root, path))
+                directory_digest = directory_sha256(resolved_path)
             except (OSError, ValueError) as exc:
                 errors.append(f"invalid isolation.{field}: {exc}")
             else:
                 if isolation.get(f"{field}_sha256") != directory_digest:
                     errors.append(f"hash mismatch for isolation.{field}")
                 else:
-                    isolation_resolved[field] = rooted(root, path).resolve()
+                    isolation_resolved[field] = resolved_path.resolve()
     if len(set(isolation_resolved.values())) != len(isolation_resolved):
         errors.append("isolation directories must be distinct")
     for flag, field in (("-cfg_directory", "cfg_directory"),
