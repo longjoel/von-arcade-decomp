@@ -7,6 +7,12 @@ from evidence_metrics import metrics
 
 
 def main() -> int:
+    try:
+        metrics([], {}, {}, {})
+    except ValueError as error:
+        assert "ledger input" in str(error)
+    else:
+        raise AssertionError("malformed ledger input was accepted")
     report = metrics(
         {"images": [{"work_units": [
             {"stage": "modeled"}, {"stage": "integrated"}, {"stage": "trace-validated"},

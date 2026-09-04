@@ -11,11 +11,22 @@ from typing import Any
 
 
 def load(path: Path | None) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8")) if path else {}
+    if path is None:
+        return {}
+    document = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(document, dict):
+        raise ValueError(f"metrics input must be an object: {path}")
+    return document
 
 
 def metrics(ledger: dict[str, Any], worklist: dict[str, Any], coverage: dict[str, Any],
             comparison: dict[str, Any], experiments: dict[str, Any] | None = None) -> dict[str, Any]:
+    for name, document in (("ledger", ledger), ("worklist", worklist),
+                           ("coverage", coverage), ("comparison", comparison)):
+        if not isinstance(document, dict):
+            raise ValueError(f"metrics {name} input must be an object")
+    if experiments is not None and not isinstance(experiments, dict):
+        raise ValueError("metrics experiments input must be an object")
     stages = Counter(
         unit.get("stage") for image in ledger.get("images", [])
         for unit in image.get("work_units", [])
@@ -66,8 +77,12 @@ def main() -> int:
     parser.add_argument("--experiments", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    report = metrics(load(args.ledger), load(args.worklist), load(args.coverage),
-                     load(args.comparison), load(args.experiments))
+    try:
+        report = metrics(load(args.ledger), load(args.worklist), load(args.coverage),
+                         load(args.comparison), load(args.experiments))
+    except (OSError, json.JSONDecodeError, ValueError) as error:
+        print(f"Evidence metrics: {error}")
+        return 1
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(f"Evidence metrics: {args.output}")
