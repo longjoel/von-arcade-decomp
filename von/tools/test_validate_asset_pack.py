@@ -53,6 +53,9 @@ def main() -> int:
         broken["assets"][0]["status"] = "verified"
         assert any("invalid status" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
+        broken["assets"][0]["media_type"] = "unknown-media"
+        assert any("unsupported media_type" in error for error in validate(broken, evidence, root))
+        broken = copy.deepcopy(pack)
         broken["assets"][0]["claims"]["identity"] = True
         assert any("claim/status vocabulary" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)

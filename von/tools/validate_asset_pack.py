@@ -17,6 +17,7 @@ CLAIM_NAMES = {
     "geometry", "source_ranges", "transform_association", "identity", "textures",
     "hierarchy", "animation", "audio_descriptor", "audio_sequence", "source_bytes",
 }
+MEDIA_TYPES = {"model", "texture", "audio-sample", "audio-sequence", "video", "image"}
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
@@ -106,6 +107,8 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         for field in ("media_type", "payload", "sha256"):
             if not asset.get(field):
                 errors.append(f"{where}: missing {field}")
+        if asset.get("media_type") not in MEDIA_TYPES:
+            errors.append(f"{where}: unsupported media_type {asset.get('media_type')!r}")
         status = asset.get("status")
         if status not in STATUSES:
             errors.append(f"{where}: invalid status {status!r}")
