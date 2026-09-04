@@ -48,6 +48,9 @@ def main() -> int:
     broken = json.loads(json.dumps(manifest))
     broken["entries"][0]["consumers"] = ["maincpu.opcode-0b-vector-service"] * 2
     assert any("existing ledger consumers" in error for error in validate(broken, ledger, root))
+    broken = json.loads(json.dumps(manifest))
+    broken["entries"][0]["configuration"] = []
+    assert any("configuration must be an object" in error for error in validate(broken, ledger, root))
     with tempfile.TemporaryDirectory() as directory:
         temp = Path(directory)
         for name in ("cfg", "nvram", "state"):

@@ -109,6 +109,9 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                         sidecar_errors = [f"unable to read capture manifest: {exc}"]
                     errors.extend(f"{where}: {error}" for error in sidecar_errors)
         configuration = entry.get("configuration", {})
+        if not isinstance(configuration, dict):
+            errors.append(f"{where}: configuration must be an object")
+            configuration = {}
         required_configuration = ("mame_revision", "patch_profile", "execution_engine")
         if stimulus.get("kind") in {"input-free-attract", "bounded-trace", "causal-trace"}:
             required_configuration = ("set",) + required_configuration
