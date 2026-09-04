@@ -108,7 +108,8 @@ def validate_lifecycle(
 
     def validate_evidence_checkpoint(where: str, unit: dict[str, Any],
                                      evidence_entry: dict[str, Any]) -> None:
-        checkpoint = unit.get("integration", {}).get("checkpoint")
+        integration = unit.get("integration")
+        checkpoint = integration.get("checkpoint") if isinstance(integration, dict) else None
         checkpoints = evidence_entry.get("checkpoints")
         if not isinstance(checkpoints, list) or checkpoint not in checkpoints:
             errors.append(f"{where}: canonical evidence does not declare integration checkpoint")

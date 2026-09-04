@@ -147,6 +147,10 @@ def main() -> int:
     del broken["images"][0]["work_units"][3]["modeling"]
     assert any("preceding modeling" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][3]["integration"] = []
+    assert any("requires preceding integration evidence" in error
+               for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][3]["modeling"].pop("boundary")
     assert any("trace-validated requires modeling.boundary" in error
                for error in validate_lifecycle(broken, manifest))
