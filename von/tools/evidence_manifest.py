@@ -155,6 +155,7 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
         artifacts = entry.get("artifacts", [])
         if not isinstance(artifacts, list) or not artifacts:
             errors.append(f"{where}: no artifacts")
+        all_declared_paths: set[Path] = set()
         for section, items in (("inputs", inputs), ("artifacts", artifacts if isinstance(artifacts, list) else [])):
             seen_paths: set[Path] = set()
             for artifact in items:
@@ -170,6 +171,10 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
                     errors.append(f"{where}: duplicate {section[:-1]} {artifact['path']}")
                     continue
                 seen_paths.add(resolved_path)
+                if resolved_path in all_declared_paths:
+                    errors.append(f"{where}: file is declared in multiple sections {artifact['path']}")
+                    continue
+                all_declared_paths.add(resolved_path)
                 if not path.is_file():
                     errors.append(f"{where}: missing {section[:-1]} {artifact.get('path')}")
                     continue

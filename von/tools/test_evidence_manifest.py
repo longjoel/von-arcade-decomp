@@ -47,6 +47,9 @@ def main() -> int:
     broken["entries"][0]["artifacts"] = broken["entries"][0]["artifacts"] * 2
     assert any("duplicate artifact" in error for error in validate(broken, ledger, root))
     broken = json.loads(json.dumps(manifest))
+    broken["entries"][0]["inputs"] = [copy for copy in broken["entries"][0]["artifacts"]]
+    assert any("multiple sections" in error for error in validate(broken, ledger, root))
+    broken = json.loads(json.dumps(manifest))
     broken["entries"] = ["malformed"]
     assert any("entry must be an object" in error for error in validate(broken, ledger, root))
     broken = json.loads(json.dumps(manifest))
