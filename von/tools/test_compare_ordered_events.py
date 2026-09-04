@@ -238,6 +238,16 @@ def main() -> int:
             assert "no hashed artifact declaration" in str(error)
         else:
             raise AssertionError("undeclared comparison provenance was accepted")
+        symlinked_original = Path(directory) / "symlinked-original.ndjson.gz"
+        symlinked_original.symlink_to(compressed_original)
+        try:
+            event_artifact_provenance(
+                {"artifacts": [{"path": "symlinked-original.ndjson.gz", "sha256": original_digest}]},
+                symlinked_original, Path(directory))
+        except ValueError as error:
+            assert "must not be a symlink" in str(error)
+        else:
+            raise AssertionError("symlinked comparison provenance was accepted")
         compressed_original.write_bytes(b"not gzip")
         try:
             load_events(compressed_original)
