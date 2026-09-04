@@ -137,8 +137,15 @@ def validate_lifecycle(
                         errors.append(f"{where}: byte-validated requires passing canonical evidence")
                     if unit.get("id") not in registered_entry.get("consumers", []):
                         errors.append(f"{where}: canonical evidence does not name this byte-validation consumer")
-                if not isinstance(unit.get("verifier"), str) or not unit.get("verifier"):
+                    if registered_entry.get("verifier") != unit.get("verifier"):
+                        errors.append(f"{where}: verifier differs from canonical evidence entry")
+                verifier = unit.get("verifier")
+                if not isinstance(verifier, str) or not verifier:
                     errors.append(f"{where}: byte-validated requires verifier")
+                elif not safe_reference(verifier):
+                    errors.append(f"{where}: verifier must be a safe relative path")
+                elif not existing_reference(verifier):
+                    errors.append(f"{where}: missing verifier {verifier}")
                 if not isinstance(unit.get("verification"), dict) or unit["verification"].get("result") != "pass":
                     errors.append(f"{where}: byte-validated requires verification.result=pass")
                 comparison = unit.get("byte_validation")
