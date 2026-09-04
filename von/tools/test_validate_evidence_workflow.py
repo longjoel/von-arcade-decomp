@@ -75,6 +75,18 @@ def main() -> int:
         errors = validate_workflow(root, root / "von/reconstruction_ledger.json", unsafe_path,
                                    run_verifiers=True)
         assert any("skipped: unsafe" in error for error in errors)
+    missing_pack = root / "von/build/missing-pack.json"
+    errors = validate_workflow(
+        root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
+        asset_pack_path=missing_pack)
+    assert any("missing pack manifest" in error for error in errors)
+    with tempfile.TemporaryDirectory(dir=root) as directory:
+        linked_pack = Path(directory) / "linked-pack.json"
+        linked_pack.symlink_to(root / "von/evidence/manifest.json")
+        errors = validate_workflow(
+            root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
+            asset_pack_path=linked_pack)
+        assert any("must not be a symlink" in error for error in errors)
     print("PASS: combined evidence workflow gates ledger and lifecycle validation")
     return 0
 

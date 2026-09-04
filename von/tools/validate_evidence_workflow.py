@@ -43,10 +43,25 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
     if strict_lifecycle:
         errors.extend(f"lifecycle: {error}" for error in validate_lifecycle(ledger, evidence, root))
     if asset_pack_path:
-        pack = load(asset_pack_path)
-        errors.extend(f"asset-pack: {error}" for error in validate_pack(
-            pack, evidence, root, rom_manifest_path, expected_tool_revision,
-            expected_map_revision))
+        if asset_pack_path.is_symlink():
+            errors.append(f"asset-pack: pack path must not be a symlink: {asset_pack_path}")
+        else:
+            try:
+                asset_pack_path.resolve().relative_to(root.resolve())
+            except (OSError, RuntimeError, ValueError):
+                errors.append(f"asset-pack: pack path escapes root: {asset_pack_path}")
+            else:
+                if not asset_pack_path.is_file():
+                    errors.append(f"asset-pack: missing pack manifest: {asset_pack_path}")
+                else:
+                    try:
+                        pack = load(asset_pack_path)
+                    except (OSError, ValueError) as error:
+                        errors.append(f"asset-pack: unable to read pack manifest: {error}")
+                    else:
+                        errors.extend(f"asset-pack: {error}" for error in validate_pack(
+                            pack, evidence, root, rom_manifest_path, expected_tool_revision,
+                            expected_map_revision))
     if check_generated:
         if not all((generated_coverage_path, generated_worklist_path, generated_status_path)):
             errors.append("generated checks require coverage, worklist, and status paths")
