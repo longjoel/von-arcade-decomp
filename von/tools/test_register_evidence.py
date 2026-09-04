@@ -41,6 +41,12 @@ def main() -> int:
         capture_path.write_text(json.dumps(capture) + "\n", encoding="utf-8")
         manifest = {"schema_version": 1, "entries": []}
         ledger = {"images": [{"work_units": [{"id": "unit-1"}]}]}
+        assert "evidence manifest must be an object" in register([], capture, capture_path,
+                                                               "bad", "verify.py", ["unit-1"], root, ledger)[0]
+        assert "schema_version" in register({"schema_version": 2, "entries": []}, capture,
+                                              capture_path, "bad", "verify.py", ["unit-1"], root, ledger)[0]
+        assert "entries" in register({"schema_version": 1, "entries": {}}, capture,
+                                       capture_path, "bad", "verify.py", ["unit-1"], root, ledger)[0]
         assert not register(manifest, capture, capture_path, "pilot capture", "verify.py", ["unit-1"], root, ledger)
         assert manifest["entries"][0]["canonical"] is True
         assert manifest["entries"][0]["capture_manifest"] == "capture.json"
@@ -52,26 +58,27 @@ def main() -> int:
         mismatched_capture = copy.deepcopy(capture)
         mismatched_capture["objective"] = "different"
         assert any("differs from on-disk" in error for error in register(
-            {}, mismatched_capture, capture_path, "mismatch", "verify.py", ["unit-1"], root))
+            {"schema_version": 1, "entries": []}, mismatched_capture, capture_path,
+            "mismatch", "verify.py", ["unit-1"], root))
         partially_invalid = {"images": [{"work_units": [
             {"id": "unit-1"}, {"id": "unit-2", "evidence": "invalid"}
         ]}]}
         before = copy.deepcopy(partially_invalid)
         assert any("invalid evidence list" in error for error in register(
-            {}, capture, capture_path, "partial", "verify.py", ["unit-1", "unit-2"],
+            {"schema_version": 1, "entries": []}, capture, capture_path, "partial", "verify.py", ["unit-1", "unit-2"],
             root, partially_invalid))
         assert partially_invalid == before
         assert any("consumers must be unique" in error for error in register(
-            {}, capture, capture_path, "duplicate consumers", "verify.py",
+            {"schema_version": 1, "entries": []}, capture, capture_path, "duplicate consumers", "verify.py",
             ["unit-1", "unit-1"], root, ledger))
         broken = copy.deepcopy(manifest)
         assert register(broken, capture, capture_path, "duplicate", "verify.py", ["unit-1"], root)
-        assert "unknown ledger consumers" in register({}, capture, root / "capture.json", "unknown", "verify.py", ["missing"], root, ledger)[0]
-        assert "missing verifier" in register({}, capture, root / "capture.json", "unsafe", "../verify.py", ["unit-1"], root, ledger)[0]
+        assert "unknown ledger consumers" in register({"schema_version": 1, "entries": []}, capture, root / "capture.json", "unknown", "verify.py", ["missing"], root, ledger)[0]
+        assert "missing verifier" in register({"schema_version": 1, "entries": []}, capture, root / "capture.json", "unsafe", "../verify.py", ["unit-1"], root, ledger)[0]
         outside = root.parent / "outside-verifier.py"
         outside.write_text("# outside\n", encoding="utf-8")
         (root / "linked-verify.py").symlink_to(outside)
-        assert "missing verifier" in register({}, capture, capture_path, "linked", "linked-verify.py", ["unit-1"], root, ledger)[0]
+        assert "missing verifier" in register({"schema_version": 1, "entries": []}, capture, capture_path, "linked", "linked-verify.py", ["unit-1"], root, ledger)[0]
     print("PASS: canonical evidence registration validates and deduplicates")
     return 0
 

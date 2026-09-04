@@ -19,6 +19,13 @@ def register(
     manifest: dict, capture: dict, capture_path: Path, description: str,
     verifier: str, consumers: list[str], root: Path, ledger: dict | None = None,
 ) -> list[str]:
+    if not isinstance(manifest, dict):
+        return ["evidence manifest must be an object"]
+    if manifest.get("schema_version") != 1:
+        return ["evidence manifest schema_version must be 1"]
+    entries = manifest.get("entries")
+    if not isinstance(entries, list):
+        return ["evidence manifest entries must be an array"]
     errors = validate_capture(capture, root)
     if errors:
         return [f"capture: {error}" for error in errors]
@@ -35,7 +42,6 @@ def register(
         return [f"unable to read capture manifest {capture_path}: {exc}"]
     if stored_capture != capture:
         return ["capture manifest argument differs from on-disk sidecar"]
-    entries = manifest.setdefault("entries", [])
     if any(entry.get("id") == capture_id for entry in entries):
         return [f"duplicate evidence id {capture_id}"]
     verifier_path = rooted(root, verifier)
