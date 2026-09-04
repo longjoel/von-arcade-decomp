@@ -87,6 +87,9 @@ def validate_lifecycle(
                 registered_verifier = canonical_entries.get(evidence_id, {}).get("verifier")
                 if registered_verifier and registered_verifier != verifier:
                     errors.append(f"{where}: verifier differs from canonical evidence entry")
+                verification = unit.get("verification")
+                if not isinstance(verification, dict) or verification.get("result") != "pass":
+                    errors.append(f"{where}: trace-validated requires verification.result=pass")
                 consumers = canonical_entries.get(evidence_id, {}).get("consumers", [])
                 if evidence_id in canonical_ids and unit.get("id") not in consumers:
                     errors.append(f"{where}: canonical evidence does not name this unit as a consumer")

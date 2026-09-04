@@ -51,7 +51,8 @@ def main() -> int:
             }, "integration": {
                 "image": "build/image.bin", "checkpoint": "startup", "test": "test.py"
             },
-             "canonical_evidence_id": "capture-v1", "verifier": "verify.py"},
+             "canonical_evidence_id": "capture-v1", "verifier": "verify.py",
+             "verification": {"result": "pass"}},
             {"id": "bytes", "stage": "byte-validated", "modeling": {
                 "boundary": "ROM", "test": "test.py", "unresolved_behavior": "none"
             }, "integration": {
@@ -97,6 +98,9 @@ def main() -> int:
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][3]["id"] = "unregistered-consumer"
     assert any("does not name this unit" in error for error in validate_lifecycle(broken, manifest))
+    broken = copy.deepcopy(lifecycle)
+    broken["images"][0]["work_units"][3]["verification"]["result"] = "fail"
+    assert any("verification.result=pass" in error for error in validate_lifecycle(broken, manifest))
     broken = copy.deepcopy(lifecycle)
     broken["images"][0]["work_units"][4]["byte_validation"]["comparison"] = "mismatch"
     assert any("must be match" in error for error in validate_lifecycle(broken, manifest))
