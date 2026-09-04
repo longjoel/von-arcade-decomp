@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from evidence_manifest import validate as validate_evidence
+from evidence_manifest import rooted, validate as validate_evidence
 from reconstruction_ledger import load, validate as validate_ledger, validate_lifecycle
 from validate_asset_pack import validate as validate_pack
 
@@ -26,7 +26,11 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
         for entry in evidence.get("entries", []):
             if not entry.get("canonical") or not entry.get("verifier"):
                 continue
-            completed = subprocess.run([sys.executable, entry["verifier"]], cwd=root,
+            verifier = rooted(root, entry["verifier"])
+            if verifier is None or not verifier.is_file():
+                errors.append(f"verifier {entry.get('id', '?')} skipped: unsafe or missing path")
+                continue
+            completed = subprocess.run([sys.executable, str(verifier)], cwd=root,
                                        capture_output=True, text=True, check=False)
             if completed.returncode:
                 detail = completed.stderr.strip() or completed.stdout.strip()
