@@ -4769,8 +4769,13 @@
               "end": "0x0009db3c"
             }
           ],
-          "symbol": "recovered_geometry_command19_third_plan",
-          "notes": "Recovers the third mirrored initial packet, +0x1df/+0x13a branch conditions, 0x562ca4/0x562c98 side effects, payload variants, and helper/display calls."
+        "symbol": "recovered_geometry_command19_third_plan",
+        "notes": "Recovers the third mirrored initial packet, +0x1df/+0x13a branch conditions, 0x562ca4/0x562c98 side effects, payload variants, and helper/display calls.",
+        "modeling": {
+          "boundary": "i960 0x9d9a0 third mirrored command-19 branch plan covering initial/follow-up packets, object-flag/countdown routing, helper/display calls, and rearm counter transitions",
+          "test": "von/tools/test_recovered_geometry_command19_branch_9d9a0.py",
+          "unresolved_behavior": "actual FIFO writes, helper/display execution, persistent counter/object-memory writes, and downstream third-branch consumers remain outside the pure branch plan"
+        }
         },
         {
           "id": "maincpu.geometry-third-state-packets-9db3c",
