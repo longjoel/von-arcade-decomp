@@ -10987,6 +10987,11 @@
             }
           ],
           "symbol": "recovered_text_status_string_plan",
+          "modeling": {
+            "boundary": "SHARC status-string classifier scans after the first byte, selects glyph mode 0 for lowercase content, selects mode 1 otherwise, and preserves mode 1 for empty strings",
+            "test": "von/tools/test_recovered_text_status_string.py",
+            "unresolved_behavior": "per-character rendering calls and downstream panel ownership remain outside the pure classifier contract"
+          },
           "notes": "Recovers the lowercase scan after the first byte: lowercase selects glyph mode 0, otherwise mode 1; an empty string emits no characters and retains mode 1. Per-character calls into 0x1d310 remain outside the pure classifier."
         },
         {
