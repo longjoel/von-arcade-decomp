@@ -8,6 +8,8 @@ import json
 import math
 from pathlib import Path
 
+from capture_manifest import validate as validate_capture_manifest
+
 
 STATUSES = ("legacy-unreviewed", "candidate", "observed", "validated",
             "rejected", "reference-capture")
@@ -149,6 +151,12 @@ def main() -> int:
                     capture_document = json.loads(capture.read_text(encoding="utf-8"))
                     if not isinstance(capture_document, dict):
                         print(f"Asset catalog: capture manifest must be an object: {capture}")
+                        return 1
+                    capture_errors = validate_capture_manifest(capture_document, capture.parent)
+                    if capture_errors:
+                        print(f"Asset catalog: invalid capture manifest: {capture}")
+                        for error in capture_errors:
+                            print(f"- {error}")
                         return 1
                     if capture_document.get("id") != evidence_document["id"]:
                         print(f"Asset catalog: capture manifest id does not match evidence: {capture}")
