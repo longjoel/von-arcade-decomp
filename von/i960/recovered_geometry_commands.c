@@ -72,13 +72,23 @@ void recovered_geometry_function_command_submit(volatile const u16 *source,
 }
 
 /* Recovered from 0x28c00. This path streams 32-bit units, unlike 0x28e88. */
+void recovered_geometry_batch_command_header(u32 command, u32 count,
+                                             u32 output[2])
+{
+    output[0] = command & 0xffffU;
+    output[1] = count;
+}
+
 void recovered_geometry_batch_command_submit(volatile const u32 *source,
                                               u32 command,
                                               u32 count)
 {
+    u32 header[2];
+
     GEO_COMMAND_WINDOW[0x140 / 4] = 0x00001414U;
-    *GEO_PROGRAM_PORT = command & 0xffffU;
-    *GEO_PROGRAM_PORT = count;
+    recovered_geometry_batch_command_header(command, count, header);
+    *GEO_PROGRAM_PORT = header[0];
+    *GEO_PROGRAM_PORT = header[1];
 
     while (count-- != 0)
         *GEO_PROGRAM_PORT = *source++;

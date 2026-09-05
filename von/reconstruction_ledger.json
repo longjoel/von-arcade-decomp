@@ -5581,6 +5581,11 @@
             }
           ],
           "symbol": "recovered_geometry_batch_command_submit",
+          "modeling": {
+            "boundary": "Models the batch-submit FIFO header: mask the command to 16 bits, then emit the declared 32-bit word count before the ordered source stream",
+            "test": "von/tools/test_recovered_geometry_batch_command_header.py",
+            "unresolved_behavior": "FIFO MMIO timing, source-buffer ownership, device consumption, completion polling, and downstream geometry effects remain outside this host-testable header contract"
+          },
           "notes": "Recovered production C preserves the 32-bit command stream and FIFO writes. A standalone candidate previously matched 24/120 bytes; byte validation is blocked on compiler/ABI calibration.",
           "milestones": {
             "c-only-i960-attract-60s": {
