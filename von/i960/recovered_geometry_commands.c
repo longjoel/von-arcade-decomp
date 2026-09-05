@@ -137,6 +137,27 @@ void recovered_geometry_buffer_and_batch_chain(void)
 
 /* Recovered caller sequence at 0x28d80. The mode value is saved in r4 by the
  * ROM and gates the two conditional setup groups. */
+u32 recovered_geometry_pipeline_startup_plan(u32 mode, u32 steps[11])
+{
+    u32 count = 0U;
+
+    steps[count++] = 1U; /* profile setup */
+    if (mode == 0U) {
+        steps[count++] = 2U; /* SHARC bootstrap upload */
+        steps[count++] = 3U; /* geometry program upload */
+    }
+    steps[count++] = 4U; /* fixed-register clear */
+    steps[count++] = 5U; /* texture tables */
+    steps[count++] = 6U; /* command-window clear */
+    steps[count++] = 7U; /* command-table copy */
+    steps[count++] = 8U; /* initial handshake */
+    if (mode == 0U)
+        steps[count++] = 9U; /* auxiliary submit */
+    steps[count++] = 10U; /* geometry buffer and batch chain */
+    steps[count++] = 11U; /* publish ready state */
+    return count;
+}
+
 void recovered_geometry_pipeline_startup(u32 mode)
 {
     recovered_geometry_profile_setup();

@@ -5715,6 +5715,11 @@
             }
           ],
           "symbol": "recovered_geometry_pipeline_startup",
+          "modeling": {
+            "boundary": "Models the 0x28d80 startup order and mode gate: profile setup, optional SHARC/program uploads and auxiliary submit for mode zero, fixed setup, geometry batch chain, and ready-state publication",
+            "test": "von/tools/test_recovered_geometry_pipeline_startup_plan.py",
+            "unresolved_behavior": "MMIO/device timing, upload payload provenance, geometry completion polling, live mapped-memory ownership, and runtime INIT checkpoint evidence remain outside this host-testable order plan"
+          },
           "notes": "Production C preserves the 0x28d80 mode gate and exact helper order: profile setup; conditional SHARC and geometry uploads; command/window, texture, and initial-handshake setup; conditional texture/auxiliary submission; geometry buffer preparation/submission; then the 0xffff state store. Direct zero-mode invocation now reaches INIT with a live heartbeat after the reconstructed startup initializes the i960 register-stack spill area. Byte validation is blocked on compiler/ABI calibration.",
           "milestones": {
             "c-only-i960-attract-60s": {
