@@ -11,7 +11,8 @@ def main():
     with tempfile.TemporaryDirectory() as temp:
         root = Path(temp); assets = root / "public/assets"; assets.mkdir(parents=True)
         (assets / "model.gltf").write_text(json.dumps({"asset": {"version": "2.0"}, "nodes": [{}], "meshes": [{}]}))
-        (assets / "evidence.json").write_text(json.dumps({"id": "capture-v1", "canonical": True}), encoding="utf-8")
+        (assets / "evidence.json").write_text(json.dumps({"id": "capture-v1", "canonical": True,
+                                                          "outcome": "pass"}), encoding="utf-8")
         manifest = root / "manifest.json"; output = root / "catalog.json"
         manifest.write_text(json.dumps({"assets": [{"id": "model", "displayName": "Model", "category": "props",
             "status": "candidate", "path": "/assets/model.gltf", "sourceTrace": "trace"}]}))
@@ -50,6 +51,20 @@ def main():
              "--output", output, "--root", root], capture_output=True, text=True, check=False)
         assert result.returncode == 1
         assert "missing evidencePath for status 'observed'" in result.stdout
+        manifest.write_text(json.dumps({"assets": [
+            {"id": "model", "displayName": "Model", "category": "props",
+             "status": "observed", "path": "/assets/model.gltf", "sourceTrace": "trace",
+             "evidencePath": "/assets/evidence.json"},
+        ]}))
+        (assets / "evidence.json").write_text(json.dumps({"id": "capture-v1", "canonical": False,
+                                                          "outcome": "pass"}), encoding="utf-8")
+        result = subprocess.run(
+            ["python3", TOOL, "--manifest", manifest, "--asset-root", root / "public",
+             "--output", output, "--root", root], capture_output=True, text=True, check=False)
+        assert result.returncode == 1
+        assert "evidence must be canonical" in result.stdout
+        (assets / "evidence.json").write_text(json.dumps({"id": "capture-v1", "canonical": True,
+                                                          "outcome": "pass"}), encoding="utf-8")
         manifest.write_text(json.dumps({"assets": [
             {"id": "model", "displayName": "Model", "category": "props",
              "status": "candidate", "path": "/assets/model.gltf", "sourceTrace": "trace"},
