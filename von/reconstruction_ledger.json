@@ -4880,9 +4880,14 @@
               "end": "0x0001cf40"
             }
           ],
-          "symbol": "recovered_text_alt_glyph_plan",
-          "notes": "Recovers the alternate two-row glyph sinks' seven-bit normalization, 96-entry clamp, row offsets, optional 0xc000 attribute mask, and column <= 30 increment boundary. Mapped glyph data bytes remain outside the pure write-plan slice.",
-          "milestones": {
+        "symbol": "recovered_text_alt_glyph_plan",
+        "notes": "Recovers the alternate two-row glyph sinks' seven-bit normalization, 96-entry clamp, row offsets, optional 0xc000 attribute mask, and column <= 30 increment boundary. Mapped glyph data bytes remain outside the pure write-plan slice.",
+        "modeling": {
+          "boundary": "i960 0x1ce00 alternate two-row glyph plan covering seven-bit normalization, 96-entry clamp, row tile offsets, optional attribute mask, and column increment boundary",
+          "test": "von/tools/test_recovered_text_alt_glyph.py",
+          "unresolved_behavior": "mapped glyph-data bytes, actual plane-memory writes, caller-provided row/column state, and downstream text consumers remain outside the pure write plan"
+        },
+        "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
                 "0x0001ce00",
