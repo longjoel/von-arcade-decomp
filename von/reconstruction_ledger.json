@@ -3295,7 +3295,12 @@
             }
           ],
           "symbol": "recovered_rom_signature_compare_2040",
-          "notes": "Exact four-byte comparison against signatures SEGA and S32A; returns one on either match and zero otherwise."
+          "notes": "Exact four-byte comparison against signatures SEGA and S32A; returns one on either match and zero otherwise.",
+          "modeling": {
+            "boundary": "i960 0x2040 four-byte ROM signature predicate accepting exactly SEGA or S32A",
+            "test": "von/tools/test_recovered_rom_signature_compare_2040.py",
+            "unresolved_behavior": "the caller's use of the signature result and any ROM access timing remain outside the pure comparison contract"
+          }
         },
         {
           "id": "maincpu.video-upload-20390-panel17",
