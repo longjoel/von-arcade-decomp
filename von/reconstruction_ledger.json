@@ -4391,8 +4391,13 @@
               "end": "0x0002422c"
             }
           ],
-          "symbol": "recovered_geometry_clip_calls_plan",
-          "notes": "Recovers frame/control writes and four raw 0x701a0 call tuples, including the runtime-derived word and fourth-call g0 dependency; later command-6 phases remain unresolved."
+        "symbol": "recovered_geometry_clip_calls_plan",
+        "notes": "Recovers frame/control writes and four raw 0x701a0 call tuples, including the runtime-derived word and fourth-call g0 dependency; later command-6 phases remain unresolved.",
+        "modeling": {
+          "boundary": "i960 0x240dc geometry clip-call plan covering frame/control publication and four raw 0x701a0 argument tuples with explicit derived-word and fourth-call inputs",
+          "test": "von/tools/test_recovered_geometry_clip_calls_240dc.py",
+          "unresolved_behavior": "derivation of the runtime clip word, actual helper/FIFO execution, later command-6 phases, and downstream geometry effects remain outside the call-tuple plan"
+        }
         },
         {
           "id": "maincpu.geometry-object-response-selector-24460",
