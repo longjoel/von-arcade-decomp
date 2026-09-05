@@ -3798,7 +3798,12 @@
             }
           ],
           "symbol": "recovered_status_mid_latch_route_plan",
-          "notes": "Recovers latch 9-20 generator masking/state updates, source 0x02feab34 0x1de00 0x40x4 render, row 4*latch-36, and latch-9 special handoff."
+          "notes": "Recovers latch 9-20 generator masking/state updates, source 0x02feab34 0x1de00 0x40x4 render, row 4*latch-36, and latch-9 special handoff.",
+          "modeling": {
+            "boundary": "i960 0x219a8 mid-latch selection, masked generator/state transition, and fixed 0x40-by-4 upload descriptor",
+            "test": "von/tools/test_recovered_status_mid_latch_route.py",
+            "unresolved_behavior": "actual state writes, special latch-9 handoff, and downstream 0x1de00 upload effects remain outside the pure route plan"
+          }
         },
         {
           "id": "maincpu.status-upper-latch-routes-21a1c",
