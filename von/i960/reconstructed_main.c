@@ -127,7 +127,11 @@ static void recovered_render_sega_logo(void)
 
 void i960_reconstructed_main(void)
 {
-    volatile u32 *const state = WORKRAM + 0x20;
+    /* Byte-relative +0x20: state[12..15] lands on 0x00500050..5c, the
+     * words the Lua upload-state observer samples. (WORKRAM is a u32*
+     * so plain +0x20 would land on 0x00500080 instead.) */
+    volatile u32 *const state =
+        (volatile u32 *)((volatile unsigned char *)WORKRAM + 0x20);
     u32 io_result;
 
     state[0] = 0x52454330UL; /* REC0 */

@@ -42,6 +42,20 @@ stays modeled. A live call needs provisioned windows plus MAME-side
 observation of the 768-store run.
 Related: all seven upload-cluster units.
 
+Update (M2 live run): the 50s original-ROM oracle trace
+(`von/build/disasm/vonj-geometry-select-50s.state.log`, ignored build
+output) shows `live_last` (`0x01814e7c`) changing across frames
+(`00850084` -> `00ff00ec` -> `00ff00eb`) while `live_first`
+(`0x01814000`) stays zero, so the `0x181xxxx` windows are writable on
+the MAME map and the real game streams the tail word. The
+`stores`/`counter` slots stay zero there as expected (original code
+does not write our `state[]` words). A vonjdev live run wrote
+`stores=0/counter=0` to the observed slots, root-caused to a base
+bug: `WORKRAM + 0x20` on a `u32 *` lands on `0x00500080`, so
+`state[12..15]` hit `0x005000b0..bc` instead of the observed
+`0x00500050..5c`; fixed to byte-relative `+0x20` in
+`reconstructed_main.c`. Rerun against a rebuilt image is pending.
+
 ## U-0005 — missing development captures
 
 The smoke gate fails on absent development captures (not regressions),
