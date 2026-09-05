@@ -188,18 +188,32 @@ void recovered_geometry_register_clear(void)
 }
 
 /* Recovered from 0x28d30. */
-void recovered_geometry_auxiliary_submit_select(void)
+void recovered_geometry_auxiliary_submit_plan(u32 state_a, u32 state_b,
+                                              u32 *source_address,
+                                              u32 *word_count)
 {
-    if (*GEOMETRY_STATE_A == 4U && *GEOMETRY_STATE_B == 32U)
+    if (state_a == 4U && state_b == 32U)
     {
-        recovered_geometry_function_command_submit(
-            (volatile const u16 *)0x001687a4, 0, 0x4e4U);
+        *source_address = 0x001687a4U;
+        *word_count = 0x4e4U;
     }
     else
     {
-        recovered_geometry_function_command_submit(
-            (volatile const u16 *)0x001686e4, 0, 0x60U);
+        *source_address = 0x001686e4U;
+        *word_count = 0x60U;
     }
+}
+
+void recovered_geometry_auxiliary_submit_select(void)
+{
+    u32 source_address;
+    u32 word_count;
+
+    recovered_geometry_auxiliary_submit_plan(
+        *GEOMETRY_STATE_A, *GEOMETRY_STATE_B,
+        &source_address, &word_count);
+    recovered_geometry_function_command_submit(
+        (volatile const u16 *)(unsigned long)source_address, 0, word_count);
 }
 
 /* Recovered from the frame/phase handoff at 0x28de8. */

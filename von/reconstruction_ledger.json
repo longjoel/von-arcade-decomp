@@ -5640,6 +5640,11 @@
             }
           ],
           "symbol": "recovered_geometry_auxiliary_submit_select",
+          "modeling": {
+            "boundary": "Models the auxiliary geometry submit selector: choose the 0x001687a4/0x4e4 source-count pair only when state A is 4 and state B is 32; otherwise choose 0x001686e4/0x60",
+            "test": "von/tools/test_recovered_geometry_auxiliary_submit.py",
+            "unresolved_behavior": "Source-ROM contents, command FIFO writes, device backpressure, mapped state ownership, and downstream geometry effects remain outside this host-testable selection contract"
+          },
           "notes": "Recovered production C preserves both state checks and source/count selections. A standalone candidate previously matched 17/76 bytes; byte validation is blocked on compiler/ABI calibration.",
           "milestones": {
             "c-only-i960-attract-60s": {
