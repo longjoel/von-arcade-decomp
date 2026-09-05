@@ -10461,6 +10461,33 @@
             "unresolved_behavior": "Sub-call bodies at 0x1c618/0x1ccf8/0x2a4e0/0x1fa00 remain outside this pure head contract"
           },
           "notes": "Pure head schedule for the 0x1ba30 service block: call chain arguments plus counter preset and bump."
+        },
+        {
+          "id": "maincpu.flag-block-1bac0",
+          "name": "flag_block_1bac0",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_flag_block_1bac0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_flag_block_1bac0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001bac0",
+              "end": "0x0001baf8"
+            }
+          ],
+          "symbol": "recovered_flag_block_plan",
+          "modeling": {
+            "boundary": "Conditional block schedule: equality gate, constant flag store, bit-0-clearing register mask",
+            "test": "von/tools/test_recovered_flag_block_1bac0.py",
+            "unresolved_behavior": "Sub-call body at 0x1c618 and live register contents remain outside this pure block contract"
+          },
+          "notes": "Pure schedule for the 0x1bac0 equality-gated flag block."
         }
       ]
     },

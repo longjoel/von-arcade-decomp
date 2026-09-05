@@ -565,6 +565,11 @@ registers, `0x1ccf8` with 0, `0x2a4e0` and `0x1fa00` with `0x1013`),
 then presets `0x12c` to `0x503a04` and bumps `0x503a00` by one. The
 pure schedule is in `recovered_service_head_1ba30.c`.
 
+The `0x1bac0` block runs only when the `0x503a04` counter equals
+`0x118`: it stores 7 to `0x503a00` and clears bit 0 of the halfword
+register at `0x10000000`. The pure schedule is in
+`recovered_flag_block_1bac0.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
