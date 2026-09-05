@@ -6497,7 +6497,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm31",
-          "notes": "Recovers the five unconditional e1fb0 calls for tiles 21, 23, 25, 27, and 29 with exact source addresses and common e33f4 exit."
+          "notes": "Recovers the five unconditional e1fb0 calls for tiles 21, 23, 25, 27, and 29 with exact source addresses and common e33f4 exit.",
+          "modeling": {
+            "boundary": "Purely models the e314c helper plan: emit tile IDs 21, 23, 25, 27, and 29 with their five exact source addresses, select helper 0x000e1fb0, set count to 5, and set the common exit address to 0x000e33f4.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime contents and ownership of the source tables are not modeled, nor are e1fb0 execution, plan consumption, common e33f4 control flow, or original video-memory/MMIO side effects."
+          }
         },
         {
           "id": "maincpu.video-dispatch-immediate-branch-arm",
