@@ -9384,6 +9384,11 @@
             }
           ],
           "symbol": "sharc_opcode_22_clipped_state_projection_service",
+          "modeling": {
+            "boundary": "Models the opcode-0x22 column-major affine projection and finite clip layer: four input words produce three translated accumulators, ordered plane comparisons return -1.0 on rejection, negative depth returns -2.0, zero/NaN depth follows the unordered fall-through, and accepted output publishes the first affine component.",
+            "test": "von/tools/test_recovered_sharc_opcode_22.py",
+            "unresolved_behavior": "FIFO waits/output timing, SHARC reciprocal refinement and register/DM alias details, runtime clip-state ownership, zero-depth exceptional semantics beyond the tested fall-through, and gameplay coordinate names remain unresolved."
+          },
           "notes": "Static listing and bounded interpreter traces recover four FIFO inputs, three translated coefficient projections, four ordered clip comparisons, reciprocal refinement, and explicit -1.0/-2.0 fallback outputs. The first three operands (x,y,z) use exact column-major affine accumulators x*s[2]+y*s[5]+z*s[8]+s[11], x*s[0]+y*s[3]+z*s[6]+s[9], and x*s[1]+y*s[4]+z*s[7]+s[10]. With affine components (A,B,C), fourth input w, and clip words (p,q,t2,t3,t4,t5), the comparisons are (q*C-p*w)/A >= t4, (q*C+q*w)/A <= t5, (p*B-p*w)/A >= t2, and (p*B+q*w)/A <= t3, in that order. A failed comparison returns -1.0; negative A returns -2.0; otherwise A is published. Runtime threshold flips hit PCs 0x20453, 0x20456, 0x2045a, and 0x2045d respectively. A nonzero-w capture with (1,2,3,1), p=2, q=3 yields 1.333333, 3.0, 0.0, and 1.666667. The zero-depth/NaN exceptional path and gameplay coordinate names remain open."
         },
         {
