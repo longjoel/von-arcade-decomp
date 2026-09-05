@@ -3771,7 +3771,12 @@
             }
           ],
           "symbol": "recovered_status_low_latch_upload_plan",
-          "notes": "Recovers the latch-through-8 source 0x02fe8fc4, attributed 0x40x8 transfer through 0x1de80, origin (0,latch-8), and unsigned wraparound behavior."
+          "notes": "Recovers the latch-through-8 source 0x02fe8fc4, attributed 0x40x8 transfer through 0x1de80, origin (0,latch-8), and unsigned wraparound behavior.",
+          "modeling": {
+            "boundary": "i960 0x2196c low-latch attributed upload descriptor with latch selection and unsigned row origin",
+            "test": "von/tools/test_recovered_status_low_latch_upload.py",
+            "unresolved_behavior": "source memory contents and downstream 0x1de80 video upload effects remain outside the pure latch/upload plan"
+          }
         },
         {
           "id": "maincpu.status-mid-latch-route-219a8",
