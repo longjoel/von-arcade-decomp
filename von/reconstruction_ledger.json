@@ -4175,8 +4175,13 @@
               "end": "0x0002381c"
             }
           ],
-          "symbol": "recovered_geometry_object_branch_dispatch_plan",
-          "notes": "Recovers the +0x18 gate, signed low-halfword response bounds, 0x17ff/0x2ffe and 0x1ff/0x3fe fixed-point windows, and three-way route selection."
+        "symbol": "recovered_geometry_object_branch_dispatch_plan",
+        "notes": "Recovers the +0x18 gate, signed low-halfword response bounds, 0x17ff/0x2ffe and 0x1ff/0x3fe fixed-point windows, and three-way route selection.",
+        "modeling": {
+          "boundary": "i960 0x237ac geometry-object branch dispatcher plan covering active-flag gating, signed response bounds, fixed-point windows, and first/second/alternate route selection",
+          "test": "von/tools/test_recovered_geometry_object_branch_dispatch_237ac.py",
+          "unresolved_behavior": "selected transform/alternate branch implementations, response production, and object-memory or FIFO side effects remain outside the pure dispatcher plan"
+        }
         },
         {
           "id": "maincpu.geometry-object-alternate-update-238a0",
