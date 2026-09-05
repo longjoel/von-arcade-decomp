@@ -88,13 +88,21 @@ void recovered_geometry_buffer_prepare(volatile u32 *output)
 }
 
 /* Core transfer from the 0x282e0 SHARC bootstrap routine. */
-void recovered_sharc_bootstrap_upload(void)
+void recovered_sharc_bootstrap_copy(volatile u16 *fifo,
+                                    volatile const u16 *source,
+                                    u32 words)
 {
     u32 index;
 
+    for (index = 0; index < words; ++index)
+        fifo[index] = source[index];
+}
+
+void recovered_sharc_bootstrap_upload(void)
+{
     *SHARC_CONTROL = 0x80000000U;
-    for (index = 0; index < SHARC_BOOT_WORDS; ++index)
-        *SHARC_FIFO = SHARC_SOURCE[index];
+    recovered_sharc_bootstrap_copy(SHARC_FIFO, SHARC_SOURCE,
+                                   SHARC_BOOT_WORDS);
     *SHARC_CONTROL = 0;
 }
 

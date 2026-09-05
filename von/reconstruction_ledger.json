@@ -3030,6 +3030,11 @@
             }
           ],
           "symbol": "recovered_sharc_bootstrap_upload",
+          "modeling": {
+            "boundary": "Models the bounded SHARC bootstrap transfer: copy the caller-supplied halfword stream to the FIFO in order for the declared word count, while leaving upload-mode control timing in the hardware wrapper",
+            "test": "von/tools/test_recovered_sharc_bootstrap_upload.py",
+            "unresolved_behavior": "SHARC control-register timing, source-ROM provenance, FIFO backpressure, device execution, and post-upload hardware state remain outside this host-testable copy contract"
+          },
           "notes": "Executes the recovered 0x282e0 SHARC bootstrap upload: enables upload mode, transfers 0x2b1e source halfwords to the SHARC FIFO, and clears the control latch. The integrated geometry pipeline invokes it on zero mode; runtime validation remains pending.",
           "milestones": {
             "c-only-i960-attract-60s": {
