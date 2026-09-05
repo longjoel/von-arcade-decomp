@@ -7411,7 +7411,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm10",
-          "notes": "Recovers the distinct plain e1f20 nine-tile arm beginning at 0xe2874. It preserves the observed tile/source order and is intentionally modeled with a separate descriptor from mirrored e2040 arms."
+          "notes": "Recovers the distinct plain e1f20 nine-tile arm beginning at 0xe2874. It preserves the observed tile/source order and is intentionally modeled with a separate descriptor from mirrored e2040 arms.",
+          "modeling": {
+            "boundary": "Purely models the e2874 plan in observed order: emit tiles 11, 1, 3, 5, 7, 21, 25, 27, and 29 with their nine exact source addresses, and set count 9.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The nine e1f20 executions, plan consumption, caller/shared-tail sequencing, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-arm9",
