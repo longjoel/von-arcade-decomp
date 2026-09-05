@@ -6687,7 +6687,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm38",
-          "notes": "Recovers the sentinel-indexed two-call e2040 payload at e34e4, including both bank tile choices, dynamic source addresses, and e35a0 convergence; range gates remain separate."
+          "notes": "Recovers the sentinel-indexed two-call e2040 payload at e34e4, including both bank tile choices, dynamic source addresses, and e35a0 convergence; range gates remain separate.",
+          "modeling": {
+            "boundary": "Purely models the e34e4 indexed post-dispatch plan: compute offset = sentinel * 4, select sources 0x02bfd544 + offset and 0x02bfd5c4 + offset, use e2040 for both calls, choose tiles 5/7 for bank_a nonzero or 1/3 otherwise, set count 2, mark the payload matched, and continue at 0x000e35a0.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The preceding e3444 range gates and runtime sentinel/bank producers are not modeled, nor are source-table contents, e2040 execution, plan consumption, later 0x000e35a0 behavior, or original video-memory/MMIO side effects."
+          }
         },
         {
           "id": "maincpu.video-dispatch-sentinel-high-indexed-pair",
