@@ -11565,6 +11565,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/i960/recovered_input_byte_parser_3a38.c", "von/tools/test_recovered_input_byte_parser_wrapper_3ae0.py"],
           "ranges": [{"start": "0x00003ae0", "end": "0x00003b00"}],
           "symbol": "recovered_input_byte_parser_wrapper_3ae0",
+          "modeling": {
+            "boundary": "Models the pure 0x3ae0 wrapper sequencing: invoke the recovered 0x3a38 transition on the first record with status bit 0, then on the second record with status bit 1, always making both calls and discarding their branch returns.",
+            "test": "von/tools/test_recovered_input_byte_parser_wrapper_3ae0.py",
+            "unresolved_behavior": "Original record-memory ownership and addresses, indirect return mechanics, caller scheduling, and effects beyond the two supplied parser states remain unresolved."
+          },
           "notes": "Exact wrapper invokes the recovered 0x3a38 byte/state transition on the two records at 0x5024cc and 0x5024d0, in order, with status-bit selectors 0 and 1. The original indirect returns are discarded."
         },
         {
