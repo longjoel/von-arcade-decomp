@@ -8122,6 +8122,11 @@
           ],
           "symbol": "recovered_geometry_pool64_acquire",
           "notes": "Recovers the paired 64-slot and 32-slot cursor primitives: increment-before-read acquisition, decrement-before-store release, and unchanged-count 0xffffffff failure at counts 64 and 32 respectively.",
+          "modeling": {
+            "boundary": "Purely models both bounded slot pools: acquire increments before reading until counts 64 or 32 are exhausted, returns 0xffffffff without changing an exhausted count, and release decrements before storing the returned value.",
+            "test": "von/tools/test_recovered_geometry_slot_pool.py",
+            "unresolved_behavior": "Does not model pool ownership, concurrent callers, caller-specific slot contents, or the surrounding geometry setup and teardown sequencing."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
