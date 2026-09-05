@@ -6525,7 +6525,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm32",
-          "notes": "Recovers e3130 as one e2040 call for tile 3/source 0x2fb7d50. The mov 7 after the unconditional branch is unreachable under the local i960 core's immediate branch semantics."
+          "notes": "Recovers e3130 as one e2040 call for tile 3/source 0x2fb7d50. The mov 7 after the unconditional branch is unreachable under the local i960 core's immediate branch semantics.",
+          "modeling": {
+            "boundary": "Purely models the e3130 reachable plan: emit one tile ID 3 with source 0x02fb7d50 and set the plan count to 1. The post-branch transition write is excluded because the local i960 immediate-branch semantics make it unreachable.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The enclosing dispatch condition, e2040 execution, plan consumption, exact continuation after the branch, and original video-memory/MMIO side effects are not modeled. The unreachable-path conclusion remains dependent on the cited local i960 core semantics."
+          }
         },
         {
           "id": "maincpu.video-dispatch-e1fb0-eight-tile-split",
