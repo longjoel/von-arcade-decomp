@@ -6741,7 +6741,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_terminal_reset",
-          "notes": "Recovers the terminal e35a0 reset value 0xff written to sentinel address 0x577590 before return; mapped-store integration remains outside the pure adapter."
+          "notes": "Recovers the terminal e35a0 reset value 0xff written to sentinel address 0x577590 before return; mapped-store integration remains outside the pure adapter.",
+          "modeling": {
+            "boundary": "Purely models the terminal reset value returned by the e35a0 adapter: return 0x000000ff, representing the byte written to the dispatch sentinel location before the terminal return.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The actual mapped store to 0x00577590, write width and ordering, caller control flow, and surrounding terminal side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-sentinel-lower-range-pair",
