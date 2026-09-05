@@ -10110,6 +10110,40 @@
             "unresolved_behavior": "0x180 stride fixups and outer r15 cadence remain outside this pure inner schedule"
           },
           "notes": "Pure trip schedule for the 0x29e68 plane-1 loop; the same counter block shape drives every other inner loop in the cluster."
+        },
+        {
+          "id": "maincpu.blend-stride-schedule-29e4c",
+          "name": "blend_stride_schedule_29e4c",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_blend_stride_schedule_29e4c.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_blend_stride_schedule_29e4c.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00029e4c",
+              "end": "0x00029e64"
+            },
+            {
+              "start": "0x00029ec8",
+              "end": "0x00029ee0"
+            },
+            {
+              "start": "0x00029f44",
+              "end": "0x00029f58"
+            }
+          ],
+          "symbol": "recovered_blend_stride_schedule_plan",
+          "modeling": {
+            "boundary": "Outer-cadence schedule: 8 passes, per-pass pointer totals 0x200/0x200/0x380, per-plane fade/scale selection from mode bits 0-2",
+            "test": "von/tools/test_recovered_blend_stride_schedule_29e4c.py",
+            "unresolved_behavior": "Pixel data movement and multiply fault semantics remain outside this pure pointer/dispatch contract"
+          },
+          "notes": "Pure stride schedule joining the three inner loops: pairs 0/1 span exactly one 4KB prologue bank per run, pair 2 advances asymmetrically."
         }
       ]
     },

@@ -482,6 +482,18 @@ advancing `32 x 4 = 0x80` bytes for 32 stores. The pure schedule is in
 `recovered_blend_loop_schedule_29e68.c`; the `0x180` stride fixups and
 the outer `r15` cadence stay unresolved.
 
+Those fixups form the outer-cadence schedule: each pass adds `0x180` to
+both pointers of pairs 0 and 1 (one fixup each, at `0x29e54`/`0x29e5c`
+and `0x29ed0`/`0x29ed8`) but twice to pair 2 (transition plus the outer
+bottom at `0x29f4c`/`0x29f50`), giving per-pass totals of `0x200`,
+`0x200`, and `0x380` over the inner `0x80`. The reloaded mode word picks
+each plane's loop form per pass (set bit = fade loop, clear = scale
+loop), and the body-first `r15` block runs 8 passes. Pairs 0/1 therefore
+span exactly `8 x 0x200 = 0x1000` bytes — one full bank from the
+`0x29d50` prologue. The pure schedule is in
+`recovered_blend_stride_schedule_29e4c.c`; pixel data and fault
+semantics stay unresolved.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
