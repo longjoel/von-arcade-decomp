@@ -2034,6 +2034,11 @@
             }
           ],
           "symbol": "recovered_io_average_controller_bytes",
+          "modeling": {
+            "boundary": "i960 eight-byte controller-state averaging loop with low-byte sampled input",
+            "test": "von/tools/test_recovered_io.py",
+            "unresolved_behavior": "mapped repeated-read timing and later packed-status synthesis remain outside this byte-average contract"
+          },
           "notes": "The first 8-byte loop averages each byte in 0x00502490..0x00502497 with the low byte of the repeated 0x01c0001e read, using unsigned floor division by two. Later packed-status synthesis remains separate.",
           "milestones": {
             "c-only-i960-attract-60s": {
