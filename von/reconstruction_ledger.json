@@ -5424,6 +5424,11 @@
             }
           ],
           "symbol": "recovered_geometry_register_clear",
+          "modeling": {
+            "boundary": "Models the fixed-register clear contract as one ordered write of 0x00004004 to the caller-supplied geometry register",
+            "test": "von/tools/test_recovered_geometry_register_clear.py",
+            "unresolved_behavior": "Mapped-register ownership, bus timing, caller phase ordering, and downstream geometry-device effects remain outside this host-testable write contract"
+          },
           "notes": "Production C reconstruction is linked into the reconstructed image and preserves the 0x4004 write. A standalone candidate previously matched 3/28 bytes; byte validation is blocked on compiler/ABI calibration.",
           "milestones": {
             "c-only-i960-attract-60s": {

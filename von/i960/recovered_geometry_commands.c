@@ -177,9 +177,14 @@ void recovered_geometry_initial_handshake(void)
 }
 
 /* Recovered from the small helper at 0x28d08. */
+void recovered_geometry_register_clear_value(volatile u32 *fixed_register)
+{
+    *fixed_register = 0x00004004U;
+}
+
 void recovered_geometry_register_clear(void)
 {
-    *GEO_FIXED_REGISTER = 0x00004004U;
+    recovered_geometry_register_clear_value(GEO_FIXED_REGISTER);
 }
 
 /* Recovered from 0x28d30. */
