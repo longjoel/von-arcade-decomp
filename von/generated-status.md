@@ -5,10 +5,10 @@ Generated from `von/reconstruction_ledger.json`, `von/attract_worklist.json`,
 
 - Active objective: `c-only-i960-attract-60s`
 - Ledger: valid (0 errors)
-- Work units: 425 total; 389 modeled; 33 integrated; 2 trace-validated; 0 byte-validated
+- Work units: 439 total; 403 modeled; 33 integrated; 2 trace-validated; 0 byte-validated
 - Physical code union: 57,206 bytes
 - Attract worklist: 262 discovered; 75 modeled integration queue; 27 integrated; 160 untriaged
-- Tests configured: 317 unit; 143 contract; 15 trace; 7 smoke; 1 attract
+- Tests configured: 331 unit; 143 contract; 15 trace; 7 smoke; 1 attract
 - Latest test results: unit=pass; contract=pass; trace=pass; smoke=fail; attract=pass
 - Evidence: 1 canonical; healthy
 

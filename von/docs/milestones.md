@@ -19,14 +19,22 @@ Scope: the `0x29c08`/`0x29d50` IO upload cluster.
       zero new errors (36 pre-existing remain).
 - [x] Full check green (317 unit / 143 contract); status regenerated.
 - [x] Reconstructed image builds clean with the new sources.
-- [ ] Branch pushed (credential handoff pending).
+- [x] Branch pushed.
 
-## M2 — live cluster call (proposed)
+## M2 — live cluster call (done 2026-09-05)
 
 Wire the shipped driver into the reconstructed runtime and observe it.
 
-- [ ] Provision `0x181xxxx` windows on the development path (U-0004).
-- [ ] Call the driver from `reconstructed_main` frame service.
-- [ ] MAME-observed 768-store run matches the harness oracle words.
-- [ ] Smoke gate unaffected (no hang, no bus fault).
-- [ ] Commit, push, regenerate status.
+- [x] Provision `0x181xxxx` windows on the development path (U-0004):
+      original-ROM oracle trace streams the window tail word, so the
+      windows are writable on the MAME map; the vonjdev live run
+      stored through them with no fault.
+- [x] Call the driver from `reconstructed_main` frame service
+      (startup-once call; results in `state[12..15]`).
+- [x] MAME-observed 768-store run matches the harness oracle words:
+      `stores=00000300 counter=00000005`, `check_upload_state.py`
+      PASS (`dst==scale(src)` on both samples).
+- [x] Smoke gate unaffected (MAME exit 0, no hang, no bus fault).
+- [x] Committed (`dc56eb5`, `086bfcf`, `7942ed7`, `dbadad1`).
+- [ ] Branch pushed (4 commits ahead of origin).
+- [x] Status regenerated.
