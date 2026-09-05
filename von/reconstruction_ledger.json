@@ -10085,6 +10085,11 @@
             }
           ],
           "symbol": "sharc_opcode_37_three_input_state_reset",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x37 reset: replace all nine matrix elements with the 3x3 identity and install the three supplied FIFO translation words directly as tail X/Y/Z.",
+            "test": "von/tools/test_recovered_sharc_opcode_37.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent DM state ownership and address mapping, delayed final-store ordering, SHARC register/DM timing, and downstream consumers of the reset state remain outside this bounded model."
+          },
           "notes": "Static listing recovers three FIFO inputs, identity matrix reset, and translation-tail installation with delayed final stores. Clean identity-seeded single-field probes confirm direct tail mapping: R13=1.0 writes X, R14=2.0 writes Y, and R15=3.0 writes Z, while all nine matrix words remain identity."
         },
         {
