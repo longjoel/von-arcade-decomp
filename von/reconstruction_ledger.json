@@ -7939,6 +7939,11 @@
           ],
           "symbol": "recovered_geometry_coordinate_submit",
           "notes": "Production C recovers the cvtzri coordinate truncation, 0..1023 bounds check, 512x512 half-coordinate index, 20-byte lookup record, two 16-bit output stores, and complete 0x35 FIFO packet. The device read values remain callback-backed; byte validation remains blocked on compiler/ABI calibration.",
+          "modeling": {
+            "boundary": "Models coordinate submission: truncate both float inputs toward zero, reject values outside 0..1023, form the 512x512 half-coordinate index, read the selected 20-byte record, store its two output halfwords, and emit the complete 0x35 FIFO packet with the final response read.",
+            "test": "von/tools/test_recovered_geometry_coordinate.py",
+            "unresolved_behavior": "FIFO reads/writes remain callback-backed rather than connected to live geometry hardware; device timing, table bounds beyond the tested callback, and downstream consumer behavior are unresolved."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
