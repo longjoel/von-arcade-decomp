@@ -9916,6 +9916,11 @@
             }
           ],
           "symbol": "sharc_opcode_33_five_input_matrix_update_service",
+          "modeling": {
+            "boundary": "Models the recovered normal opcode-0x33 update: three direct float translation inputs populate the tail, the two signed-16 angle fields are applied as Y then X rotations (Rx*Ry), and the existing matrix is updated through the shared rotation helpers.",
+            "test": "von/tools/test_recovered_sharc_opcode_33.py",
+            "unresolved_behavior": "FIFO/DM timing, exact interleaved write ordering and helper residuals, retained-field behavior, and caller-level semantics remain outside this normal transform model; combined/asymmetric trace fixtures provide separate evidence."
+          },
           "notes": "Static listing recovers five FIFO inputs, persistent translation-tail loads, two signed-parameter helper chains with scale 0x38c9116d, and interleaved 3x3 matrix updates with delayed final write. A live identity-seeded packet with direct tail (1,2,3) and both signed fields zero preserves the matrix to helper precision and reads back exact tail (1,2,3) through opcode-0x11. Reset-corrected direct state tracing shows R13=0x4000 producing the conventional X-axis pattern [c,0,0 / 0,~0,-1 / 0,+1,~0], and R14=0x4000 producing the conventional Y-axis pattern [~0,0,+1 / 0,~1,0 / -1,0,~0]. Both fields are live X/Y rotations; each pass partially overwrites the shared state window while preserving the expected Rx*Ry transform. The combined R14=R13=0x4000 packet produces a recorded 12-write suffix, guarded by von/tools/test_sharc_opcode_33_combined_trace.py. An asymmetric 1..9 seed with both fields at 0x4000 produces first-pass rows approximately [7,8,9 / 4,5,6 / -1,-2,-3], then final lower rows [1,2,3 / 4,5,6], confirming the complete Rx*Ry composition; the ROM-rounded suffix is guarded by von/tools/test_sharc_opcode_33_asymmetric_trace.py. The reusable model is von/i960/recovered_sharc_opcode_33.c, covered by von/tools/test_recovered_sharc_opcode_33.py."
         },
         {
