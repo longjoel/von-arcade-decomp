@@ -8060,6 +8060,11 @@
           ],
           "symbol": "recovered_geometry_projection_packet",
           "notes": "Production C recovers the deterministic projection prefix: float truncation and bounds, 0x41 half-coordinate indexing, 40-unit quotients, and the eight-word 0x35 packet. A runtime trace oracle now confirms 1,677 complete response triplets with lookup/final values always zero and the middle value limited to 0, 6, or 13 in that capture; representative request-index pairs are 0xbe7c->0, 0xc079->13, 0x138af->6, and 0x23d04->13. A rebuilt two-cabinet DRC capture reached the linked scene on both boards and produced 1,097 complete triplets on P1 and 1,096 on P2 before incomplete capture tails; every complete triplet was [0,13,0]. The post-read callback dispatch through 0x6eb70 and mode-specific output mask at 0x6f820-0x6f8fc remain separately documented because they depend on runtime state and board response encoding. The opt-in gameplay_progress.lua logger captured mode 7, byte-map pointer 0x02fc0d50, records pointer 0x02bef690, auxiliary pointer 0x02bf039c, all-0x80 map entries, sampled selectors 0/6/13, and changing mask globals 0x562c80/0x562c84 on both linked cabinets. These are runtime snapshots, not universal semantic names; the DRC scene is not yet a numeric parity test against the interpreter trace.",
+          "modeling": {
+            "boundary": "Models the deterministic projection packet core: truncate and bounds-check coordinates, form the 0x41 half-coordinate request index, compute 40-unit quotients, select the supplied record, and build the eight-word 0x35 continuation with the complemented packet field.",
+            "test": "von/tools/test_recovered_geometry_projection.py",
+            "unresolved_behavior": "Does not model live table/SHARC response values, post-read dispatch through 0x6eb70, mode-specific output-mask selection, runtime FIFO timing, or numeric parity across the DRC and interpreter captures."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
