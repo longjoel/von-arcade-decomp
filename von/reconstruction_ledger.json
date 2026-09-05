@@ -10058,6 +10058,32 @@
             "unresolved_behavior": "Who re-arms the cluster after a 0x29c08 clamp zeroes the counter remains outside this pure seed schedule"
           },
           "notes": "Pure seed schedule for the 0x29d2c setup tail: links the 0x29c08/0x29d50 cluster lifecycle (preset 4 = active, clamp-zeroed = parked)."
+        },
+        {
+          "id": "maincpu.blend-kernel-29dec",
+          "name": "blend_kernel_29dec",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_blend_kernel_29dec.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_blend_kernel_29dec.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00029dec",
+              "end": "0x00029e1c"
+            }
+          ],
+          "symbol": "recovered_blend_kernel_mul",
+          "modeling": {
+            "boundary": "Per-texel kernel shared by all 0x29d50 loops: scale form (factor * masked) >> 8 and fade form masked + (factor * (masked - mask)) >> 8 over in & 0x00ff00ff",
+            "test": "von/tools/test_recovered_blend_kernel_29dec.py",
+            "unresolved_behavior": "Loop trip counts, pointer chasing, and multiply fault semantics remain outside this pure per-texel contract"
+          },
+          "notes": "Pure kernel for the 0x29dec blend loop, repeated with different factors across the other five blend loops and both direct-path loops."
         }
       ]
     },

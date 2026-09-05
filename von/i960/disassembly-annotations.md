@@ -465,6 +465,16 @@ and zeroes `0x51a264`/`0x51a268`, which parks the uploader (counter 0)
 until the state is re-seeded. The pure schedule is in
 `recovered_upload_state_init_29d2c.c`; who re-arms it stays unresolved.
 
+Every pixel loop in `0x29dc0-0x2a0bc` shares one per-texel kernel over
+`in & 0x00ff00ff`: the bit-clear/direct-scale arm stores
+`(factor * masked) >> 8` while the bit-set/direct-fade arm stores
+`masked + (factor * (masked - mask)) >> 8`, with low-32-bit products and
+logical shifts. The canonical instance is the `0x29dec` loop (factor
+`g4`, add-back form); the other five blend loops and both direct-path
+loops repeat it with `0x100 - fade` or `fade + 0x100` factors. The pure
+kernel is in `recovered_blend_kernel_29dec.c`; loop trip counts, pointer
+chasing, and fault semantics stay unresolved.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
