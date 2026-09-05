@@ -9249,7 +9249,7 @@
           "id": "sharc.opcode-08-service-state-reset",
           "name": "opcode_08_service_state_reset",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -9264,6 +9264,11 @@
             }
           ],
           "symbol": "sharc_opcode_08_service_state_reset",
+          "modeling": {
+            "boundary": "Models the exact opcode-0x08 reset boundary: write the 32-bit zero value to DM 0x30100 and return, with no payload consumption, response emission, or clearing of the later coefficient/state windows.",
+            "test": "von/tools/test_sharc_opcode_08.py",
+            "unresolved_behavior": "SHARC FIFO/dispatcher scheduling, delayed-return timing, DM bus/address semantics, and all consumers of the reset word remain outside this static store-only model."
+          },
           "notes": "Static listing recovers a single zero store to DM 0x30100 followed by delayed return; no payload, output, or broad state clear is present."
         },
         {
