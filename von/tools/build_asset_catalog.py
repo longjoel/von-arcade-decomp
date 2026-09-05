@@ -86,6 +86,9 @@ def main() -> int:
         if status not in STATUSES:
             print(f"Asset catalog: unsupported asset status: {status!r}")
             return 1
+        if status in {"observed", "validated", "reference-capture"} and not entry.get("evidencePath"):
+            print(f"Asset catalog: missing evidencePath for status {status!r}")
+            return 1
         try:
             path = asset_path(args.asset_root, entry.get("path"), "asset")
         except ValueError as error:
@@ -108,7 +111,11 @@ def main() -> int:
             if not evidence.is_file():
                 print(f"Asset catalog: missing evidence: {evidence}")
                 return 1
-            record["evidence"] = json.loads(evidence.read_text(encoding="utf-8"))
+            evidence_document = json.loads(evidence.read_text(encoding="utf-8"))
+            if not isinstance(evidence_document, dict):
+                print(f"Asset catalog: evidence must be an object: {evidence}")
+                return 1
+            record["evidence"] = evidence_document
         entries.append(record)
     catalog = {"version": 1, "assets": entries,
                "counts": {status: sum(entry["status"] == status for entry in entries)

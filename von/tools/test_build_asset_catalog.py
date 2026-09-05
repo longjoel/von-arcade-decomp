@@ -11,6 +11,7 @@ def main():
     with tempfile.TemporaryDirectory() as temp:
         root = Path(temp); assets = root / "public/assets"; assets.mkdir(parents=True)
         (assets / "model.gltf").write_text(json.dumps({"asset": {"version": "2.0"}, "nodes": [{}], "meshes": [{}]}))
+        (assets / "evidence.json").write_text(json.dumps({"id": "capture-v1", "canonical": True}), encoding="utf-8")
         manifest = root / "manifest.json"; output = root / "catalog.json"
         manifest.write_text(json.dumps({"assets": [{"id": "model", "displayName": "Model", "category": "props",
             "status": "candidate", "path": "/assets/model.gltf", "sourceTrace": "trace"}]}))
@@ -28,9 +29,11 @@ def main():
         assert catalog["assets"][0]["geometry"] == {"nodes": 1, "meshes": 1, "materials": 0, "images": 0}
         manifest.write_text(json.dumps({"assets": [
             {"id": "model", "displayName": "Model", "category": "props",
-             "status": "observed", "path": "/assets/model.gltf", "sourceTrace": "trace"},
+             "status": "observed", "path": "/assets/model.gltf", "sourceTrace": "trace",
+             "evidencePath": "/assets/evidence.json"},
             {"id": "reference", "displayName": "Reference", "category": "props",
-             "status": "reference-capture", "path": "/assets/model.gltf", "sourceTrace": "trace"},
+             "status": "reference-capture", "path": "/assets/model.gltf", "sourceTrace": "trace",
+             "evidencePath": "/assets/evidence.json"},
         ]}))
         subprocess.run(["python3", TOOL, "--manifest", manifest, "--asset-root", root / "public",
                         "--output", output, "--root", root], check=True)
@@ -38,6 +41,15 @@ def main():
         assert catalog["counts"]["observed"] == 1
         assert catalog["counts"]["reference-capture"] == 1
         valid_manifest = manifest.read_text()
+        manifest.write_text(json.dumps({"assets": [
+            {"id": "model", "displayName": "Model", "category": "props",
+             "status": "observed", "path": "/assets/model.gltf", "sourceTrace": "trace"},
+        ]}))
+        result = subprocess.run(
+            ["python3", TOOL, "--manifest", manifest, "--asset-root", root / "public",
+             "--output", output, "--root", root], capture_output=True, text=True, check=False)
+        assert result.returncode == 1
+        assert "missing evidencePath for status 'observed'" in result.stdout
         manifest.write_text(json.dumps({"assets": [
             {"id": "model", "displayName": "Model", "category": "props",
              "status": "verified", "path": "/assets/model.gltf", "sourceTrace": "trace"},
