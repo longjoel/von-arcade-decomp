@@ -542,6 +542,11 @@ Just above, the `0x1b940` leaf forwards the service halfword at
 the `0x1fe90` sub-call, and passes 3 to `0x2a4e0`. The pure schedule
 is in `recovered_slot_forward_1b940.c`.
 
+The `0x1ba08` block calls `0x2a4e0` with 2, publishes 1 to `0x5039f4`,
+and stores the call's own resume address `0x1ba10` (not the entry link)
+to `0x503a00`. The pure schedule is in
+`recovered_link_publish_1ba08.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero

@@ -10353,6 +10353,33 @@
             "unresolved_behavior": "Sub-call bodies at 0x1fe90/0x2a4e0 remain outside this pure forward contract"
           },
           "notes": "Pure forward schedule for the 0x1b940 service leaf, adjacent to the parking leaves."
+        },
+        {
+          "id": "maincpu.link-publish-1ba08",
+          "name": "link_publish_1ba08",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "LIKELY",
+          "sources": [
+            "von/i960/recovered_link_publish_1ba08.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_link_publish_1ba08.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001ba08",
+              "end": "0x0001ba24"
+            }
+          ],
+          "symbol": "recovered_link_publish_plan",
+          "modeling": {
+            "boundary": "Constant block schedule: call arg 2, flag 1 at 0x5039f4, resume address 0x1ba10 at 0x503a00",
+            "test": "von/tools/test_recovered_link_publish_1ba08.py",
+            "unresolved_behavior": "Sub-call body at 0x2a4e0 and surrounding branch conditions remain outside this pure block contract"
+          },
+          "notes": "Pure schedule for the 0x1ba08 block: the stored link is the call resume address, a LIKELY reading of g14 flow."
         }
       ]
     },
