@@ -3663,7 +3663,12 @@
             }
           ],
           "symbol": "recovered_weapon_five_marker_plan",
-          "notes": "Recovers the (1,8) text route and five consecutive 0x2674 marker writes at the record +0x44/+0x48 coordinate through table offset 0x114."
+          "notes": "Recovers the (1,8) text route and five consecutive 0x2674 marker writes at the record +0x44/+0x48 coordinate through table offset 0x114.",
+          "modeling": {
+            "boundary": "i960 0x214bc five-marker weapon text descriptor and consecutive 0x2674 marker destination plan",
+            "test": "von/tools/test_recovered_weapon_five_marker_handler.py",
+            "unresolved_behavior": "actual text/marker memory writes and downstream weapon rendering effects remain outside the pure five-marker plan"
+          }
         },
         {
           "id": "maincpu.weapon-three-quad-marker-handler-21784",
