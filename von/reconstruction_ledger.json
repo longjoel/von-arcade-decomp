@@ -2083,6 +2083,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_io.py"],
           "ranges": [{"start": "0x00002850", "end": "0x00002884"}],
           "symbol": "recovered_io_setup_plan",
+          "modeling": {
+            "boundary": "i960 0x2830 controller upload schedule and per-byte status-wait sequencing",
+            "test": "von/tools/test_recovered_io.py",
+            "unresolved_behavior": "MMIO execution and controller timing remain outside the pure upload-plan model"
+          },
           "notes": "Pure 0x2830 controller upload schedule: copies 21 fixed bytes to the controller port and invokes the status wait per byte. MMIO execution/timing remains outside the model."
         },
         {
