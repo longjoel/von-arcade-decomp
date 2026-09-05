@@ -4824,8 +4824,13 @@
               "end": "0x0009de44"
             }
           ],
-          "symbol": "recovered_geometry_post_state_gate_plan",
-          "notes": "Recovers command-6 emission, the 0x562ca8 persistent dispatch gate, the all-three-countdowns-equal-30 condition, and the one-time 0x2a4e0(0x114c) startup call."
+        "symbol": "recovered_geometry_post_state_gate_plan",
+        "notes": "Recovers command-6 emission, the 0x562ca8 persistent dispatch gate, the all-three-countdowns-equal-30 condition, and the one-time 0x2a4e0(0x114c) startup call.",
+        "modeling": {
+          "boundary": "i960 0x9ddac post-state gate plan covering command-6 FIFO emission, persistent dispatch-gate transition, all-three-countdowns-equal-30 predicate, and one-time startup-call argument",
+          "test": "von/tools/test_recovered_geometry_post_state_gate_9ddac.py",
+          "unresolved_behavior": "actual FIFO/persistent-memory writes, startup-call execution, and downstream post-state dispatch remain outside the pure gate plan"
+        }
         },
         {
           "id": "maincpu.text-glyph-address-plan",
