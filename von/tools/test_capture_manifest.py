@@ -157,6 +157,10 @@ def main() -> int:
         broken["inputs"] = {"path": "rom-manifest.json"}
         assert any("inputs must be an array" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
+        broken["inputs"] = []
+        assert any("runtime capture requires at least one hashed input" in error
+                   for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
         del broken["inputs"]
         assert any("inputs must be an array" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)

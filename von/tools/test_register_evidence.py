@@ -25,6 +25,8 @@ def main() -> int:
             (root / name).mkdir()
         artifact = root / "summary.json"
         artifact.write_text('{"capture_id":"capture-v1","tier":"A","edge_semantics":"possible_static_edges"}\n', encoding="utf-8")
+        input_path = root / "rom-manifest.json"
+        input_path.write_text('{"rom":"fixture"}\n', encoding="utf-8")
         capture = {
             "schema_version": 1, "id": "capture-v1", "objective": "pilot",
             "hypothesis": "startup reaches scheduler", "expected_discriminator": "scheduler checkpoint",
@@ -36,7 +38,7 @@ def main() -> int:
                          "-state_directory", str(root / "state"),
                          "-seconds_to_run", "1"],
             "isolation": {"cfg_directory": "cfg", "nvram_directory": "nvram", "state_directory": "state"},
-            "coverage_report": "summary.json", "inputs": [], "artifacts": [entry(artifact, root)],
+            "coverage_report": "summary.json", "inputs": [entry(input_path, root)], "artifacts": [entry(artifact, root)],
         }
         for field in ("cfg_directory", "nvram_directory", "state_directory"):
             capture["isolation"][f"{field}_sha256"] = directory_sha256(root / capture["isolation"][field])

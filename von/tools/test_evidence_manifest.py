@@ -83,6 +83,8 @@ def main() -> int:
             (temp / name).mkdir()
         summary = temp / "summary.json"
         summary.write_text('{"capture_id":"capture-v1","tier":"A","edge_semantics":"possible_static_edges"}\n', encoding="utf-8")
+        input_path = temp / "rom-manifest.json"
+        input_path.write_text('{"rom":"fixture"}\n', encoding="utf-8")
         verifier = temp / "verify.py"
         verifier.write_text("# verifier\n", encoding="utf-8")
         capture = {
@@ -96,7 +98,7 @@ def main() -> int:
                          "-state_directory", str(temp / "state"),
                          "-seconds_to_run", "1"],
             "isolation": {"cfg_directory": "cfg", "nvram_directory": "nvram", "state_directory": "state"},
-            "coverage_report": "summary.json", "inputs": [], "artifacts": [entry(summary, temp)],
+            "coverage_report": "summary.json", "inputs": [entry(input_path, temp)], "artifacts": [entry(summary, temp)],
         }
         for field in ("cfg_directory", "nvram_directory", "state_directory"):
             capture["isolation"][f"{field}_sha256"] = directory_sha256(temp / capture["isolation"][field])
@@ -109,7 +111,8 @@ def main() -> int:
                          "checkpoints": capture["checkpoints"],
                          "hypothesis": capture["hypothesis"],
                          "expected_discriminator": capture["expected_discriminator"],
-                         "configuration": capture["configuration"], "artifacts": capture["artifacts"],
+                         "configuration": capture["configuration"], "inputs": capture["inputs"],
+                         "artifacts": capture["artifacts"],
                          "capture_manifest": "capture.json",
                          "capture_manifest_sha256": hashlib.sha256(
                              (temp / "capture.json").read_bytes()).hexdigest(),
