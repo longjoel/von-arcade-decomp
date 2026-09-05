@@ -9747,7 +9747,7 @@
           "id": "sharc.opcode-2d-one-word-passthrough-service",
           "name": "opcode_2d_one_word_passthrough_service",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -9762,6 +9762,11 @@
             }
           ],
           "symbol": "sharc_opcode_2d_one_word_passthrough_service",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x2d passthrough: consume one FIFO word and return the exact 32-bit input word for the delayed output write, preserving all bit patterns while handing off at the opcode-0x2e boundary.",
+            "test": "von/tools/test_recovered_sharc_opcode_2b_2d.py",
+            "unresolved_behavior": "FIFO production and wait timing, output FIFO backpressure, delayed-return transport, opcode dispatch, and opcode-0x2e packet consumers remain outside this bit-preserving leaf model."
+          },
           "notes": "Static listing recovers one FIFO input, one output-FIFO wait, delayed passthrough write, and the boundary into opcode 0x2e. The reusable C contract preserves the input word exactly."
         },
         {
