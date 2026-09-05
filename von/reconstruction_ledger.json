@@ -2257,6 +2257,11 @@
             }
           ],
           "symbol": "recovered_audio_queue_has_space",
+          "modeling": {
+            "boundary": "i960 host-to-SCSP ring-buffer free-space calculation with one-slot empty invariant",
+            "test": "von/tools/test_recovered_audio_queue.py",
+            "unresolved_behavior": "concurrent producer/consumer timing and mapped audio transport remain outside the pure capacity calculation"
+          },
           "notes": "Computes free space in the 64-byte host-to-SCSP ring while preserving one empty slot to distinguish full from empty.",
           "milestones": {
             "c-only-i960-attract-60s": {
