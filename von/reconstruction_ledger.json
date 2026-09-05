@@ -11415,6 +11415,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_record_counter_address_2b6ac.py"],
           "ranges": [{"start": "0x0002b6ac", "end": "0x0002b6c0"}],
           "symbol": "recovered_geometry_record_counter_address_2b6ac",
+          "modeling": {
+            "boundary": "Models the pure 0x2b6ac indexed address calculation: derive the 100-byte-stride counter-table address 0x51c5b4 + index*100, equivalent to the original shift/add sequence.",
+            "test": "von/tools/test_recovered_geometry_record_counter_address_2b6ac.py",
+            "unresolved_behavior": "Subsequent counter increment, threshold decisions, MMIO calls, and ownership of the addressed table remain outside this address-only model."
+          },
           "notes": "The original shift/add sequence computes 25*index and addresses the 100-byte-stride record counter table at 0x51c5b4. The subsequent counter increment/threshold and MMIO call are intentionally excluded."
         },
         {
