@@ -5745,6 +5745,11 @@
           ],
           "symbol": "recovered_comm_control_reset",
           "notes": "Recovers the two byte stores clearing mapped communication control locations 0x1a14000 and 0x1a14002. Host-tested as a two-byte reset.",
+          "modeling": {
+            "boundary": "i960 0xc5608 communication-control reset model covering the two mapped control-byte clears at offsets 0 and 2",
+            "test": "von/tools/test_recovered_comm_status.py",
+            "unresolved_behavior": "communication-board presence, device-side register effects, bus ordering, and subsequent handshake/state-machine behavior remain outside the pure byte-reset model"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
