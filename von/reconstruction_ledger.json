@@ -7709,6 +7709,11 @@
           ],
           "symbol": "recovered_video_dispatch_plan",
           "notes": "Recovers the repeated bank flag and exact 0x577590 sentinel/table/default gate before the e2330 jump-table arms. Individual table-arm tile subsets remain separate.",
+          "modeling": {
+            "boundary": "Purely models the common pre-dispatch decision: derive bank_a as geometry_mode == 0 or the exact geometry_mode 2/palette_mode 1/geometry_gate 0/board_bit == palette_delta predicate, preserve dispatch_state as the table index, route 0xff to NOOP, values above 0x81 to DEFAULT, and the remaining values to TABLE.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "Does not model the original 0x577590 memory access, jump-table target resolution, individual arm execution, downstream tile expansion, video writes, or runtime caller state."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
