@@ -7249,7 +7249,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm18",
-          "notes": "Recovers both bank-dependent six-tile plain e1f20 sequences, including their distinct source banks and continuation targets e30a8/e30cc."
+          "notes": "Recovers both bank-dependent six-tile plain e1f20 sequences, including their distinct source banks and continuation targets e30a8/e30cc.",
+          "modeling": {
+            "boundary": "Purely models the e2ad4 conditional plan: emit tiles 1, 3, 5, 7, 9, and 11; select the six exact bank-A or bank-B source addresses; set count 6; and select exit 0x000e30a8 for bank_a nonzero or 0x000e30cc otherwise.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime bank producer, e1f20 execution, plan consumption, downstream exit control flow, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-bank-select-arm",
