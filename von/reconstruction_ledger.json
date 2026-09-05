@@ -9763,6 +9763,11 @@
             }
           ],
           "symbol": "sharc_opcode_2e_packed_parameter_matrix_rebuild_service",
+          "modeling": {
+            "boundary": "Models the finite opcode-0x2e packed rebuild: each translation uses the recovered low-16 packed-float decoder, each angle uses its signed low-byte promoted by eight bits and pi/32767 scaling, and the matrix is rebuilt with the recovered Rx*Ry*Rz composition.",
+            "test": "von/tools/test_recovered_sharc_opcode_2e.py",
+            "unresolved_behavior": "FIFO/DM timing, packed-table storage and exact zero/denormal handling, helper residual precision, persistent writeback mapping, and caller-level field naming remain provisional."
+          },
           "notes": "Static listing recovers six FIFO inputs, packed-table decoding via DM 0x30141, decoded tail installation, three signed-parameter helper chains with scale 0x38c9116d, and persistent matrix rebuild with delayed final write. A serialized runtime trace of low-16 packed 0x3c00 shows I6 switching to 0x30141, the decoder constructing exact 0x3f800000 (1.0), and execution reaching the final delayed state store at 0x206e0. The complete trace writes matrix [0x3f7fffff,0,0 / 0,0x3f7fffff,0 / 0,0,0x3f7ffffe] and translation tail [0x3f800000,0x38000000,0x38000000], directly confirming packed X mapping and the ROM's zero-shaped decode for the other coordinates. Existing readback evidence confirms low-16 packed 0x4000 writes exact tail 2.0. Signed-byte angle fields operate on that decoded state; remaining caller-level field naming is provisional."
         },
         {
