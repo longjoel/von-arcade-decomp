@@ -10026,6 +10026,11 @@
             }
           ],
           "symbol": "sharc_opcode_35_stateful_math_handler",
+          "modeling": {
+            "boundary": "Models the visible opcode-0x35 scalar result path: consume the six supplied FIFO words as prior F0/F2 state multipliers, additive w4, and divisor w5; form (previous_f0*w0 + previous_f2*w2 + w4) / w5 using the recovered 128-entry RECIPS seed and three rounded Newton corrections, returning the corrected quotient bits.",
+            "test": "von/tools/test_recovered_sharc_opcode_35.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent F0/F2/F13 state ownership, complete register/DM staging, output FIFO pairing, exceptional/denormal behavior beyond tested zero and infinity divisors, and the opcode-35-to-36 continuation remain outside this bounded scalar model."
+          },
           "notes": "Static SHARC listing recovers six FIFO reads as R4,R0,R6,R2,R13,R12, the parallel F0/F2/F13 state feeds, R0-to-R7 staging, three reciprocal-correction stages driven by F11, and one result write at instruction 0x908. The preceding opcode 0x34 ends its delayed tail stores at 0x8f0/0x8f1 and opcode 0x35 begins at 0x8f2 without a state reset, establishing a shared continuation boundary. The ADSP-2106x manual resolves RECIPS as an 8-bit reciprocal seed followed by the same Newton refinement. Runtime evidence in the expanded helper-sweep trace shows a six-word vector 4321912d/00000000/430caea5/c2a00000/c7507c0a/c3f00103 producing bdcccccd, followed by a second six-word vector producing 00000001; the output-boundary snapshot for the first vector observes F11=40000000 (2.0), F12=3f800000 (1.0), F4=4321912d, F6=430caea5, and R0=4306a2f7 (134.6365814). Full correction-stage tracing shows the residual lane converging through bb080000, 3f807f76, 3f800080, and 3f800000 while F7 settles on the emitted scalar, proving the delayed F0*F7 finalization. The operand roles are now numerically resolved: the state-derived F0 numerator at 0x208fe is divided by the sixth FIFO word in F12; the first result matches -64626.6171875/-480.0079041=134.6365814 and the second matches -200000/-1=200000. The other five FIFO words feed preceding state/pipeline setup rather than the final quotient; persistent geometric names and complete response pairing remain provisional."
         },
         {
