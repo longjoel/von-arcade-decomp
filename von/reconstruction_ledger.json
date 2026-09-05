@@ -7330,7 +7330,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm14",
-          "notes": "Recovers both plain e1f20 arms entering the shared e2a30 tail: the e29a4 path supplies tiles 1, 3, 5, 7, 9, and 11, while e29fc supplies 1, 3, 5, and 7; the shared source 0x2fb7c90 is attributed to the tile selector set immediately before the join."
+          "notes": "Recovers both plain e1f20 arms entering the shared e2a30 tail: the e29a4 path supplies tiles 1, 3, 5, 7, 9, and 11, while e29fc supplies 1, 3, 5, and 7; the shared source 0x2fb7c90 is attributed to the tile selector set immediately before the join.",
+          "modeling": {
+            "boundary": "Purely models the shared-tail plan builders: arm e29a4 emits tiles 1/3/5/7/9/11 with sources 0x02fb7a50, 0x02fb7b10, 0x02fb4090, 0x02fb4150, 0x02fb7bd0, and 0x02fb7c90 and count 6; arm e29fc emits tiles 1/3/5/7 with sources 0x02fb7a50, 0x02fb7b10, 0x02fb7bd0, and 0x02fb7c90 and count 4.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The shared e2a30 tail, e1f20 execution, plan consumption, caller sequencing, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-special-exit-arm",
