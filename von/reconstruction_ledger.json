@@ -7773,6 +7773,11 @@
           ],
           "symbol": "recovered_video_setup_plan",
           "notes": "Recovers the exact bank-selection predicate, fourteen odd-tile asset descriptors, and six published video base-pointer offsets plus the 0xff sentinel. The routine's calls to the existing palette producer and tile expander are represented as an explicit integration boundary; mapped-memory writes remain outside this pure plan.",
+          "modeling": {
+            "boundary": "Purely models the video setup descriptor plan: select bank A or B using the exact predicate, emit four bank-dependent odd-tile assets plus ten shared assets, and publish base 0x02f8d890 with offsets 0x60c0, 0xc180, 0x12240, 0x18300, and 0x1e3c0 plus sentinel 0xff.",
+            "test": "von/tools/test_recovered_video_setup.py",
+            "unresolved_behavior": "Does not execute the palette producer or tile expander, publish pointers into mapped memory, or model hardware video-memory writes and caller timing."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
