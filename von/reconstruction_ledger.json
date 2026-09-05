@@ -2680,6 +2680,11 @@
             }
           ],
           "symbol": "recovered_host_service_request",
+          "modeling": {
+            "boundary": "Models the pure host-service request thunk at 0x1348: OR bit 10 into the reconstructed host-control mirror, then write the resulting value to the interrupt-control MMIO register; no queue or callback sequencing is included.",
+            "test": "von/tools/test_recovered_audio_queue.py",
+            "unresolved_behavior": "The audio producer/consumer queue, MMIO timing and side effects, host-control storage ownership, and callback/service scheduling remain unresolved outside this thunk."
+          },
           "notes": "Shared service-request thunk called by the audio producer. It sets bit 10 in the host control mirror and writes the same value to the interrupt-control MMIO register.",
           "milestones": {
             "c-only-i960-attract-60s": {
