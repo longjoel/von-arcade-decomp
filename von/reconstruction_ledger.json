@@ -8853,6 +8853,11 @@
             }
           ],
           "symbol": "recovered_byte_compare",
+          "modeling": {
+            "boundary": "Models the pure bounded unsigned-byte comparison: it examines at most the requested length, returns zero for equal or zero-length ranges, and otherwise returns the first left-byte minus right-byte difference with unsigned-byte arithmetic.",
+            "test": "von/tools/test_recovered_byte_compare.py",
+            "unresolved_behavior": "The four runtime callers, source-buffer ownership and validity, surrounding formatter/utility control flow, and consumers of the comparison result are not modeled by this primitive."
+          },
           "notes": "Recovers the bounded byte-range comparison at 0xf5c58: equal ranges and zero length return zero; the first unequal unsigned byte returns left minus right. The four observed callers remain in formatter/utility paths.",
           "milestones": {
             "c-only-i960-attract-60s": {
