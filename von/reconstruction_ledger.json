@@ -5905,6 +5905,11 @@
           ],
           "symbol": "recovered_object_pool_create_rebased",
           "notes": "Recovers the third 37-entry pool construction path: input +0x14/+0x18/+0x1c rebased to slot +0x10/+0x14/+0x18, mode/selector lookup through 0x13e170 and 0x13db08, direct class-byte selection through 0xc4f40, context copied to +0x08/+0x0a/+0x0c, work fields cleared, and input +0x1c low-half committed at +0x0e. The external 0xf5058 bookkeeping call and semantic table names remain provisional.",
+          "modeling": {
+            "boundary": "i960 0xc5310 rebased object-pool creator model covering first-free-slot selection, input-field rebasing, mode/selector table lookup, work-field clearing, class/halfword assignment, source-handle capture, and sequence allocation",
+            "test": "von/tools/test_recovered_object_pool_create.py",
+            "unresolved_behavior": "external 0xf5058 bookkeeping, mapped pool ownership, table semantic meanings, allocation failure side effects, and downstream object dispatch remain outside the deterministic creator model"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
