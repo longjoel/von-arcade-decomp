@@ -1619,6 +1619,11 @@
             }
           ],
           "symbol": "sharc_helper_20d68_branched_floating_point_reduction",
+          "modeling": {
+            "boundary": "SHARC floating-point helper input, LOGB branch selection, reciprocal refinement, and caller-facing ratio result",
+            "test": "von/tools/test_recovered_sharc_helper_20d68_candidate.py",
+            "unresolved_behavior": "direct infinity input and exact internal edge rounding remain provisional beyond the captured finite and normalized edge paths"
+          },
           "notes": "Static listing recovers LOGB-based exponent-distance branches, reciprocal-refined main and magnitude paths, and equality/zero, exponent-bound, and magnitude-bound delayed-return tails. The equal/zero second-input branch reaches 0x20dbb and returns the surviving F0; exponent-distance bounds route to 0x20db5/0x20db8 before refinement, while the normal path applies sign/threshold corrections through R10 and the DM 0x30300 table. The DM 0x30300 constants begin with 2-sqrt(3) and sqrt(3), and opcode 0x0f feeds endpoint differences through this helper before applying the 32767/pi fixed-point scale; this identifies an atan-family ratio/direction reducer. The direct opcode-0x0f zero-vector probe emits 0x00000000 after scale/FIX. The readable candidate matches captured finite outputs and the normal finite 123/124-step LOGB boundary. A live eight-vector edge capture establishes canonical 0xffffffff NaNs, caller-side infinity saturation to 0x7f7fffff/0xff7fffff, and subnormal flush-to-zero; verify_sharc_20d68_nonfinite_trace.py checks the normalized helper inputs, paths, results, caller words, and final low ASTAT flags. Direct infinity input and exact internal edge rounding remain provisional."
         },
         {
