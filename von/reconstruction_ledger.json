@@ -9511,6 +9511,32 @@
             "unresolved_behavior": "Actual 0x1d570 execution and string storage remain outside this pure emit schedule"
           },
           "notes": "Pure emit schedule for the 0xe3a70 fan-out: emits the first three string bytes with sign extension through 0x1d570."
+        },
+        {
+          "id": "maincpu.state-shift-77e20",
+          "name": "state_shift_77e20",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/disassembly-annotations.md"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_memory.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00077e20",
+              "end": "0x00077e50"
+            }
+          ],
+          "modeling": {
+            "boundary": "fixed state-shift wrapper chains two 0xf5d40 forward copies of 0xf4 bytes: 0x504d60 to 0x504e60, then 0x504f60 to 0x504d60",
+            "test": "von/tools/test_recovered_memory.py",
+            "unresolved_behavior": "Runtime state contents and exact wrapper instruction encoding remain provisional beyond the fixed address/length contract"
+          },
+          "notes": "Fixed wrapper around 0xf5d40 like 0x2330: two chained 0xf4-byte copies shifting state down one slot. All addresses and the length are immediate and reuse the recovered forward-copy contract."
         }
       ]
     },

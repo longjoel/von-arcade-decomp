@@ -468,6 +468,12 @@ The fixed fan-out at `0xe3a70` emits the first three string bytes through
 the `0x1d570` status helper, sign-extending each low byte (`shlo 24`/
 `shri 24`). The pure schedule is in `recovered_tribyte_emit_e3a70.c`.
 
+The state-shift helper at `0x77e20` chains two `0xf5d40` forward copies of
+`0xf4` bytes: first `0x504d60` to `0x504e60`, then `0x504f60` to `0x504d60`.
+Like the `0x2330` wrapper it is a call-site contract reusing
+`recovered_memory_copy_forward()` with fully immediate addresses and
+length, so no second copy implementation is introduced.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at
