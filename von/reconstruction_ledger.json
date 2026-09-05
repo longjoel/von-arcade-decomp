@@ -1382,7 +1382,7 @@
           "id": "maincpu.opcode-11-state-readback-service",
           "name": "opcode_11_state_readback_service",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -1397,6 +1397,11 @@
             }
           ],
           "symbol": "sharc_opcode_11_state_readback_service",
+          "modeling": {
+            "boundary": "Models the exact no-payload opcode-0x11 state readback: load the state pointer from DM 0x30101, stream twelve sequential state words to the output FIFO with readiness waits, and place the twelfth output in the delayed-return slot.",
+            "test": "von/tools/test_sharc_opcode_11.py",
+            "unresolved_behavior": "Persistent state ownership/address units, FIFO backpressure and dispatch scheduling, delayed-return timing, and semantic interpretation of the twelve returned fields remain outside this static readback model."
+          },
           "notes": "Static listing recovers a no-payload sequential readback of twelve words from the DM 0x30101 state pointer to the output FIFO. The twelfth output is after RTS (DB); state field meaning remains provisional."
         },
         {
