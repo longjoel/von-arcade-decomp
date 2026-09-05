@@ -3,8 +3,8 @@
   "coverage_source": "von/build/attract-coverage/vonj-attract-60s.json",
   "discovered_units": 262,
   "represented_units": 102,
-  "modeled_units": 77,
-  "integrated_units": 25,
+  "modeled_units": 75,
+  "integrated_units": 27,
   "untriaged_units": 160,
   "ordering": "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality",
   "units": [
@@ -1731,8 +1731,8 @@
     {
       "entry": "0x00029c08",
       "observed_call_edges": 1,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
       "priority": 0,
       "weight": null,
       "work_unit": "maincpu.clamp-store-29c08",
@@ -1743,8 +1743,8 @@
     {
       "entry": "0x00029d50",
       "observed_call_edges": 1,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
       "priority": 0,
       "weight": null,
       "work_unit": "maincpu.upload-select-29d50",

@@ -9985,7 +9985,7 @@
           "id": "maincpu.clamp-store-29c08",
           "name": "clamp_store_29c08",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_clamp_store_29c08.c"
           ],
@@ -10012,13 +10012,19 @@
               ]
             }
           },
+          "integration": {
+            "image": "von/build/upload-cluster-harness",
+            "image_sha256": "ce231a52b6e9bb173e53f44d5d69c62984d24714618305d99ffc1dd108e249dd",
+            "checkpoint": "upload-cluster-768-store-run",
+            "test": "von/tools/test_recovered_upload_cluster_driver.py"
+          },
           "notes": "Pure store schedule for the 0x29c08 triple: the bl/cmpible arms reduce to a signed minimum against 0x100."
         },
         {
           "id": "maincpu.upload-select-29d50",
           "name": "upload_select_29d50",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_upload_select_29d50.c"
           ],
@@ -10045,13 +10051,19 @@
               ]
             }
           },
+          "integration": {
+            "image": "von/build/upload-cluster-harness",
+            "image_sha256": "ce231a52b6e9bb173e53f44d5d69c62984d24714618305d99ffc1dd108e249dd",
+            "checkpoint": "upload-cluster-768-store-run",
+            "test": "von/tools/test_recovered_upload_cluster_driver.py"
+          },
           "notes": "Pure prologue schedule for the 0x29d50 uploader: sub-3 counters return early, otherwise bank-select plus mode dispatch."
         },
         {
           "id": "maincpu.upload-state-init-29d2c",
           "name": "upload_state_init_29d2c",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_upload_state_init_29d2c.c"
           ],
@@ -10071,13 +10083,19 @@
             "test": "von/tools/test_recovered_upload_state_init_29d2c.py",
             "unresolved_behavior": "Who re-arms the cluster after a 0x29c08 clamp zeroes the counter remains outside this pure seed schedule"
           },
+          "integration": {
+            "image": "von/build/upload-cluster-harness",
+            "image_sha256": "ce231a52b6e9bb173e53f44d5d69c62984d24714618305d99ffc1dd108e249dd",
+            "checkpoint": "upload-cluster-768-store-run",
+            "test": "von/tools/test_recovered_upload_cluster_driver.py"
+          },
           "notes": "Pure seed schedule for the 0x29d2c setup tail: links the 0x29c08/0x29d50 cluster lifecycle (preset 4 = active, clamp-zeroed = parked)."
         },
         {
           "id": "maincpu.blend-kernel-29dec",
           "name": "blend_kernel_29dec",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_blend_kernel_29dec.c"
           ],
@@ -10097,13 +10115,19 @@
             "test": "von/tools/test_recovered_blend_kernel_29dec.py",
             "unresolved_behavior": "Loop trip counts, pointer chasing, and multiply fault semantics remain outside this pure per-texel contract"
           },
+          "integration": {
+            "image": "von/build/upload-cluster-harness",
+            "image_sha256": "ce231a52b6e9bb173e53f44d5d69c62984d24714618305d99ffc1dd108e249dd",
+            "checkpoint": "upload-cluster-768-store-run",
+            "test": "von/tools/test_recovered_upload_cluster_driver.py"
+          },
           "notes": "Pure kernel for the 0x29dec blend loop, repeated with different factors across the other five blend loops and both direct-path loops."
         },
         {
           "id": "maincpu.blend-loop-schedule-29e68",
           "name": "blend_loop_schedule_29e68",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_blend_loop_schedule_29e68.c"
           ],
@@ -10123,13 +10147,19 @@
             "test": "von/tools/test_recovered_blend_loop_schedule_29e68.py",
             "unresolved_behavior": "0x180 stride fixups and outer r15 cadence remain outside this pure inner schedule"
           },
+          "integration": {
+            "image": "von/build/upload-cluster-harness",
+            "image_sha256": "ce231a52b6e9bb173e53f44d5d69c62984d24714618305d99ffc1dd108e249dd",
+            "checkpoint": "upload-cluster-768-store-run",
+            "test": "von/tools/test_recovered_upload_cluster_driver.py"
+          },
           "notes": "Pure trip schedule for the 0x29e68 plane-1 loop; the same counter block shape drives every other inner loop in the cluster."
         },
         {
           "id": "maincpu.blend-stride-schedule-29e4c",
           "name": "blend_stride_schedule_29e4c",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_blend_stride_schedule_29e4c.c"
           ],
@@ -10157,13 +10187,19 @@
             "test": "von/tools/test_recovered_blend_stride_schedule_29e4c.py",
             "unresolved_behavior": "Pixel data movement and multiply fault semantics remain outside this pure pointer/dispatch contract"
           },
+          "integration": {
+            "image": "von/build/upload-cluster-harness",
+            "image_sha256": "ce231a52b6e9bb173e53f44d5d69c62984d24714618305d99ffc1dd108e249dd",
+            "checkpoint": "upload-cluster-768-store-run",
+            "test": "von/tools/test_recovered_upload_cluster_driver.py"
+          },
           "notes": "Pure stride schedule joining the three inner loops: pairs 0/1 span exactly one 4KB prologue bank per run, pair 2 advances asymmetrically."
         },
         {
           "id": "maincpu.direct-stride-schedule-29f60",
           "name": "direct_stride_schedule_29f60",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_direct_stride_schedule_29f60.c"
           ],
@@ -10194,6 +10230,12 @@
             "boundary": "Direct-path schedule: fade<=0 selects fade form else scale with fade+0x100; 8 passes with uniform 0x200 per-pair strides",
             "test": "von/tools/test_recovered_direct_stride_schedule_29f60.py",
             "unresolved_behavior": "Pixel data movement and multiply fault semantics remain outside this pure dispatch/pointer contract"
+          },
+          "integration": {
+            "image": "von/build/upload-cluster-harness",
+            "image_sha256": "ce231a52b6e9bb173e53f44d5d69c62984d24714618305d99ffc1dd108e249dd",
+            "checkpoint": "upload-cluster-768-store-run",
+            "test": "von/tools/test_recovered_upload_cluster_driver.py"
           },
           "notes": "Pure dispatch/stride schedule for the mode-0 direct path: every pair spans exactly one 4KB bank, unlike the blend path pair 2."
         }
