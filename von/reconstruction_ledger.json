@@ -11495,6 +11495,11 @@
             }
           ],
           "symbol": "recovered_status_value_plan",
+          "modeling": {
+            "boundary": "Models the signed status-value split: negative values copy 20x3 from 0x02fe17ec, advance the current column by 21, and choose a 4x3 glyph from 0x02ea1fd0 using ((g0-48)&15); nonnegative values clear a 25x3 region through 0x1df00",
+            "test": "von/tools/test_recovered_status_value_renderer.py",
+            "unresolved_behavior": "Caller value provenance, glyph decoding, source-asset ownership, SHARC tile-RAM destination, and display timing remain outside this branch contract"
+          },
           "notes": "Recovers the signed split: negative values copy 0x02fe17ec as 20x3, advance the current column by 21, and select a 4x3 glyph from 0x02ea1fd0 using ((g0-48)&15); nonnegative values clear 25x3 through 0x1df00."
         },
         {
