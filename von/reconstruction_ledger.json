@@ -6076,7 +6076,12 @@
             }
           ],
           "symbol": "recovered_secondary_transition_select",
-          "notes": "Recovers the exact 0x504dc8 gate and object-state selector: gate 1 writes transition 2 only for state 7, otherwise transition 1; non-1 gates leave the transition unchanged."
+          "notes": "Recovers the exact 0x504dc8 gate and object-state selector: gate 1 writes transition 2 only for state 7, otherwise transition 1; non-1 gates leave the transition unchanged.",
+          "modeling": {
+            "boundary": "i960 0x79d20 secondary-transition selector model covering the 0x504dc8 gate, state-7 special case, default transition write, and unchanged output for non-1 gates",
+            "test": "von/tools/test_recovered_secondary_transition.py",
+            "unresolved_behavior": "caller-side object selection, mapped global storage, downstream state dispatch, and transition consumer effects remain outside the pure selector model"
+          }
         },
         {
           "id": "maincpu.object-state-transition-tail",
