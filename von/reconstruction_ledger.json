@@ -11711,6 +11711,11 @@
             }
           ],
           "symbol": "recovered_streak_plan",
+          "modeling": {
+            "boundary": "Models streak-status rendering: initial 22x2 clear, embedded OVER 100 STRAIGHTS WINS message path, bounded digit path, and two fixed follow-on tile transfers",
+            "test": "von/tools/test_recovered_streak_status_renderer.py",
+            "unresolved_behavior": "Streak-value provenance, glyph decoding, source asset ownership, SHARC tile-RAM destination, and display timing remain outside this branch sequence contract"
+          },
           "notes": "Recovers the initial 22x2 clear, embedded OVER 100 STRAIGHTS WINS string path, bounded digit path, and two fixed follow-on tile transfers."
         },
         {
