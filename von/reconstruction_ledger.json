@@ -8693,6 +8693,11 @@
             }
           ],
           "symbol": "recovered_text_write_tile_block",
+          "modeling": {
+            "boundary": "Models the pure bounded text-tile rectangle write: for each row and column in the supplied width-by-height dimensions, the row-contiguous source halfword is copied to the destination at a 64-tile row stride and column offset with bit 15 forced; zero dimensions perform no writes.",
+            "test": "von/tools/test_recovered_text_tile_block.py",
+            "unresolved_behavior": "The runtime state loads from the ROM text column/row globals and the actual 0x01004000 tile-plane mapping, bus behavior, and display consumption are not modeled by this helper."
+          },
           "notes": "Recovers the width-by-height writer into tile plane 0x01004000, using current text row/column state, 64-tile destination stride, row-contiguous source halfwords, and forced bit 15. Zero dimensions are no-ops.",
           "milestones": {
             "c-only-i960-attract-60s": {
