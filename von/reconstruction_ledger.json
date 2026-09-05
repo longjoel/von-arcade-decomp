@@ -11414,6 +11414,11 @@
             }
           ],
           "symbol": "recovered_panel7_transfer_plan",
+          "modeling": {
+            "boundary": "Models the fixed panel-7 attributed transfer through 0x1dc10: source 0x02fe1350 at column/row (10,10), width g12+31, and height 5",
+            "test": "von/tools/test_recovered_panel6_panel7.py",
+            "unresolved_behavior": "The caller's g12 population, source asset ownership, SHARC tile-RAM destination, and display timing remain outside this transfer contract"
+          },
           "notes": "Recovers the fixed-position attributed transfer: source 0x02fe1350, column/row (10,10), width g12+31, height 5, through 0x1dc10."
         },
         {
