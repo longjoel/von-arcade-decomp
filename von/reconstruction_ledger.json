@@ -2359,6 +2359,11 @@
             }
           ],
           "symbol": "recovered_audio_short_delay",
+          "modeling": {
+            "boundary": "i960 volatile four-count audio settle-delay loop",
+            "test": "von/tools/test_recovered_audio_helpers.py",
+            "unresolved_behavior": "cycle-accurate SCSP register-settle timing and interrupt interaction remain unresolved beyond the countdown contract"
+          },
           "notes": "The observed leaf seeds a volatile countdown with four and loops until zero. It is used as a short SCSP register-settle delay during audio initialization.",
           "milestones": {
             "c-only-i960-attract-60s": {
