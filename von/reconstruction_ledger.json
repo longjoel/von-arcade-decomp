@@ -9459,6 +9459,32 @@
             "unresolved_behavior": "Actual FIFO traffic, table dereference at 0x51bb28, and the final response read remain outside this pure validation/packet schedule"
           },
           "notes": "Pure schedule for the 0x6ede0 helper: truncates both floats toward zero, keeps the pair exactly for [0, 1023] via the halved 0xfffffe00 mask, indexes 20-byte records from 0x51bb28 asymmetrically, and orders the eight packet words as 53/rec+4/x/rec+12/y/rec+8^0x80000000/rec+16/rec+8. The 0x40800000 load is dead."
+        },
+        {
+          "id": "maincpu.rank-string-e39c0",
+          "name": "rank_string_e39c0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_rank_string_e39c0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_rank_string_e39c0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000e39c0",
+              "end": "0x000e39e4"
+            }
+          ],
+          "symbol": "recovered_rank_string_plan",
+          "modeling": {
+            "boundary": "Rank-string emit schedule: six-byte stride into parallel number/suffix tables, number half through the 0x1d1d0 walker, suffix half through 0x1d1b0",
+            "test": "von/tools/test_recovered_rank_string_e39c0.py",
+            "unresolved_behavior": "Actual walker execution and string-table ROM provenance remain outside this pure address/schedule plan"
+          },
+          "notes": "Pure emit schedule for the 0xe39c0 ranking emitter: index scales by ((i*2+i)*2) into tables 0xe36c0 (' 1', ' 2', ...) and 0xe3700 ('ST', 'ND', ...). Ten static callers in the results screens."
         }
       ]
     },

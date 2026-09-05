@@ -456,6 +456,14 @@ also go out through the caller pointers. The `0x40800000` load is dead
 (the `addrl` adds a zero register). The pure plan is in
 `recovered_command6_pair_6ede0.c`.
 
+The tiny emitter at `0xe39c0` renders ranking ordinals from parallel
+tables: `0xe36c0` holds `" 1"`, `" 2"`, ... while `0xe3700` holds `"ST"`,
+`"ND"`, `"RD"`, `"TH"`, ... The index scales by `((i*2+i)*2)` (`shlo 1`,
+`addo`, `shlo 1`) for a six-byte stride. The number half goes through the
+`0x1d1d0` walker and the suffix through the `0x1d1b0` walker. Ten static
+callers sit in the `0xe3xxx`–`0xe6xxx` results screens. The pure schedule
+is in `recovered_rank_string_e39c0.c`.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at
