@@ -5609,6 +5609,11 @@
           ],
           "symbol": "recovered_command_profile_initialize",
           "notes": "Recovers the profile-13 exception, configuration call/sentinel, first-column handler call, clearing of 0x5770f4 and 0x577118, profile long/word table loads, helper ordering, and handle publication to 0x577110/0x577114. Indirect/helper targets and semantic table meanings remain provisional.",
+          "modeling": {
+            "boundary": "i960 0xc8fa0 command-profile initializer model covering the profile-13 setup exception, callback order, selector/pending reset, profile table loads, and handle publication",
+            "test": "von/tools/test_recovered_command_profile_initialize.py",
+            "unresolved_behavior": "indirect helper implementations, configuration allocation semantics, table ownership, mapped state addresses, and the semantic meaning of profile values remain outside this callback-and-state model"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
