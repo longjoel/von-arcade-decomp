@@ -11,15 +11,35 @@ from export_geometry_assemblies import split_assemblies
 from export_geometry_frame_textured_gltf import select_frame
 
 
+def path_error(label: str, path: Path, root: Path, *, output: bool = False) -> str | None:
+    if path.is_symlink():
+        return f"{label} path must not be a symlink: {path}"
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, RuntimeError, ValueError):
+        return f"{label} path escapes root: {path}"
+    if not output and not path.is_file():
+        return f"missing {label}: {path}"
+    return None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--trace", type=Path, required=True)
     parser.add_argument("--time", type=float, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--root", type=Path, default=Path.cwd(),
+                        help="root that geometry trace and candidate output must remain within")
     parser.add_argument("--min-objects", type=int, default=1)
     parser.add_argument("--tolerance", type=float, default=.02)
     parser.add_argument("--distance", type=float, default=15.0)
     args = parser.parse_args()
+    root = args.root.resolve()
+    for label, path, output in (("trace", args.trace, False), ("output", args.output, True)):
+        error = path_error(label, path, root, output=output)
+        if error:
+            print(f"Geometry candidates: {error}")
+            return 1
     if args.distance <= 0:
         raise SystemExit("distance must be positive")
     selected_time, objects = select_frame(args.trace, args.time, None, args.tolerance, args.min_objects)
