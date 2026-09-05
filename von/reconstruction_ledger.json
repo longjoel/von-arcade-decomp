@@ -6606,7 +6606,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm35",
-          "notes": "Recovers the selector-driven two-call e1fb0 prefix and fixed three-call e2040 suffix at e3314, including bank-specific table bases and selector-5 substitution."
+          "notes": "Recovers the selector-driven two-call e1fb0 prefix and fixed three-call e2040 suffix at e3314, including bank-specific table bases and selector-5 substitution.",
+          "modeling": {
+            "boundary": "Purely models the e3314 mixed plan: select the two-tile e1fb0 prefix from bank-specific table bases 0x00142e94/0x00142f34 with the bank-B selector-5 tile 5/7 substitution, append fixed e2040 tiles 25/27/29 and their exact sources, then set count 5 and exit 0x000e33f4.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime bank and selector producers, selector range, table contents, e1fb0/e2040 execution, plan consumption, common continuation behavior, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-sentinel-match-subpath",
