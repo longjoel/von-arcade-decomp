@@ -11279,6 +11279,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_inner_packet_8e120.py"],
           "ranges": [{"start": "0x0008e120", "end": "0x0008e2b0"}],
           "symbol": "recovered_geometry_inner_packet_8e120",
+          "modeling": {
+            "boundary": "Models the pure 0x8e120 per-record packet: thirteen-word FIFO framing with low-halfword inputs, response-dependent object +0x4/+0x8 selection, control/window writes and completion word, FIFO response read at 0x884000, and direct destinations +0x174/+0x17c versus table address 0x562430 + index*12 with the bounded table-write predicate.",
+            "test": "von/tools/test_recovered_geometry_inner_packet_8e120.py",
+            "unresolved_behavior": "Outer setup, live FIFO/MMIO effects, frame readback and returned response production, and caller-side record/table ownership remain outside this per-record model."
+          },
           "notes": "Pure per-record packet: models 0x8e238 FIFO-response selection of object +0x4/+0x8, command-window fields, returned pair destinations +0x174/+0x17c versus 0x562430+index*12, and exact FIFO word order. Outer setup and MMIO remain external."
         },
         {
