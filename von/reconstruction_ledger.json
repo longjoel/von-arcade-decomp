@@ -10229,6 +10229,11 @@
             }
           ],
           "symbol": "sharc_opcode_3c_normalized_state_update",
+          "modeling": {
+            "boundary": "Models the normal and observed degenerate opcode-0x3c frame update: derive the orthonormal 3x3 frame from the supplied direction using horizontal XZ magnitude and full length, clear the three affine-tail words, and publish nine canonical-NaN matrix words plus a zero tail for zero/XZ-degenerate or NaN probe inputs.",
+            "test": "von/tools/test_recovered_sharc_opcode_3c.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent DM state ownership/address mapping, SHARC RSQRTS/RECIPS rounding versus host arithmetic, exceptional inputs beyond tested NaN and degenerate cases, delayed write ordering, and downstream state consumers remain outside this bounded frame model."
+          },
           "notes": "Static listing and runtime readback recover the normal-case orthonormal frame written by opcode 0x3c. The third column is the normalized input direction, the first is its XZ-plane perpendicular, and the second completes the frame. For (3,4,12), opcode 0x11 reads back approximately [0.9701425,-0.0746264,0.2307692 / 0,0.9514860,0.3076923 / -0.2425356,-0.2985054,0.9230769]. Edge probes show both (0,1,0) and (0,0,0) write 0xffffffff to all nine matrix slots and zero to the three tail slots; (1,0,0) writes [0,0,1 / 0,1,0 / -1,0,0]. The C model and direct test also preserve the observed canonical-NaN tail for NaN input."
         },
         {
