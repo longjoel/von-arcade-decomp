@@ -13,6 +13,18 @@ MATRIX = re.compile(r"vonj_geometry_matrix: (?:seq=\d+ )?time=([0-9.e+-]+) m=([^
 OBJECT = re.compile(r"vonj_geometry_object: (?:seq=\d+ )?time=([0-9.e+-]+) tpa=([0-9a-f]+) tha=([0-9a-f]+) oba=([0-9a-f]+) count=([0-9a-f]+) mode=(\d+) source=([^ ]+)(?: opcode=([0-9a-f]+))?")
 
 
+def path_error(label: str, path: Path, root: Path, *, output: bool = False) -> str | None:
+    if path.is_symlink():
+        return f"{label} path must not be a symlink: {path}"
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, RuntimeError, ValueError):
+        return f"{label} path escapes root: {path}"
+    if not output and not path.is_file():
+        return f"missing {label}: {path}"
+    return None
+
+
 def summarize(trace: Path, start_time: float, matrix_limit: int | None) -> dict[str, object]:
     matrix_count = object_count = attached = 0
     current_matrix: tuple[float, ...] | None = None
@@ -72,7 +84,17 @@ def main() -> int:
     parser.add_argument("--start-time", type=float, default=43.0)
     parser.add_argument("--matrix-limit", type=int)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--root", type=Path,
+                        help="root that trace and summary output must remain within (defaults to trace parent)")
     args = parser.parse_args()
+    root = (args.root or args.trace.parent).resolve()
+    for label, path, output in (("trace", args.trace, False), ("output", args.output, True)):
+        if path is None:
+            continue
+        error = path_error(label, path, root, output=output)
+        if error:
+            print(f"Geometry trace: {error}")
+            return 1
     encoded = json.dumps(summarize(args.trace, args.start_time, args.matrix_limit), indent=2, sort_keys=True) + "\n"
     if args.output:
         args.output.write_text(encoded)
