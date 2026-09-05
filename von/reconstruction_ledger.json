@@ -5402,6 +5402,11 @@
             }
           ],
           "symbol": "recovered_geometry_float_conversion",
+          "modeling": {
+            "boundary": "geometry raw IEEE-754 words are reduced to an unbiased exponent-like value plus 128, clamped to the byte range 0..0x80, with zero/subnormal handling explicit",
+            "test": "von/tools/test_geometry_float_conversion.py",
+            "unresolved_behavior": "original logbnr/cvtzri instruction rounding and full runtime table-consumer integration remain provisional beyond the pure conversion boundaries"
+          },
           "notes": "Recovered helper is used by the checked-in geometry table generator. A standalone candidate previously matched 3/60 bytes; byte validation is blocked on compiler support for the original logbnr/cvtzri sequence.",
           "milestones": {
             "c-only-i960-attract-60s": {
