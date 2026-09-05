@@ -11252,6 +11252,11 @@
             }
           ],
           "symbol": "recovered_status_code_table_plan",
+          "modeling": {
+            "boundary": "Models the embedded status-code table as nine fixed 16-byte records at 0x1f680: indices 0-7 contain status strings, index 8 is blank, and the consumer renders the selected record at text position (8,14)",
+            "test": "von/tools/test_recovered_status_code_table.py",
+            "unresolved_behavior": "Runtime status-code production, glyph decoding, and downstream panel routing remain outside this static table contract"
+          },
           "notes": "Classifies the embedded table as nine 16-byte records at 0x1f680; indices 0-7 are status strings, index 8 is blank, and the consumer uses text position (8,14)."
         },
         {
