@@ -2427,6 +2427,11 @@
             }
           ],
           "symbol": "recovered_audio_send_clamped_level",
+          "modeling": {
+            "boundary": "i960 signed-level clamp, three-byte audio framing, and capacity-gated enqueue",
+            "test": "von/tools/test_recovered_audio_helpers.py",
+            "unresolved_behavior": "mapped sound transport timing and command-consumer behavior remain outside the bounded enqueue contract"
+          },
           "notes": "Clamps the signed input to the observed inclusive range 1..127, frames it as 0xa0, selector 1, level, and sends the three-byte audio command when FIFO capacity permits."
         },
         {
