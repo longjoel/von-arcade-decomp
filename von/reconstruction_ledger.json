@@ -10199,6 +10199,11 @@
             }
           ],
           "symbol": "sharc_opcode_3b_fixed_source_table_copy_bridge",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x3b bridge: preserve the supplied fixed-source word as the output value, derive the copy destination as (source_value >> 2) + 0x01400000, write the fixed 0x05800b0b seed followed by 12 table words, and expose the post-increment destination pointer as address + 13.",
+            "test": "von/tools/test_recovered_sharc_opcode_3b.py",
+            "unresolved_behavior": "Fixed DM 0x01407fff ownership and read timing, FIFO production/backpressure, destination/protocol field semantics, exact post-increment addressing, delayed output ordering, and downstream consumers remain outside this bounded bridge model."
+          },
           "notes": "Static listing recovers fixed-source read/output at DM 0x01407fff, derived destination addressing, seeded 12-word table copy, and delayed output of the post-increment destination pointer; protocol semantics remain provisional."
         },
         {
