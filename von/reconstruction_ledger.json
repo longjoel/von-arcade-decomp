@@ -4014,7 +4014,12 @@
             }
           ],
           "symbol": "recovered_status_strip_reset_plan",
-          "notes": "Recovers the zero-source 0x1dfd0 64x4 upload with caller_g14+31 rows, two state clears, and the 0x0100c000/0xfff zero-halfword reset."
+          "notes": "Recovers the zero-source 0x1dfd0 64x4 upload with caller_g14+31 rows, two state clears, and the 0x0100c000/0xfff zero-halfword reset.",
+          "modeling": {
+            "boundary": "i960 0x23510 status-strip reset descriptor with zero-source upload, caller-derived rows, state clears, and plane clear",
+            "test": "von/tools/test_recovered_status_strip_reset_23510.py",
+            "unresolved_behavior": "actual strip/state/plane memory writes and downstream 0x1dfd0 upload effects remain outside the pure reset plan"
+          }
         },
         {
           "id": "maincpu.status-mode-renderer-23410",
