@@ -10290,6 +10290,11 @@
             }
           ],
           "symbol": "sharc_opcode_3e_four_input_one_result_service",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x3e scalar service: interpret FIFO words as (a,c,b,d), compute the two-dimensional Euclidean distance hypotf(a-b,c-d), and return the recovered canonical SHARC NaN for zero differences or unordered NaN inputs.",
+            "test": "von/tools/test_recovered_sharc_opcode_3e.py",
+            "unresolved_behavior": "FIFO production and wait timing, exact RSQRTS refinement/rounding versus host hypotf, negative/overflowing radicands and other exceptional inputs beyond tested zero and NaN cases, output FIFO backpressure, delayed store ordering, and downstream consumers remain outside this bounded distance model."
+          },
           "notes": "Runtime vectors (3,0,4,0) and (8,5,12,8) both emit 0x409fffff (4.9999995), confirming the two-dimensional difference distance and SHARC rounding. Isolated runtime probes show both zero difference and a NaN input emit canonical 0xffffffff NaN through the same path; the reusable C model now preserves that boundary explicitly."
         },
         {
