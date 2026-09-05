@@ -7681,7 +7681,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm0",
-          "notes": "Recovers jump-table arm 0 as four mirrored tile-expander calls for tiles 11, 21, 23, and 25 with their exact ROM source addresses, followed by the common e33f4 exit."
+          "notes": "Recovers jump-table arm 0 as four mirrored tile-expander calls for tiles 11, 21, 23, and 25 with their exact ROM source addresses, followed by the common e33f4 exit.",
+          "modeling": {
+            "boundary": "Purely models the fixed arm-0 tile plan: emit tiles 11, 21, 23, and 25 from ROM sources 0x02fb75d0, 0x02fb5b90, 0x02fb5c50, and 0x02fb5d10, in that order, with count 4.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "Does not model the original i960 memory reads, tile-expander call semantics, downstream video writes, or the common e33f4 control-flow exit."
+          }
         },
         {
           "id": "maincpu.video-dispatch-prefix",
