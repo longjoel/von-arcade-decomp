@@ -1555,6 +1555,11 @@
             }
           ],
           "symbol": "sharc_target_2039b_three_input_state_output_service",
+          "modeling": {
+            "boundary": "SHARC three-input FIFO affine accumulation, persistent state-tail reads, and row-major state output",
+            "test": "von/tools/test_recovered_sharc_opcode_1a.py",
+            "unresolved_behavior": "exceptional-value and 40-bit floating-point behavior remain open beyond the finite affine vectors"
+          },
           "notes": "Static listing recovers three FIFO inputs, persistent state-tail seeds at offsets 0x09..0x0b, and nine products over the coefficient order 0,3,6,1,4,7,2,5,8 added into three accumulators. The resulting stored row-major transform is output[j] = tail[j] + x*state[j] + y*state[3+j] + z*state[6+j]. Focused runtime probes confirm the 0x2039b boundary, identity output (1,2,3), diagonal output (2,6,12), and a split-packet opcode-0x07 load with tail (10,20,30) producing exact (11,22,33). The reusable affine model is in recovered_sharc_opcode_1a.c and covered by test_recovered_sharc_opcode_1a.py. Only exceptional-value/40-bit floating behavior remains open."
         },
         {
