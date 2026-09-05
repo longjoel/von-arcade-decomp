@@ -8158,6 +8158,11 @@
           ],
           "symbol": "recovered_geometry_record_init",
           "notes": "Recovers the deterministic 84-byte record initialization from the 0x6fb90 allocator: eleven template-word placements, cleared status/link fields, and the association-value/999 sentinel branches. The following bookkeeping commit is tracked separately.",
+          "modeling": {
+            "boundary": "Purely models initialization of one 84-byte record: clear all 21 aligned words, copy the eleven template fields into their recovered offsets, set association and 999 sentinel values, and leave status/link fields zeroed.",
+            "test": "von/tools/test_recovered_geometry_record_init.py",
+            "unresolved_behavior": "Does not model allocator/free-list head mutation, mapped record ownership, linked-record bookkeeping, or subsequent geometry pipeline consumption."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
