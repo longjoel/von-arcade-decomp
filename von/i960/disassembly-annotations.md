@@ -480,6 +480,13 @@ reaches its own check), divides the `0x504dc0` dividend, saturates the
 quotient down to `90`, and reports `1` when the dividend exceeds `120`.
 The pure plan is in `recovered_divisor_clamp_78090.c`.
 
+The gate at `0x81e60` calls `0x84d90` only when mode `0x5039f4` is `4`,
+`0x503a00` is `10`, and `0x504e42` is nonzero; the ten-way table at
+`0x81eb4` then dispatches on the object's `+0x64` field for states `0-9`
+(the `cmpobl` arm compares literal-first, so anything above `9` exits).
+The entry object still sits in `r4` for the target. The pure plan is in
+`recovered_dispatch_gate_81e60.c`; the ten `0x83xxx` targets stay outside.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at

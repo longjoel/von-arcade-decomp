@@ -9563,6 +9563,32 @@
             "unresolved_behavior": "Actual state-word reads/writes and downstream consumers remain outside this pure divisor/saturation plan"
           },
           "notes": "Pure schedule for the 0x78090 divider: literal-first compare order keeps the mode-7 wide-divisor arm live; quotient saturates at 90 and the flag collapses to 1 past dividend 120."
+        },
+        {
+          "id": "maincpu.dispatch-gate-81e60",
+          "name": "dispatch_gate_81e60",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_dispatch_gate_81e60.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_dispatch_gate_81e60.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00081e60",
+              "end": "0x00081eb2"
+            }
+          ],
+          "symbol": "recovered_dispatch_gate_plan",
+          "modeling": {
+            "boundary": "Dispatch gate schedule: 0x84d90 pre-call on mode 4/sub-mode 10/live flag, ten-way table on object state 0-9 with literal-first bound",
+            "test": "von/tools/test_recovered_dispatch_gate_81e60.py",
+            "unresolved_behavior": "The ten 0x83xxx table targets and their object effects remain outside this pure gate schedule"
+          },
+          "notes": "Pure gate schedule for 0x81e60: pre-call needs mode 4, sub-mode 10, and a nonzero flag; the table needs only the flag and a state within 0-9. The entry object passes through r4."
         }
       ]
     },
