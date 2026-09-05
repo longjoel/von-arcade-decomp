@@ -5978,6 +5978,11 @@
           ],
           "symbol": "recovered_object_pool_create",
           "notes": "Recovers the 37-entry 0x576c50 pool scan with 0x2c-byte stride and signed-halfword +0x04 free sentinel, input field copies, exact 0x13e170/0x13db08/0xc4f40 lookup chain, cleared work fields, source-handle and sequence bookkeeping, and full-pool return path. The 0xf5058 helper remains an external bookkeeping boundary and the semantic names of the table-derived fields are provisional.",
+          "modeling": {
+            "boundary": "i960 0xc5130 primary object-pool creator model covering the 37-slot scan, free-slot selection, input/type table lookup chain, class-derived halfword selection, field initialization, sequence allocation, and full-pool failure return",
+            "test": "von/tools/test_recovered_object_pool_create.py",
+            "unresolved_behavior": "external 0xf5058 bookkeeping, mapped pool ownership, table semantic meanings, pointer-width/source-handle ABI behavior, and downstream object dispatch remain outside the deterministic creator model"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
