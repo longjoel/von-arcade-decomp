@@ -426,6 +426,14 @@ The fourth sibling at `0x1cea0` pairs plane `0x01000000` with the forced
 shifted gate and column-wrap contract. The pure plan is in
 `recovered_glyph_emit_p0a_1cea0.c`, completing the emitter family.
 
+The retry controller at `0x3ba0` steps the sign-extended `0x1d0002c`
+counter and compares the `0x1d00038` limit ordinally: a limit inside the
+step returns early unless the mode byte is set with bit `4` of `0x5024a4`
+also set, while a limit past the step advances (a zero mode byte first
+rewinds the limit through `0x2330`). The tail calls `0x2a580` with
+`0x111c` and reports `1`. The pure decision is in
+`recovered_retry_3ba0.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero

@@ -9876,6 +9876,32 @@
             "unresolved_behavior": "Actual link values, callee execution, and downstream state use remain outside this pure op schedule"
           },
           "notes": "Pure fifteen-op schedule for the 0x34c0 prologue including its 0x22f0/0x2330 calls. Straight line, no branches."
+        },
+        {
+          "id": "maincpu.retry-3ba0",
+          "name": "retry_3ba0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_retry_3ba0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_retry_3ba0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00003ba0",
+              "end": "0x00003c38"
+            }
+          ],
+          "symbol": "recovered_retry_plan",
+          "modeling": {
+            "boundary": "Retry decision: stepped counter against the ordinal limit, mode/flag early exits, limit rewind through 0x2330, 0x2a580 tail reporting 1",
+            "test": "von/tools/test_recovered_retry_3ba0.py",
+            "unresolved_behavior": "Actual state contents, callee execution, and reread stability remain outside this pure retry decision"
+          },
+          "notes": "Pure decision DAG for the 0x3ba0 retry controller. Straight-line forward branches only; the limit rewind applies the stepped difference."
         }
       ]
     },
