@@ -11431,6 +11431,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_status_counter_add2_2b7b0.py"],
           "ranges": [{"start": "0x0002b7b0", "end": "0x0002b7d8"}],
           "symbol": "recovered_status_counter_add2_2b7b0",
+          "modeling": {
+            "boundary": "Models the pure 0x2b7b0 status-counter transition: add exactly two to a supplied 32-bit counter with target wraparound semantics, corresponding to the original load/store around 0x503a00.",
+            "test": "von/tools/test_recovered_status_counter_add2_2b7b0.py",
+            "unresolved_behavior": "The fixed callback, memory ownership at 0x503a00, threshold handling, and any MMIO or caller effects remain outside this arithmetic model."
+          },
           "notes": "Original instructions load 0x503a00, add exactly 2, store it, and return through a fixed callback. Callback/MMIO behavior is excluded."
         },
         {
