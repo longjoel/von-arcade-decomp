@@ -431,6 +431,13 @@ column in `0x504ce0` advances while at most `61`. The pure plan is in
 `recovered_glyph_emit_1d090.c`; the `0x1cf40`/`0x1cfe0` plane variants
 remain separate.
 
+The sibling at `0x1cf40` is the same glyph shape without control-code
+branches: the entry gate compares the shifted (not sign-extended) value
+against `0x5f000000`, so every masked byte stays on the table path. It
+targets plane `0x01002000` with only bit `15` set (no `0x4000` bank
+attribute) and shares the column-wrap contract. The pure plan is in
+`recovered_glyph_emit_plane1_1cf40.c`.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at

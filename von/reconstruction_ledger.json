@@ -9381,6 +9381,32 @@
             "unresolved_behavior": "Actual glyph-table dereference, tile-RAM writes, and the 0x1cf40/0x1cfe0 plane variants remain outside this pure emit schedule"
           },
           "notes": "Pure emit schedule for the 0x1d090 renderer: biased 0x4b/0x54 select fixed control pairs 0x837c/d and 0x837e/f; other bytes index table 0x2ea0fd0 (negative for control bytes); each glyph is a vertical tile pair in plane 0x01000000 with 0xc000 attributes; column advances while at most 61."
+        },
+        {
+          "id": "maincpu.glyph-emit-plane1-1cf40",
+          "name": "glyph_emit_plane1_1cf40",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_glyph_emit_plane1_1cf40.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_glyph_emit_plane1_1cf40.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001cf40",
+              "end": "0x0001cfdc"
+            }
+          ],
+          "symbol": "recovered_glyph_emit_plane1_plan",
+          "modeling": {
+            "boundary": "Plane-1 glyph emit schedule: 0x7f mask, shifted 0x5f000000 gate, glyph-table index, vertical tile pair with bit15 only, column advance capped at 61",
+            "test": "von/tools/test_recovered_glyph_emit_plane1_1cf40.py",
+            "unresolved_behavior": "Actual glyph-table dereference, tile-RAM writes, and the 0x1cfe0 plane variant remain outside this pure emit schedule"
+          },
+          "notes": "Pure emit schedule for the 0x1cf40 renderer: same glyph shape as 0x1d090 without control-code branches, targeting plane 0x01002000 with only bit 15 set. Every masked byte stays on the table path; column advances while at most 61."
         }
       ]
     },
