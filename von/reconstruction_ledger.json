@@ -8498,6 +8498,11 @@
             }
           ],
           "symbol": "recovered_geometry_result_builder_9e450_plan",
+          "modeling": {
+            "boundary": "Models the 0x9e450 state/result-builder contract: shared command-0x38 response scratch, flag-set dynamic four-word command-31 delta packet, flag-clear object+0x184 input, common distance response placement, and command-29/30 follow-up packets with their halfword transforms, sign-bit toggle, and state-indexed table outputs.",
+            "test": "von/tools/test_recovered_geometry_result_builder_9e450.py",
+            "unresolved_behavior": "Live FIFO response values and timing, mapped object and linked-record writes, complete caller state, selector/state-table semantics beyond the modeled addresses, and downstream SHARC/device state remain unresolved."
+          },
           "notes": "Recovers the larger result/state builder: shared command-0x38 projection and command-31 distance framing, the flag-set dynamic four-word packet [(linked.+0x14-response0)+31, linked.+0x14-response0, linked.+0x18-response1, linked.+0x1c-response2] with i960 wraparound, versus the object+0x184 clear input, intermediate response placement at output +0x0e and paired +0x08, then command 29 with a sign-extended paired halfword and only sign bit 31 toggled by NOTBIT at output +0x18, followed by command 30 with the zero-extended low halfword and raw response at +0x20. Selector-table values are stored at output +0x14 and +0x24. The follow-up and flag-set packet models are executable, and all follow-up table addresses are modeled as 0x562cb0 + state_byte*3*16 plus field offset. Inspected callers seed r6 with lda 0x58(g2),r6 as the record-array base and form the slot pointer with addo r6,g2,g2 before dispatch; the callee uses object+0x74 to reach the linked record fields for the three subtractions."
         },
         {
