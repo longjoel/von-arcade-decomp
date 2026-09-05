@@ -7039,7 +7039,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm26",
-          "notes": "Recovers the distinct downstream bank-dependent two-tile plain e1f20 split at e2ea0, including its common e33f4 exit; source addresses overlap the earlier e2a40 gate but the arm is separately addressed."
+          "notes": "Recovers the distinct downstream bank-dependent two-tile plain e1f20 split at e2ea0, including its common e33f4 exit; source addresses overlap the earlier e2a40 gate but the arm is separately addressed.",
+          "modeling": {
+            "boundary": "Purely models the e2ea0 conditional plan: emit tiles 5 and 7, select sources 0x02fb4990/0x02fb4a50 for bank_a nonzero or 0x02fb4b10/0x02fb4bd0 otherwise, set count 2, and continue at 0x000e33f4.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime bank producer, e1f20 execution, plan consumption, shared e33f4 control flow, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-nested-payload-arms",
