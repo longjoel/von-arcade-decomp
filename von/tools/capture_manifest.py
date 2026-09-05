@@ -62,8 +62,14 @@ def rooted(root: Path, path_text: Any) -> Path | None:
     candidate = root / path_text
     try:
         candidate.resolve().relative_to(root.resolve())
+        relative_parts = candidate.relative_to(root).parts
     except (OSError, RuntimeError, ValueError):
         return None
+    current = root
+    for part in relative_parts:
+        current /= part
+        if current.is_symlink():
+            return None
     return candidate
 
 
