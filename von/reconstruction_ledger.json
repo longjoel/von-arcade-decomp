@@ -5257,6 +5257,11 @@
             }
           ],
           "symbol": "recovered_text_expand_video_blocks",
+          "modeling": {
+            "boundary": "Models packed-byte expansion: mask each source byte by the selected mode, split it into two four-pixel 4-bit lane groups, emit eight destination words per positive block, and preserve the recovered block order",
+            "test": "von/tools/test_recovered_text_video.py",
+            "unresolved_behavior": "Source asset provenance, caller block-count/profile routing, live destination bus timing, and downstream video-controller consumption remain outside this deterministic lane-expansion model"
+          },
           "notes": "Recovers and executes the packed-byte expansion: each mode-masked source byte becomes two four-pixel 4-bit lane groups in a 32-bit destination word, with eight values processed per positive block. All 256 source bytes and 16 mode values are host-tested; the reconstructed video bootstrap invokes the block scheduler. Runtime attract validation remains pending.",
           "milestones": {
             "c-only-i960-attract-60s": {
