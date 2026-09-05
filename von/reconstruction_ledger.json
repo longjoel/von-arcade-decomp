@@ -8791,6 +8791,11 @@
             }
           ],
           "symbol": "recovered_crc16_table",
+          "modeling": {
+            "boundary": "Models the pure seeded table checksum: count samples are read at the supplied signed stride, each updates the 32-bit 0xDEBDEB00 accumulator through the supplied CRC-CCITT 0x1021 table, and the final table lookup/fold returns the ROM-compatible 32-bit result.",
+            "test": "von/tools/test_recovered_crc16_table.py",
+            "unresolved_behavior": "The ROM table storage and source-memory ownership, caller-selected stride/count, checksum consumers, and any runtime validation or failure behavior are not modeled by this helper."
+          },
           "notes": "Recovers the seeded 0xDEBDEB00 table checksum using the 256-entry CRC-CCITT 0x1021 table at 0x2f20, a sign-extended stride, and the ROM's final fold. The model is independently reference-tested over empty, contiguous, and strided inputs.",
           "milestones": {
             "c-only-i960-attract-60s": {
