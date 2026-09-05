@@ -2067,6 +2067,11 @@
             }
           ],
           "symbol": "recovered_io_pack_controller_state",
+          "modeling": {
+            "boundary": "i960 packed controller-status mask construction and prior-work-word mask updates",
+            "test": "von/tools/test_recovered_io.py",
+            "unresolved_behavior": "controller write timing and higher-level bit meanings remain separate from this deterministic packed-status contract"
+          },
           "notes": "Models the packed-status tail from four 16-bit controller reads and prior work words: it builds the 24-bit +2/+4/+6 mask, complements it into status_49c, stores the +c low byte at status_498/499/49a, and applies the two i960 andnot/notand masks to work words at 0x5024a0..0x5024bc. Controller write timing and higher-level bit meanings remain separate."
         },
         {
