@@ -11902,6 +11902,11 @@
             }
           ],
           "symbol": "recovered_geometry_object_xz_state_output_request",
+          "modeling": {
+            "boundary": "Models the post-gate XZ state-output request: host command 26 emits packet [26, selected_x, 0, selected_z], maps to SHARC opcode 0x1a, and returns tail + matrix*(x,0,z); opcode 0x26 remains a separate five-word upload service",
+            "test": "von/tools/test_recovered_geometry_object_packet.py",
+            "unresolved_behavior": "Projection-gate inputs, live FIFO/MMIO transport, response timing, and production of selected vectors remain outside this command/response model"
+          },
           "notes": "Host decimal command 26 maps to SHARC opcode 0x1a, not opcode 0x26. The post-gate packet is [26, selected_x, 0, selected_z], and opcode 0x1a returns tail + matrix*(x,0,z). Opcode 0x26 remains the separate five-word parameter upload service."
         },
         {
