@@ -2393,6 +2393,11 @@
             }
           ],
           "symbol": "recovered_audio_send_u16_when_idle",
+          "modeling": {
+            "boundary": "i960 idle-gated audio command framing with special-byte preservation and normal-command suppression",
+            "test": "von/tools/test_recovered_audio_queue.py",
+            "unresolved_behavior": "mapped audio transport timing and board-status synchronization remain outside the producer framing contract"
+          },
           "notes": "Sibling producer framing helper. It preserves the 0xff one-byte case and suppresses normal 0xae/high/low commands only when mode is 1 and the low board-status byte is zero.",
           "milestones": {
             "c-only-i960-attract-60s": {
