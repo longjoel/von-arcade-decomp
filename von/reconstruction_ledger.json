@@ -2977,6 +2977,11 @@
             }
           ],
           "symbol": "recovered_random_next",
+          "modeling": {
+            "boundary": "i960 31-bit state step multiplies by 0x5d588b65, folds the 64-bit product with the observed chkbit/addc carry behavior, masks bit 31, and publishes the next state",
+            "test": "von/tools/test_recovered_runtime_math.py",
+            "unresolved_behavior": "caller-specific random usage, persistent-state integration, and exact hardware timing remain provisional beyond the pure-step vectors"
+          },
           "notes": "High-frequency attract leaf. The pure step multiplies the 31-bit state by 0x5d588b65, folds the 64-bit product into 31 bits exactly as the emul/chkbit/addc sequence does, and the hardware wrapper updates 0x005785d0.",
           "milestones": {
             "c-only-i960-attract-60s": {
