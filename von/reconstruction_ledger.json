@@ -5828,6 +5828,11 @@
             }
           ],
           "symbol": "recovered_geometry_profile_packet",
+          "modeling": {
+            "boundary": "Models the pure 0xc5d70 profile packet framing: profile 3 emits the exact 14-word tagged command with masked input shifts, repeated intermediate math fields, and g6/g1/g5 ordering; other profiles emit the four-word 0x2b fallback packet; both share three copies of the supplied FIFO result plus the output tag.",
+            "test": "von/tools/test_recovered_geometry_profile_packet.py",
+            "unresolved_behavior": "Extended-FPU intermediate production, mapped FIFO behavior, MMIO writes, and semantic geometry interpretation remain explicit inputs or unresolved outside this framing model."
+          },
           "notes": "Recovers profile-3's 14-word tagged FIFO framing and alternate profile's four-word 0x2b packet, exact input masks, repeated intermediate g4 fields, final g6/g1/g5 ordering, and common three-result-plus-output-tag tail. Extended-FPU intermediates and mapped FIFO result are explicit oracle inputs; semantic geometry meaning remains provisional.",
           "milestones": {
             "c-only-i960-attract-60s": {
