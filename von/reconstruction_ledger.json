@@ -7303,7 +7303,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm16",
-          "notes": "Recovers the bank-dependent two-tile plain-expansion gate at e2a40. Nonzero bank selects sources 0x2fb4990/0x2fb4a50; zero selects 0x2fb4b10/0x2fb4bd0; both paths continue through shared downstream arms."
+          "notes": "Recovers the bank-dependent two-tile plain-expansion gate at e2a40. Nonzero bank selects sources 0x2fb4990/0x2fb4a50; zero selects 0x2fb4b10/0x2fb4bd0; both paths continue through shared downstream arms.",
+          "modeling": {
+            "boundary": "Purely models the e2a40 bank-selected plan: emit tiles 5 and 7, select sources 0x02fb4990/0x02fb4a50 for bank_a nonzero or 0x02fb4b10/0x02fb4bd0 otherwise, and set count 2 before the shared downstream tail.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime bank producer, plain expansion execution, plan consumption, shared downstream tail, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-plain-shared-tail-arms",
