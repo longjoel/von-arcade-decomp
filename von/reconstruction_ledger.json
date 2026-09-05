@@ -10542,6 +10542,33 @@
             "unresolved_behavior": "Glyph-table provenance and downstream consumers remain outside this pure decode contract"
           },
           "notes": "Pure decode kernel proven exhaustively over the full 16-bit input space against an independent bit mapping."
+        },
+        {
+          "id": "maincpu.doorbell-1ccf8",
+          "name": "doorbell_1ccf8",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_doorbell_1ccf8.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_doorbell_1ccf8.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001ccf8",
+              "end": "0x0001cd0c"
+            }
+          ],
+          "symbol": "recovered_doorbell_plan",
+          "modeling": {
+            "boundary": "Doorbell schedule: low-halfword publish to 0x1800000 with caller-link passthrough",
+            "test": "von/tools/test_recovered_doorbell_1ccf8.py",
+            "unresolved_behavior": "Device-register effects downstream of 0x1800000 remain outside this pure publish contract"
+          },
+          "notes": "Pure schedule for the 0x1ccf8 MMIO doorbell leaf used across the service leaves."
         }
       ]
     },
