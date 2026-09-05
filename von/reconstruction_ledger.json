@@ -10626,6 +10626,11 @@
             }
           ],
           "symbol": "opcode_4c_branched_normalized_predicate",
+          "modeling": {
+            "boundary": "Models the normal opcode-0x4c predicate: subtract state slots s0..s2 from input x/y/z, return 1 immediately when the Y difference is negative, otherwise return 0 only when the Euclidean distance is strictly below the fourth input bound and return 1 otherwise.",
+            "test": "von/tools/test_recovered_sharc_opcode_4c.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent DM 0x30157 ownership/address mapping, exact SHARC RSQRTS/compare rounding, extra-input fallback transport, exceptional values beyond tested NaN behavior, and downstream consumers remain outside this bounded branched predicate model."
+          },
           "notes": "The listing recovers x/y/z FIFO inputs in R8/R9/R10, a bound in R11, and a first IF LT immediately after PASS(F1) for F1=y-s[1]. The normal path computes the Euclidean distance from state offsets 0..2 with the SHARC reciprocal-square-root refinement and COMPares it against R11, returning 0 iff distance<R11 and 1 otherwise. Live probes with state [0,0,0,4,5] and (3,4,0) returned 1 for bound 0 at 0x20ced and 0 for bound 6 at 0x20cf7; the negative-Y path waited for its documented extra FIFO word."
         },
         {
