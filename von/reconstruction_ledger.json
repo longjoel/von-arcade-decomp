@@ -9980,6 +9980,32 @@
             "unresolved_behavior": "Actual cursor effects and callee execution remain outside this pure dispatch schedule"
           },
           "notes": "Pure dispatch schedule for the 0x1ef70 cursor home: zero selector fills via 0x1df00, anything else emits via 0x1dc90."
+        },
+        {
+          "id": "maincpu.clamp-store-29c08",
+          "name": "clamp_store_29c08",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_clamp_store_29c08.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_clamp_store_29c08.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00029c08",
+              "end": "0x00029c4c"
+            }
+          ],
+          "symbol": "recovered_clamp_store_plan",
+          "modeling": {
+            "boundary": "Clamp-store schedule: signed min(g0, 0x100) at 0x51a260 with zeroed 0x51a264/0x51a268 slots",
+            "test": "von/tools/test_recovered_clamp_store_29c08.py",
+            "unresolved_behavior": "Actual controller values and downstream consumers remain outside this pure store schedule"
+          },
+          "notes": "Pure store schedule for the 0x29c08 triple: the bl/cmpible arms reduce to a signed minimum against 0x100."
         }
       ]
     },

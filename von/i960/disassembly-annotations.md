@@ -443,6 +443,11 @@ caller link instead. The pure schedules are in
 `recovered_home_dispatch_1ef70.c`, `recovered_block_emit_1dc90.c`, and
 `recovered_block_fill_1df00.c`.
 
+The store triple at `0x29c08` reduces to a signed minimum: the `bl` and
+`cmpible` arms combine so the value at `0x51a260` is `min(g0, 0x100)`
+while `0x51a264`/`0x51a268` are zeroed (the link, already cleared).
+The pure schedule is in `recovered_clamp_store_29c08.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
