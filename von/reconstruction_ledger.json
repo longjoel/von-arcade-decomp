@@ -9492,6 +9492,11 @@
             }
           ],
           "symbol": "sharc_opcode_24_fixed_point_projection_service",
+          "modeling": {
+            "boundary": "Models the tested finite opcode-0x24 frame-transpose update: three inputs are normalized through the local RSQRTS/refinement path, the transpose of the opcode-0x23 Y-up frame is formed, and it is post-multiplied into the existing column-major 3x3 state.",
+            "test": "von/tools/test_recovered_sharc_opcode_24.py",
+            "unresolved_behavior": "FIFO/output timing, DM state-pointer mapping, exact x=z=0 SHARC NaN payloads, and the adjacent opcode-0x25 fixed-point/output service remain outside this finite-path model."
+          },
           "notes": "Static listing recovers FIFO order R0,R1,R2, exact x*x+y*y+z*z accumulation, reciprocal-square-root normalization retaining all three normalized lanes, and the delayed matrix/state update ending at 0x20509. Runtime identity and seeded-state probes prove that opcode 0x24 constructs the transpose of opcode 0x23's Y-up frame and post-multiplies the existing column-major state by it: x-axis transforms seeded words [1,2,3,4,5,6,7,8,9] into [-7,-8,-9,4,5,6,1,2,3], z-axis preserves the seed, and (1,2,3) matches the transposed 0x23 frame. The finite-path model is implemented in recovered_sharc_opcode_24.c and regression-tested; the x=z=0 NaN payload remains architecture-specific. The shared scale 0x4622f83d, FIX, helper, and two output writes begin at 0x20522 under adjacent opcode 0x25."
         },
         {
