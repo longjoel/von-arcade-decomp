@@ -2744,6 +2744,11 @@
           ],
           "symbol": "recovered_host_interrupt_initialize",
           "notes": "Initializes all four host timer reload registers to 0x61a80, acknowledges with zero, installs interrupt control 0x23d in the work mirror and MMIO register, and clears shared timer state at 0x51aac0. The source is compiled into the reconstruction, but active invocation waits for the unrecovered interrupt dispatcher at 0x1380 because enabling this mask reaches the original vector path.",
+          "modeling": {
+            "boundary": "Purely models the initialization values and write order: acknowledge with zero, write 0x00061a80 to timer registers 1, 0, 3, and 2, install control 0x0000023d in the mirror and MMIO register, then clear shared timer state.",
+            "test": "von/tools/test_recovered_host_control.py",
+            "unresolved_behavior": "Does not model live host MMIO visibility, interrupt delivery after enabling 0x23d, or the unrecovered dispatcher/vector path at 0x1380."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
