@@ -11263,6 +11263,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_accumulator_scan_7f4d0.py"],
           "ranges": [{"start": "0x0007f4d0", "end": "0x0007f5d0"}],
           "symbol": "recovered_geometry_accumulator_scan_7f4d0",
+          "modeling": {
+            "boundary": "Models the pure 32-entry 0x7f4d0 candidate scan: byte-mask each table and peer value, require a nonzero table byte and peer in the half-open interval [table, table+5), and select the lowest supplied metric while updating the selected metric output; no candidate returns 0xffffffff.",
+            "test": "von/tools/test_recovered_geometry_accumulator_scan_7f4d0.py",
+            "unresolved_behavior": "FIFO, floating-point, and MMIO effects that produce or consume the table, peer, and metric arrays remain outside this model."
+          },
           "notes": "Pure 32-entry byte-table candidate predicate: nonzero table byte, peer in [table, table+5), and minimum supplied metric selection. FIFO, floating-point, and MMIO effects are excluded."
         },
         {
