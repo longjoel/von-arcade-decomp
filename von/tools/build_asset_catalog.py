@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -135,6 +136,29 @@ def main() -> int:
                 if evidence_document.get("canonical") is not True:
                     print(f"Asset catalog: evidence must be canonical for status {status!r}")
                     return 1
+                capture_manifest = evidence_document.get("capture_manifest")
+                if capture_manifest is not None:
+                    try:
+                        capture = asset_path(args.asset_root, capture_manifest, "capture manifest")
+                    except ValueError as error:
+                        print(f"Asset catalog: {error}")
+                        return 1
+                    if not capture.is_file():
+                        print(f"Asset catalog: missing capture manifest: {capture}")
+                        return 1
+                    capture_document = json.loads(capture.read_text(encoding="utf-8"))
+                    if not isinstance(capture_document, dict):
+                        print(f"Asset catalog: capture manifest must be an object: {capture}")
+                        return 1
+                    if capture_document.get("id") != evidence_document["id"]:
+                        print(f"Asset catalog: capture manifest id does not match evidence: {capture}")
+                        return 1
+                    if not isinstance(evidence_document.get("capture_manifest_sha256"), str):
+                        print(f"Asset catalog: missing capture manifest hash: {evidence}")
+                        return 1
+                    if hashlib.sha256(capture.read_bytes()).hexdigest() != evidence_document["capture_manifest_sha256"]:
+                        print(f"Asset catalog: capture manifest hash mismatch: {capture}")
+                        return 1
             record["evidence"] = evidence_document
         entries.append(record)
     catalog = {"version": 1, "assets": entries,
