@@ -9708,6 +9708,32 @@
             "unresolved_behavior": "Zero divisors and NaN comparison outcomes remain outside this pure predicate plan"
           },
           "notes": "Pure predicate shared by the 0x7a438 (mode 10/0x7ad90) and 0x7a4a8 (mode 9/0x7a9f0) arms over sign-extended +0x1d0/+0x1d8 halfwords. divr divides src2/src1 per the MAME i960 core."
+        },
+        {
+          "id": "maincpu.glyph-emit-p0a-1cea0",
+          "name": "glyph_emit_p0a_1cea0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_glyph_emit_p0a_1cea0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_glyph_emit_p0a_1cea0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001cea0",
+              "end": "0x0001cf3c"
+            }
+          ],
+          "symbol": "recovered_glyph_emit_p0a_plan",
+          "modeling": {
+            "boundary": "Plane-0 attributed emit schedule: 0x7f mask, shifted 0x5f000000 gate, distinct 0x2ea10d0 table, forced 0xc000 attributes, column advance capped at 61",
+            "test": "von/tools/test_recovered_glyph_emit_p0a_1cea0.py",
+            "unresolved_behavior": "Actual glyph-table dereference and tile-RAM writes remain outside this pure emit schedule"
+          },
+          "notes": "Pure emit schedule for the 0x1cea0 renderer: plane-0 base with forced bank attributes from its own glyph table. Completes the four-emitter family."
         }
       ]
     },
