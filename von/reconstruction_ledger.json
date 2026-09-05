@@ -11295,6 +11295,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_packet_tail_8e310.py"],
           "ranges": [{"start": "0x0008e310", "end": "0x0008e398"}],
           "symbol": "recovered_geometry_packet_tail_8e310",
+          "modeling": {
+            "boundary": "Models the pure 0x8e310 ten-word packet tail: selector 5 with three low-halfword vector values, selector 46 (31+15) with three masked byte values, selector 0x1f, and the supplied frame-readback word in exact FIFO order.",
+            "test": "von/tools/test_recovered_geometry_packet_tail_8e310.py",
+            "unresolved_behavior": "Device and MMIO setup, live FIFO transport, and production of the vector, byte, and frame-readback inputs remain outside this packet-tail model."
+          },
           "notes": "Models the byte-indexed packet tail's selectors 5 and 46 (31+15), three widened vector halfwords, three masked bytes, and frame readback fixture. Device/MMIO setup remains external."
         },
         {
