@@ -5121,6 +5121,11 @@
             }
           ],
           "symbol": "recovered_halfword_byte_swap_copy",
+          "modeling": {
+            "boundary": "Models the bounded halfword copy loop: byte-swap each 16-bit source value, preserve destination order, and stop after the caller-supplied halfword count",
+            "test": "von/tools/test_recovered_text_video.py",
+            "unresolved_behavior": "Caller source/destination provenance, active asset-transfer routing, destination hardware timing, and later consumers of the swapped stream remain outside this pure copy model"
+          },
           "notes": "Recovers the adjacent halfword byte-swap copy loop and exhaustively checks the transform across all 16-bit source values.",
           "milestones": {
             "c-only-i960-attract-60s": {
