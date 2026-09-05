@@ -9027,6 +9027,11 @@
               "end": "0x000f5c58"
             }
           ],
+          "modeling": {
+            "boundary": "general text formatter creates a saved context, parses bytes through the 0xf5210 dispatch table, emits expanded characters through 0x1cc40, and converges unsupported directives at 0xf5bf4",
+            "test": "von/tools/test_text_formatter_boundary.py",
+            "unresolved_behavior": "full printf-style conversion semantics and live directive coverage remain provisional beyond the recovered control-flow boundary"
+          },
           "notes": "Static boundary for the general formatted-text path: 0xf5100 creates the saved context, 0xf5190 parses the format string and dispatches through the 0xf5210 table, and unsupported/conversion-specific paths converge at 0xf5bf4. Plain strings and the observed two-digit diagnostic are separately reconstructed; full conversion replacement remains deferred until runtime vectors cover the live directives.",
           "milestones": {
             "c-only-i960-attract-60s": {
