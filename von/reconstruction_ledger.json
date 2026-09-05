@@ -9977,6 +9977,11 @@
             }
           ],
           "symbol": "opcode_40_base",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x40 base calculation: widen the FIFO operand by a 16-bit left shift, add the fixed 0x01c00000 bias, and return the resulting 32-bit base value destined for the persistent DM 0x30148 state field.",
+            "test": "von/tools/test_recovered_sharc_opcode_40_41.py",
+            "unresolved_behavior": "FIFO production and wait timing, SHARC DM address-unit conventions, persistent DM 0x30148 ownership/write timing, overflow interpretation beyond 32-bit wrap, and floating-point consumers of the base remain outside this bounded arithmetic model."
+          },
           "notes": "Static SHARC listing recovers one FIFO operand, a 16-bit left shift plus 0x01c00000 bias, and the store of the resulting 32-bit base at DM 0x30148. The host contract is exhaustively tested; SHARC DM address-unit conventions remain tied to the extracted listing representation."
         },
         {
