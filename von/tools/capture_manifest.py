@@ -122,6 +122,9 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
         errors.append("runtime capture requires at least one hashed input")
     if stimulus.get("kind") == "input-free-attract" and not manifest.get("coverage_report"):
         errors.append("input-free-attract capture requires coverage_report")
+    if (stimulus.get("kind") in {"input-free-attract", "bounded-trace", "causal-trace"}
+            and (not isinstance(stimulus.get("phase"), str) or not stimulus["phase"])):
+        errors.append("runtime capture requires a non-empty stimulus.phase")
     configuration = manifest.get("configuration", {})
     if not isinstance(configuration, dict):
         errors.append("configuration must be an object")

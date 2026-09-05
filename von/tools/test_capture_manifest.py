@@ -189,6 +189,10 @@ def main() -> int:
         assert any("command set does not match configuration.set" in error
                    for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
+        del broken["stimulus"]["phase"]
+        assert any("runtime capture requires a non-empty stimulus.phase" in error
+                   for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
         broken["isolation"] = []
         assert any("isolation must be an object" in error for error in validate(broken, root))
         outside = root.parent / "outside-capture-fixture.txt"

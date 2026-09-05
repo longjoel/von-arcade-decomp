@@ -30,7 +30,7 @@ def main() -> int:
         capture = {
             "schema_version": 1, "id": "capture-v1", "objective": "pilot",
             "hypothesis": "startup reaches scheduler", "expected_discriminator": "scheduler checkpoint",
-            "stimulus": {"kind": "input-free-attract", "seconds": 1},
+            "stimulus": {"kind": "input-free-attract", "seconds": 1, "phase": "startup"},
             "checkpoints": ["reset", "scheduler"],
             "configuration": {"set": "vonj", "mame_revision": "a" * 40, "patch_profile": "none", "execution_engine": "interpreter"},
             "command": ["mame", "vonj", "-cfg_directory", str(root / "cfg"),
