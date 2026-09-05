@@ -6850,7 +6850,12 @@
             }
           ],
           "symbol": "recovered_transition_selector_target",
-          "notes": "Recovers the ten-entry 0x784e0 selector table and unsigned selector>9 immediate-return boundary; handler-local mode tests and mapped writes remain separate."
+          "notes": "Recovers the ten-entry 0x784e0 selector table and unsigned selector>9 immediate-return boundary; handler-local mode tests and mapped writes remain separate.",
+          "modeling": {
+            "boundary": "Purely models the 0x784c8 selector dispatch: map unsigned selectors 0 through 9 to the ten exact handler addresses 0x00078508 through 0x00078618, and return target 0 for selectors at or above 10 without entering a handler.",
+            "test": "von/tools/test_recovered_transition_selector_dispatch.py",
+            "unresolved_behavior": "Handler-local mode predicates, action table reads, mapped writes, state mutations, and downstream handler behavior are not modeled by this dispatch unit."
+          }
         },
         {
           "id": "maincpu.transition-selector-handler-predicates",
