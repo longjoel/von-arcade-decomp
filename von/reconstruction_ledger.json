@@ -3717,7 +3717,12 @@
             }
           ],
           "symbol": "recovered_weapon_irregular_handler_plan",
-          "notes": "Recovers the 0x21580 marker runs of lengths 2,4,4 and the 0x21674 text-only route, sharing the (3,8) text prologue and mode-dependent writer."
+          "notes": "Recovers the 0x21580 marker runs of lengths 2,4,4 and the 0x21674 text-only route, sharing the (3,8) text prologue and mode-dependent writer.",
+          "modeling": {
+            "boundary": "i960 irregular weapon-handler text descriptor with mode-dependent three marker runs and text-only fallback",
+            "test": "von/tools/test_recovered_weapon_irregular_handlers.py",
+            "unresolved_behavior": "actual text/marker memory writes and downstream weapon rendering effects remain outside the pure irregular-handler plan"
+          }
         },
         {
           "id": "maincpu.status-loop-entry-reset-218f0",
