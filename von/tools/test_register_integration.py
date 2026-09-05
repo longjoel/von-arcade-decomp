@@ -15,7 +15,10 @@ def main() -> int:
         root = Path(directory)
         (root / "image.bin").write_bytes(b"image")
         (root / "integration-test.py").write_text("print('pass')\n", encoding="utf-8")
-        unit = {"id": "unit", "stage": "integrated"}
+        unit = {"id": "unit", "stage": "integrated", "modeling": {
+            "boundary": "state", "test": "integration-test.py",
+            "unresolved_behavior": "device timing",
+        }}
         ledger = {"images": [{"name": "maincpu", "work_units": [unit]}]}
         assert not register(ledger, "unit", "image.bin", "startup-init",
                             "integration-test.py", root)
@@ -31,6 +34,9 @@ def main() -> int:
         assert any("not integration-promoted" in error for error in register(
             {"images": [{"work_units": [{"id": "planned", "stage": "planned"}]}]},
             "planned", "image.bin", "startup-init", "integration-test.py", root))
+        assert any("missing modeling evidence" in error for error in register(
+            {"images": [{"work_units": [{"id": "raw", "stage": "integrated"}]}]},
+            "raw", "image.bin", "startup-init", "integration-test.py", root))
         broken = copy.deepcopy(ledger)
         del broken["images"][0]["work_units"][0]["integration"]
         assert any("missing or unsafe integration image" in error for error in register(

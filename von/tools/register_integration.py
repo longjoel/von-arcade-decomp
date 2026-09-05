@@ -53,6 +53,14 @@ def register(ledger: dict[str, Any], unit_id: str, image: str,
     unit = matches[0]
     if unit.get("stage") not in STAGES:
         return [f"work unit {unit_id} is not integration-promoted"]
+    modeling = unit.get("modeling")
+    if not isinstance(modeling, dict):
+        return [f"work unit {unit_id} is missing modeling evidence"]
+    for field in ("boundary", "test", "unresolved_behavior"):
+        if not isinstance(modeling.get(field), str) or not modeling[field]:
+            return [f"work unit {unit_id} is missing modeling.{field}"]
+    if not safe_file(root, modeling["test"]):
+        return [f"work unit {unit_id} has missing or unsafe modeling test {modeling['test']}"]
     if "integration" in unit:
         return [f"work unit {unit_id} already has integration evidence"]
     unit["integration"] = {
