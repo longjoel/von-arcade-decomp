@@ -11511,6 +11511,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_status_record_init_3ed60.py"],
           "ranges": [{"start": "0x0003ed60", "end": "0x0003edd0"}],
           "symbol": "recovered_status_record_init_3ed60",
+          "modeling": {
+            "boundary": "Models the pure 0x3ed60 sibling initializer: scan 23 status halfwords for the first bit-15 match, return 23 on failure, populate the distinct g5-selector/g3-byte/g4-final-value field mapping, clear +0x14/+0x18/+0x1c, and load the selector&0xffff table halfword.",
+            "test": "von/tools/test_recovered_status_record_init_3ed60.py",
+            "unresolved_behavior": "Pool-memory writes, helper production, caller/service argument origins, and helper/MMIO side effects remain outside this bounded result contract."
+          },
           "notes": "Exact sibling bounded scan over 23 records at 0x51ad10 with 0x24-byte stride and status bit 15. Preserves the distinct 0x3ed60 argument mapping: g5 selector, g3 byte field, g4 final field, and selector-masked 0x3eca0 halfword. The helper/MMIO side effect is excluded."
         },
         {
