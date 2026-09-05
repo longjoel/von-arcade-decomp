@@ -11333,6 +11333,11 @@
             }
           ],
           "symbol": "recovered_continued_renderer_plan",
+          "modeling": {
+            "boundary": "Models the fixed continued-message renderer: source string at 0x1f9e0 is sent through helper 0x1da90 at row 20, with the destination column/origin supplied by incoming g14",
+            "test": "von/tools/test_recovered_continued_renderer.py",
+            "unresolved_behavior": "String glyph decoding, caller ownership of g14, and downstream panel composition remain outside this renderer-call contract"
+          },
           "notes": "Recovers the fixed TO BE CONTINUED... message at 0x1f9e0, text helper 0x1da90, row 20, and column/origin sourced from incoming g14."
         },
         {
