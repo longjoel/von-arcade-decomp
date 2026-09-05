@@ -3609,7 +3609,12 @@
             }
           ],
           "symbol": "recovered_weapon_record_dispatch_plan",
-          "notes": "Recovers ten 0x68-byte records at 0x20b50, their offset-0 asset pointers, handlers for selectors 0-7, and fallback handler 0x218a0 for selectors 8, 9, and out-of-range values."
+          "notes": "Recovers ten 0x68-byte records at 0x20b50, their offset-0 asset pointers, handlers for selectors 0-7, and fallback handler 0x218a0 for selectors 8, 9, and out-of-range values.",
+          "modeling": {
+            "boundary": "i960 0x211f0 weapon-record table and selector dispatch plan with ten 0x68-byte records and fallback handler",
+            "test": "von/tools/test_recovered_weapon_record_dispatch.py",
+            "unresolved_behavior": "asset-record contents and downstream weapon handlers remain outside the pure table-address and dispatch contract"
+          }
         },
         {
           "id": "maincpu.weapon-three-point-handlers-21240-214b8",
