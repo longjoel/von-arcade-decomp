@@ -14,7 +14,7 @@ fi
 printf 'Using i960 CPU mode: %s\n' "$CPU_FLAG"
 mkdir -p /src/von/build/i960
 
-for source in main recovered_io recovered_host_queue recovered_host_control recovered_runtime_math recovered_audio_queue recovered_memory recovered_geometry recovered_polygon_rom recovered_geometry_commands recovered_geometry_object_packet recovered_text recovered_texture recovered_geometry_profile recovered_texture_decompress recovered_video_palette recovered_video_tiles recovered_geometry_coordinate recovered_record_scan recovered_geometry_projection recovered_text_two_digit recovered_text_string_walk recovered_object_state_dispatch recovered_object_state_runtime recovered_object_state_random_selector recovered_object_state_zero recovered_object_state_one recovered_object_state_two recovered_object_state_three recovered_object_state_four recovered_object_state_five recovered_object_state_six recovered_object_state_seven recovered_object_state_terminal recovered_attract_schedule recovered_attract_platform recovered_sega_tiles recovered_sega_char reconstructed_main; do
+for source in main recovered_io recovered_host_queue recovered_host_control recovered_runtime_math recovered_audio_queue recovered_memory recovered_geometry recovered_polygon_rom recovered_geometry_commands recovered_geometry_object_packet recovered_text recovered_texture recovered_geometry_profile recovered_texture_decompress recovered_video_palette recovered_video_tiles recovered_geometry_coordinate recovered_record_scan recovered_geometry_projection recovered_text_two_digit recovered_text_string_walk recovered_object_state_dispatch recovered_object_state_runtime recovered_object_state_random_selector recovered_object_state_zero recovered_object_state_one recovered_object_state_two recovered_object_state_three recovered_object_state_four recovered_object_state_five recovered_object_state_six recovered_object_state_seven recovered_object_state_terminal recovered_attract_schedule recovered_attract_platform recovered_sega_tiles recovered_sega_char recovered_upload_cluster recovered_blend_kernel_29dec reconstructed_main; do
     i960-elf-gcc "$CPU_FLAG" -O1 -ffreestanding -fno-builtin -fno-common \
         -c "/src/von/i960/$source.c" -o "/src/von/build/i960/$source.o"
 done
@@ -65,6 +65,8 @@ COMMON_OBJECTS=(
     /src/von/build/i960/recovered_attract_platform.o
     /src/von/build/i960/recovered_sega_tiles.o
     /src/von/build/i960/recovered_sega_char.o
+    /src/von/build/i960/recovered_upload_cluster.o
+    /src/von/build/i960/recovered_blend_kernel_29dec.o
 )
 
 i960-elf-gcc "$CPU_FLAG" -nostdlib -nostartfiles \

@@ -36,5 +36,16 @@ run-mame:
 
 check: check-recovered-c test-recovered test-unit test-contract
 
+# Host harness for the 0x29c08/0x29d50 upload cluster. The binary is a
+# build artifact (not committed); strict lifecycle validation requires
+# building it first so integration.image hashes resolve.
+build-upload-cluster-harness:
+	mkdir -p build
+	$(CC) $(CFLAGS) -O2 i960/recovered_upload_cluster.c \
+	    i960/recovered_blend_kernel_29dec.c \
+	    tools/harness_upload_cluster_main.c \
+	    -o build/upload-cluster-harness
+	./build/upload-cluster-harness
+
 clean:
 	@:
