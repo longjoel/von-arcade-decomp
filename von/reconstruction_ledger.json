@@ -2883,6 +2883,11 @@
             }
           ],
           "symbol": "recovered_audio_queue_consume",
+          "modeling": {
+            "boundary": "Models the bounded audio service path: when the 64-byte FIFO is nonempty and SCSP status bit 0 is ready, consume one byte, advance 0x0051aa70 modulo 64, and write it to SCSP command MMIO 0x009c0000",
+            "test": "von/tools/test_recovered_audio_queue_consumer.py",
+            "unresolved_behavior": "Interrupt scheduling, live SCSP status timing, device response, and production of queued command bytes remain outside this consumer model"
+          },
           "notes": "Recovers the bit-10 interrupt branch: when the 64-byte FIFO is nonempty and SCSP status bit 0 is ready, consume one byte, advance 0x0051aa70 modulo 64, and write the value to SCSP command MMIO 0x009c0000. The reconstructed heartbeat polls the generated control mirror to integrate this bounded service path."
         },
         {
