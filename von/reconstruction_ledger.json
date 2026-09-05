@@ -4121,8 +4121,13 @@
               "end": "0x000237a8"
             }
           ],
-          "symbol": "recovered_geometry_object_init_plan",
-          "notes": "Recovers the 0x0a/0x1d/0x1e FIFO prefix, signed halfword deltas, 0x43200000 command constant, +2.5f derivation, response folds, and +0xa0/+0xa1 clears."
+        "symbol": "recovered_geometry_object_init_plan",
+        "notes": "Recovers the 0x0a/0x1d/0x1e FIFO prefix, signed halfword deltas, 0x43200000 command constant, +2.5f derivation, response folds, and +0xa0/+0xa1 clears.",
+        "modeling": {
+          "boundary": "i960 0x23670 geometry-object initializer plan covering FIFO command arguments, signed coordinate deltas, fixed-point/float derivation, response folds, state updates, and initialization clears",
+          "test": "von/tools/test_recovered_geometry_object_init_23670.py",
+          "unresolved_behavior": "actual FIFO/MMIO submission, object-memory writes, response production, and downstream geometry consumption remain outside the pure initializer plan"
+        }
         },
         {
           "id": "maincpu.geometry-object-transform-update-2381c-23b3c",
