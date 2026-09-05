@@ -3393,7 +3393,12 @@
             }
           ],
           "symbol": "recovered_repeated_status_route_plan",
-          "notes": "Recovers five repeated source-or-clear routes with one 4-column/8-wide case and four 2-column/12-wide cases, all height 4."
+          "notes": "Recovers five repeated source-or-clear routes with one 4-column/8-wide case and four 2-column/12-wide cases, all height 4.",
+          "modeling": {
+            "boundary": "i960 repeated status source-or-clear route descriptors with route-specific geometry and helper selection",
+            "test": "von/tools/test_recovered_repeated_status_routes.py",
+            "unresolved_behavior": "source/fill memory contents and downstream rendering-helper side effects remain outside the pure route plan"
+          }
         },
         {
           "id": "maincpu.status-block-routes-20660-206e8",
