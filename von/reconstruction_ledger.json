@@ -11279,6 +11279,11 @@
             }
           ],
           "symbol": "recovered_status_code_dispatch_plan",
+          "modeling": {
+            "boundary": "Models the status dispatcher’s initial blanking fill and bounded selector map: selectors 0-7 choose the corresponding 0x1dc90 case and 0x1f680-0x1f6f0 record, while all other values choose the blank case and record 0x1f700",
+            "test": "von/tools/test_recovered_status_code_dispatch.py",
+            "unresolved_behavior": "Runtime caller status semantics, per-case panel contents, and downstream SHARC display timing remain outside this dispatch contract"
+          },
           "notes": "Recovers the initial blanking fill and bounded selector map: selectors 0-7 select eight 0x1dc90 case blocks and status records 0x1f680-0x1f6f0; all other values select blank case 0x1f978/record 0x1f700."
         },
         {
