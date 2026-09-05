@@ -11543,6 +11543,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_status_record_reset_3eeb0.py"],
           "ranges": [{"start": "0x0003eeb0", "end": "0x0003ef48"}],
           "symbol": "recovered_status_record_reset_3eeb0",
+          "modeling": {
+            "boundary": "Models the pure 0x3eeb0 bounded reset contract: scan 23 status halfwords for the first bit-15 active slot, return 23 without writes when none is found, mask selector/caller halfword fields, load selector&0xffff table data, copy three supplied device readbacks, clear +0x14/+0x18/+0x1c, and preserve the full caller value.",
+            "test": "von/tools/test_recovered_status_record_reset_3eeb0.py",
+            "unresolved_behavior": "Device I/O, 0xf5058 bookkeeping, pool-memory ownership, helper production, and caller scheduling are represented as inputs or remain outside this bounded record-write model."
+          },
           "notes": "Exact bounded first-active-record scan over 23 records at 0x51ad10 with 0x24-byte stride. Captures selector g1, selector-masked 0x3eca0 halfword, caller g0, three 0x884000 readback values, cleared fields, and g14 helper result; device I/O and 0xf5058 bookkeeping are supplied as inputs and excluded."
         },
         {
