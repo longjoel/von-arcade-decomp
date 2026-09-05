@@ -4661,8 +4661,13 @@
               "end": "0x0009d59c"
             }
           ],
-          "symbol": "recovered_geometry_clear_flag_packet_plan",
-          "notes": "Recovers the signed +0x1e4 input boundary, fixed command-19/18 packet, readback publication, and +0x1de-selected frame variants. The extended-FP derivation is divide by 3.390625 (0x40590000), multiply by 3.0625 (0x40440000), then single-precision FIFO storage; a host reference helper covers signed boundary values while exact extended-FP edge rounding remains qualified."
+        "symbol": "recovered_geometry_clear_flag_packet_plan",
+        "notes": "Recovers the signed +0x1e4 input boundary, fixed command-19/18 packet, readback publication, and +0x1de-selected frame variants. The extended-FP derivation is divide by 3.390625 (0x40590000), multiply by 3.0625 (0x40440000), then single-precision FIFO storage; a host reference helper covers signed boundary values while exact extended-FP edge rounding remains qualified.",
+        "modeling": {
+          "boundary": "i960 0x9d454 clear-flag packet plan covering signed input, command-19/18 nine-word packet, derived-word input, readback/pointer publication, and flag-selected frame variants",
+          "test": "von/tools/test_recovered_geometry_clear_flag_packet_9d454.py",
+          "unresolved_behavior": "exact extended-FP edge rounding, actual FIFO/MMIO writes, board response, and downstream clear-flag consumers remain outside the pure packet plan"
+        }
         },
         {
           "id": "maincpu.geometry-command19-branch-9d59c",
