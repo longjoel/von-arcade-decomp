@@ -6183,7 +6183,12 @@
             }
           ],
           "symbol": "recovered_object_state_zero_route",
-          "notes": "Recovers state-0 direct transition 7 for nonnegative timing or clear mode bit 1, plus negative-time role/object-value windows that write 8. All other negative-time paths intentionally preserve the pending transition with no write."
+          "notes": "Recovers state-0 direct transition 7 for nonnegative timing or clear mode bit 1, plus negative-time role/object-value windows that write 8. All other negative-time paths intentionally preserve the pending transition with no write.",
+          "modeling": {
+            "boundary": "i960 0x790a4 object-state zero-arm model covering timer sign, mode-bit bypass, role exclusions, object-value thresholds, and transitions 7/8 with unchanged fallthrough",
+            "test": "von/tools/test_recovered_object_state_zero.py",
+            "unresolved_behavior": "mapped global reads/writes, object-pointer provenance, common-tail remapping, caller scheduling, and runtime timing source remain outside the pure state-arm model"
+          }
         },
         {
           "id": "maincpu.object-state-seven-arm",
