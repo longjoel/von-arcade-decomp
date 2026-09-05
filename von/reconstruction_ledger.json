@@ -2141,6 +2141,11 @@
             }
           ],
           "symbol": "recovered_io_normal_input_plan",
+          "modeling": {
+            "boundary": "i960 two-bank controller setup/command schedule with indexed table selection and fixed tail",
+            "test": "von/tools/test_recovered_io.py",
+            "unresolved_behavior": "controller port execution, status waits, and hardware timing remain outside the 3,321-byte pure schedule"
+          },
           "notes": "Preserves both 30-entry loops: each emits the 21-byte 0x2850 setup sequence and the 34-byte 0x2ab0 command, using table[index] with command indices 0..29 and 30..59, followed by the 21-byte 0x28b0 tail. The complete pure schedule is 3,321 bytes."
         },
         {
