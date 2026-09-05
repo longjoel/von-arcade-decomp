@@ -7120,7 +7120,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm23",
-          "notes": "Recovers the bank-dependent two-tile plain e1f20 sequence at e2df8, including exact source banks and continuations e3008/e304c."
+          "notes": "Recovers the bank-dependent two-tile plain e1f20 sequence at e2df8, including exact source banks and continuations e3008/e304c.",
+          "modeling": {
+            "boundary": "Purely models the e2df8 conditional plan: emit tiles 9 and 11, select sources 0x02fb5290/0x02fb5350 with exit 0x000e3008 for bank_a nonzero or 0x02fb5410/0x02fb54d0 with exit 0x000e304c otherwise, and set count 2.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime bank producer, e1f20 execution, plan consumption, downstream continuation behavior, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-conditional-plain-arm-4",
