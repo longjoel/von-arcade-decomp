@@ -11468,6 +11468,11 @@
             }
           ],
           "symbol": "recovered_panel10_transfer_plan",
+          "modeling": {
+            "boundary": "Models the fixed panel-10 transfer through 0x1dc10: source 0x02fe0404 at column/row (10,20), width 31, and height 5",
+            "test": "von/tools/test_recovered_panel10_transfer.py",
+            "unresolved_behavior": "The source asset's population, SHARC tile-RAM destination, and display timing remain outside this fixed transfer contract"
+          },
           "notes": "Recovers source 0x02fe0404 through 0x1dc10 at column/row (10,20), width 31 and height 5."
         },
         {
