@@ -3283,6 +3283,11 @@
             }
           ],
           "symbol": "recovered_memory_copy_forward",
+          "modeling": {
+            "boundary": "Models the forward non-overlap memory-copy primitive: aligned 16-, 8-, 4-, 2-, and 1-byte loops all preserve the same byte-for-byte forward-copy result",
+            "test": "von/tools/test_recovered_memory.py",
+            "unresolved_behavior": "Overlap semantics, caller buffer ownership, runtime dispatch selection, and live video-memory/MMIO effects remain outside this forward-copy model"
+          },
           "notes": "Recovers and executes the forward non-overlap copy primitive's byte-for-byte contract. The original dispatches among aligned 16-, 8-, 4-, 2-, and 1-byte loops; reconstructed_main now invokes the recovered video upload, and the C implementation preserves their common forward-copy behavior. Runtime attract validation remains pending.",
           "milestones": {
             "c-only-i960-attract-60s": {
