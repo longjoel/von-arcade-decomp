@@ -9883,6 +9883,11 @@
             }
           ],
           "symbol": "sharc_opcode_32_nine_input_matrix_rebuild_service",
+          "modeling": {
+            "boundary": "Models the recovered normal opcode-0x32 contract: three direct float translation inputs populate the tail, the live angle fields are scaled signed-16 values applied in Y, Z, X order (equivalent to Rx*Rz*Ry), and the persistent matrix is rebuilt through the shared rotation helpers.",
+            "test": "von/tools/test_recovered_sharc_opcode_32.py",
+            "unresolved_behavior": "FIFO/DM timing, retained R13-R15 field reuse, exact helper residuals, persistent writeback layout, and caller-level semantics of the nine inputs remain unresolved rather than inferred."
+          },
           "notes": "Static listing recovers nine FIFO inputs, persistent translation-tail handling, three signed-parameter helper chains with scale 0x38c9116d, and interleaved persistent matrix rebuild with delayed final write. An identity-seeded all-zero live packet followed by opcode-0x11 preserves identity to helper precision (0x3f7ffffe diagonals) and zero tail. Isolated identity-seeded packets with R0=1, R1=1, and R2=1 place exact 1.0 in tail slots 0x09, 0x0a, and 0x0b respectively while leaving the matrix identity, establishing direct translation inputs. Asymmetric matrix-seeded tracing resolves the three pass order as Y(R3), Z(R5), then X(R6), equivalent to Rx*Rz*Ry; matrix rows 1..9 become approximately [-4,-5,-6 / 1,2,3 / 7,8,9]. A neutral-angle retained-field probe shows R15 and R14 writing tail slots 0x09 and 0x0a, while R13 has no observable identity-state effect; delayed register reuse prevents treating R13..R15 as a simple extra translation vector. The normal translation/angle contract is modeled in von/i960/recovered_sharc_opcode_32.c and covered by von/tools/test_recovered_sharc_opcode_32.py."
         },
         {
