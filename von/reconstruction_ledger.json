@@ -7438,7 +7438,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm9",
-          "notes": "Recovers the 0xe2830 mirrored tile sequence for tiles 21, 25, 27, and 29 with exact ROM source addresses, followed by the common e33f4 exit. It is explicitly distinguished from the plain e1f20 arm at 0xe2874."
+          "notes": "Recovers the 0xe2830 mirrored tile sequence for tiles 21, 25, 27, and 29 with exact ROM source addresses, followed by the common e33f4 exit. It is explicitly distinguished from the plain e1f20 arm at 0xe2874.",
+          "modeling": {
+            "boundary": "Purely models the e2830 mirrored plan: emit tiles 21, 25, 27, and 29 with sources 0x02fb6cd0, 0x02fb7e10, 0x02bfed8c, and 0x02fb6fd0, and set count 4 before the shared continuation.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The mirrored e2040 executions, plan consumption, common e33f4 control flow, caller sequencing, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-arm8",
