@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import subprocess
 import sys
@@ -78,6 +79,7 @@ def register(ledger: dict[str, Any], unit_id: str, image: str,
         return [f"work unit {unit_id} already has integration evidence"]
     unit["integration"] = {
         "image": image,
+        "image_sha256": hashlib.sha256((root / image).read_bytes()).hexdigest(),
         "checkpoint": checkpoint,
         "test": test,
     }

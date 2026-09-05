@@ -110,6 +110,13 @@ def validate_lifecycle(
             errors.append(f"{where}: integration.image must be a safe relative path")
         elif root is not None and not existing_reference(image):
             errors.append(f"{where}: missing integration image {image}")
+        image_digest = integration.get("image_sha256")
+        if not isinstance(image_digest, str) or not SHA256_RE.fullmatch(image_digest):
+            errors.append(f"{where}: integration.image_sha256 must be a SHA-256 digest")
+        elif root is not None and isinstance(image, str) and existing_reference(image):
+            actual_image_digest = hashlib.sha256((root / image).read_bytes()).hexdigest()
+            if actual_image_digest != image_digest:
+                errors.append(f"{where}: integration image hash mismatch")
         if not nonempty_text(integration.get("checkpoint")):
             errors.append(f"{where}: {unit.get('stage')} requires integration.checkpoint")
         test = integration.get("test")

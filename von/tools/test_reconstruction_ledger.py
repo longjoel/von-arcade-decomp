@@ -90,12 +90,14 @@ def main() -> int:
             {"id": "integrated", "stage": "integrated", "modeling": {
                 "boundary": "RAM", "test": "test.py", "unresolved_behavior": "timing"
             }, "integration": {
-                "image": "build/image.bin", "checkpoint": "startup", "test": "test.py"
+                "image": "build/image.bin", "image_sha256": hashlib.sha256(b"image").hexdigest(),
+                "checkpoint": "startup", "test": "test.py"
             }},
             {"id": "trace", "stage": "trace-validated", "modeling": {
                 "boundary": "RAM", "test": "test.py", "unresolved_behavior": "timing"
             }, "integration": {
-                "image": "build/image.bin", "checkpoint": "startup", "test": "test.py"
+                "image": "build/image.bin", "image_sha256": hashlib.sha256(b"image").hexdigest(),
+                "checkpoint": "startup", "test": "test.py"
             },
              "canonical_evidence_id": "capture-v1", "evidence": ["capture-v1"],
              "verifier": "verify.py",
@@ -103,7 +105,8 @@ def main() -> int:
             {"id": "bytes", "stage": "byte-validated", "modeling": {
                 "boundary": "ROM", "test": "test.py", "unresolved_behavior": "none"
             }, "integration": {
-                "image": "build/image.bin", "checkpoint": "startup", "test": "test.py"
+                "image": "build/image.bin", "image_sha256": hashlib.sha256(b"image").hexdigest(),
+                "checkpoint": "startup", "test": "test.py"
              }, "evidence": ["capture-v1"], "byte_validation": {
                 "original_range": "0x100-0x110", "reconstructed_range": "0x20-0x30",
                 "comparison": "match"

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import tempfile
 from pathlib import Path
 
@@ -23,7 +24,9 @@ def main() -> int:
         assert not register(ledger, "unit", "image.bin", "startup-init",
                             "integration-test.py", root, run_test=True)
         assert unit["integration"] == {
-            "image": "image.bin", "checkpoint": "startup-init",
+            "image": "image.bin",
+            "image_sha256": hashlib.sha256(b"image").hexdigest(),
+            "checkpoint": "startup-init",
             "test": "integration-test.py",
         }
         assert any("already has" in error for error in register(
