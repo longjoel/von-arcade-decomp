@@ -7012,7 +7012,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm27",
-          "notes": "Recovers the bank-dependent two-tile plain e1f20 payload at e2eec, including exact source banks and e30a8/e30cc continuations."
+          "notes": "Recovers the bank-dependent two-tile plain e1f20 payload at e2eec, including exact source banks and e30a8/e30cc continuations.",
+          "modeling": {
+            "boundary": "Purely models the e2eec conditional plan: emit tiles 9 and 11, select sources 0x02fb4c90/0x02fb4d50 for bank_a nonzero or 0x02fb4e10/0x02fb4ed0 otherwise, set count 2, and select exit 0x000e30a8 or 0x000e30cc accordingly.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime bank producer, e1f20 execution, plan consumption, continuation control flow at both exits, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-downstream-bank-split",
