@@ -5538,7 +5538,12 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_linked_list_append_298b8.py"],
           "ranges": [{"start": "0x000298b8", "end": "0x000298f0"}],
           "symbol": "recovered_linked_list_append_298b8",
-          "notes": "Pure fixture-tested intrusive doubly-linked-list append: sentinel next link, old-tail predecessor, old-tail successor update, and global tail publication. Memory ownership and allocator effects remain external."
+          "notes": "Pure fixture-tested intrusive doubly-linked-list append: sentinel next link, old-tail predecessor, old-tail successor update, and global tail publication. Memory ownership and allocator effects remain external.",
+          "modeling": {
+            "boundary": "i960 0x298b8 intrusive doubly-linked-list append model covering sentinel termination, predecessor linkage, old-tail successor update, and new-tail publication",
+            "test": "von/tools/test_linked_list_append_298b8.py",
+            "unresolved_behavior": "node allocation and ownership, list-head/tail storage, concurrent mutation, and callers' surrounding object-state effects remain outside the pure link-update plan"
+          }
         },
         {
           "id": "maincpu.geometry-function-command-submit",
