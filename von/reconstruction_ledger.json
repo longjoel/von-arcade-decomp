@@ -4148,8 +4148,13 @@
               "end": "0x00023bc0"
             }
           ],
-          "symbol": "recovered_geometry_object_transform_update_plan",
-          "notes": "Recovers the shared parent-coordinate copy, scale/scale-squared coefficient updates, and +0x18 active flag for the 0x2381c and 0x23b3c branches; bound predicates remain dispatcher-specific."
+        "symbol": "recovered_geometry_object_transform_update_plan",
+        "notes": "Recovers the shared parent-coordinate copy, scale/scale-squared coefficient updates, and +0x18 active flag for the 0x2381c and 0x23b3c branches; bound predicates remain dispatcher-specific.",
+        "modeling": {
+          "boundary": "i960 0x2381c/0x23b3c geometry transform-update plan covering parent-coordinate copies, scale and scale-squared coefficient application, and active-state update",
+          "test": "von/tools/test_recovered_geometry_object_transform_update_2381c.py",
+          "unresolved_behavior": "dispatcher-specific bound predicates, object-memory writes, and downstream transformed-object consumption remain outside the pure transform plan"
+        }
         },
         {
           "id": "maincpu.geometry-object-branch-dispatch-237ac",
