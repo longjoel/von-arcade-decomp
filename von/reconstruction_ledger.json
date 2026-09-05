@@ -10363,6 +10363,11 @@
             }
           ],
           "symbol": "sharc_opcode_42_six_input_packed_coordinate_matrix_service",
+          "modeling": {
+            "boundary": "Models the bounded opcode-0x42 service: decode the low 16 bits of three packed coordinate inputs with the recovered binary16-shaped construction, project them through the incoming row-major matrix into the translation tail, then apply in-place Z, Y, and X row rotations from the three signed-16 angle words in sequence.",
+            "test": "von/tools/test_recovered_sharc_opcode_42.py",
+            "unresolved_behavior": "FIFO production and wait timing, DM 0x30141/source and persistent-state ownership, SHARC helper rounding and intermediate write scheduling, delayed final stores, exact state-record layout, and downstream consumers remain outside this bounded first-pass/rotation model."
+          },
           "notes": "Static listing recovers six FIFO inputs, packed-coordinate decoding through DM 0x30141, three persistent-state transform records, three signed fixed-point helper pairs, and delayed final matrix/state writes. Identity-seeded probes show decoded R0/R1/R2 write tail X/Y/Z respectively; packed zero reads back as 0x38000000 under the ROM's no-special-case decode. Isolated R13/R14/R15=0x4000 captures produce conventional X/Y/Z quarter-turns with SHARC residuals. A fresh interpreter trace of R13=0x4000 records the final row-major matrix [0x3f7ffffe,0,0 / 0x80000000,0xb8492eee,0xbf7fffff / 0,0x3f7fffff,0xb8492eee], with writes split across PCs 0x20b4d..0x20b58, 0x20b66..0x20b71, and 0x20b7f..0x20b88. The combined 0x4000,0x4000,0x4000 probe records [0x311e1abc,0x38492eef,0x3f800000 / 0xb8c92eef,0xbf800000,0x38492eef / 0x3f800000,0xb8c92eef,0x311e1abc], the ROM-rounded Rx*Ry*Rz result. An asymmetric 1..9 matrix seed yields rows [7,8,9], [-4,-5,-6], [1,2,3], confirming sequential Z/Y/X row rotations and showing that intermediate writes are pipeline stages rather than final state."
         },
         {
