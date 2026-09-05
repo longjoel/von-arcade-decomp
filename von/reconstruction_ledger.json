@@ -2115,6 +2115,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_io_runtime_upload.py"],
           "ranges": [{"start": "0x000025d0", "end": "0x00002a30"}],
           "symbol": "recovered_io_runtime_upload_plan",
+          "modeling": {
+            "boundary": "i960 runtime-upload gate, callback/publication handoff, and bounded indexed-command transfer",
+            "test": "von/tools/test_recovered_io_runtime_upload.py",
+            "unresolved_behavior": "callback bodies, port reads/writes, and status-wait timing remain external inputs to this handoff contract"
+          },
           "notes": "Pure 0x29d0 gate and 0x25d0 callback/publication contract, followed by the bounded 0x2990 indexed-command handoff. Callback bodies, port reads/writes, and status waits are explicit inputs or remain external."
         },
         {
