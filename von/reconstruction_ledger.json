@@ -8470,6 +8470,11 @@
             }
           ],
           "symbol": "recovered_geometry_result_builder_9e250_plan",
+          "modeling": {
+            "boundary": "Models the 0x9e250 sibling entry contract: selector-stride and parameter lookup, shared command-0x38 response scratch, flag-set signed paired-halfword comparison with alternate-table replacement, flag-clear constant/write placement, common command-31 seven-word framing, and final response storage at +0x28.",
+            "test": "von/tools/test_recovered_geometry_result_builder_9e250.py",
+            "unresolved_behavior": "Live FIFO response values and timing, mapped record writes, full selector and alternate-table semantics, and downstream SHARC/device state remain unresolved."
+          },
           "notes": "Recovers the sibling result-builder variant's shared 0x38 response scratch and common seven-word decimal-31 request, while preserving its distinct branches: the flag-set path sign-extends paired-record +0x06 and only replaces it from the alternate 0x562cb0 table when the primary value is greater; the flag-clear path writes immediate 0xffffe000 to output +0x0c and paired-record +0x06. The final SHARC opcode-0x1f handler remains 0x203ea, with the final host response read at 0x9e438 and storage at output +0x28."
         },
         {
