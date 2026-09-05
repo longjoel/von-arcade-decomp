@@ -9427,7 +9427,7 @@
           "id": "sharc.opcode-21-six-word-parameter-upload-service",
           "name": "opcode_21_six_word_parameter_upload_service",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -9443,6 +9443,11 @@
             }
           ],
           "symbol": "sharc_opcode_21_six_word_parameter_upload_service",
+          "modeling": {
+            "boundary": "Models the exact opcode-0x21 six-word parameter upload: consume FIFO R0..R5 and store the raw words sequentially at DM 0x30136..0x3013b, including the final two delayed-return stores; record the confirmed opcode-0x22 reload offsets without assigning provisional geometric names.",
+            "test": "von/tools/test_sharc_opcode_21.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent DM ownership/address units, exact threshold semantics and geometric naming, delayed-store timing, packet-boundary/runtime dispatch correlation, and downstream clipping behavior remain outside this upload model."
+          },
           "notes": "Static listing recovers six FIFO inputs into R0..R5 and sequential stores at DM 0x30136..0x3013b, with the final two stores in delayed-return slots. Opcode 0x22 reloads the block through I6, uses offsets 0x00 and 0x01 as plane coefficients, and consumes offsets 0x04, 0x05, 0x02, and 0x03 at four interleaved clipping comparisons; this establishes the upload as clip-parameter state, while exact threshold ordering and geometric names remain provisional. The recurring 0x21 words at i960 0x8e3e0/0x8e3ec in gameplay are payloads of host command 0x2e, not runtime evidence that SHARC opcode 0x21 was dispatched."
         },
         {
