@@ -6552,7 +6552,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm33",
-          "notes": "Recovers the bank-dependent eight-call e1fb0 sequence at e3248, including the four-bank-dependent prefix, fixed four-tile suffix, helper identity, and common e33f4 exit."
+          "notes": "Recovers the bank-dependent eight-call e1fb0 sequence at e3248, including the four-bank-dependent prefix, fixed four-tile suffix, helper identity, and common e33f4 exit.",
+          "modeling": {
+            "boundary": "Purely models the e3248 helper plan: emit tiles 1, 3, 5, 7, 21, 25, 27, and 29; select the exact four source addresses for bank_a nonzero versus zero; use the fixed four suffix sources; set helper 0x000e1fb0, count 8, and exit 0x000e33f4.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime producer and meaning of bank_a are not modeled, nor are the source-table contents, e1fb0 execution, plan consumption, common e33f4 control flow, or original video-memory/MMIO side effects."
+          }
         },
         {
           "id": "maincpu.video-dispatch-e1fb0-selector-arm",
