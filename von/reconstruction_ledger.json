@@ -4229,8 +4229,13 @@
               "end": "0x00023978"
             }
           ],
-          "symbol": "recovered_geometry_object_lifecycle_plan",
-          "notes": "Recovers the +0x18 guard and bounded +0x19 increment for lifecycle values 0-31."
+        "symbol": "recovered_geometry_object_lifecycle_plan",
+        "notes": "Recovers the +0x18 guard and bounded +0x19 increment for lifecycle values 0-31.",
+        "modeling": {
+          "boundary": "i960 0x23954 geometry-object lifecycle-tail plan covering active-state gating and bounded lifecycle-counter increment",
+          "test": "von/tools/test_recovered_geometry_object_lifecycle_tail_23954.py",
+          "unresolved_behavior": "actual object-memory update, lifecycle consumers, and surrounding geometry teardown or dispatch behavior remain outside the pure state-transition plan"
+        }
         },
         {
           "id": "maincpu.geometry-object-variant-23980",
