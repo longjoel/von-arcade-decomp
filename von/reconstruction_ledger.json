@@ -11495,6 +11495,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_status_record_init_3ecd0.py"],
           "ranges": [{"start": "0x0003ecd0", "end": "0x0003ed58"}],
           "symbol": "recovered_status_record_init_3ecd0",
+          "modeling": {
+            "boundary": "Models the pure 0x3ecd0 bounded initializer: scan 23 status halfwords for the first bit-15 match, return 23 on failure, then populate the selected record fields, mask the caller byte to 8 bits, clear +0x14/+0x18/+0x1c, and load the table halfword using selector&0xffff.",
+            "test": "von/tools/test_recovered_status_record_init_3ecd0.py",
+            "unresolved_behavior": "Pool-memory writes, the helper producing helper_value, caller/service arguments, and any MMIO or post-initialization side effects remain outside this pure result contract."
+          },
           "notes": "Exact bounded first-free-record scan over 23 records at 0x51ad10 with 0x24-byte stride and status bit 15, followed by the observed field initialization and selector-masked 0x3eca0 halfword lookup. The helper call and pool memory side effects are outside the pure result contract."
         },
         {
