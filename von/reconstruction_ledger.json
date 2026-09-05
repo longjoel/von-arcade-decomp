@@ -5087,6 +5087,11 @@
             }
           ],
           "symbol": "recovered_word_expand_blocks",
+          "modeling": {
+            "boundary": "Models the fixed-width text/video block converter: expand each source halfword through the recovered nibble/bit mapping, ignore source bit 15, and write exactly 16 destination halfwords in order",
+            "test": "von/tools/test_recovered_text_video.py",
+            "unresolved_behavior": "Caller buffer provenance, active startup/display routing, destination hardware timing, and consumers of the expanded block remain outside this pure conversion model"
+          },
           "notes": "Recovers the 16-word-block halfword converter, including its exact nibble/bit expansion and ignored source bit 15. The transform is exhaustively checked for every 16-bit input value.",
           "milestones": {
             "c-only-i960-attract-60s": {
