@@ -1536,7 +1536,10 @@
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_16.py"
+            "von/tools/test_sharc_opcode_16.py",
+            "von/tools/probe_sharc_rotation_siblings.lua",
+            "von/i960/recovered_sharc_opcode_16.c",
+            "von/tools/test_recovered_sharc_opcode_16.py"
           ],
           "ranges": [
             {
@@ -1545,6 +1548,12 @@
             }
           ],
           "symbol": "sharc_opcode_16_scalar_state_projection_service",
+          "stage": "modeled",
+          "modeling": {
+            "boundary": "SHARC signed-scalar FIFO input, helper-derived Z-axis row-pair rotation, and six matrix state-window writes at offsets 0x00,0x03,0x01,0x04,0x02,0x05",
+            "test": "von/tools/test_recovered_sharc_opcode_16.py",
+            "unresolved_behavior": "caller-level axis naming, delayed-return integration, and broader state-window ownership remain provisional beyond the atomic rotation snapshots"
+          },
           "notes": "Static listing recovers one signed-16 FIFO input, helper pair 0x20dbe/0x20dc4 with scale 0x38c9116d, and six state writes at offsets 0x00,0x03,0x01,0x04,0x02,0x05. The final two writes are delayed-return slots; higher-level meaning remains provisional."
         },
         {
