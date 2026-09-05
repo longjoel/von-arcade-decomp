@@ -8191,7 +8191,12 @@
             }
           ],
           "symbol": "recovered_geometry_allocator_commit",
-          "notes": "Recovers the allocator commit tail: source association write, count increment, free-list head advance by 0x30, and negated next-node available-count update."
+          "notes": "Recovers the allocator commit tail: source association write, count increment, free-list head advance by 0x30, and negated next-node available-count update.",
+          "modeling": {
+            "boundary": "Purely models allocator commit bookkeeping: store the allocated slot in the source association field, increment the source count with 32-bit wraparound, advance the free-list head by 0x30, and store the two's-complement next-node word as available count.",
+            "test": "von/tools/test_recovered_geometry_allocator_commit.py",
+            "unresolved_behavior": "Does not model pointer-linked memory traversal, allocator ownership, concurrent pool mutation, or subsequent record/link consumers."
+          }
         },
         {
           "id": "maincpu.geometry-link-release-plan",
