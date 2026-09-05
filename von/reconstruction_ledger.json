@@ -9817,6 +9817,11 @@
             }
           ],
           "symbol": "sharc_opcode_30_matrix_setup_update_service",
+          "modeling": {
+            "boundary": "Models the finite opcode-0x30 update: translation is transformed by the prior column-major matrix into the tail, and the persistent matrix is rebuilt as scalar times a Z rotation using the signed-16 angle scaled by pi/32767.",
+            "test": "von/tools/test_recovered_sharc_opcode_30.py",
+            "unresolved_behavior": "FIFO/DM timing, exact SHARC trig-helper residuals, persistent writeback mapping, the caller-level meaning of the scalar, and downstream state consumers remain provisional."
+          },
           "notes": "Static listing recovers five FIFO inputs, translation-tail update, identity matrix initialization, the signed R15 helper pair 0x20dbe/0x20dc4 with scale 0x38c9116d, and complete matrix writeback with delayed final stores. Serialized state tracing with R13=1.0 and R15=0 ends at identity with tail (0,0,1); R13=1.0 and R15=0x4000 ends at the conventional Z-axis quarter-turn [c,-1,0 / 1,c,0 / 0,0,1]. The complementary R15=0, R13=0x4000 trace records raw 0x00004000 matrix words, proving that R13 is copied directly into the floating-point accumulator at 0x2074d rather than passed through a second trig helper. The identity stores and first pass are intermediate; caller-level naming of the scalar remains provisional."
         },
         {
