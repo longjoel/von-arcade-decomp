@@ -4393,8 +4393,13 @@
               "end": "0x00024540"
             }
           ],
-          "symbol": "recovered_geometry_object_response_selector_plan",
-          "notes": "Recovers the object +0x1d0/+0x1d2 guard, +0x1d8 quarter/third/half threshold routes, 0x2be0088 table indexing, and 0x40002c/0x49c980/0x49c984 fallbacks; subsequent command-6 calls remain unresolved."
+        "symbol": "recovered_geometry_object_response_selector_plan",
+        "notes": "Recovers the object +0x1d0/+0x1d2 guard, +0x1d8 quarter/third/half threshold routes, 0x2be0088 table indexing, and 0x40002c/0x49c980/0x49c984 fallbacks; subsequent command-6 calls remain unresolved.",
+        "modeling": {
+          "boundary": "i960 0x24460 geometry-object response selector plan covering guard comparison, quarter/third/half threshold routing, indexed table selection, and fixed fallback pointers",
+          "test": "von/tools/test_recovered_geometry_object_response_selector_24460.py",
+          "unresolved_behavior": "actual response-table contents in production, subsequent command-6 calls, pointer consumers, and geometry side effects remain outside the pure selector plan"
+        }
         },
         {
           "id": "maincpu.geometry-object-clip-calls-24540",
