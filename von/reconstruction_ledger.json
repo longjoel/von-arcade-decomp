@@ -5434,6 +5434,11 @@
             }
           ],
           "symbol": "recovered_geometry_buffer_prepare",
+          "modeling": {
+            "boundary": "geometry buffer preparation emits 0x2000 deterministic words from the recovered exponent conversion and submits them as four contiguous 0x800-word batches with fixed source and command strides",
+            "test": "von/tools/test_geometry_buffer_model.py",
+            "unresolved_behavior": "machine-code equivalence, MMIO timing, and live consumer ownership remain provisional beyond the pure buffer and batch-shape model"
+          },
           "notes": "Recovered C generation of all 0x2000 output words is verified by von/tools/verify_geometry_buffer.py and the captured runtime vector. The four-batch chain is additionally checked by von/tools/verify_geometry_chain.py. Byte-for-byte machine-code validation remains blocked on compiler/ABI calibration.",
           "milestones": {
             "c-only-i960-attract-60s": {
