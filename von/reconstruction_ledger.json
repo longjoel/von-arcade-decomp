@@ -1698,6 +1698,11 @@
             }
           ],
           "symbol": "sharc_opcode_1b_signed_fixed_point_service",
+          "modeling": {
+            "boundary": "SHARC signed-16 FIFO input, fixed-angle helper scaling, and single floating-point output",
+            "test": "von/tools/test_recovered_sharc_opcode_1bc.py",
+            "unresolved_behavior": "endpoint rounding remains implementation-specific beyond the established sine-scale vectors"
+          },
           "notes": "One FIFO word is sign-extended from 16 bits, converted to float, calls helper 0x20dc4, is scaled by 0x38c9116d, and is emitted once. The helper reads the coefficient path at DM 0x3030c. Runtime probe probe_sharc_opcode_1b.lua confirms the sine-shaped behavior: inputs 0, 0x4000, 0x7fff, and 0x8000 emit 0x00000000, 0x3f800000, 0xb3bbbd00, and 0x38c92eef. The \u03c0/32767 angle scale and sine interpretation are established; endpoint rounding remains implementation-specific."
         },
         {
