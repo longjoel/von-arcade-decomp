@@ -7973,7 +7973,12 @@
             }
           ],
           "symbol": "recovered_geometry_35_producer_6f600",
-          "notes": "Recovers the sibling host geometry producer: 0..1023 cvtzri validation, half-coordinate 0x41 lookup, and the six-word 0x35 continuation [record+0x04, original x, record+0x0c, original y, record+0x10, bitwise-not(record+0x08)] followed by one FIFO read. The callback response remains an explicit device boundary."
+          "notes": "Recovers the sibling host geometry producer: 0..1023 cvtzri validation, half-coordinate 0x41 lookup, and the six-word 0x35 continuation [record+0x04, original x, record+0x0c, original y, record+0x10, bitwise-not(record+0x08)] followed by one FIFO read. The callback response remains an explicit device boundary.",
+          "modeling": {
+            "boundary": "Models the 0x6f600 producer contract: truncate and bounds-check both coordinates, submit the half-coordinate 0x41 lookup, select the returned 20-byte record, emit the six-word 0x35 continuation using the original coordinate bits and complemented record field, and return the final FIFO response.",
+            "test": "von/tools/test_recovered_geometry_35_producer_6f600.py",
+            "unresolved_behavior": "FIFO callbacks remain an explicit device boundary; live SHARC response timing, table bounds outside the tested callback, and downstream stateful opcode behavior are unresolved."
+          }
         },
         {
           "id": "maincpu.fixed-record-last-nonempty-scan",
