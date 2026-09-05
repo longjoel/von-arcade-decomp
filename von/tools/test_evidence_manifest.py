@@ -34,6 +34,10 @@ def main() -> int:
     broken["entries"][0]["canonical"] = "true"
     assert any("canonical must be boolean" in error for error in validate(broken, ledger, root))
     broken = json.loads(json.dumps(manifest))
+    broken["entries"][0]["id"] = "von/build/capture.log"
+    assert any("stable id must be a non-path string" in error
+               for error in validate(broken, ledger, root))
+    broken = json.loads(json.dumps(manifest))
     broken["entries"][0]["consumers"] = [""]
     assert any("must name existing ledger consumers" in error for error in validate(broken, ledger, root))
     broken = json.loads(json.dumps(manifest))

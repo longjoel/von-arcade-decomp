@@ -22,6 +22,13 @@ def safe_path(path_text: object) -> bool:
     return not path.is_absolute() and ".." not in path.parts
 
 
+def stable_id(value: object) -> bool:
+    """Return whether an evidence ID is opaque and not a filesystem path."""
+    return (isinstance(value, str) and bool(value) and value not in {".", ".."}
+            and "/" not in value and "\\" not in value
+            and not Path(value).is_absolute())
+
+
 def rooted(root: Path, path_text: object) -> Path | None:
     if not safe_path(path_text):
         return None
@@ -65,7 +72,9 @@ def validate(manifest: dict, ledger: dict, root: Path) -> list[str]:
             errors.append(f"{where}: entry must be an object")
             continue
         evidence_id = entry.get("id")
-        if not isinstance(evidence_id, str) or not evidence_id or evidence_id in ids:
+        if not stable_id(evidence_id):
+            errors.append(f"{where}: stable id must be a non-path string")
+        elif evidence_id in ids:
             errors.append(f"{where}: missing or duplicate stable id")
         elif evidence_id:
             ids.add(evidence_id)

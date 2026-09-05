@@ -139,6 +139,9 @@ def main() -> int:
         broken["objective"] = ""
         assert any("objective" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
+        broken["id"] = "captures/capture.json"
+        assert any("stable capture id" in error for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
         broken["checkpoints"] = ["reset", "reset"]
         assert any("checkpoints" in error for error in validate(broken, root))
         broken = copy.deepcopy(manifest)

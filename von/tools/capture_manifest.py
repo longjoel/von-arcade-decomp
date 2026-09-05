@@ -68,6 +68,13 @@ def safe_path(path_text: Any) -> bool:
     return not path.is_absolute() and ".." not in path.parts
 
 
+def stable_id(value: Any) -> bool:
+    """Return whether a value is an opaque ID rather than a filesystem path."""
+    return (isinstance(value, str) and bool(value) and value not in {".", ".."}
+            and "/" not in value and "\\" not in value
+            and not Path(value).is_absolute())
+
+
 def rooted(root: Path, path_text: Any) -> Path | None:
     """Resolve a manifest path only when it remains inside the capture root."""
     if not safe_path(path_text):
@@ -92,7 +99,7 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
         return ["capture manifest must be an object"]
     if manifest.get("schema_version") != 1:
         errors.append("schema_version must be 1")
-    if not isinstance(manifest.get("id"), str) or not manifest.get("id"):
+    if not stable_id(manifest.get("id")):
         errors.append("missing stable capture id")
     stimulus = manifest.get("stimulus", {})
     if not isinstance(stimulus, dict):

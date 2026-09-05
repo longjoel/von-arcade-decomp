@@ -32,7 +32,7 @@ def main() -> int:
                for error in validate_lifecycle({"images": []}, {}))
     assert any("manifest.entries[0]: entry must be an object" in error
                for error in validate_lifecycle({"images": []}, {"entries": ["bad"]}))
-    assert any("stable id must be a non-empty string" in error
+    assert any("stable id must be a non-path string" in error
                for error in validate_lifecycle({"images": []}, {"entries": [{}]}))
     malformed_shape = {"schema_version": 2, "images": [{"name": "maincpu", "work_units": {}}]}
     assert any("work_units must be an array" in error for error in validate(malformed_shape))
@@ -133,6 +133,13 @@ def main() -> int:
                               "verifier_sha256": "a" * 64,
                               "checkpoints": ["startup"], "consumers": ["trace", "bytes"]}]}
     assert not validate_lifecycle(lifecycle, manifest)
+    path_id_lifecycle = copy.deepcopy(lifecycle)
+    path_id_lifecycle["images"][0]["work_units"][3]["canonical_evidence_id"] = "von/build/capture.log"
+    path_id_lifecycle["images"][0]["work_units"][3]["evidence"] = ["von/build/capture.log"]
+    path_id_manifest = copy.deepcopy(manifest)
+    path_id_manifest["entries"][0]["id"] = "von/build/capture.log"
+    assert any("stable id must be a non-path string" in error for error in validate_lifecycle(
+        path_id_lifecycle, path_id_manifest))
     with tempfile.TemporaryDirectory() as directory:
         lifecycle_root = Path(directory)
         (lifecycle_root / "build").mkdir()

@@ -84,6 +84,11 @@ def validate_lifecycle(
     def nonempty_text(value: Any) -> bool:
         return isinstance(value, str) and bool(value)
 
+    def stable_id(value: Any) -> bool:
+        return (isinstance(value, str) and bool(value) and value not in {".", ".."}
+                and "/" not in value and "\\" not in value
+                and not Path(value).is_absolute())
+
     def validate_modeling(where: str, unit: dict[str, Any]) -> None:
         modeling = unit.get("modeling")
         if not isinstance(modeling, dict):
@@ -161,8 +166,8 @@ def validate_lifecycle(
             errors.append(f"manifest.entries[{index}]: entry must be an object")
             continue
         evidence_id = entry.get("id")
-        if not isinstance(evidence_id, str) or not evidence_id:
-            errors.append(f"manifest.entries[{index}]: stable id must be a non-empty string")
+        if not stable_id(evidence_id):
+            errors.append(f"manifest.entries[{index}]: stable id must be a non-path string")
         else:
             if evidence_id in manifest_ids:
                 errors.append(f"manifest.entries[{index}]: duplicate stable id")
