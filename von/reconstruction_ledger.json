@@ -1237,6 +1237,11 @@
             }
           ],
           "symbol": "sharc_opcode_0c_vector_normalization_service",
+          "modeling": {
+            "boundary": "SHARC vector FIFO inputs, shared RSQRTS refinement, and normalized output FIFO writes",
+            "test": "von/tools/test_recovered_sharc_opcode_0c.py",
+            "unresolved_behavior": "mixed non-finite vector combinations remain provisional beyond the observed edge vectors"
+          },
           "notes": "Static listing recovers three FIFO inputs into R6,R9,R5, a sum-of-squares accumulator, three RSQRTS correction rounds, and three normalized outputs from R0,R1,R2. The third output is delayed. Forced interpreter-backed runtime confirms (3,4,12) -> 0x3e6c4ec4, 0x3e9d89d8, 0x3f6c4ec4 and zero -> 0xffffffff in all lanes. A dedicated rounding probe adds adjacent-ULP, cancellation, and large-magnitude vectors; the C model reproduces the live asymmetric result 0x3f3504f3,0x3f3504f4,0, cancellation result 0x3f3504f4,0xbf3504f3,0, and large mixed result 0x3f13cd3a,0x3f13cd3a,0x3f13cd3b. A direct ten-vector edge capture establishes all-lane canonical NaNs for zero, signed zero, standalone denormal, and NaN; preserves infinite axes; exposes the 0x1f800000 RSQRTS(+inf) artifact beside infinity; and preserves a denormal in the final finite multiply. The C model implements these observed boundaries plus the shared RSQRTS seed and three-round refinement; other mixed nonfinite combinations remain provisional."
         },
         {
