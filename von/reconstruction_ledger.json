@@ -7276,7 +7276,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm17",
-          "notes": "Recovers the bank-dependent four-tile plain e1f20 sequence at e2a48: bank A sources 0x2fb5290/0x2fb5350/0x2fb3d90/0x2fb3e50; bank B sources 0x2fb5410/0x2fb54d0/0x2fb3f10/0x2fb3fd0."
+          "notes": "Recovers the bank-dependent four-tile plain e1f20 sequence at e2a48: bank A sources 0x2fb5290/0x2fb5350/0x2fb3d90/0x2fb3e50; bank B sources 0x2fb5410/0x2fb54d0/0x2fb3f10/0x2fb3fd0.",
+          "modeling": {
+            "boundary": "Purely models the e2a48 plain plan: emit tiles 9, 11, 1, and 3; select the four exact bank-A or bank-B source addresses; and set count 4.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime bank producer, e1f20 execution, plan consumption, caller/continuation sequencing, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-bank-select-gate",
