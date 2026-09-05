@@ -5643,6 +5643,11 @@
           ],
           "symbol": "recovered_command_profile_advance",
           "notes": "Recovers the third-column profile handler selection at profile*3+2, pre-increment handler input, and post-call increment of 0x577114. The indirect handler remains a callback boundary and the profile table's semantic names are provisional.",
+          "modeling": {
+            "boundary": "i960 0xc8f60 command-profile advance wrapper model covering third-column handler selection, callback input capture, post-callback increment, and returned table index",
+            "test": "von/tools/test_recovered_command_profile_dispatch.py",
+            "unresolved_behavior": "indirect handler semantics, profile-table ownership, mapped state publication, overflow policy, and downstream command effects remain outside the callback wrapper"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
