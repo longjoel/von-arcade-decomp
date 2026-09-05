@@ -1500,7 +1500,7 @@
           "id": "maincpu.opcode-15-scalar-state-projection-service",
           "name": "opcode_15_scalar_state_projection_service",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -1530,7 +1530,7 @@
           "id": "maincpu.opcode-16-scalar-state-projection-service",
           "name": "opcode_16_scalar_state_projection_service",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -1560,7 +1560,7 @@
           "id": "maincpu.opcode-17-streamed-geometry-service",
           "name": "opcode_17_streamed_geometry_service",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -1694,13 +1694,15 @@
           "id": "maincpu.helpers-20dbe-20dc4-shared-fixed-point-reduction",
           "name": "helpers_20dbe_20dc4_shared_fixed_point_reduction",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_helpers_20dbe.py"
+            "von/tools/test_sharc_helpers_20dbe.py",
+            "von/i960/recovered_sharc_helper_20dbe.c",
+            "von/tools/test_recovered_sharc_helper_20dbe.py"
           ],
           "ranges": [
             {
@@ -1709,6 +1711,11 @@
             }
           ],
           "symbol": "sharc_helpers_20dbe_20dc4_shared_fixed_point_reduction",
+          "modeling": {
+            "boundary": "SHARC 0x20dbe cosine-phase and 0x20dc4 sine-phase entries share fixed-point staging, pi reduction, six-pass correction, and delayed-return output",
+            "test": "von/tools/test_recovered_sharc_helper_20dbe.py",
+            "unresolved_behavior": "exceptional-value handling, extended-precision behavior, and complete replacement integration remain provisional beyond the finite captured quadrant sweep"
+          },
           "notes": "Static listing recovers distinct 0x20dbe and 0x20dc4 entry setup, their shared reduction body at 0x20dca, signed fixed-point staging, six-pass correction loop, delayed-return tails, and the 0x20de1 next-helper boundary. DM 0x3030c is identified as a pi reducer plus odd sine-series coefficients through x^15/15!, and 0x38c9116d is pi/32767; 0x20dc4 is the sine-shaped path and 0x20dbe its pi/2 phase-shifted cosine sibling. A 32-request interpreter sweep matches all sampled sine and cosine outputs. Reconstructing the residual with rounded high-word/correction-word subtractions resolves the former 0x3000/0xd000 low-bit mismatch without an ad-hoc correction; broader exceptional-value and extended-precision behavior remains provisional."
         },
         {
