@@ -4067,8 +4067,13 @@
               "end": "0x00023610"
             }
           ],
-          "symbol": "recovered_status_string_glyph_plan",
-          "notes": "Recovers the origin save/restore, suffix lowercase scan, byte-0/byte-1 selection, font mode 0/1 selection, and 0x4000-attributed 0x1d310 glyph call."
+        "symbol": "recovered_status_string_glyph_plan",
+        "notes": "Recovers the origin save/restore, suffix lowercase scan, byte-0/byte-1 selection, font mode 0/1 selection, and 0x4000-attributed 0x1d310 glyph call.",
+        "modeling": {
+          "boundary": "i960 0x23560 status-string glyph selector plan covering lowercase-suffix scan, character/index selection, font mode, glyph helper, attributes, and origin save/restore addresses",
+          "test": "von/tools/test_recovered_status_string_glyph_23560.py",
+          "unresolved_behavior": "actual string storage, font glyph decoding, helper rendering, and video-memory writes remain outside the pure selector plan"
+        }
         },
         {
           "id": "maincpu.status-indexed-glyph-23620",
