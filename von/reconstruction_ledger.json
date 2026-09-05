@@ -10321,6 +10321,11 @@
             }
           ],
           "symbol": "sharc_opcode_3f_four_input_followup_service",
+          "modeling": {
+            "boundary": "Models the bounded opcode-0x3f mixed-representation result path: interpret the first two FIFO words as signed 32-bit integers A/B, the third as IEEE float C, the delayed fourth as IEEE float D, and return D + C*(float(A)/float(B)) for normal inputs with the observed canonical-NaN and positive-infinity saturation boundaries.",
+            "test": "von/tools/test_recovered_sharc_opcode_3f.py",
+            "unresolved_behavior": "FIFO production and wait timing, exact RECIPS/Newton rounding and register scheduling, negative/infinite denominator behavior beyond tested cases, complete state ownership, output FIFO backpressure, delayed store ordering, and downstream consumers remain outside this bounded mixed-quotient model."
+          },
           "notes": "The first two FIFO words are integer-converted by FLOAT; the third is consumed as an IEEE F4 bit-pattern and the fourth overwrites F12 in the delayed input slot. Runtime vectors (0x3f800000,0x40000000,3.0,4.0) and (0x40000000,0x40800000,3.0,5.0) emit 0x40df4000 (6.9765625) and 0x40ff417d (7.9767442), confirming the mixed representation and reciprocal-refined quotient in normal cases. Edge probes show zero or one numerator over a zero denominator emits canonical 0xffffffff NaN; -1/1 with C=3,D=4 emits 1.0; INT_MIN/1 emits 0xcfc00000; NaN C emits canonical NaN; and infinite C saturates to 0x7f7fffff. The reusable C contract now covers those observed coefficient/denominator boundaries explicitly."
         },
         {
