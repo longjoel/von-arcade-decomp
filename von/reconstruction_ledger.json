@@ -10481,6 +10481,11 @@
             }
           ],
           "symbol": "opcode_47_normalized_predicate_service",
+          "modeling": {
+            "boundary": "Models the normal opcode-0x47 predicate: interpret inputs as (a,b,c,d), compute radial = hypot(a-s0,b-s2) and delta = s1-d from the opcode-0x46 state window, then return 0 only when c+s5 is strictly greater than radial and s4 <= delta <= s3, otherwise return 1.",
+            "test": "von/tools/test_recovered_sharc_opcode_47.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent state ownership and address mapping, SHARC RSQRTS/compare rounding at boundaries, exceptional values beyond tested NaNs, output FIFO backpressure, delayed store ordering, and downstream consumers remain outside this bounded predicate model."
+          },
           "notes": "Static listing and traced runtime recover the exact normal-case predicate. Inputs are (a,b,c,d)=(R8,R10,R9,R13); s[0],s[2],s[5] form the radial expression, while s[1]-d is compared inclusively against stored s[4] and s[3]. Opcode 0x46 negates F4 before storing its fifth uploaded word, so stored s[4] is already the lower-bound sign. A controlled state s2=0,s3=3,s4=-0.5,s5=0 with (3,4,6,-2) reaches 0x20c09 and emits 0; the radial-failing case reaches 0x20c0d and emits 1. Boundary rounding remains SHARC-specific."
         },
         {
