@@ -10586,7 +10586,7 @@
           "ranges": [
             {
               "start": "0x0001c618",
-              "end": "0x0001cf4"
+              "end": "0x0001c6f4"
             }
           ],
           "symbol": "recovered_window_clear_plan",
