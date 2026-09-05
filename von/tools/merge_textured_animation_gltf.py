@@ -17,6 +17,29 @@ from pathlib import Path
 OBA = re.compile(r"oba_([0-9a-fA-F]+)")
 
 
+def verify_merged_animations(document: dict) -> list:
+    """Every animation channel must resolve to a sampler with valid accessors."""
+    errors = []
+    accessors = document.get("accessors", [])
+    for clip_index, clip in enumerate(document.get("animations", [])):
+        samplers = clip.get("samplers", [])
+        for channel_index, channel in enumerate(clip.get("channels", [])):
+            where = f"clip {clip_index} channel {channel_index}"
+            sampler_index = channel.get("sampler")
+            if not isinstance(sampler_index, int) or not 0 <= sampler_index < len(samplers):
+                errors.append(f"{where} references missing sampler {sampler_index}")
+                continue
+            sampler = samplers[sampler_index]
+            for role in ("input", "output"):
+                accessor_index = sampler.get(role)
+                if not isinstance(accessor_index, int) or not 0 <= accessor_index < len(accessors):
+                    errors.append(f"{where} sampler {role} references missing accessor {accessor_index}")
+            node_index = channel.get("target", {}).get("node")
+            if not isinstance(node_index, int) or not 0 <= node_index < len(document.get("nodes", [])):
+                errors.append(f"{where} targets missing node {node_index}")
+    return errors
+
+
 def node_oba(node: dict) -> int | None:
     geometry = node.get("extras", {}).get("geometry_object", {})
     if "oba" in geometry:
@@ -71,6 +94,9 @@ def main() -> int:
             old_node = channel["target"]["node"]
             channel["target"]["node"] = textured_nodes[animation_nodes[old_node]]
     result["animations"] = animations
+    errors = verify_merged_animations(result)
+    if errors:
+        raise SystemExit("merged animation is structurally invalid: " + "; ".join(errors))
     result.setdefault("extras", {})["animation_source"] = str(args.animation)
     result["extras"]["animation_nodes_mapped_by"] = "geometry_object OBA"
     args.output.parent.mkdir(parents=True, exist_ok=True)

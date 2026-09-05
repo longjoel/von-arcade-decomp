@@ -35,6 +35,12 @@ def main():
         assert result["accessors"][0]["bufferView"] == 0
         assert result["animations"][0]["channels"][0]["target"]["node"] == 0
         assert result["materials"][0]["name"] == "paint"
+        from merge_textured_animation_gltf import verify_merged_animations
+        assert verify_merged_animations(result) == []
+        # A clip whose channels dangle past the sampler array is rejected.
+        broken = json.loads(output.read_text())
+        broken["animations"][0]["channels"].append({"sampler": 99, "target": {"node": 0, "path": "scale"}})
+        assert any("missing sampler 99" in error for error in verify_merged_animations(broken))
     print("PASS: textured animation merge")
 
 
