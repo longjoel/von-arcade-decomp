@@ -11306,6 +11306,11 @@
             }
           ],
           "symbol": "recovered_clear_g14_return_plan",
+          "modeling": {
+            "boundary": "Models the indirect return thunk: clear g14, then branch through g0 to the fixed return stub at 0x1f9d4",
+            "test": "von/tools/test_recovered_clear_g14_return.py",
+            "unresolved_behavior": "The caller-selected return target, surrounding stack protocol, and downstream panel state remain outside this thunk contract"
+          },
           "notes": "Recovers the indirect return thunk: branch through g0 to return stub 0x1f9d4 after clearing g14."
         },
         {
