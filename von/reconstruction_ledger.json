@@ -9630,6 +9630,11 @@
             }
           ],
           "symbol": "sharc_opcode_29_matrix_reset_parameterized_initializer_service",
+          "modeling": {
+            "boundary": "Models the opcode-0x29 finite initializer: a signed-16 angle is scaled by pi/32767, the persistent 3x3 state is reset to a conventional row-major Y rotation with host-equivalent helper rounding, and the three translation words are preserved in the tail.",
+            "test": "von/tools/test_recovered_sharc_opcode_29.py",
+            "unresolved_behavior": "FIFO/DM timing, exact SHARC helper residual rounding at nominal zero entries, state writeback address mapping, and caller-level semantic ownership of the rotation and translation remain provisional."
+          },
           "notes": "Static listing recovers four FIFO inputs, identity reset of the persistent 3x3 state, translation-tail installation, signed-16 conversion with scale 0x38c9116d, helper calls 0x20dbe/0x20dc4, and transformed matrix writeback. A live opcode-0x29 plus opcode-0x11 readback preserves translation (10,20,30) exactly; angle 0 yields the identity diagonal within helper rounding (0x3f7fffff), signed angle 0x4000 yields [c,0,+1 / 0,1,0 / -1,0,c], and signed angle 0xc000 yields [c,0,-1 / 0,1,0 / +1,0,c], with c=0xb8492eef at nominal zero entries. This identifies the conventional row-major Y-axis rotation initializer and establishes signed-16 angle scaling, reset, and writeback; only caller-level meaning remains provisional."
         },
         {
