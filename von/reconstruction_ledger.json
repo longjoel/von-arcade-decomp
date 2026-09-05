@@ -6443,7 +6443,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm29",
-          "notes": "Recovers the distinct e3090 bank-dependent two-tile plain e1f20 payload and common e33f4 exit."
+          "notes": "Recovers the distinct e3090 bank-dependent two-tile plain e1f20 payload and common e33f4 exit.",
+          "modeling": {
+            "boundary": "Purely models the e3090 downstream plan: emit tiles 1 and 3; select the two exact source addresses for bank_a nonzero versus zero; set count to 2 and the common exit address to 0x000e33f4.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime producer and meaning of the bank gate are not modeled, nor are reads from the source tables, e1f20 execution, plan ownership, common e33f4 control flow, or the original video-memory/MMIO side effects."
+          }
         },
         {
           "id": "maincpu.video-dispatch-mirrored-pointer-table-arm",
