@@ -3416,6 +3416,11 @@
             }
           ],
           "symbol": "recovered_upload_20460_plan/recovered_panel18_plan",
+          "modeling": {
+            "boundary": "Models the pure 0x20460/0x20480 panel-18 plan: fixed 0x1bc90 upload geometry to 0x01fd89d0 with rows caller g17+31, plus the source-present 0x2fcf468/0x1dc10 route or clear-helper 0x1df00 route with four-column advance and 8x4 dimensions.",
+            "test": "von/tools/test_recovered_upload_20460_panel18.py",
+            "unresolved_behavior": "Upload and fill-helper execution, device/MMIO transfer effects, source-buffer contents, and caller panel-position state remain outside this plan model."
+          },
           "notes": "Recovers the fixed upload to 0x01fd89d0 and the following four-column-advance 8x4 source-or-clear panel route."
         },
         {
