@@ -6254,7 +6254,12 @@
             }
           ],
           "symbol": "recovered_object_state_one_route",
-          "notes": "Recovers the state-1 mode-bit-1/role>6 gate, sign-based timing split, and caller<=2/mode-bit-2 transition-9 override. The loaded 0x40590000 constant is dead in the effective compare; direct outputs are 7, 8, or 9."
+          "notes": "Recovers the state-1 mode-bit-1/role>6 gate, sign-based timing split, and caller<=2/mode-bit-2 transition-9 override. The loaded 0x40590000 constant is dead in the effective compare; direct outputs are 7, 8, or 9.",
+          "modeling": {
+            "boundary": "i960 0x79178 object-state one-arm model covering mode-bit/role gating, timer-sign routing, caller/mode transition-9 override, and direct transitions 7/8/9",
+            "test": "von/tools/test_recovered_object_state_one.py",
+            "unresolved_behavior": "mapped global reads/writes, object-pointer provenance, common-tail remapping, caller scheduling, and runtime timing source remain outside the pure state-arm model"
+          }
         },
         {
           "id": "maincpu.object-state-two-arm",
