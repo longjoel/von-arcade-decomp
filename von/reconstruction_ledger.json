@@ -3134,6 +3134,11 @@
           ],
           "symbol": "recovered_text_write_tile_control",
           "notes": "Preserves the helper's single 32-bit write of its input to tile/control MMIO address 0x01800000.",
+          "modeling": {
+            "boundary": "Purely models the tile-control bus contract: pass the 32-bit input through unchanged and target MMIO address 0x01800000.",
+            "test": "von/tools/test_recovered_text_control.py",
+            "unresolved_behavior": "Does not model live tile-control MMIO visibility, bus timing, device interpretation of the value, or caller sequencing."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
