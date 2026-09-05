@@ -1141,7 +1141,7 @@
           "id": "maincpu.opcode-09-matrix-state-service",
           "name": "opcode_09_matrix_state_service",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -1159,6 +1159,11 @@
             }
           ],
           "symbol": "sharc_opcode_09_matrix_state_service",
+          "modeling": {
+            "boundary": "Models the opcode-0x09 four-vector matrix service: consume twelve lane-major FIFO words as four (x,y,z) triplets, apply the persistent row-major matrix column-dot transform to each, and store twelve derived words at offsets 0x00..0x0b, while preserving the identified main-CPU caller packet and its opcode-05 selection/0x3a/0x06 continuation ordering.",
+            "test": "von/tools/test_recovered_sharc_opcode_09_caller.py",
+            "unresolved_behavior": "SHARC FIFO production and floating-point rounding, persistent matrix/state ownership and address semantics, exact delayed-store timing, lane semantic names, and downstream geometry interpretation remain outside this bounded transform/caller model."
+          },
           "notes": "Static listing and the reusable model recover twelve FIFO inputs in four groups of three, nine coefficient words through the DM 0x30101 state pointer, and twelve derived stores at offsets 0x00..0x0b. Each input triplet (x,y,z) maps to (x*s0+y*s3+z*s6, x*s1+y*s4+z*s7, x*s2+y*s5+z*s8), matching the established column-dot ordering and excluding the translation tail. The final two stores are delayed-return slots. Main-CPU listing 0x41fbc..0x41ff4 identifies a direct caller: opcode 0x05 selects/advances the state window, opcode 0x09 follows, and three quadwords from host offsets +0x08/+0x18/+0x28 provide the twelve inputs. Their lane-major order is [x0..x3,y0..y3,z0..z3], so the SHARC groups them as four vectors (x0,y0,z0)..(x3,y3,z3). This establishes a twelve-word derived state block associated with one host record; lane semantic names remain open."
         },
         {
