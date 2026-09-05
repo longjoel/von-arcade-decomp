@@ -10245,6 +10245,33 @@
             "test": "von/tools/test_recovered_upload_cluster_driver.py"
           },
           "notes": "Pure dispatch/stride schedule for the mode-0 direct path: every pair spans exactly one 4KB bank, unlike the blend path pair 2."
+        },
+        {
+          "id": "maincpu.park-store-1b960",
+          "name": "park_store_1b960",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_park_store_1b960.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_park_store_1b960.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001b960",
+              "end": "0x0001b97c"
+            }
+          ],
+          "symbol": "recovered_park_store_plan",
+          "modeling": {
+            "boundary": "Fixed-input leaf schedule: clamp 0 parks the uploader, publish 25 to 0x503a00, save caller link at 0x5024c6",
+            "test": "von/tools/test_recovered_park_store_1b960.py",
+            "unresolved_behavior": "The re-arm source that unparks the uploader (U-0001) remains outside this pure leaf contract"
+          },
+          "notes": "Pure leaf schedule for the 0x1b960 parking caller: identifies one half of U-0001."
         }
       ]
     },

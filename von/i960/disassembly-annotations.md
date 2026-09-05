@@ -510,6 +510,11 @@ direct and blend stride schedules span their banks over 8 passes, one
 inner loop contributes 32 kernel texels, and the run budgets exactly
 `8 x 3 x 32 = 768` stores.
 
+One parking caller is identified at `0x1b960`: the leaf fixes `g0` to 0
+so the clamp stores 0 (parking the uploader), publishes 25 to
+`0x503a00`, and saves the link at `0x5024c6`. The pure schedule is in
+`recovered_park_store_1b960.c`; the re-arm source stays open (U-0001).
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
