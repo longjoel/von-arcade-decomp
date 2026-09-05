@@ -3282,6 +3282,11 @@
             }
           ],
           "symbol": "recovered_mixed_upload_plan",
+          "modeling": {
+            "boundary": "Models the pure ordered 0x20210 upload plan: one 0x1dc10 64x30 record followed by four 0x1de80 width-64 records, with fixed source addresses and row/height derivation from caller g8 and g16; caller g17/g12 are intentionally unused by this plan.",
+            "test": "von/tools/test_recovered_video_mixed_upload.py",
+            "unresolved_behavior": "Upload helper execution, device/MMIO transfers, source-buffer contents, and downstream video state remain outside this sequence plan."
+          },
           "notes": "Recovers one plain 0x1dc10 64x30 transfer and four ordered 0x1de80 converted width-64 transfers with rows derived from g8, g14, and g16."
         },
         {
