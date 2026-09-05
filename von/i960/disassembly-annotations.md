@@ -553,6 +553,13 @@ for the `0x1fa30` call, then either jumps to the link block on flag
 takes the link block only when the entry counter was exactly 1. The
 pure schedule is in `recovered_counter_dispatch_1b9d0.c`.
 
+Further down, the `0x1ba70` tail gates a `0x2a4e0` call with `0x1317`
+on counter equality with 480, then runs the same dispatch shape with a
+constant terminal: flag-set stores 22 to `0x503a00` with no counter
+store, otherwise the counter decrements and the 22-store happens only
+from counter 1. The pure schedule is in
+`recovered_threshold_dispatch_1ba70.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
