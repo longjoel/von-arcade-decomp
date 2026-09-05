@@ -4420,8 +4420,13 @@
               "end": "0x00024690"
             }
           ],
-          "symbol": "recovered_geometry_object_clip_calls_plan",
-          "notes": "Recovers selected-pointer/frame publication and all four raw 0x701a0 calls; the first-call cvtir/addrl conversion is represented by an explicit derived-call input pending an independent floating-point helper model."
+        "symbol": "recovered_geometry_object_clip_calls_plan",
+        "notes": "Recovers selected-pointer/frame publication and all four raw 0x701a0 calls; the first-call cvtir/addrl conversion is represented by an explicit derived-call input pending an independent floating-point helper model.",
+        "modeling": {
+          "boundary": "i960 0x24540 geometry-object clip-call plan covering selected/frame pointer publication, control setup, four raw 0x701a0 argument vectors, and FIFO address",
+          "test": "von/tools/test_recovered_geometry_object_clip_calls_24540.py",
+          "unresolved_behavior": "the cvtir/addrl derived value, actual clip-helper execution, FIFO/MMIO writes, and downstream geometry effects remain outside the call-argument plan"
+        }
         },
         {
           "id": "maincpu.geometry-mode-zero-clip-calls-24cc8",
