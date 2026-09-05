@@ -434,6 +434,15 @@ rewinds the limit through `0x2330`). The tail calls `0x2a580` with
 `0x111c` and reports `1`. The pure decision is in
 `recovered_retry_3ba0.c`.
 
+The block cluster around `0x1ef70` homes the cursor words (`16` to
+`0x504cdc`/`0x504ce0`, `18` to `0x504ce4`), then fills a `32x6` block
+through `0x1df00` for a zero selector or emits one through `0x1dc90`
+from `0x2fd6d20` otherwise. The emitter writes `rows x width` halfwords
+with `0xc000` attributes from the cursor slot; the fill writes the
+caller link instead. The pure schedules are in
+`recovered_home_dispatch_1ef70.c`, `recovered_block_emit_1dc90.c`, and
+`recovered_block_fill_1df00.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero

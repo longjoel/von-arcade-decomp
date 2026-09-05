@@ -9902,6 +9902,84 @@
             "unresolved_behavior": "Actual state contents, callee execution, and reread stability remain outside this pure retry decision"
           },
           "notes": "Pure decision DAG for the 0x3ba0 retry controller. Straight-line forward branches only; the limit rewind applies the stepped difference."
+        },
+        {
+          "id": "maincpu.block-emit-1dc90",
+          "name": "block_emit_1dc90",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_block_emit_1dc90.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_block_emit_1dc90.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001dc90",
+              "end": "0x0001dd04"
+            }
+          ],
+          "symbol": "recovered_block_emit_plan",
+          "modeling": {
+            "boundary": "Block string emit schedule: rows x width halfwords with 0xc000 attributes from the cursor slot in plane 0",
+            "test": "von/tools/test_recovered_block_emit_1dc90.py",
+            "unresolved_behavior": "Actual string contents and tile-RAM writes remain outside this pure emit schedule"
+          },
+          "notes": "Pure emit schedule for the 0x1dc90 block emitter over rows x width halfwords with a 64-slot row stride."
+        },
+        {
+          "id": "maincpu.block-fill-1df00",
+          "name": "block_fill_1df00",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_block_fill_1df00.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_block_fill_1df00.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001df00",
+              "end": "0x0001df64"
+            }
+          ],
+          "symbol": "recovered_block_fill_plan",
+          "modeling": {
+            "boundary": "Block fill schedule: rows x width caller-link tiles from the cursor slot in plane 0",
+            "test": "von/tools/test_recovered_block_fill_1df00.py",
+            "unresolved_behavior": "Actual link values and tile-RAM writes remain outside this pure fill schedule"
+          },
+          "notes": "Pure fill schedule for the 0x1df00 block filler over rows x width tiles with a 64-slot row stride."
+        },
+        {
+          "id": "maincpu.home-dispatch-1ef70",
+          "name": "home_dispatch_1ef70",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_home_dispatch_1ef70.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_home_dispatch_1ef70.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001ef70",
+              "end": "0x0001efbc"
+            }
+          ],
+          "symbol": "recovered_home_dispatch_plan",
+          "modeling": {
+            "boundary": "Cursor-home dispatch: homes three cursor words, then fills or emits a 32x6 block by selector",
+            "test": "von/tools/test_recovered_home_dispatch_1ef70.py",
+            "unresolved_behavior": "Actual cursor effects and callee execution remain outside this pure dispatch schedule"
+          },
+          "notes": "Pure dispatch schedule for the 0x1ef70 cursor home: zero selector fills via 0x1df00, anything else emits via 0x1dc90."
         }
       ]
     },
