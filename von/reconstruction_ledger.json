@@ -5473,8 +5473,13 @@
           "sources": ["von/i960/recovered_object_threshold_constant_761b0.c"],
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/i960/boot-path.md", "von/tools/test_recovered_object_threshold_constant_761b0.py"],
           "ranges": [{"start": "0x000761b0", "end": "0x00076234"}],
-          "symbol": "recovered_object_threshold_constant_761b0",
-          "notes": "Pure fixture-tested threshold mapping: counters through 0x54 map to 0x45000000, 0x55..0x59 to 0x45800000, 0x5a..0x5e to 0x46000000, and 0x5f+ to 0x46800000; selector 29 is emitted. State/FIFO/MMIO effects remain external."
+        "symbol": "recovered_object_threshold_constant_761b0",
+        "notes": "Pure fixture-tested threshold mapping: counters through 0x54 map to 0x45000000, 0x55..0x59 to 0x45800000, 0x5a..0x5e to 0x46000000, and 0x5f+ to 0x46800000; selector 29 is emitted. State/FIFO/MMIO effects remain external.",
+        "modeling": {
+          "boundary": "i960 0x761b0 object-threshold selector plan covering four counter ranges, IEEE-754 output constants, and fixed selector 29",
+          "test": "von/tools/test_recovered_object_threshold_constant_761b0.py",
+          "unresolved_behavior": "state updates, FIFO/MMIO effects, caller context, and downstream use of the selected constant remain outside the pure threshold mapping"
+        }
         },
         {
           "id": "maincpu.geometry-fifo-argument-plan-76240",
