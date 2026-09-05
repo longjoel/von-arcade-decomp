@@ -3269,7 +3269,12 @@
             }
           ],
           "symbol": "recovered_attribute_pair_plan",
-          "notes": "Recovers the selector-dependent direct pair writes, 14*g1 byte offset, c000 attribute OR, and indirect return stub 0x2038c."
+          "notes": "Recovers the selector-dependent direct pair writes, 14*g1 byte offset, c000 attribute OR, and indirect return stub 0x2038c.",
+          "modeling": {
+            "boundary": "i960 0x20300 selector-dependent attribute pair source/destination plan with 14-byte record stride",
+            "test": "von/tools/test_recovered_attribute_pair_writer.py",
+            "unresolved_behavior": "the source and destination memory contents, actual pair writes, and indirect caller return remain outside the pure address/attribute plan"
+          }
         },
         {
           "id": "maincpu.rom-signature-compare-2040",
