@@ -5677,6 +5677,11 @@
           ],
           "symbol": "recovered_command_profile_dispatch",
           "notes": "Recovers extraction of control-word bits 13..15 into 0x5770f4, three-column table selection at profile*3+1 from 0xc8e10, packet-builder call ordering, and selected-handler call using 0x577114. The two indirect calls are callback boundaries and the table/profile semantic names remain provisional.",
+          "modeling": {
+            "boundary": "i960 0xc8f10 command-profile dispatch model covering control-word selector extraction, middle-column table indexing, packet-preparation ordering, and selected callback dispatch",
+            "test": "von/tools/test_recovered_command_profile_dispatch.py",
+            "unresolved_behavior": "packet-builder and selected-handler implementations, mapped selector/input state, table ownership, profile semantics, and downstream command effects remain outside the callback dispatch wrapper"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
