@@ -3447,7 +3447,12 @@
             }
           ],
           "symbol": "recovered_status_block_route_206f0_plan",
-          "notes": "Recovers six current-position source-or-clear blocks, widths 16,16,16,20,20,20, all height 4."
+          "notes": "Recovers six current-position source-or-clear blocks, widths 16,16,16,20,20,20, all height 4.",
+          "modeling": {
+            "boundary": "i960 0x206f0 status-block source-or-clear route descriptors with six source addresses and width families 16/20",
+            "test": "von/tools/test_recovered_status_block_routes_206f0.py",
+            "unresolved_behavior": "source/fill memory contents and downstream block-render helper effects remain outside the pure route descriptor"
+          }
         },
         {
           "id": "maincpu.status-transition-routes-207e0-20810",
