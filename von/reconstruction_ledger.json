@@ -9317,6 +9317,11 @@
             }
           ],
           "symbol": "opcode_18_state_window",
+          "modeling": {
+            "boundary": "Models the pure SHARC opcode-0x18 state-window transfer: selector*16 chooses a 16-word record from the supplied table, all 16 words are copied into scratch in order, and output receives scratch words 0 through 11 in order.",
+            "test": "von/tools/test_recovered_sharc_opcode_18.py",
+            "unresolved_behavior": "FIFO input/output protocol, DM pointer/register mapping, delayed-return scheduling, runtime table-base storage, and the semantic meaning of the copied floating-point state remain outside this pure transfer model."
+          },
           "notes": "Static listing recovers one FIFO input through helper 0x20e54, a 16-word table-window copy into DM 0x3010b..0x3011a, and a 12-word output loop. The pure-C model captures selector*16 record selection, the full scratch copy, and output of scratch words 0..11. The dispatcher mapping identifies this target as opcode 0x18; floating-point state meaning remains unresolved."
         },
         {
