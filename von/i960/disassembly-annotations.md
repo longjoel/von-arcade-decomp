@@ -438,6 +438,11 @@ targets plane `0x01002000` with only bit `15` set (no `0x4000` bank
 attribute) and shares the column-wrap contract. The pure plan is in
 `recovered_glyph_emit_plane1_1cf40.c`.
 
+The third sibling at `0x1cfe0` shares the `0x1cf40` gate, table, plane,
+and wrap contract, but combines glyph data with `or 0xc000` instead of
+`setbit 15`: a set bit `14` survives `0x1cf40` and is forced here. The
+pure plan is in `recovered_glyph_emit_attr_1cfe0.c`.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at

@@ -9407,6 +9407,32 @@
             "unresolved_behavior": "Actual glyph-table dereference, tile-RAM writes, and the 0x1cfe0 plane variant remain outside this pure emit schedule"
           },
           "notes": "Pure emit schedule for the 0x1cf40 renderer: same glyph shape as 0x1d090 without control-code branches, targeting plane 0x01002000 with only bit 15 set. Every masked byte stays on the table path; column advances while at most 61."
+        },
+        {
+          "id": "maincpu.glyph-emit-attr-1cfe0",
+          "name": "glyph_emit_attr_1cfe0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_glyph_emit_attr_1cfe0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_glyph_emit_attr_1cfe0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001cfe0",
+              "end": "0x0001d080"
+            }
+          ],
+          "symbol": "recovered_glyph_emit_attr_plan",
+          "modeling": {
+            "boundary": "Attributed glyph emit schedule: 0x7f mask, shifted 0x5f000000 gate, glyph-table index, vertical tile pair with forced 0xc000 attributes, column advance capped at 61",
+            "test": "von/tools/test_recovered_glyph_emit_attr_1cfe0.py",
+            "unresolved_behavior": "Actual glyph-table dereference and tile-RAM writes remain outside this pure emit schedule"
+          },
+          "notes": "Pure emit schedule for the 0x1cfe0 renderer: same shape as 0x1cf40 but combines glyph data with or 0xc000, forcing both attribute bits where 0x1cf40 preserves bit 14. Completes the three-emitter family."
         }
       ]
     },
