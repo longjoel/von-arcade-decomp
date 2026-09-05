@@ -10509,6 +10509,11 @@
             }
           ],
           "symbol": "opcode_48_five_word_state_upload",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x48 five-word state upload: copy FIFO words R0 through R4 verbatim into state slots 0 through 4, preserving every raw bit pattern without numeric conversion.",
+            "test": "von/tools/test_recovered_sharc_opcode_48.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent DM 0x30157 ownership/address mapping, delayed final-store ordering, SHARC transport behavior, opcode-0x49 packet consumption, and downstream semantics remain outside this bounded upload model."
+          },
           "notes": "Static listing recovers the exact direct mapping s[0..4]=R0..R4 into DM 0x30157..0x3015b, with the final two stores delayed after RTS and no sign or numeric conversion. The reusable bit-preserving C model is covered with structured and randomized word patterns. Opcode 0x49 consumes subsequent predicate packets against this five-word state window."
         },
         {
