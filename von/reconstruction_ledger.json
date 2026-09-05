@@ -10932,6 +10932,11 @@
             }
           ],
           "symbol": "recovered_text_mode_setup_plan",
+          "modeling": {
+            "boundary": "SHARC text-mode setup stores timing-derived globals and selects the 19x2 glyph or fill helper based on the mode input",
+            "test": "von/tools/test_recovered_text_mode_setup.py",
+            "unresolved_behavior": "downstream tile-RAM writes, helper timing, and caller-level status-panel meaning remain provisional beyond the setup-plan model"
+          },
           "notes": "Recovers timing-global initialization and helper selection: g10+31 is stored at 0x504cdc/0x504ce0, g13+31 at 0x504ce4, nonzero g0 calls 0x1dc90 with source 0x02fd0cd4 and dimensions 19x2, while zero g0 calls the 0x1df00 fill helper with dimensions 19x2 and no source pointer."
         },
         {
