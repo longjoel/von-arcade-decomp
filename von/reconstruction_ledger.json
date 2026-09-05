@@ -4202,8 +4202,13 @@
               "end": "0x00023950"
             }
           ],
-          "symbol": "recovered_geometry_object_alternate_update_plan",
-          "notes": "Recovers the alternate 0x1d/0x1e request pair, response folds into object coordinates, adjusted +0x0c writes, and +0x18/+0x19 clears."
+        "symbol": "recovered_geometry_object_alternate_update_plan",
+        "notes": "Recovers the alternate 0x1d/0x1e request pair, response folds into object coordinates, adjusted +0x0c writes, and +0x18/+0x19 clears.",
+        "modeling": {
+          "boundary": "i960 0x238a0 alternate geometry-object update plan covering paired FIFO requests, response-derived coordinate updates, float-bias adjustment, and active-state clears",
+          "test": "von/tools/test_recovered_geometry_object_alternate_update_238a0.py",
+          "unresolved_behavior": "actual FIFO/MMIO requests, response production, object-memory writes, and downstream alternate-path consumers remain outside the pure update plan"
+        }
         },
         {
           "id": "maincpu.geometry-object-lifecycle-tail-23954",
