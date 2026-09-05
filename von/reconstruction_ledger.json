@@ -6958,7 +6958,12 @@
             }
           ],
           "symbol": "recovered_transition_apply_action5",
-          "notes": "Applies the decoded action-5 and action-10 selector-table values to a pure transition/action state for selectors 0..9; mapped global stores remain at the integration boundary."
+          "notes": "Applies the decoded action-5 and action-10 selector-table values to a pure transition/action state for selectors 0..9; mapped global stores remain at the integration boundary.",
+          "modeling": {
+            "boundary": "Purely models the action adapters: for selectors 0 through 9, write the corresponding action-5 or action-10 table value into transition, write action 5 or 10 into the provided state, and return success; reject selectors at or above 10 without modifying state.",
+            "test": "von/tools/test_recovered_transition_selector_dispatch.py",
+            "unresolved_behavior": "Mapped global stores, original object-state addresses, caller sequencing, and downstream effects of the transition/action state are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-arm13",
