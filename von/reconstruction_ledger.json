@@ -2799,7 +2799,12 @@
             }
           ],
           "symbol": "recovered_text_voltage_warning_interrupt_path",
-          "notes": "Recovers the complete terminal bit-9 interrupt path: perform the fixed video upload, initialize text/video state, emit four voltage-warning records at (4,16), (4,19), (4,25), and (20,28), then enter the 0x12d0 fatal halt."
+          "notes": "Recovers the complete terminal bit-9 interrupt path: perform the fixed video upload, initialize text/video state, emit four voltage-warning records at (4,16), (4,19), (4,25), and (20,28), then enter the 0x12d0 fatal halt.",
+          "modeling": {
+            "boundary": "Purely models the terminal bit-9 sequence as fixed operations: perform the recovered video upload, reset text/video state, emit warning records at (4,16), (4,19), (4,25), and (20,28), then request the fatal halt.",
+            "test": "von/tools/test_recovered_text_video.py",
+            "unresolved_behavior": "Does not model live video/text MMIO effects, glyph consumer timing, interrupt delivery, or the architecture-specific infinite loop after the 0x12d0 fatal halt."
+          }
         },
         {
           "id": "maincpu.host-interrupt-acknowledge",
