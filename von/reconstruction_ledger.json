@@ -9711,6 +9711,11 @@
             }
           ],
           "symbol": "sharc_opcode_2c_six_input_matrix_rebuild_service",
+          "modeling": {
+            "boundary": "Models the finite opcode-0x2c six-input rebuild: three direct float translation words are preserved, three signed-16 angle words are scaled by pi/32767, and the persistent matrix is rebuilt as the recovered row-major Rx*Ry*Rz composition with host-equivalent helper precision.",
+            "test": "von/tools/test_recovered_sharc_opcode_2c.py",
+            "unresolved_behavior": "FIFO/DM timing, exact SHARC helper residuals near quarter turns, persistent-state writeback mapping, chained opcode-0x10/reset context, and caller-level meaning of the translation and Euler angles remain provisional."
+          },
           "notes": "Static listing recovers six FIFO inputs, direct floating-point R0/R1/R2 translation inputs, three signed-16 conversion/helper chains with scale 0x38c9116d, and interleaved rebuilds of the persistent 3x3 matrix. A serialized all-zero six-word packet after opcode-0x10 identity reset reaches the handler and writes identity to helper precision. An isolated direct-float packet (1,2,3,0,0,0) reads back exact tail (1,2,3) with identity matrix, establishing the float-translation form distinct from packed opcode 0x2e. Serialized identity-reset probes establish R13 as the conventional X-axis Y/Z rotation [c,0,0 / 0,c,-s / s,0,c], R14 as the conventional Y-axis X/Z rotation [c,0,s / 0,1,0 / -s,0,c], and R15 as the conventional Z-axis X/Y rotation [c,-s,0 / s,c,0 / 0,0,c], all with SHARC helper rounding. R14=0x0040 reads back [0x3f7ffec4,0,0x3bc9111a / 0,0x3f7ffffe,0 / 0xbbc91118,0,0x3f7ffec4]; R14=0x4000 reads back [0xb8492eee,0,0x3f800000 / 0,0x3f7ffffe,0 / 0xbf7ffffe,0,0xb8492eee]. The prior distinct-middle interpretation came from an unsafely chained probe and is superseded."
         },
         {
