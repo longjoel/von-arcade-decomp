@@ -6823,7 +6823,12 @@
             }
           ],
           "symbol": "recovered_timing_variant_route",
-          "notes": "Recovers the pure normalized-difference guard and current-vs-threshold split to action 5 or action 10. Calls to 0x784c8, 0x783c8, and 0x78408 and their mapped state effects remain outside the adapter."
+          "notes": "Recovers the pure normalized-difference guard and current-vs-threshold split to action 5 or action 10. Calls to 0x784c8, 0x783c8, and 0x78408 and their mapped state effects remain outside the adapter.",
+          "modeling": {
+            "boundary": "Purely models the 0x786d0 timing decision: decode current_bits and threshold_bits as floats, reject when fabsf(current - threshold) is NaN, otherwise route current >= threshold to action 5 and current < threshold to action 10.",
+            "test": "von/tools/test_recovered_timing_variant.py",
+            "unresolved_behavior": "The runtime producers of both float values, calls to 0x784c8/0x783c8/0x78408, mapped object-state writes, and downstream action effects are not modeled."
+          }
         },
         {
           "id": "maincpu.transition-selector-dispatch",
