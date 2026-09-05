@@ -111,7 +111,14 @@ def main() -> int:
         assert not validate(reference, evidence, root)
         broken = copy.deepcopy(reference)
         broken["assets"][0]["claims"]["audio_descriptor"] = "validated"
-        assert any("reference-capture assets cannot declare validated claims" in error
+        assert any("only validated assets may declare validated claims" in error
+                   for error in validate(broken, evidence, root))
+        observed = copy.deepcopy(reference)
+        observed["assets"][0]["status"] = "observed"
+        assert not validate(observed, evidence, root)
+        broken = copy.deepcopy(observed)
+        broken["assets"][0]["claims"]["source_bytes"] = "validated"
+        assert any("only validated assets may declare validated claims" in error
                    for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
         broken["assets"][0]["claims"]["source_ranges"] = "candidate"
