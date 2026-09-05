@@ -86,7 +86,7 @@ def main() -> int:
         for name in ("cfg", "nvram", "state"):
             (temp / name).mkdir()
         summary = temp / "summary.json"
-        summary.write_text('{"capture_id":"capture-v1","tier":"A","edge_semantics":"possible_static_edges"}\n', encoding="utf-8")
+        summary.write_text('{"capture_id":"capture-v1","tier":"A","edge_semantics":"possible_static_edges","canonical":false,"registration":"discovery-only"}\n', encoding="utf-8")
         input_path = temp / "rom-manifest.json"
         input_path.write_text('{"rom":"fixture"}\n', encoding="utf-8")
         verifier = temp / "verify.py"

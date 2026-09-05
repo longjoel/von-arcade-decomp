@@ -28,7 +28,7 @@ def main() -> int:
         input_path.write_text('{"rom": "fixture"}\n', encoding="utf-8")
         artifact_path.write_text('{"seq": 1}\n', encoding="utf-8")
         report_path = root / "coverage.json"
-        report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "possible_static_edges", "phase": "stable-attract"}\n', encoding="utf-8")
+        report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "possible_static_edges", "canonical": false, "registration": "discovery-only", "phase": "stable-attract"}\n', encoding="utf-8")
         manifest = {
             "schema_version": 1, "id": "fixture-v1", "objective": "test-capture",
             "hypothesis": "coverage is bounded", "expected_discriminator": "report is Tier A",
@@ -122,7 +122,10 @@ def main() -> int:
         assert any("coverage report must be an object" in error for error in validate(manifest, root))
         report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "executed_edges"}\n', encoding="utf-8")
         assert any("possible_static_edges" in error for error in validate(manifest, root))
-        report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "possible_static_edges", "phase": "stable-attract"}\n', encoding="utf-8")
+        report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "possible_static_edges", "canonical": false, "registration": "discovery-only", "phase": "stable-attract"}\n', encoding="utf-8")
+        report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "possible_static_edges", "canonical": true, "registration": "canonical", "phase": "stable-attract"}\n', encoding="utf-8")
+        assert any("explicitly noncanonical" in error for error in validate(manifest, root))
+        report_path.write_text('{"capture_id": "fixture-v1", "tier": "A", "edge_semantics": "possible_static_edges", "canonical": false, "registration": "discovery-only", "phase": "stable-attract"}\n', encoding="utf-8")
         broken = copy.deepcopy(manifest)
         broken["artifacts"][0]["path"] = "../outside.log"
         assert any("missing file" in error for error in validate(broken, root))

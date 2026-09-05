@@ -23,7 +23,8 @@ def main():
         coverage_path = assets / "coverage.json"
         coverage_path.write_text(json.dumps({
             "capture_id": "capture-v1", "tier": "A",
-            "edge_semantics": "possible_static_edges", "phase": "startup",
+            "edge_semantics": "possible_static_edges", "canonical": False,
+            "registration": "discovery-only", "phase": "startup",
         }), encoding="utf-8")
         capture = {
             "schema_version": 1, "id": "capture-v1", "objective": "catalog-fixture",

@@ -179,6 +179,11 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
                     errors.append("coverage report must be Tier A")
                 if isinstance(report, dict) and report.get("edge_semantics") != "possible_static_edges":
                     errors.append("coverage report must use possible_static_edges semantics")
+                if isinstance(report, dict) and report.get("canonical") is not False:
+                    errors.append("coverage report must be explicitly noncanonical")
+                if (isinstance(report, dict)
+                        and report.get("registration") != "discovery-only"):
+                    errors.append("coverage report registration must be discovery-only")
                 expected_phase = stimulus.get("phase")
                 if (isinstance(report, dict) and report.get("phase") is not None
                         and report.get("phase") != expected_phase):

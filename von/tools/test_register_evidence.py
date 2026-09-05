@@ -24,7 +24,7 @@ def main() -> int:
         for name in ("cfg", "nvram", "state"):
             (root / name).mkdir()
         artifact = root / "summary.json"
-        artifact.write_text('{"capture_id":"capture-v1","tier":"A","edge_semantics":"possible_static_edges"}\n', encoding="utf-8")
+        artifact.write_text('{"capture_id":"capture-v1","tier":"A","edge_semantics":"possible_static_edges","canonical":false,"registration":"discovery-only"}\n', encoding="utf-8")
         input_path = root / "rom-manifest.json"
         input_path.write_text('{"rom":"fixture"}\n', encoding="utf-8")
         capture = {
