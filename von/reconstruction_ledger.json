@@ -9850,6 +9850,32 @@
             "unresolved_behavior": "Actual queue contents, port timing, and downstream consumers remain outside this pure pump schedule"
           },
           "notes": "Pure schedule for the 0x18538 ring pump over the 0x504c60 queue with head/tail at 0x504c70/0x504c74 and the 0x504c78 drain fallback."
+        },
+        {
+          "id": "maincpu.init-schedule-34c0",
+          "name": "init_schedule_34c0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_init_schedule_34c0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_init_schedule_34c0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000034c0",
+              "end": "0x00003534"
+            }
+          ],
+          "symbol": "recovered_init_op_at",
+          "modeling": {
+            "boundary": "Fixed init schedule: ordered caller-link stores with preserved widths across state slots, calls to 0x22f0 and 0x2330, then closing stores",
+            "test": "von/tools/test_recovered_init_schedule_34c0.py",
+            "unresolved_behavior": "Actual link values, callee execution, and downstream state use remain outside this pure op schedule"
+          },
+          "notes": "Pure fifteen-op schedule for the 0x34c0 prologue including its 0x22f0/0x2330 calls. Straight line, no branches."
         }
       ]
     },

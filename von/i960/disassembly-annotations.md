@@ -451,6 +451,12 @@ empty queue refreshes `0x504c78` from `0x502512` when they differ and
 emits its low byte to port `0`. The pure schedule is in
 `recovered_queue_pump_18538.c`.
 
+The straight-line prologue at `0x34c0` stores the caller link across a
+fixed run of state slots (`stob`/`stos`/`st` widths preserved), calls
+`0x22f0` with index `0` and then `0x2330`, and finishes with four more
+halfword stores plus one word store. The ordered fifteen-op schedule is
+in `recovered_init_schedule_34c0.c`.
+
 The plane-0 emitter at `0x1d090` masks the byte to `0x7f`, subtracts `32`,
 and sign-extends the low byte (`shlo 24`/`shri 24`, confirmed arithmetic in
 the MAME i960 core). Biased values `0x4b`/`0x54` emit the fixed control
