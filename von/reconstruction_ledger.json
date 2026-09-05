@@ -8621,6 +8621,11 @@
             }
           ],
           "symbol": "recovered_transition_wrapper",
+          "modeling": {
+            "boundary": "Models the pure transition-wrapper side effects: the supplied transition table is indexed by the selector and its value is written to transition state, while the action field is always set to 5.",
+            "test": "von/tools/test_recovered_transition_wrapper.py",
+            "unresolved_behavior": "The ROM table contents beyond the fixture, the 0x504d68/0x504d94/0x504db8 global storage, caller sequencing, and downstream action execution are not modeled by this helper."
+          },
           "notes": "Recovers the fixed transition/action side effects: table 0x72690 indexed by global selector 0x504d68 writes 0x504d94, while action code 5 writes 0x504db8. The table remains an explicit data input.",
           "milestones": {
             "c-only-i960-attract-60s": {
