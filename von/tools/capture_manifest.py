@@ -13,6 +13,7 @@ from typing import Any
 
 
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
+MAME_REVISION_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
 def has_symlink_component(path: Path) -> bool:
@@ -125,6 +126,9 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
     for field in ("set", "mame_revision", "patch_profile", "execution_engine"):
         if not isinstance(configuration.get(field), str) or not configuration.get(field):
             errors.append(f"configuration.{field} must be a non-empty string")
+    if (isinstance(configuration.get("mame_revision"), str)
+            and not MAME_REVISION_RE.fullmatch(configuration["mame_revision"])):
+        errors.append("configuration.mame_revision must be a 40-hex commit")
     command = manifest.get("command")
     if not isinstance(command, list) or not command or not all(isinstance(item, str) and item for item in command):
         errors.append("command must be a non-empty string array")

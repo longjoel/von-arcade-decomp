@@ -30,7 +30,7 @@ def main() -> int:
             "hypothesis": "startup reaches scheduler", "expected_discriminator": "scheduler checkpoint",
             "stimulus": {"kind": "input-free-attract", "seconds": 1},
             "checkpoints": ["reset", "scheduler"],
-            "configuration": {"set": "vonj", "mame_revision": "abc", "patch_profile": "none", "execution_engine": "interpreter"},
+            "configuration": {"set": "vonj", "mame_revision": "a" * 40, "patch_profile": "none", "execution_engine": "interpreter"},
             "command": ["mame", "vonj", "-cfg_directory", str(root / "cfg"),
                          "-nvram_directory", str(root / "nvram"),
                          "-state_directory", str(root / "state"),
