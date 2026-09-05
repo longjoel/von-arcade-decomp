@@ -8326,7 +8326,12 @@
             }
           ],
           "symbol": "recovered_geometry_clip_region",
-          "notes": "Recovers the signed four-way strict-quadrant dispatch and shared equality path preceding the floating-point geometry packet bodies."
+          "notes": "Recovers the signed four-way strict-quadrant dispatch and shared equality path preceding the floating-point geometry packet bodies.",
+          "modeling": {
+            "boundary": "Purely models signed clip classification: return the shared equality route when either coordinate pair is equal, otherwise select one of four strict quadrants from the x/right and y/bottom comparisons.",
+            "test": "von/tools/test_recovered_geometry_clip_region.py",
+            "unresolved_behavior": "Does not model the four floating-point packet bodies, geometry-device effects, FIFO timing, or downstream branch consumers."
+          }
         },
         {
           "id": "maincpu.geometry-common-packet-tail",
@@ -8348,7 +8353,12 @@
             }
           ],
           "symbol": "recovered_geometry_packet_tail",
-          "notes": "Recovers the shared three-word FIFO tail written after the geometry branch bodies: pending g4, pending g5, and zero."
+          "notes": "Recovers the shared three-word FIFO tail written after the geometry branch bodies: pending g4, pending g5, and zero.",
+          "modeling": {
+            "boundary": "Purely models the shared three-word tail: emit pending g4, pending g5, and a zero terminator in order.",
+            "test": "von/tools/test_recovered_geometry_packet_tail.py",
+            "unresolved_behavior": "Does not model FIFO timing, mapped device writes, branch-specific packet bodies, or downstream geometry-device interpretation."
+          }
         },
         {
           "id": "maincpu.geometry-object-packet-prefix",
