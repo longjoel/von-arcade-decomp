@@ -6330,7 +6330,12 @@
             }
           ],
           "symbol": "recovered_object_state_three_route",
-          "notes": "Reduced state-3 control flow selects only direct transitions 7 or 9. Role 4 uses caller-state and mode-bit gates; other roles use caller states 0..2 with mode bit 2. Related-object state and timer branches collapse to 7 under their caller guards. The downstream global-state check is preserved as an explicit overwrite path."
+          "notes": "Reduced state-3 control flow selects only direct transitions 7 or 9. Role 4 uses caller-state and mode-bit gates; other roles use caller states 0..2 with mode bit 2. Related-object state and timer branches collapse to 7 under their caller guards. The downstream global-state check is preserved as an explicit overwrite path.",
+          "modeling": {
+            "boundary": "i960 0x7928c object-state three-arm model covering role-4 and non-role-4 caller/mode gates, reduced transition selection 7/9, and the explicit global-state overwrite path",
+            "test": "von/tools/test_recovered_object_state_three.py",
+            "unresolved_behavior": "mapped global reads/writes, object-pointer provenance, common-tail remapping, caller scheduling, and original timing/related-state source remain outside the reduced state-arm model"
+          }
         },
         {
           "id": "maincpu.object-state-five-arm",
