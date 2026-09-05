@@ -6,15 +6,14 @@
  * out = masked + (factor * (masked - mask)) >> 8 (bit-set blend arm,
  * direct arm). Products keep the low 32 bits; shifts are logical.
  */
-#include <stdint.h>
-
-typedef uint32_t u32;
+/* No libc headers: this file also ships in the freestanding i960 image. */
+typedef unsigned int u32;
 
 #define RECOVERED_BLEND_MASK 0x00ff00ffU
 
 static u32 recovered_blend_mullo(u32 factor, u32 value)
 {
-    return (u32)((uint64_t)factor * (uint64_t)value);
+    return (u32)((unsigned long long)factor * (unsigned long long)value);
 }
 
 u32 recovered_blend_kernel_mul(u32 pixel, u32 factor)

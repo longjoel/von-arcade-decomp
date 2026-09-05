@@ -13,10 +13,9 @@
  * Returns the number of texel stores performed (768 for a full run,
  * 0 when the sub-3 guard exits early).
  */
-#include <stdint.h>
-
-typedef uint32_t u32;
-typedef int32_t s32;
+/* No libc headers: this file also ships in the freestanding i960 image. */
+typedef unsigned int u32;
+typedef signed int s32;
 
 u32 recovered_blend_kernel_mul(u32 pixel, u32 factor);
 u32 recovered_blend_kernel_fade(u32 pixel, u32 factor);
