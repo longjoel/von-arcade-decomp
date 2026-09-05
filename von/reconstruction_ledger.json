@@ -3124,6 +3124,11 @@
             }
           ],
           "symbol": "recovered_geometry_command_window_clear",
+          "modeling": {
+            "boundary": "Models the command-window clear loop: for each of 64 sixteen-byte slots, clear only the +4 and +8 word fields and preserve the slot's other words and adjacent memory",
+            "test": "von/tools/test_recovered_geometry_command_window_clear.py",
+            "unresolved_behavior": "Mapped command-window ownership, MMIO synchronization, caller phase ordering, and later command-table/display consumption remain outside this host-testable clear contract"
+          },
           "notes": "Executes the recovered 0x284b8 command-window clear route, zeroing the +4 and +8 fields of all 64 command slots. The integrated geometry pipeline invokes it before command-table setup; runtime validation remains pending.",
           "milestones": {
             "c-only-i960-attract-60s": {

@@ -22,15 +22,21 @@ typedef unsigned short u16;
 #define GEOMETRY_STATE_B   ((volatile u32 *)0x00503a00)
 
 /* The first loop clears the +4 and +8 fields of 64 sixteen-byte slots. */
-void recovered_geometry_command_window_clear(void)
+void recovered_geometry_command_window_clear_slots(volatile u32 *window,
+                                                   u32 slots)
 {
     u32 slot;
 
-    for (slot = 0; slot < 64; ++slot)
+    for (slot = 0; slot < slots; ++slot)
     {
-        GEO_COMMAND_WINDOW[slot * 4 + 1] = 0;
-        GEO_COMMAND_WINDOW[slot * 4 + 2] = 0;
+        window[slot * 4 + 1] = 0;
+        window[slot * 4 + 2] = 0;
     }
+}
+
+void recovered_geometry_command_window_clear(void)
+{
+    recovered_geometry_command_window_clear_slots(GEO_COMMAND_WINDOW, 64);
 }
 
 /* The second loop copies 64 inline table bytes into those same fields. */
