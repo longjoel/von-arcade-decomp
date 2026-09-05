@@ -5581,7 +5581,12 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_function_plan_28e88.py"],
           "ranges": [{"start": "0x00028e88", "end": "0x00028efc"}],
           "symbol": "recovered_geometry_function_plan_28e88",
-          "notes": "Pure fixture-tested command stream: 0x404 function word, bit-23 command normalization, count, masked 16-bit payload, 0x1010 completion word, and terminal zero. Device MMIO remains external."
+          "notes": "Pure fixture-tested command stream: 0x404 function word, bit-23 command normalization, count, masked 16-bit payload, 0x1010 completion word, and terminal zero. Device MMIO remains external.",
+          "modeling": {
+            "boundary": "i960 0x28e88 geometry function command-stream model covering fixed framing, bit-23 command normalization, count, masked 16-bit payload words, completion marker, and terminal zero",
+            "test": "von/tools/test_recovered_geometry_function_plan_28e88.py",
+            "unresolved_behavior": "device FIFO/MMIO submission, completion timing, command consumer interpretation, and caller-side buffer ownership remain outside the pure stream builder"
+          }
         },
         {
           "id": "maincpu.command-profile-initializer",
