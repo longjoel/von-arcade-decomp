@@ -1115,7 +1115,7 @@
           "id": "maincpu.opcode-05-07-state-window-services",
           "name": "opcode_05_07_state_window_services",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -1130,6 +1130,11 @@
             }
           ],
           "symbol": "sharc_opcode_05_07_state_window_services",
+          "modeling": {
+            "boundary": "Models the opcode-0x05/0x06/0x07 state-window lifecycle: opcode 0x05 advances the indexed window up to seven, copies 12 words through the current state pointer with the recovered 11-word offset, and saves the advanced pointer; opcode 0x06 decrements a nonzero index and subtracts 12 from the pointer; opcode 0x07 consumes R0..R11 and stores them sequentially through the selected state pointer.",
+            "test": "von/tools/test_sharc_state_services.py",
+            "unresolved_behavior": "FIFO production and wait timing for opcode 0x07, DM address-unit/bus semantics, exact state-window semantic naming, delayed-store timing, and higher-level vector/geometry consumers remain outside this static state-service model."
+          },
           "notes": "Static listing recovers opcode 0x05 forward stepping/copy of a 12-word window at offset 0x0b, opcode 0x06 reverse stepping by 12 words, and opcode 0x07's exact 12-word FIFO load into the DM 0x30101 state pointer. Window meaning remains pending vector-consumer correlation."
         },
         {
