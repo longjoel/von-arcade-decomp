@@ -3960,7 +3960,12 @@
             }
           ],
           "symbol": "recovered_plane_full_clear_plan",
-          "notes": "Recovers both indirect-return tile-plane clears: destinations 0x01000000/0x01004000, 0xfff zero halfwords, and local return stubs 0x22ca4/0x22ce4."
+          "notes": "Recovers both indirect-return tile-plane clears: destinations 0x01000000/0x01004000, 0xfff zero halfwords, and local return stubs 0x22ca4/0x22ce4.",
+          "modeling": {
+            "boundary": "i960 0x22c70/0x22cb0 full tile-plane clear descriptors with variant destinations and indirect return stubs",
+            "test": "von/tools/test_recovered_plane_full_clear_thunks.py",
+            "unresolved_behavior": "actual plane-memory clear writes and caller-visible register-bank effects remain outside the pure clear plan"
+          }
         },
         {
           "id": "maincpu.hud-reset-22d30",
