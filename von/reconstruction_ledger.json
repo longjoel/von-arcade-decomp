@@ -11738,6 +11738,11 @@
             }
           ],
           "symbol": "recovered_text_status_panel_plan",
+          "modeling": {
+            "boundary": "Models the text-status panel source/fill route: preserve a 0x50-byte frame, use column 10 and row g6+31 with width g10+31 and height 3, copy source 0x02fd8238 through 0x1dd10 for nonzero g0, and use 0x1df70 zero fill otherwise",
+            "test": "von/tools/test_recovered_text_status_panel_route.py",
+            "unresolved_behavior": "Caller status provenance, source asset ownership, SHARC tile-RAM destination, and display timing remain outside this framed route contract"
+          },
           "notes": "Recovers the paired source/fill route: both branches use column 10, row g6+31, width g10+31, height 3, and a 0x50-byte preservation frame; nonzero g0 copies source 0x02fd8238 through 0x1dd10, while zero g0 fills through 0x1df70 with zero."
         },
         {
