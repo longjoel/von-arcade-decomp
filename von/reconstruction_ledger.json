@@ -5493,6 +5493,11 @@
             }
           ],
           "symbol": "recovered_geometry_command_batch_loop",
+          "modeling": {
+            "boundary": "geometry batch loop performs four 0x800-word submissions at 0x2000-byte source strides, advances command offsets by 0x800, and emits the fixed 0x0f0f frame-function handoff sequence",
+            "test": "von/tools/test_geometry_buffer_model.py",
+            "unresolved_behavior": "MMIO completion timing, frame-status polling, and live geometry-board ownership remain provisional beyond the deterministic batch partition contract"
+          },
           "notes": "Static audit against 0x28c80-0x28cf4 confirms the initial handoff, four 0x800-word batches at 0x2000-byte strides, three handoffs per batch, and two final handoffs. Byte validation is blocked on compiler/ABI calibration.",
           "milestones": {
             "c-only-i960-attract-60s": {
