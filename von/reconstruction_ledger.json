@@ -8409,6 +8409,11 @@
               "end": "0x0006ff20"
             }
           ],
+          "modeling": {
+            "boundary": "selector-gated geometry helper returns for nonzero selectors and for selector zero writes 0x303 plus the exact 0x80/0x00f80140 control-pulse sequence to the mapped geometry ports",
+            "test": "von/tools/test_geometry_control_selector.py",
+            "unresolved_behavior": "geometry-board interpretation and MMIO timing remain hardware-specific beyond the host-side write contract"
+          },
           "notes": "Selector-zero guard and exact geometry control writes are recovered: 0x303 to 0x00800030, 0x80 to 0x00804000, and 0x00f80140 to 0x00804008, 0x0080400c, and 0x00804000 twice. Hardware interpretation remains external to the host contract.",
           "milestones": {
             "c-only-i960-attract-60s": {
