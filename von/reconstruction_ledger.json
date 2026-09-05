@@ -10488,6 +10488,33 @@
             "unresolved_behavior": "Sub-call body at 0x1c618 and live register contents remain outside this pure block contract"
           },
           "notes": "Pure schedule for the 0x1bac0 equality-gated flag block."
+        },
+        {
+          "id": "maincpu.masked-call-1bafc",
+          "name": "masked_call_1bafc",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_masked_call_1bafc.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_masked_call_1bafc.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001bafc",
+              "end": "0x0001bb4c"
+            }
+          ],
+          "symbol": "recovered_masked_call_plan",
+          "modeling": {
+            "boundary": "Dispatch schedule: six-bit mask selects dual, single, or no calls, then the counter always bumps",
+            "test": "von/tools/test_recovered_masked_call_1bafc.py",
+            "unresolved_behavior": "Sub-call bodies at 0x1ffb0/0x2a4e0 remain outside this pure dispatch contract"
+          },
+          "notes": "Pure dispatch schedule for the 0x1bafc masked call block."
         }
       ]
     },

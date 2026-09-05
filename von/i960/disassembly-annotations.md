@@ -570,6 +570,12 @@ The `0x1bac0` block runs only when the `0x503a04` counter equals
 register at `0x10000000`. The pure schedule is in
 `recovered_flag_block_1bac0.c`.
 
+The `0x1bafc` block masks the same counter to six bits: a zero mask
+issues `0x1ffb0` with 1 plus `0x2a4e0` with `0x1342`, a 32 mask issues
+`0x1ffb0` with 0 alone, and any other mask skips the calls — then the
+counter always bumps in place. The pure schedule is in
+`recovered_masked_call_1bafc.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
