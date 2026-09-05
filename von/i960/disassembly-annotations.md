@@ -464,6 +464,10 @@ tables: `0xe36c0` holds `" 1"`, `" 2"`, ... while `0xe3700` holds `"ST"`,
 callers sit in the `0xe3xxx`–`0xe6xxx` results screens. The pure schedule
 is in `recovered_rank_string_e39c0.c`.
 
+The fixed fan-out at `0xe3a70` emits the first three string bytes through
+the `0x1d570` status helper, sign-extending each low byte (`shlo 24`/
+`shri 24`). The pure schedule is in `recovered_tribyte_emit_e3a70.c`.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at

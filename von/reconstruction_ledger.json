@@ -9485,6 +9485,32 @@
             "unresolved_behavior": "Actual walker execution and string-table ROM provenance remain outside this pure address/schedule plan"
           },
           "notes": "Pure emit schedule for the 0xe39c0 ranking emitter: index scales by ((i*2+i)*2) into tables 0xe36c0 (' 1', ' 2', ...) and 0xe3700 ('ST', 'ND', ...). Ten static callers in the results screens."
+        },
+        {
+          "id": "maincpu.tribyte-emit-e3a70",
+          "name": "tribyte_emit_e3a70",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_tribyte_emit_e3a70.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_tribyte_emit_e3a70.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000e3a70",
+              "end": "0x000e3aa4"
+            }
+          ],
+          "symbol": "recovered_tribyte_emit_plan",
+          "modeling": {
+            "boundary": "Three-byte emit schedule: fixed offsets 0-2 with sign-extended low bytes through the 0x1d570 status helper",
+            "test": "von/tools/test_recovered_tribyte_emit_e3a70.py",
+            "unresolved_behavior": "Actual 0x1d570 execution and string storage remain outside this pure emit schedule"
+          },
+          "notes": "Pure emit schedule for the 0xe3a70 fan-out: emits the first three string bytes with sign extension through 0x1d570."
         }
       ]
     },
