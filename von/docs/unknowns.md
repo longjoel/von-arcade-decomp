@@ -64,6 +64,26 @@ Caveat: on vonjdev the `0x0181xxxx` source windows read zero, so the
 scale check holds trivially (`0==0`); a nonzero-source live
 confirmation still wants the original-ROM stream comparison.
 
+## U-0006 — model-table header and subgroup markers
+
+Model part tables are located and record-decoded (`main_data`
+0xbed828: 19 `[tpa, tha, oba]` records, all trace-verified), but the
+10-word header at 0xbed800 (OBA-like `0x91xxxx` and `0x49xxxx`
+values, `0x00 0x00 0xffffffff` terminator) and the in-table `[0, 0,
+3]`, `[0, 0, 2]`, `[0, 0, 4]` subgroup markers are undecoded. Tables
+are contiguous (`0xffffffff` separator, next table at 0xbed948).
+Related: `decode_model_part_table.py`.
+
+## U-0007 — trace slot families are not models
+
+Proven by measurement: a 404-family slot-co-occurrence export put 19
+parts from three ROM regions (`0x89xxxx`, `0x9exxxx`, `0xa6xxxx`)
+with 19 distinct per-frame body transforms into one "family". Slot
+co-occurrence groups screen-sharing strangers, never models. Model
+identity comes from ROM part tables (U-0006); trace supplies
+per-part transforms and textures only.
+Related: `fingerprint_geometry_assemblies.py`, showcase pack.
+
 ## U-0005 — missing development captures
 
 The smoke gate fails on absent development captures (not regressions),
