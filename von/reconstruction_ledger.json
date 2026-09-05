@@ -1727,6 +1727,11 @@
             }
           ],
           "symbol": "sharc_opcode_1c_signed_fixed_point_service",
+          "modeling": {
+            "boundary": "SHARC signed-16 FIFO input, ABS/π/2 cosine reduction, shared coefficient scaling, and single output",
+            "test": "von/tools/test_recovered_sharc_opcode_1bc.py",
+            "unresolved_behavior": "exact endpoint rounding remains implementation-specific beyond the established cosine-scale vectors"
+          },
           "notes": "One FIFO word is sign-extended from 16 bits, converted to float, calls helper 0x20dbe, is scaled by 0x38c9116d, and is emitted once. This helper establishes ABS(F0), pi/2, and a 0.5 path before the shared coefficient reduction. Runtime probe probe_sharc_opcode_1c.lua confirms the cosine-shaped behavior: inputs 0, 0x4000, 0x7fff, and 0x8000 emit 0x3f7fffff, 0xb8492eef, 0xbf7fffff, and 0xbf7fffff; exact endpoint rounding remains implementation-specific."
         },
         {
