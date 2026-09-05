@@ -10597,6 +10597,11 @@
             }
           ],
           "symbol": "opcode_4b_branched_three_valued_predicate",
+          "modeling": {
+            "boundary": "Models the finite opcode-0x4b three-valued path: return 1 for positive Y difference, return 2 for zero/NaN horizontal seed, otherwise form the 3D radius and recovered geometry-dependent bound from the fourth input and state constants, returning 0 when radius is strictly below bound plus state[3] and 2 otherwise.",
+            "test": "von/tools/test_recovered_sharc_opcode_4b.py",
+            "unresolved_behavior": "FIFO production and wait timing, exact shared helper/RSQRTS refinement and boundary rounding, exceptional values beyond tested singular/NaN cases, extra-input fallback transport, output FIFO backpressure, delayed stores, and downstream semantics remain outside this finite-path model."
+          },
           "notes": "The listing recovers FIFO inputs x/y/z/bound in R8/R9/R10/R13, a first GT branch on dy=y-state[1] that consumes one extra FIFO word and reaches the output-1 fallback, and a normal path beginning with dx\u00b2+dz\u00b2 followed by normalized/refinement stages using state[3] and constants at state[5..8] (2, 1/3, 0.5, 3). The c80 write overwrites R2 with dz before c82 forms dz\u00b2, so caller R2 is not an input. Live traces confirm final F0 is the full Euclidean radius and that the refined F9 bound contribution is linear in the fourth input but geometry-dependent: for y=-4 and horizontal radii 1 and 2, unit inputs produce F9\u22480.582983 and 0.942809; horizontal radius zero is a reciprocal-square-root singularity producing NaN and delayed output 2. The reusable C predicate now preserves that zero-horizontal result-2 tail. Normal delayed outputs are 2 or 0; exact refinement formula and boundaries remain provisional. Separate opcode-0x44 initialization confirms positive-Y input (0,4,0,0) emits 1 at 0x20cc9 and negative-Y input (0,-4,0,0) emits 2 at 0x20cbf."
         },
         {
