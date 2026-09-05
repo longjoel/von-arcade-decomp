@@ -1056,7 +1056,7 @@
           "id": "maincpu.opcode-00-02-scalar-services",
           "name": "opcode_00_02_scalar_services",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -1071,6 +1071,11 @@
             }
           ],
           "symbol": "sharc_opcode_00_02_scalar_services",
+          "modeling": {
+            "boundary": "Models the three eight-slot scalar service shapes for opcodes 0x00, 0x01, and 0x02: consume two FIFO words into the aliased F0/F1 lanes, apply add, subtract, or multiply respectively, wait for output readiness, emit one result, and return.",
+            "test": "von/tools/test_sharc_scalar_services.py",
+            "unresolved_behavior": "FIFO production and wait timing, SHARC floating-point rounding/special values, exact register alias scheduling beyond the traced normal cases, output transport, and caller interpretation remain outside this grouped scalar-service model."
+          },
           "notes": "Static listing recovers three eight-slot handlers: each consumes two FIFO words, applies add/subtract/multiply to F0/F1, emits one result, and returns. A focused interpreter trace resolves staging: FIFO reads visibly update the aliased F0/F1 raw lanes before the operation; vectors 1+2=3, 2-1=1, and 0.5*2=1 all reach the output FIFO. Reproducible instrumentation is covered by von/tools/test_sharc_scalar_trace_patch.py."
         },
         {
