@@ -146,8 +146,16 @@ def main() -> int:
         local_link.symlink_to(summary)
         linked_artifact = json.loads(json.dumps(runtime))
         linked_artifact["entries"][0]["artifacts"] = [{"path": "local-link-summary.json", "sha256": "0" * 64}]
-        assert any("missing artifact" in error for error in validate(
+        assert any("missing artifact" in error or "invalid artifact path" in error for error in validate(
             linked_artifact, {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
+        linked_directory = temp / "linked-evidence"
+        linked_directory.symlink_to(temp)
+        nested_artifact = json.loads(json.dumps(runtime))
+        nested_artifact["entries"][0]["artifacts"] = [{"path": "linked-evidence/summary.json",
+                                                         "sha256": "0" * 64}]
+        assert any("missing artifact" in error or "invalid artifact path" in error
+                   for error in validate(nested_artifact,
+                                         {"images": [{"work_units": [{"id": "unit"}]}]}, temp))
         mismatched = json.loads(json.dumps(runtime))
         mismatched["entries"][0]["stimulus"]["kind"] = "causal-trace"
         assert any("stimulus kind" in error for error in validate(
