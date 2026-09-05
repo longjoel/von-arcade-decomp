@@ -1888,6 +1888,11 @@
             }
           ],
           "symbol": "recovered_io_failure_prepare",
+          "modeling": {
+            "boundary": "i960 I/O failure-state byte/halfword reset and handoff to input initialization",
+            "test": "von/tools/test_recovered_io.py",
+            "unresolved_behavior": "downstream input-initializer scheduling and hardware failure-dispatch timing remain unresolved beyond the deterministic stores"
+          },
           "notes": "Clears byte fields at 0x00502480, 0x005023f0, 0x00502481, 0x00502482 and the halfword at 0x00502484, then calls the 0x2bb0 input initializer. The deterministic stores are vector-tested.",
           "milestones": {
             "c-only-i960-attract-60s": {
