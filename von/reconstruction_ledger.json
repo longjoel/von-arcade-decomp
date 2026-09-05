@@ -11247,6 +11247,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_accumulator_transition_7f5d0.py"],
           "ranges": [{"start": "0x0007f5d0", "end": "0x0007f6b0"}],
           "symbol": "recovered_geometry_accumulator_transition_7f5d0",
+          "modeling": {
+            "boundary": "Models the pure 0x7f5d0 eligibility and action-selection gates: all three supplied candidate/metric/threshold predicates must pass, then mode/state/gate combinations select action state 1/code 10 or mode-4 state 4/code 4; the deterministic default is state/code zero.",
+            "test": "von/tools/test_recovered_geometry_accumulator_transition_7f5d0.py",
+            "unresolved_behavior": "Floating-point and FIFO computations that produce the boolean inputs, MMIO effects, and downstream action execution remain outside this model."
+          },
           "notes": "Pure deterministic state gates and action selection; floating-point and FIFO outcomes are explicit boolean inputs and MMIO is excluded."
         },
         {
