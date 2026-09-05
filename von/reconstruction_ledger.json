@@ -9601,6 +9601,11 @@
             }
           ],
           "symbol": "sharc_opcode_28_projected_threshold_predicate_service",
+          "modeling": {
+            "boundary": "Models the opcode-0x28 projected predicate: all three translated affine components are formed, then finite projected depth, radial magnitude, lower bound, and strict upper/lower comparisons determine acceptance; any nonfinite or failed gate returns zero and only the surviving finite path returns one.",
+            "test": "von/tools/test_recovered_sharc_opcode_28.py",
+            "unresolved_behavior": "FIFO and DM state-window timing, reciprocal refinement/register alias details, exact exceptional payload propagation, and downstream use of the boolean result remain unresolved."
+          },
           "notes": "The listing and finite-path model recover five FIFO inputs in R0/R1/R2/R5/R6, translation-tail loads at 0x3010a..0x3010c, and all three translated components: (tailX+x*s0+y*s3+z*s6, tailY+x*s1+y*s4+z*s7, tailZ+x*s2+y*s5+z*s8). Only the third component F2 affects the visible decision. The three strict gates are F2<=0, F2>=R6, and post-refinement sqrt(x*x+z*F2)>=F2*R5; all branch to the zero fallback, while the surviving path emits delayed 1. Identity-state probes for unit-X and unit-Z requests emitted zeros at 0x2056b, 0x2056d, and 0x20570, while unit-Z with R5=R6=2 passed both strict gates and emitted 1 at 0x205a3. Edge probes show the zero-horizontal singularity reaches an unordered intermediate but emits fallback 0 at 0x205a7, negative depth takes the first LE gate and emits the same 0, and both NaN-horizontal and NaN-depth inputs also emit 0 with intermediate NaNs canonicalized to 0xffffffff. The reusable model explicitly rejects nonfinite projected depth/radial/bound values and is tested with lower/upper boundary, translated-vector, zero, negative-depth, and NaN cases; exact exceptional payload propagation remains architecture-specific."
         },
         {
