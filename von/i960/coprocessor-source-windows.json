@@ -1,0 +1,20 @@
+{
+  "description": "Validated ROM-backed source windows used by the original i960 upload routines.",
+  "generator": "von/tools/extract_coprocessor_sources.py",
+  "windows": {
+    "sharc": {
+      "source": "maincpu + 0x0016b58c",
+      "bus_address": "0x0016b58c",
+      "words": 11038,
+      "bytes": 22076,
+      "sha256": "b79f37baa8205e9ef90c7640d596dbaae700d6fd67eb149c125a9fb4042a38da"
+    },
+    "geometry": {
+      "source": "main_data + 0x00fc6290",
+      "bus_address": "0x02fc6290",
+      "words": 9340,
+      "bytes": 18680,
+      "sha256": "620c93d7242123f6a296057c53673044d8aaca6ad6fbb1e3800d1ea4ca2d22d3"
+    }
+  }
+}

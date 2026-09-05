@@ -98,11 +98,25 @@ void recovered_sharc_bootstrap_copy(volatile u16 *fifo,
         fifo[index] = source[index];
 }
 
+/* Host-side port variant: every halfword targets the same MMIO address. */
+void recovered_sharc_bootstrap_port_copy(volatile u16 *fifo,
+                                         volatile const u16 *source,
+                                         u32 words)
+{
+    u32 index;
+
+    for (index = 0; index < words; ++index)
+        fifo[0] = source[index];
+}
+
 void recovered_sharc_bootstrap_upload(void)
 {
     *SHARC_CONTROL = 0x80000000U;
-    recovered_sharc_bootstrap_copy(SHARC_FIFO, SHARC_SOURCE,
-                                   SHARC_BOOT_WORDS);
+    /* The host FIFO is a fixed-address port. Incrementing the pointer here
+     * walks off the mapped 16 KiB window after 0x2000 writes and feeds only a
+     * truncated bootstrap to MAME's ADSP DMA model. */
+    recovered_sharc_bootstrap_port_copy(SHARC_FIFO, SHARC_SOURCE,
+                                         SHARC_BOOT_WORDS);
     *SHARC_CONTROL = 0;
 }
 

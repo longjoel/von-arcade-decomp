@@ -6,6 +6,27 @@
  */
 typedef unsigned int u32;
 
+/* Legal 3x4 geometry matrix command: opcode followed by 12 IEEE-754 words. */
+u32 recovered_geometry_matrix_submission(const u32 matrix[12], u32 packet[13])
+{
+    u32 index;
+    packet[0] = 0x05800000U;
+    for (index = 0U; index < 12U; ++index)
+        packet[index + 1U] = matrix[index];
+    return 13U;
+}
+
+/* The legal Model 2 polygon-ROM display command's four-word object record. */
+u32 recovered_geometry_polygon_object_submission(u32 tpa, u32 tha, u32 oba,
+                                                 u32 count, u32 packet[4])
+{
+    packet[0] = tpa;
+    packet[1] = tha;
+    packet[2] = oba;
+    packet[3] = count;
+    return 4U;
+}
+
 /* Emit the common ten-word prefix. Callers append object-dependent fields. */
 u32 recovered_geometry_object_packet_prefix(const u32 base[3],
                                             u32 parameter_16,
@@ -104,6 +125,30 @@ u32 recovered_geometry_object_profile_length_request(
         0U, profile_vector[2],
     };
     return recovered_geometry_object_length_request(endpoints, packet);
+}
+
+u32 recovered_geometry_object_scalar_request(u32 length_response,
+                                             u32 second_parameter,
+                                             u32 packet[3]);
+
+/* Concrete first 0x3403c submission captured from the original FIFO. */
+u32 recovered_geometry_object_profile_submission(const u32 base[3],
+                                                 const u32 profile_vector[3],
+                                                 u32 length_response,
+                                                 u32 angle_response,
+                                                 u32 packet[29])
+{
+    u32 index;
+    index = recovered_geometry_object_packet_transform_prefix(
+        base, 0x6cU, 0x17U, 0xffffff80U, 0U, 0U, 0x0fecU, packet);
+    packet[index++] = 0x06U;
+    packet[index++] = 0x05U;
+    packet[index++] = 0x06U;
+    index += recovered_geometry_object_profile_length_request(
+        profile_vector, packet + index);
+    index += recovered_geometry_object_scalar_request(
+        length_response, angle_response, packet + index);
+    return index;
 }
 
 /* The following 0x0a request consumes the 0x1f response as its first input. */

@@ -9,6 +9,10 @@
 
 #include "recovered_geometry_pipeline.h"
 #include "recovered_object_state_pipeline.h"
+#include "recovered_attract_schedule.h"
+#include "recovered_attract_platform.h"
+#include "recovered_sega_tiles.h"
+
 
 typedef unsigned long u32;
 typedef unsigned short u16;
@@ -48,6 +52,38 @@ int recovered_texture_loader_profile_setup(void);
 void recovered_text_set_position(u32 column, u32 row);
 void recovered_text_write_string(volatile const unsigned char *text);
 void recovered_text_write_glyph_string(volatile const unsigned char *text);
+static void recovered_render_mech_select(void);
+static void recovered_render_phase(const unsigned char *title);
+static void recovered_render_sega_logo(void);
+
+static void recovered_i960_present(void *opaque,
+                                    recovered_attract_platform_u32 event,
+                                    recovered_attract_platform_u32 tick)
+{
+    volatile u32 *state = (volatile u32 *)opaque;
+    state[11] = tick;
+    switch (event) {
+    case RECOVERED_ATTRACT_EVENT_SEGA_LOGO:
+        recovered_render_sega_logo();
+        state[4] = 0x53454741UL; /* SEGA */
+        break;
+    case RECOVERED_ATTRACT_EVENT_MACHINE_SELECT:
+        recovered_render_mech_select();
+        state[4] = 0x494e4954UL; /* INIT */
+        break;
+    case RECOVERED_ATTRACT_EVENT_TAKEOFF:
+        recovered_render_phase(TEXT_TAKEOFF);
+        break;
+    case RECOVERED_ATTRACT_EVENT_LEVEL_INTRO:
+        recovered_render_phase(TEXT_LEVEL_INTRO);
+        break;
+    case RECOVERED_ATTRACT_EVENT_MATCH_ENTRY:
+        recovered_render_phase(TEXT_MATCH_ENTRY);
+        break;
+    default:
+        break;
+    }
+}
 
 static void recovered_render_mech_select(void)
 {
@@ -71,6 +107,15 @@ static void recovered_render_phase(const unsigned char *title)
     recovered_text_write_string(title);
 }
 
+/* The original input-free attract path holds the SEGA bumper before its
+ * graphics-only title screen.  The development renderer consumes this state
+ * marker while the title geometry command stream is still being recovered. */
+static void recovered_render_sega_logo(void)
+{
+    recovered_sega_logo_char_data();
+    recovered_sega_logo_tiles();
+}
+
 void i960_reconstructed_main(void)
 {
     volatile u32 *const state = WORKRAM + 0x20;
@@ -79,6 +124,7 @@ void i960_reconstructed_main(void)
     state[0] = 0x52454330UL; /* REC0 */
     io_result = recovered_io_self_test();
     state[1] = io_result;
+    state[4] = 0x424f4f54UL; /* BOOT */
     if (io_result != 0) {
         recovered_io_failure_prepare();
         recovered_io_input_initialize();
@@ -86,12 +132,16 @@ void i960_reconstructed_main(void)
     }
 
     recovered_text_startup_asset_transfer(0U);
-    recovered_geometry_pipeline_startup(0);
+    state[4] = 0x5452414eUL; /* TRAN */
+    recovered_geometry_pipeline_startup_development();
+    state[4] = 0x47454f30UL; /* GEO0 */
     /* The SCSP FIFO is part of the board's host-visible audio boundary.  Its
      * initializer emits the observed 0xff startup command and arms the
      * generated consumer path below. */
     recovered_audio_initialize_scsp();
+    state[4] = 0x41554430UL; /* AUD0 */
     recovered_text_video_control_bootstrap(0U);
+    state[4] = 0x56494430UL; /* VID0 */
     recovered_text_font_asset_initialize();
     recovered_text_video_upload();
     state[7] = recovered_object_state_runtime_tick();
@@ -123,37 +173,50 @@ void i960_reconstructed_main(void)
     state[4] = 0x494e4954UL; /* INIT */
     state[9] = 0U; /* timed attract presentation has not yet fired */
 
-    for (;;) {
-        recovered_io_service();
-        recovered_audio_service_pending();
+    {
+        const struct recovered_attract_platform presentation_platform = {
+            (void *)state, recovered_i960_present
+        };
+
+        for (;;) {
         state[5] = state[5] + 1;
+        /* These are frame-scale services, not inner-loop operations.  The
+         * recovered startup loop advances about 400 iterations per frame;
+         * keep a bounded polling interval so the generated image does not
+         * spend the entire attract run repeating MMIO reads. */
+        if ((state[5] & 0x1ffU) == 0U) {
+            recovered_io_service();
+            recovered_audio_service_pending();
+        }
         /* The reconstructed host has no vblank callback in this development
          * image. The captured loader loop advances at roughly 400 iterations
          * per frame, so use a bounded heartbeat threshold to expose the next
          * recovered attract boundary without depending on coin polarity. */
-        if (state[9] == 0U && state[5] >= 360000U) {
-            recovered_render_mech_select();
-            state[9] = 1U;
+        /* The generated image's tight loop advances about 300,000 counts per
+         * emulated second. Keep this pure scheduler shared with Linux so the
+         * phase boundaries can be debugged without hardware MMIO. */
+        {
+            recovered_schedule_u32 next_phase;
+            recovered_schedule_u32 event;
+            recovered_attract_step((recovered_schedule_u32)state[5],
+                                   (recovered_schedule_u32)state[9],
+                                   &next_phase, &event);
+            if (next_phase != state[9]) {
+                recovered_attract_present(&presentation_platform, event, state[5]);
+                state[9] = next_phase;
+            }
         }
-        if (state[9] == 1U && state[5] >= 780000U) {
-            recovered_render_phase(TEXT_TAKEOFF);
-            state[9] = 2U;
-        }
-        if (state[9] == 2U && state[5] >= 1400000U) {
-            recovered_render_phase(TEXT_LEVEL_INTRO);
-            state[9] = 3U;
-        }
-        if (state[9] == 3U && state[5] >= 2400000U) {
-            recovered_render_phase(TEXT_MATCH_ENTRY);
-            state[9] = 4U;
-        }
-        if (state[9] == 4U && state[10] == 0U && (state[5] & 0x3ffU) == 0U) {
+    if (state[9] == RECOVERED_ATTRACT_MATCH_ENTRY &&
+            (state[5] & 0x3fffU) == 0U) {
             /* Match-entry's first confirmed recurring host operation is the
-             * geometry frame/phase handoff. Keep it on the reconstructed
-             * device path while object-record production is integrated. */
+             * geometry frame/phase handoff. Repeat the parser-accepted seed
+             * on a bounded cadence so the attract run has continuing video
+             * activity while object-record production is integrated. */
             recovered_geometry_frame_submission();
+            recovered_geometry_object_packet_probe();
             recovered_geometry_match_object_seed();
             state[10] = state[10] + 1U;
+        }
         }
     }
 }

@@ -40,7 +40,16 @@ def main() -> int:
         if fifo[words] != 0xBEEF:
             raise SystemExit("FIFO copy exceeded the declared word count")
 
-    print(f"PASS: {words:,} SHARC bootstrap halfwords copied in order")
+        recovered.recovered_sharc_bootstrap_port_copy.argtypes = [
+            ctypes.POINTER(ctypes.c_uint16), ctypes.POINTER(ctypes.c_uint16),
+            ctypes.c_uint32,
+        ]
+        port = (ctypes.c_uint16 * 2)(0xBEEF, 0xCAFE)
+        recovered.recovered_sharc_bootstrap_port_copy(port, source, words)
+        if port[0] != source[words - 1] or port[1] != 0xCAFE:
+            raise SystemExit("fixed-address FIFO port copy walked its MMIO window")
+
+    print(f"PASS: {words:,} SHARC bootstrap halfwords copied in order and fixed-port mode")
     return 0
 
 

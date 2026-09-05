@@ -1,0 +1,19 @@
+diff --git a/src/mame/sega/model2.cpp b/src/mame/sega/model2.cpp
+--- a/src/mame/sega/model2.cpp
++++ b/src/mame/sega/model2.cpp
+@@ -725,6 +725,16 @@ void model2b_state::copro_fifo_w(u32 data)
+ 		{
+ 			logerror("vonj_geometry_76240_fifo: kind=write pc=%08x data=%08x\n", pc, data);
+ 			vonj_geometry_76240_write_trace_count++;
+ 		}
++		static unsigned vonj_geometry_object_packet_trace_count;
++		if ((machine().system().name == std::string_view("vonj")) &&
++			(pc >= 0x0003403c) && (pc < 0x00034ed0) &&
++			(vonj_geometry_object_packet_trace_count < 4096))
++		{
++			logerror("vonj_geometry_object_fifo: pc=%08x data=%08x\n", pc, data);
++			vonj_geometry_object_packet_trace_count++;
++		}
+ 		m_copro_fifo_in->push(u32(data));
+ 	}
+ }

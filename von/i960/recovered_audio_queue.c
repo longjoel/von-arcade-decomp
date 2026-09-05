@@ -87,6 +87,8 @@ typedef unsigned short u16;
 #define SCSP_CONTROL      (*(volatile u16 *)0x009c0004)
 #define SCSP_COMMAND      (*(volatile u16 *)0x009c0000)
 #define AUDIO_SERVICE_BIT (1U << 10)
+#define AUDIO_STAGE       (*(volatile u32 *)0x005000b0)
+#define AUDIO_DIRECT_COUNT (*(volatile u32 *)0x005000b4)
 
 void recovered_host_interrupt_mask_update(u32 mask);
 
@@ -202,6 +204,24 @@ static void recovered_audio_send_frame(const u8 *frame, u32 count)
     recovered_host_service_request();
 }
 
+/* Development-target bridge: vonjdev has the host UART mapped at 0x9c0000,
+ * while the recovered interrupt vector still enters original ROM code.  Send
+ * the same framed bytes through that mapped endpoint without raising the
+ * unresolved bit-10 interrupt.  The exact producer above remains available
+ * for original-path comparison and unit tests. */
+void recovered_audio_send_u16_direct(u32 value)
+{
+    u8 encoded[3];
+    u32 count;
+    u32 index;
+
+    count = recovered_audio_command_bytes(
+        value, AUDIO_MODE, BOARD_STATUS, encoded);
+    for (index = 0; index < count; ++index)
+        SCSP_COMMAND = (u16)encoded[index];
+    AUDIO_DIRECT_COUNT += count;
+}
+
 void recovered_audio_send_u16(u32 value)
 {
     u8 encoded[3];
@@ -216,9 +236,12 @@ void recovered_audio_send_u16(u32 value)
     if (!recovered_audio_queue_has_space(
             AUDIO_READ_INDEX, AUDIO_WRITE_INDEX, count))
         return;
+    AUDIO_STAGE = 31U;
     for (index = 0; index < count; ++index)
         recovered_audio_queue_push(encoded[index]);
+    AUDIO_STAGE = 32U;
     recovered_host_service_request();
+    AUDIO_STAGE = 33U;
 }
 
 /* The sibling 0x2a5f0 sender suppresses status 0 instead of status 2. */
@@ -282,11 +305,13 @@ void recovered_audio_initialize_scsp(void)
 {
     u32 index;
 
+    AUDIO_STAGE = 1U;
     AUDIO_WRITE_INDEX = 0U;
     AUDIO_READ_INDEX = 0U;
     for (index = 0; index < 0x40U; ++index)
         AUDIO_QUEUE[index] = (u8)recovered_audio_queue_init_fill_value();
 
+    AUDIO_STAGE = 2U;
     SCSP_CONTROL = (u16)recovered_audio_init_status_value(0U);
     recovered_audio_short_delay();
     SCSP_CONTROL = (u16)recovered_audio_init_status_value(1U);
@@ -298,5 +323,7 @@ void recovered_audio_initialize_scsp(void)
     SCSP_CONTROL = (u16)recovered_audio_init_status_value(4U);
     recovered_audio_short_delay();
     SCSP_CONTROL = (u16)recovered_audio_init_status_value(5U);
-    recovered_audio_send_u16(0xffU);
+    AUDIO_STAGE = 3U;
+    recovered_audio_send_u16_direct(0xffU);
+    AUDIO_STAGE = 4U;
 }

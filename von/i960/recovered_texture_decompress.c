@@ -58,6 +58,9 @@ int recovered_texture_decompress(volatile const u8 *source,
     u32 value;
     u32 output_word;
     u32 index;
+    u32 secondary_bank;
+    u8 low_format;
+    u8 high_format;
 
     /* The ROM clears 0xfed bytes of its persistent ring storage. */
     *TEXTURE_STATUS = 0;
@@ -115,8 +118,26 @@ int recovered_texture_decompress(volatile const u8 *source,
             else
             {
                 output_word |= (value & 0xffU) << 8;
-                if (output_index < 0x60000U ||
-                    !texture_use_secondary_bank(output_index))
+                /* Keep the bank decision in this routine.  The original
+                 * i960 ABI leaves the caller return link live across this
+                 * hot path; older i960 GCC versions can ignore
+                 * always_inline and emit a call to the helper instead. */
+                secondary_bank = 0;
+                if (output_index >= 0x60000U)
+                {
+                    low_format = TEXTURE_FORMAT_TABLE[output_index & 0x1ffU];
+                    high_format = TEXTURE_FORMAT_TABLE[(output_index >> 8) & 0x1feU];
+                    secondary_bank = (high_format == 1 || low_format == 1) ||
+                        (high_format == 3 && low_format >= 3) ||
+                        (low_format == 3 && high_format >= 4) ||
+                        (high_format == 5 && low_format >= 5) ||
+                        (low_format == 5 && high_format >= 6) ||
+                        (high_format == 7 && low_format >= 7) ||
+                        (low_format == 7 && high_format >= 8) ||
+                        (high_format == 9 && low_format >= 9) ||
+                        (low_format == 9 && high_format >= 10);
+                }
+                if (!secondary_bank)
                     *primary = (u16)output_word;
                 else
                     *secondary = (u16)output_word;

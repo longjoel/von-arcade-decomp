@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+import re
 from pathlib import Path
 
 
@@ -12,15 +14,30 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--pcs", required=True, type=Path)
     parser.add_argument("--manifest", required=True, type=Path)
+    parser.add_argument("--expected-seconds", type=float)
     args = parser.parse_args()
 
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     generated_end = int(manifest["generated_code_bytes"])
+    coverage = args.pcs.read_text(encoding="ascii")
     pcs = {
         int(line, 16)
-        for raw in args.pcs.read_text(encoding="ascii").splitlines()
+        for raw in coverage.splitlines()
         if (line := raw.strip()) and not line.startswith("#")
     }
+    if not pcs:
+        raise SystemExit("error: PC coverage is empty")
+    if any(pc < 0 or pc % 4 for pc in pcs):
+        raise SystemExit("error: invalid or unaligned i960 PC")
+    if args.expected_seconds is not None:
+        if not math.isfinite(args.expected_seconds) or args.expected_seconds <= 0:
+            raise SystemExit("error: expected seconds must be finite and positive")
+        completion = re.findall(r"^# completed_time=([0-9.]+)$", coverage, re.MULTILINE)
+        if len(completion) != 1:
+            raise SystemExit("error: missing or duplicate capture completion time")
+        elapsed = float(completion[0])
+        if not math.isfinite(elapsed) or elapsed < args.expected_seconds:
+            raise SystemExit(f"error: capture ended at {elapsed}s before {args.expected_seconds}s")
     escaped = sorted(pc for pc in pcs if pc >= generated_end)
     zero = 0 in pcs
     print(

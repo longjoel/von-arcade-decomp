@@ -28,6 +28,29 @@ with tempfile.TemporaryDirectory() as directory:
         0x16, 0x6C, 0x15, 0x17, 0x14, 0xFFFFFF80,
     ]
 
+    object_submission = lib.recovered_geometry_polygon_object_submission
+    object_submission.restype = ctypes.c_uint32
+    object_submission.argtypes = [
+        ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32,
+        ctypes.c_uint32, ctypes.POINTER(ctypes.c_uint32),
+    ]
+    object_packet = (ctypes.c_uint32 * 4)()
+    assert object_submission(0x004A0C3C, 0x004A0C44, 0x0091AF12, 0, object_packet) == 4
+    assert list(object_packet) == [0x004A0C3C, 0x004A0C44, 0x0091AF12, 0]
+
+    matrix_submission = lib.recovered_geometry_matrix_submission
+    matrix_submission.restype = ctypes.c_uint32
+    matrix_submission.argtypes = [
+        ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(ctypes.c_uint32),
+    ]
+    matrix = (ctypes.c_uint32 * 12)(
+        0x3E23D70A, 0, 0, 0, 0x3DB17E78, 0,
+        0, 0, 0x3F800000, 0xC2D00000, 0xC1E00000, 0x3F800000,
+    )
+    matrix_packet = (ctypes.c_uint32 * 13)()
+    assert matrix_submission(matrix, matrix_packet) == 13
+    assert list(matrix_packet) == [0x05800000] + list(matrix)
+
     extended = lib.recovered_geometry_object_packet_transform_prefix
     extended.restype = ctypes.c_uint32
     extended.argtypes = [
@@ -66,6 +89,19 @@ with tempfile.TemporaryDirectory() as directory:
     profile_packet = (ctypes.c_uint32 * 7)()
     assert profile_length(profile_vector, profile_packet) == 7
     assert list(profile_packet) == [0x1F, 0, 0xBEDDB3E1, 0, 0, 0, 0xBE800000]
+
+    submission = lib.recovered_geometry_object_profile_submission
+    submission.restype = ctypes.c_uint32
+    submission.argtypes = [
+        ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(ctypes.c_uint32),
+        ctypes.c_uint32, ctypes.c_uint32, ctypes.POINTER(ctypes.c_uint32),
+    ]
+    submission_packet = (ctypes.c_uint32 * 29)()
+    assert submission(base, profile_vector, 0x3F000004, 0xBF5DB3D0, submission_packet) == 29
+    assert list(submission_packet[:16]) == list(packet16)
+    assert list(submission_packet[16:19]) == [0x06, 0x05, 0x06]
+    assert list(submission_packet[19:26]) == [0x1F, 0, 0xBEDDB3E1, 0, 0, 0, 0xBE800000]
+    assert list(submission_packet[26:29]) == [0x0A, 0x3F000004, 0xBF5DB3D0]
 
     scalar = lib.recovered_geometry_object_scalar_request
     scalar.restype = ctypes.c_uint32

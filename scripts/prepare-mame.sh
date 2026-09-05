@@ -77,6 +77,10 @@ patch_already_applied() {
             contains_text 'vonj_geometry_polygon_trace_count' "$MAME_DIR/src/mame/sega/model2_v.cpp" ;;
         0012-von-renderer-boundary-tracing.patch)
             contains_text 'vonj_video_frame_trace_count' "$MAME_DIR/src/mame/sega/model2_v.cpp" ;;
+        0037-von-reconstructed-geometry-parser-tracing.patch)
+            contains_text 'vonj_geometry_parse_trace_count < 4096' "$MAME_DIR/src/mame/sega/model2_v.cpp" ;;
+        0038-von-reconstructed-geometry-opcode-tracing.patch)
+            contains_text 'machine().time().as_double() > 30.0' "$MAME_DIR/src/mame/sega/model2_v.cpp" ;;
         *)
             return 1 ;;
     esac

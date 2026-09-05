@@ -67,6 +67,14 @@ rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/mame/sega/model2
     "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/mame/sega/model2_v.cpp" || {
     printf 'error: failed to synchronize geometry tracing source\n' >&2; exit 1
 }
+rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/emu/debug/debugcpu.h" \
+    "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/emu/debug/debugcpu.h" || {
+    printf 'error: failed to synchronize debugger header\n' >&2; exit 1
+}
+rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/emu/debug/debugcpu.cpp" \
+    "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/emu/debug/debugcpu.cpp" || {
+    printf 'error: failed to synchronize debugger implementation\n' >&2; exit 1
+}
 
 printf 'Building MAME remotely in Docker...\n'
 ssh "${SSH_ARGS[@]}" "$REMOTE_HOST" "cd '$REMOTE_CHECKOUT' && VON_MAME_BUILD_IMAGE='$BUILD_IMAGE' JOBS='$REMOTE_JOBS' VON_MAME_PATCH_SET='${VON_MAME_PATCH_SET:-core}' ./scripts/build-mame-docker.sh" || {

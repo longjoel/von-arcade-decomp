@@ -6,6 +6,22 @@ typedef unsigned long u32;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
+#include "recovered_geometry_select_frame.inc"
+
+u32 recovered_geometry_object_packet_prefix(const u32 base[3],
+                                            u32 parameter_16,
+                                            u32 parameter_15,
+                                            u32 parameter_14,
+                                            u32 packet[10]);
+u32 recovered_geometry_object_profile_submission(const u32 base[3],
+                                                 const u32 profile_vector[3],
+                                                 u32 length_response,
+                                                 u32 angle_response,
+                                                 u32 packet[29]);
+u32 recovered_geometry_polygon_object_submission(u32 tpa, u32 tha, u32 oba,
+                                                 u32 count, u32 packet[4]);
+u32 recovered_geometry_matrix_submission(const u32 matrix[12], u32 packet[13]);
+
 #define GEO_COMMAND_WINDOW ((volatile u32 *)0x00800000)
 #define GEO_COMMAND_TABLE  ((volatile const u8 *)0x00028470)
 #define GEO_PROGRAM_PORT   ((volatile u32 *)0x00804000)
@@ -184,6 +200,44 @@ void recovered_geometry_pipeline_startup(u32 mode)
     *GEOMETRY_STATE = 0xffffU;
 }
 
+/* Development boundary used until the bulk display-list grammar and board
+ * upload contract is validated. Both source windows are now ROM-backed and
+ * the SHARC FIFO transport is fixed-address; probe the geometry stream after
+ * that prerequisite. */
+void recovered_geometry_pipeline_startup_development(void)
+{
+    recovered_geometry_profile_setup();
+    recovered_sharc_bootstrap_upload();
+    recovered_geometry_program_upload();
+    recovered_geometry_register_clear();
+    recovered_texture_initializer();
+    recovered_geometry_command_window_clear();
+    recovered_geometry_command_table_copy();
+    recovered_geometry_initial_handshake();
+    *GEOMETRY_STATE = 0xffffU;
+}
+
+/* Parser-observed setup stream preceding the first matrix/object batch. */
+u32 recovered_geometry_display_preamble(volatile u32 output[28])
+{
+    static const u32 words[28] = {
+        0x0b001616U, 0x47800000U, 0x03800707U, 3U,
+        0x04000808U, 0x41004000U,
+        0x01800303U, 0x00000080U, 0x01f40204U,
+        0x00f80140U, 0x00f80140U, 0x00f80140U, 0x00f80140U,
+        0x03000606U, 0U, 0U,
+        0x04800909U, 0x44160000U, 0x44160000U,
+        0x05000a0aU, 0U, 0U, 0x3f800000U,
+        0x02000404U, 0x00800000U, 0U,
+        0x08001010U, 0U
+    };
+    u32 index;
+
+    for (index = 0U; index < 28U; ++index)
+        output[index] = words[index];
+    return 28U;
+}
+
 /* Recovered from the startup handshake at 0x28418. */
 void recovered_geometry_initial_handshake_plan(volatile u32 *control,
                                                volatile u32 *write_start,
@@ -277,38 +331,101 @@ void recovered_geometry_frame_submission(void)
 }
 
 /* First captured match display-list prefix at the 0x2b430 -> geometry
- * command boundary.  This is deliberately a small, exact prefix: it carries
- * the mode/focal state and first captured matrix before the first captured
- * polygon-ROM object.  The remaining record dispatcher can append objects to
- * the same display-list format. */
-void recovered_geometry_match_object_seed(void)
+ * command boundary. The returned words are the matrix, legal polygon opcode,
+ * and first eight ordered object records from one original frame. */
+u32 recovered_geometry_match_object_batch(u32 output[45])
 {
     static const u32 matrix_packet[12] = {
-        0x3f7f6825U, 0x3bca931eU, 0x3d8ac0b8U,
-        0x3b45f807U, 0x3f7da8a8U, 0xbe0a226cU,
-        0xbd8b311cU, 0x3e0a0622U, 0x3f7d10fcU,
-        0xbff1e819U, 0xc176f7b2U, 0x42aff0faU
+        0x3e23d70aU, 0x00000000U, 0x00000000U,
+        0x00000000U, 0x3db11111U, 0x00000000U,
+        0x00000000U, 0x00000000U, 0x3f800000U,
+        0xc2d00000U, 0xc1e00000U, 0x3f800000U
     };
-    static const u32 object_packet[4] = {
-        0x0009b7e4U, 0x0009b9dcU, 0x009e410dU, 6U
+    static const u32 object_records[8][4] = {
+        { 0x00000000U, 0x0040000cU, 0x0084553fU, 1U },
+        { 0x004a0c3cU, 0x004a0c44U, 0x0091af12U, 0U },
+        { 0x0049c858U, 0x0049c918U, 0x0091433fU, 0U },
+        { 0x004a0c48U, 0x004a0c50U, 0x0091af23U, 0U },
+        { 0x004a2d96U, 0x004a456eU, 0x0091e76cU, 0U },
+        { 0x0049cd74U, 0x0049cd9cU, 0x0091577dU, 0U },
+        { 0x0009b7e4U, 0x0009b9dcU, 0x009e410dU, 0U },
+        { 0x0009b6c8U, 0x0009b7d4U, 0x009e3f80U, 0U }
     };
     u32 index;
-    u32 write_index = 0x10000U / 4U;
-
-    /* vonjdev maps the geometry buffer as ordinary host RAM.  Populate the
-     * published page directly so the development renderer sees the same
-     * display-list words the hardware FIFO would have committed. */
-    GEO_DISPLAY_BUFFER[write_index++] = 0x03800000U;
-    GEO_DISPLAY_BUFFER[write_index++] = 3U;
-    GEO_DISPLAY_BUFFER[write_index++] = 0x04800000U;
-    GEO_DISPLAY_BUFFER[write_index++] = 600U;
-    GEO_DISPLAY_BUFFER[write_index++] = 600U;
-    GEO_DISPLAY_BUFFER[write_index++] = 0x05800000U;
     for (index = 0U; index < 12U; ++index)
-        GEO_DISPLAY_BUFFER[write_index++] = matrix_packet[index];
-    GEO_DISPLAY_BUFFER[write_index++] = 0x00800101U;
-    for (index = 0U; index < 4U; ++index)
-        GEO_DISPLAY_BUFFER[write_index++] = object_packet[index];
+        output[index] = matrix_packet[index];
+    output[12] = 0x00800101U;
+    for (index = 0U; index < 8U; ++index)
+        recovered_geometry_polygon_object_submission(
+            object_records[index][0], object_records[index][1],
+            object_records[index][2], object_records[index][3],
+            output + 13U + index * 4U);
+    return 45U;
+}
+
+void recovered_geometry_match_object_seed(void)
+{
+    u32 matrix_packet[13];
+    u32 packet[4];
+    u32 matrix_index;
+    u32 record_index;
+    u32 index;
+    u32 write_index = 0x10000U / 4U;
+    static u32 animation_frame;
+
+    /* vonjdev maps the geometry buffer as ordinary host RAM. Populate the
+     * published page directly so the development renderer sees the same
+     * display-list words the hardware FIFO would have committed. The setup
+     * preamble follows the original parser trace: LOD, mode, z-sort, window,
+     * texture parameters, focal distance, light, texture data, and dummy. */
+    write_index += recovered_geometry_display_preamble(
+        GEO_DISPLAY_BUFFER + write_index);
+    record_index = 0U;
+    for (matrix_index = 0U; matrix_index < 37U; ++matrix_index) {
+        recovered_geometry_matrix_submission(
+            (animation_frame & 1U) != 0U
+                ? select_matrices_frame1[matrix_index]
+                : select_matrices[matrix_index], matrix_packet);
+        for (index = 0U; index < 13U; ++index)
+            GEO_DISPLAY_BUFFER[write_index++] = matrix_packet[index];
+        while (record_index < 40U &&
+               select_object_matrix[record_index] == matrix_index) {
+            GEO_DISPLAY_BUFFER[write_index++] = 0x00800101U;
+            recovered_geometry_polygon_object_submission(
+                select_objects[record_index][0], select_objects[record_index][1],
+                select_objects[record_index][2], select_objects[record_index][3],
+                packet);
+            for (index = 0U; index < 4U; ++index)
+                GEO_DISPLAY_BUFFER[write_index++] = packet[index];
+            ++record_index;
+        }
+    }
+    ++animation_frame;
+    /* Terminate the published display list. Without the GEO end opcode the
+     * parser falls through into the cleared buffer and repeatedly interprets
+     * the startup sentinel (0x07800f0f), diverging from the original stream's
+     * bounded command sequence. */
+    GEO_DISPLAY_BUFFER[write_index++] = 0x07800f0fU;
     *GEO_READ_START = 0x00010000U;
-    *GEO_WRITE_START = 0U;
+    *GEO_WRITE_START = (write_index * 4U) & 0x1ffffU;
+}
+
+/* Integrate the recovered host object-packet emitter without submitting its
+ * still-unvalidated payload to the display-list parser. The command window is
+ * an observable scratch boundary in vonjdev and provides a safe handoff for
+ * the next packet/parser comparison fixture. */
+void recovered_geometry_object_packet_probe(void)
+{
+    static const u32 base[3] = { 0x0000b6d0U, 0x00004c4cU, 0x0000bb8bU };
+    static const u32 profile_vector[3] = {
+        0xbeddb3e1U, 0xbf5db3d0U, 0xbe800000U
+    };
+    u32 packet[29];
+    u32 packet_words;
+    u32 index;
+
+    packet_words = recovered_geometry_object_profile_submission(
+        base, profile_vector, 0x3f000004U, 0xbf5db3d0U, packet);
+    for (index = 0U; index < packet_words; ++index)
+        GEO_COMMAND_WINDOW[0x180U / 4U + index] = packet[index];
 }

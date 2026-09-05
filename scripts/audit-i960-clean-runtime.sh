@@ -7,7 +7,14 @@ require_mame
 
 SECONDS_TO_RUN="${VON_CLEAN_AUDIT_SECONDS:-8}"
 OUT_DIR="$ROOT_DIR/von/build/i960/clean-audit"
+OUT_DIR="${VON_CLEAN_AUDIT_OUTPUT_DIR:-$OUT_DIR}"
+mkdir -p "$OUT_DIR"
+# Each invocation owns its capture files and cabinet state. A failed launch
+# must never reuse a previous run's coverage or append to its progress log.
+OUT_DIR="$(mktemp -d "$OUT_DIR/run-XXXXXXXX")"
+printf 'Clean audit capture: %s\n' "$OUT_DIR"
 PC_LOG="$OUT_DIR/clean-${SECONDS_TO_RUN}s.pcs"
+PROGRESS_LOG="$OUT_DIR/clean-${SECONDS_TO_RUN}s.progress"
 RUN_LOG="$OUT_DIR/clean-${SECONDS_TO_RUN}s.log"
 ROM_PATH="$ROOT_DIR/von/build/rompath/reconstructed-clean"
 MANIFEST="$ROOT_DIR/von/build/i960/reconstructed-clean-maincpu.manifest.json"
@@ -19,9 +26,12 @@ mkdir -p "$OUT_DIR"
 set +e
 VON_ATTRACT_SECONDS="$SECONDS_TO_RUN" \
 VON_ATTRACT_PC_LOG="$PC_LOG" \
+VON_ATTRACT_PROGRESS_LOG="$PROGRESS_LOG" \
 SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}" \
 "$MAME_BIN" vonjdev -rompath "$ROM_PATH" \
     -debug -debugger none -video none -sound none -skip_gameinfo -nothrottle \
+    -cfg_directory "$OUT_DIR/cfg" -nvram_directory "$OUT_DIR/nvram" \
+    -state_directory "$OUT_DIR/state" \
     -autoboot_script "$ROOT_DIR/von/tools/trace_i960_attract_coverage.lua" \
     -seconds_to_run "$SECONDS_TO_RUN" 2>&1 | tee "$RUN_LOG"
 MAME_STATUS=$?
@@ -30,7 +40,8 @@ set -e
 AUDIT_STATUS=0
 if [[ -s "$PC_LOG" ]]; then
     python3 "$ROOT_DIR/von/tools/audit_clean_i960_coverage.py" \
-        --pcs "$PC_LOG" --manifest "$MANIFEST" || AUDIT_STATUS=$?
+        --pcs "$PC_LOG" --manifest "$MANIFEST" \
+        --expected-seconds "$SECONDS_TO_RUN" || AUDIT_STATUS=$?
 else
     printf 'error: MAME produced no i960 PC coverage: %s\n' "$PC_LOG" >&2
     AUDIT_STATUS=1

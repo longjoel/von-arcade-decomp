@@ -1470,6 +1470,13 @@ translation, rotation, and scale channels for 250 captured frames. Its output
 is `von/build/disasm/player-select-animation.gltf`; the current animation is
 the select-screen sequence, not a gameplay skeleton or a frame-swapped mesh.
 
+The generated i960 path now consumes the corresponding 40-object slot list from
+the exact `16.288808`-second frame in
+`recovered_geometry_match_object_seed()`. This promotes the ripped
+polygon-ROM player assemblies from an offline export into the visible
+reconstructed display list, including the complete 37-matrix event sequence
+for that captured frame.
+
 The mode-3 polygon stream is exportable without applying the animation matrix:
 two initial vertices are followed by attribute records, skipped normal slots,
 and triangle/quad vertices; link bits in the attribute word select strip

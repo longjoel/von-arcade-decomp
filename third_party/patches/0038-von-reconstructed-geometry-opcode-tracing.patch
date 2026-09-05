@@ -1,0 +1,20 @@
+--- a/src/mame/sega/model2_v.cpp
++++ b/src/mame/sega/model2_v.cpp
+@@ -2417,8 +2417,18 @@ void model2_state::geo_parse()
+ 	while (end_code == false && (input - m_bufferram) < 0x20000/4 && op_count++ < 0x8000)
+ 	{
+ 		/* read in the opcode */
+ 		opcode = *input++;
++		static unsigned vonj_geometry_opcode_trace_count;
++		if ((machine().system().name == std::string_view("vonj") ||
++			 machine().system().name == std::string_view("vonjdev")) &&
++			(machine().time().as_double() > 30.0) &&
++			(vonj_geometry_opcode_trace_count < 8192))
++		{
++			logerror("vonj_geometry_opcode: time=%f read=%08x opcode=%08x p0=%08x p1=%08x p2=%08x p3=%08x\n",
++				machine().time().as_double(), m_geo_read_start_address, opcode,
++				input[0], input[1], input[2], input[3]);
++			vonj_geometry_opcode_trace_count++;
++		}
+ 
+ 		/* if it's a jump opcode, do the jump */

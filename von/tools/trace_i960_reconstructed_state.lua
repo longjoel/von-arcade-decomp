@@ -17,7 +17,7 @@ emu.register_periodic(function()
         pcall(function() manager.machine.video:snapshot() end)
     end
     if frame % 10 == 0 then
-        log(string.format("frame=%d render_mode=%08x videoctl=%08x init=%08x texture_status=%08x heartbeat=%08x attract_tick=%08x transition=%08x loader=%08x done0=%04x bank1=%04x",
+        log(string.format("frame=%d render_mode=%08x videoctl=%08x init=%08x texture_status=%08x heartbeat=%08x attract_tick=%08x transition=%08x attract_phase=%08x geometry_submissions=%08x audio_stage=%08x audio_direct_count=%08x done0=%04x bank1=%04x",
             frame,
             space:read_u32(0x10000000),
             space:read_u32(0x0098000c),
@@ -25,8 +25,11 @@ emu.register_periodic(function()
             space:read_u32(0x00500098),
             space:read_u32(0x00500094),
             space:read_u32(0x0050009c),
-            space:read_u32(0x005000a0),
+            space:read_u32(0x005000a4),
+            space:read_u32(0x005000a8),
             space:read_u32(0x00504d98),
+            space:read_u32(0x005000b0),
+            space:read_u32(0x005000b4),
             space:read_u16(0x01000000 + 0x0323 * 2),
             space:read_u16(0x01000000 + 0x0359 * 2)))
         if frame == 60 then

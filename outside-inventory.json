@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "root": "/home/longjoel/Work/von-arcade-decomp",
+  "files": [
+    {
+      "path": "von/tools/test_inventory_evidence.py",
+      "bytes": 5625,
+      "sha256": "5cd206ce392ca3aab2b1b025d5ea6600bf69d33bbf602f62cd3c39b47c3637a0",
+      "tracked": true,
+      "producer": null,
+      "consumers": [],
+      "classification": "source-and-tests",
+      "decision": "keep"
+    }
+  ],
+  "duplicate_groups": []
+}

@@ -1374,6 +1374,14 @@ these words to the ADSP-21062 external DMA interface and releases its halt
 line. This transport is modeled; SHARC execution and payload interpretation
 remain deferred.
 
+The reconstructed C path preserves the transport detail that matters here:
+`0x00884000` is a fixed FIFO port, so every halfword is written to the same
+address. An incrementing `u16 *` implementation reached the end of the mapped
+window after `0x2000` writes, produced an 8,192-word boot, and triggered an
+ADSP PC-stack underflow. The fixed-port implementation transfers all 11,038
+words; the paired geometry program stream is also enabled from its validated
+`main_data + 0x00fc6290` source window.
+
 The first post-upload command activity is separate from the program port. The
 host clears 16-byte slots at `0x00800000`, then copies the inline table at
 `0x00028470` into that window. The first nonzero observed fields are at

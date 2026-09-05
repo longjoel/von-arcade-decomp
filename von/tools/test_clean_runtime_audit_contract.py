@@ -44,6 +44,29 @@ def main() -> int:
         )
         assert result.returncode != 0
         assert "PC zero was executed" in result.stderr
+        cases = [
+            ("# visited=0\n", None, "PC coverage is empty"),
+            ("00000100\n", None, "escaped generated code"),
+            ("00000005\n", None, "invalid or unaligned"),
+            ("00000004\n", "60", "completion time"),
+            ("00000004\n# completed_time=59.99\n", "60", "before 60.0s"),
+            ("00000004\n# completed_time=60.0\n# completed_time=61.0\n", "60", "completion time"),
+            ("00000004\n# completed_time=60.0\n", "nan", "finite and positive"),
+            ("00000004\n# completed_time=60.0\n", "60", None),
+        ]
+        for content, duration, error in cases:
+            pcs.write_text(content, encoding="ascii")
+            command = ["python3", "von/tools/audit_clean_i960_coverage.py",
+                       "--pcs", str(pcs), "--manifest", str(manifest)]
+            if duration is not None:
+                command += ["--expected-seconds", duration]
+            result = subprocess.run(command, capture_output=True, text=True)
+            assert (result.returncode == 0) == (error is None), result
+            if error:
+                assert error in result.stderr, result.stderr
+    assert 'mktemp -d "$OUT_DIR/run-XXXXXXXX"' in script
+    assert '--expected-seconds "$SECONDS_TO_RUN"' in script
+    assert '# completed_time=%.9f' in lua
     print("PASS: clean runtime always audits PCs before propagating MAME failure")
     return 0
 
