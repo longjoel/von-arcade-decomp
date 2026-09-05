@@ -5325,6 +5325,11 @@
             }
           ],
           "symbol": "recovered_text_video_initialize",
+          "modeling": {
+            "boundary": "Models video/text initialization: reset the nine recovered state fields to their startup values and clear the four exact halfword regions at 0x01000000, 0x0100c000, 0x01008000, and 0x0100a000",
+            "test": "von/tools/test_recovered_text_video.py",
+            "unresolved_behavior": "Original mapped-memory ownership, clear-loop bus timing, caller phase ordering, and later video-controller effects remain outside this deterministic initialization model"
+          },
           "notes": "Resets the nine observed text/video state fields and clears the four exact halfword regions at 0x01000000, 0x0100c000, 0x01008000, and 0x0100a000. The reconstructed startup and attract render paths invoke this recovered implementation; runtime attract validation remains pending.",
           "milestones": {
             "c-only-i960-attract-60s": {
