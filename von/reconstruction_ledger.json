@@ -3156,6 +3156,11 @@
             }
           ],
           "symbol": "recovered_geometry_initial_handshake",
+          "modeling": {
+            "boundary": "Models the startup handshake's seven ordered writes: reset control and write-start, place the 0x0f0f command-window marker around the write-start transition, set read-start, and clear the phase field",
+            "test": "von/tools/test_recovered_geometry_initial_handshake.py",
+            "unresolved_behavior": "Mapped-register ownership, device acknowledgement timing, caller phase ordering, and downstream geometry-controller state remain outside this host-testable write plan"
+          },
           "notes": "Production C reconstruction is linked into the reconstructed image and preserves the seven observed MMIO writes. A standalone candidate previously matched 18/76 bytes; byte validation is blocked on compiler/ABI calibration.",
           "milestones": {
             "c-only-i960-attract-60s": {

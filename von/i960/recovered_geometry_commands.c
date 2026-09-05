@@ -154,15 +154,26 @@ void recovered_geometry_pipeline_startup(u32 mode)
 }
 
 /* Recovered from the startup handshake at 0x28418. */
+void recovered_geometry_initial_handshake_plan(volatile u32 *control,
+                                               volatile u32 *write_start,
+                                               volatile u32 *command_window,
+                                               volatile u32 *read_start,
+                                               volatile u32 *phase)
+{
+    *control = 0;
+    *write_start = 0;
+    command_window[0x0f0 / 4] = 0x00000f0fU;
+    *write_start = 0x00010000U;
+    command_window[0x0f0 / 4] = 0x00000f0fU;
+    *read_start = 0x00010000U;
+    *phase = 0;
+}
+
 void recovered_geometry_initial_handshake(void)
 {
-    *GEO_CONTROL = 0;
-    *GEO_WRITE_START = 0;
-    GEO_COMMAND_WINDOW[0x0f0 / 4] = 0x00000f0fU;
-    *GEO_WRITE_START = 0x00010000U;
-    GEO_COMMAND_WINDOW[0x0f0 / 4] = 0x00000f0fU;
-    *GEO_READ_START = 0x00010000U;
-    *GEO_PHASE = 0;
+    recovered_geometry_initial_handshake_plan(
+        GEO_CONTROL, GEO_WRITE_START, GEO_COMMAND_WINDOW,
+        GEO_READ_START, GEO_PHASE);
 }
 
 /* Recovered from the small helper at 0x28d08. */
