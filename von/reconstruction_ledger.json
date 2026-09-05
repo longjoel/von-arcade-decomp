@@ -5724,6 +5724,11 @@
             }
           ],
           "symbol": "recovered_geometry_function_command_submit",
+          "modeling": {
+            "boundary": "geometry function submission emits 0x0404, normalizes the command to a masked 16-bit word, streams the requested halfword count, emits 0x1010 completion, and terminates with zero",
+            "test": "von/tools/test_recovered_geometry_function_plan_28e88.py",
+            "unresolved_behavior": "live FIFO/MMIO timing, source-table ownership, and compiler/ABI byte equivalence remain provisional beyond the deterministic command-plan model"
+          },
           "notes": "Static audit against 0x28e88-0x28efc confirms the 0x404 function word, bit-23 command normalization, count, masked 16-bit stream, 0x1010 completion word, and final zero write. Byte validation is blocked on compiler/ABI calibration.",
           "milestones": {
             "c-only-i960-attract-60s": {
