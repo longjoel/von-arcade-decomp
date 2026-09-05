@@ -1325,6 +1325,11 @@
             }
           ],
           "symbol": "sharc_opcode_0f_difference_service",
+          "modeling": {
+            "boundary": "SHARC four-word FIFO input, paired difference formation, angle-helper scaling, and output FIFO publication",
+            "test": "von/tools/test_recovered_sharc_opcode_0f.py",
+            "unresolved_behavior": "helper approximation and edge rounding remain provisional beyond the verified finite and paired edge vectors"
+          },
           "notes": "Static listing recovers four FIFO inputs in R1,R0,R3,R2 order, differences F1-F3 and F0-F2, helper 0x20d68, fixed scale 0x4622f83d, FIX, and one output. Interpreter-backed probes establish a signed angle reduction: (x,y)=(0,1) -> 0, (1,0) -> 0x3fff, (1,1) -> 0x1fff, (0,-1) -> 0xffffc000, (-1,0) -> 0x7fff, and the all-zero difference vector -> 0x00000000 in signed 16-bit angle units. The C model uses atan2f with the verified negative-Y axis correction and exact tested scaling; broader helper approximation and edge rounding remain provisional. The eight-vector direct FIFO companion now produces the same canonical-NaN, infinity, and flushed-subnormal sequence under default DRC and -nodrc interpreter after the localized DRC NaN writeback correction; clean paired captures also match every sampled ASTAT and STKY word."
         },
         {
