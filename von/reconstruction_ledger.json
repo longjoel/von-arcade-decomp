@@ -9433,6 +9433,32 @@
             "unresolved_behavior": "Actual glyph-table dereference and tile-RAM writes remain outside this pure emit schedule"
           },
           "notes": "Pure emit schedule for the 0x1cfe0 renderer: same shape as 0x1cf40 but combines glyph data with or 0xc000, forcing both attribute bits where 0x1cf40 preserves bit 14. Completes the three-emitter family."
+        },
+        {
+          "id": "maincpu.command6-pair-6ede0",
+          "name": "command6_pair_6ede0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_command6_pair_6ede0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_command6_pair_6ede0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0006ede0",
+              "end": "0x0006eedc"
+            }
+          ],
+          "symbol": "recovered_command6_pair_plan",
+          "modeling": {
+            "boundary": "Command-6 float-pair schedule: truncating validation to [0, 1023], asymmetric ty*512 + tx/2 index, eight-word FIFO packet order with halfword outputs, 0x47c34f80 reject",
+            "test": "von/tools/test_recovered_command6_pair_6ede0.py",
+            "unresolved_behavior": "Actual FIFO traffic, table dereference at 0x51bb28, and the final response read remain outside this pure validation/packet schedule"
+          },
+          "notes": "Pure schedule for the 0x6ede0 helper: truncates both floats toward zero, keeps the pair exactly for [0, 1023] via the halved 0xfffffe00 mask, indexes 20-byte records from 0x51bb28 asymmetrically, and orders the eight packet words as 53/rec+4/x/rec+12/y/rec+8^0x80000000/rec+16/rec+8. The 0x40800000 load is dead."
         }
       ]
     },

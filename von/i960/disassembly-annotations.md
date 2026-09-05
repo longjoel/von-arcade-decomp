@@ -443,6 +443,19 @@ and wrap contract, but combines glyph data with `or 0xc000` instead of
 `setbit 15`: a set bit `14` survives `0x1cf40` and is forced here. The
 pure plan is in `recovered_glyph_emit_attr_1cfe0.c`.
 
+The command-6 helper at `0x6ede0` validates a float pair and emits an
+eight-word FIFO packet. Both floats truncate toward zero (`cvtzri`); each
+truncated value is halved arithmetically and masked with `0xfffffe00`, so
+the pair is valid exactly for `[0, 1023]` inputs, with the `0x47c34f80`
+reject returning no FIFO traffic. The index is asymmetric
+(`trunc_y * 512 + trunc_x >> 1`), unlike `0x6ece0`, and addresses
+20-byte records from `0x51bb28`. The packet order is `53`, record `+0x04`,
+`x` bits, record `+0x0c`, `y` bits, record `+0x08` with only bit `31`
+flipped, record `+0x10`, record `+0x08`; the record's first two halfwords
+also go out through the caller pointers. The `0x40800000` load is dead
+(the `addrl` adds a zero register). The pure plan is in
+`recovered_command6_pair_6ede0.c`.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at
