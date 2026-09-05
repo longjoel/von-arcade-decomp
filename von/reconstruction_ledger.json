@@ -5711,6 +5711,11 @@
           ],
           "symbol": "recovered_object_pool_reset",
           "notes": "Recovers invalidation of all 37 pool records, zeroing of their type bytes, and the eight-word 0xffffffff side-table fill at 0x577070. Host-tested with pre-populated records and side-table values.",
+          "modeling": {
+            "boundary": "i960 0xc55a8 object-pool reset model covering 37 record invalidations, type-byte clearing, and eight-word side-table sentinel fill",
+            "test": "von/tools/test_recovered_object_pool_create.py",
+            "unresolved_behavior": "pool allocation and ownership, mapped address layout, concurrent callers, and later object-dispatch semantics remain outside the deterministic reset loop"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
