@@ -5939,6 +5939,11 @@
           ],
           "symbol": "recovered_object_pool_create_constant",
           "notes": "Recovers the sibling creator over the same 37-entry 0x576c50 pool. It copies input values at +0x10/+0x14/+0x18 and +0x0c, accepts the precomputed +0x28 word and selector byte from caller registers, selects the signed +0x04 halfword through the selector's low eight bits, clears +0x1c/+0x20/+0x24, and commits source/sequence fields. It intentionally leaves the other small fields untouched, matching the listing; helper 0xf5058 remains external.",
+          "modeling": {
+            "boundary": "i960 0xc5240 constant object-pool creator model covering first-free-slot selection, copied input fields, caller-supplied derived value and selector, low-byte halfword lookup, work-field clearing, source capture, and sequence allocation",
+            "test": "von/tools/test_recovered_object_pool_create.py",
+            "unresolved_behavior": "external 0xf5058 bookkeeping, mapped pool ownership, untouched-field provenance, table semantics, allocation failure side effects, and downstream object dispatch remain outside the deterministic creator model"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
