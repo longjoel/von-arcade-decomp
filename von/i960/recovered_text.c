@@ -82,6 +82,45 @@ void recovered_text_set_position(u32 column, u32 row)
         TEXT_STATE_ORIGIN, TEXT_STATE_COLUMN, TEXT_STATE_ROW, column, row);
 }
 
+u32 recovered_text_emit_char_plan(u32 character,
+                                  u32 origin,
+                                  u32 column,
+                                  u32 row,
+                                  u32 *tile_index,
+                                  u32 *tile_value,
+                                  u32 *next_column,
+                                  u32 *next_row)
+{
+    *tile_index = 0;
+    *tile_value = 0;
+    *next_column = column;
+    *next_row = row;
+
+    if (character > 31U) {
+        *tile_index = (row << 6) + column;
+        *tile_value = 0x8000U | character;
+        if (column <= 61U)
+            *next_column = column + 1U;
+        return 1U;
+    }
+
+    if (character == 9U) {
+        column = (column + 8U) & ~7U;
+        if (column > 61U) {
+            *next_column = 0;
+            if (row <= 46U)
+                *next_row = row + 1U;
+        } else {
+            *next_column = column;
+        }
+    } else if (character == 10U) {
+        *next_column = origin;
+        if (row <= 46U)
+            *next_row = row + 1U;
+    }
+    return 0U;
+}
+
 void recovered_text_emit_char(u8 character)
 {
     u32 column = *TEXT_STATE_COLUMN;

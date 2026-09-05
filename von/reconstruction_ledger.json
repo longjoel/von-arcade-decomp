@@ -3225,6 +3225,11 @@
             }
           ],
           "symbol": "recovered_text_emit_char",
+          "modeling": {
+            "boundary": "Models the character transition plan: printable bytes produce the 0x8000 tile value and bounded tile index, TAB advances to the next eight-column stop or wraps, LF returns to the origin column, and other controls are inert",
+            "test": "von/tools/test_recovered_text_character_plan.py",
+            "unresolved_behavior": "Live tile-RAM/MMIO timing, caller character provenance, glyph rendering, and downstream display effects remain outside this pure transition plan"
+          },
           "notes": "Observed during input-free startup. Printable tile writes and TAB/LF state transitions are represented; reconstructed loader tile offsets match the original trace.",
           "milestones": {
             "c-only-i960-attract-60s": {
