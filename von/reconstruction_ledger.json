@@ -9287,6 +9287,11 @@
             }
           ],
           "symbol": "sharc_opcode_44_constant_initializer",
+          "modeling": {
+            "boundary": "Models the pure four-word SHARC opcode-0x44 initializer: the supplied destination receives the exact raw IEEE-754 words 0x40000000, 0x3eaaaaab, 0x3f000000, and 0x40400000 corresponding to DM 0x3015c through 0x3015f, independent of its prior contents.",
+            "test": "von/tools/test_recovered_sharc_opcode_44.py",
+            "unresolved_behavior": "SHARC delayed-return scheduling, DM address mapping/bus behavior, opcode dispatch, and downstream semantic roles of the constants are not modeled by this reusable word initializer."
+          },
           "notes": "Static listing recovers four delayed-return-safe writes at DM 0x3015c..0x3015f: raw words 0x40000000, 0x3eaaaaab, 0x3f000000, and 0x40400000. The reusable C model preserves those exact words and takes no input, while downstream constant roles remain provisional."
         },
         {
