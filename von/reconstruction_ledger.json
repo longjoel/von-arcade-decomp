@@ -11630,6 +11630,11 @@
             }
           ],
           "symbol": "recovered_panel14_lookup_plan",
+          "modeling": {
+            "boundary": "Models the panel-14 lookup renderer: select table entry ((g0-48)&15) from 0x02ea2090, transfer one 1x2 cell through 0x1dc10, and advance the bounded destination column by one",
+            "test": "von/tools/test_recovered_panel14_lookup_renderer.py",
+            "unresolved_behavior": "Caller value provenance, glyph decoding, table asset ownership, SHARC tile-RAM destination, and display timing remain outside this lookup contract"
+          },
           "notes": "Recovers the ((g0-48)&15) lookup into table 0x02ea2090, 1x2 transfer through 0x1dc10, and bounded one-column advance."
         },
         {
