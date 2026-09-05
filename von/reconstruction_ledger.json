@@ -7168,7 +7168,12 @@
             "von/tools/test_recovered_video_dispatch.py"
           ],
           "symbol": "recovered_video_dispatch_arm21",
-          "notes": "Recovers the two bank-dependent four-tile plain e1f20 sequences at e2ca0, including exact source banks and continuations e2fbc/e2fe0."
+          "notes": "Recovers the two bank-dependent four-tile plain e1f20 sequences at e2ca0, including exact source banks and continuations e2fbc/e2fe0.",
+          "modeling": {
+            "boundary": "Purely models the e2ca0 conditional plan: emit tiles 1, 3, 5, and 7; select the four exact bank-A or bank-B source addresses; set count 4; and select exit 0x000e2fbc for bank_a nonzero or 0x000e2fe0 otherwise.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime bank producer, e1f20 execution, plan consumption, downstream exit control flow, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-conditional-plain-arm-2",
