@@ -9537,6 +9537,32 @@
             "unresolved_behavior": "Runtime state contents and exact wrapper instruction encoding remain provisional beyond the fixed address/length contract"
           },
           "notes": "Fixed wrapper around 0xf5d40 like 0x2330: two chained 0xf4-byte copies shifting state down one slot. All addresses and the length are immediate and reuse the recovered forward-copy contract."
+        },
+        {
+          "id": "maincpu.divisor-clamp-78090",
+          "name": "divisor_clamp_78090",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_divisor_clamp_78090.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_divisor_clamp_78090.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00078090",
+              "end": "0x00078110"
+            }
+          ],
+          "symbol": "recovered_divisor_clamp_plan",
+          "modeling": {
+            "boundary": "Mode divisor schedule: 0xbb8 for modes 4/7 else 0x64, integer quotient saturated down to 90, flag 1 when the dividend exceeds 120",
+            "test": "von/tools/test_recovered_divisor_clamp_78090.py",
+            "unresolved_behavior": "Actual state-word reads/writes and downstream consumers remain outside this pure divisor/saturation plan"
+          },
+          "notes": "Pure schedule for the 0x78090 divider: literal-first compare order keeps the mode-7 wide-divisor arm live; quotient saturates at 90 and the flag collapses to 1 past dividend 120."
         }
       ]
     },

@@ -474,6 +474,12 @@ Like the `0x2330` wrapper it is a call-site contract reusing
 `recovered_memory_copy_forward()` with fully immediate addresses and
 length, so no second copy implementation is introduced.
 
+The divider at `0x78090` selects `0xbb8` for modes `4`/`7` and `0x64`
+otherwise (the `cmpibge` arm compares literal-first, so mode `7` still
+reaches its own check), divides the `0x504dc0` dividend, saturates the
+quotient down to `90`, and reports `1` when the dividend exceeds `120`.
+The pure plan is in `recovered_divisor_clamp_78090.c`.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at
