@@ -4256,8 +4256,13 @@
               "end": "0x00023acc"
             }
           ],
-          "symbol": "recovered_geometry_object_variant_plan",
-          "notes": "Recovers the 0x0a preamble, object-minus-parent delta, 0x504baa/0x504ba8 response basis, and 0x150000/0x190000/0x1b800000 transform gate."
+        "symbol": "recovered_geometry_object_variant_plan",
+        "notes": "Recovers the 0x0a preamble, object-minus-parent delta, 0x504baa/0x504ba8 response basis, and 0x150000/0x190000/0x1b800000 transform gate.",
+        "modeling": {
+          "boundary": "i960 0x23980 geometry-object variant preamble plan covering FIFO setup, parent/response deltas, fixed-point conversion, and transform-versus-alternate path gating",
+          "test": "von/tools/test_recovered_geometry_object_variant_23980.py",
+          "unresolved_behavior": "actual FIFO response, object-memory writes, selected path implementation, and downstream geometry effects remain outside the pure preamble plan"
+        }
         },
         {
           "id": "maincpu.geometry-cleanup-helper-23ca0",
