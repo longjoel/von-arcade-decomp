@@ -11792,6 +11792,11 @@
             }
           ],
           "symbol": "recovered_text_status_panel3_plan",
+          "modeling": {
+            "boundary": "Models text-status panel3, including its 0x1f2a0 prologue path: preserve a 0x50-byte frame, use column 2 and row g6+31 with width g27+31 and height 3, copy source 0x02fd848a through 0x1dd10 for nonzero g0, and use 0x1df70 zero fill otherwise",
+            "test": "von/tools/test_recovered_text_status_panel3_route.py",
+            "unresolved_behavior": "Caller status provenance, source asset ownership, SHARC tile-RAM destination, and display timing remain outside this framed route contract"
+          },
           "notes": "Recovers the third sibling source/fill route (with 0x1f2a0 inside its prologue): both branches use column 2, row g6+31, width g27+31, height 3, and the 0x50-byte preservation frame; nonzero g0 copies source 0x02fd848a through 0x1dd10, while zero g0 fills through 0x1df70 with zero."
         },
         {
