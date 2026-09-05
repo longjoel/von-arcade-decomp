@@ -8689,6 +8689,11 @@
             }
           ],
           "symbol": "recovered_action_dispatch_target",
+          "modeling": {
+            "boundary": "Models the pure 44-entry action selector gate: selectors 0 through 43 return their exact dispatch-table targets, including selector 12’s 0x78084 alias, while out-of-range selectors return the shared 0x78084 fallback target.",
+            "test": "von/tools/test_recovered_action_dispatch.py",
+            "unresolved_behavior": "The individual action wrappers, indirect-call execution, selector storage, and runtime effects of the returned targets are not modeled by this table helper."
+          },
           "notes": "Recovers the 44-entry selector gate/table at 0x77e60-0x77f2c: selectors 0..43 use 0x77e7c, slot 12 aliases 0x78084, and out-of-range values branch to 0x78084. Individual action wrappers remain separate.",
           "milestones": {
             "c-only-i960-attract-60s": {
