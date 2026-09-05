@@ -3474,7 +3474,12 @@
             }
           ],
           "symbol": "recovered_status_transition_plan",
-          "notes": "Recovers the plain 20x4 0x207e0 route and attributed 23x2 0x20810 route, each with source-or-clear behavior at current origin."
+          "notes": "Recovers the plain 20x4 0x207e0 route and attributed 23x2 0x20810 route, each with source-or-clear behavior at current origin.",
+          "modeling": {
+            "boundary": "i960 0x207e0/0x20810 plain and attributed status-transition source-or-clear descriptors",
+            "test": "von/tools/test_recovered_status_transition_routes.py",
+            "unresolved_behavior": "status source/fill memory contents and downstream plain/attributed rendering effects remain outside the pure transition plan"
+          }
         },
         {
           "id": "maincpu.attributed-status-routes-20840-209b8",
