@@ -11819,6 +11819,11 @@
             }
           ],
           "symbol": "recovered_press_start_plan",
+          "modeling": {
+            "boundary": "Models press-start status rendering: configure the recovered text position, choose fixed message 0x1f370 for nonzero input or blank 0x1f390 for zero, and set or clear bit 2 at 0x502484 accordingly",
+            "test": "von/tools/test_recovered_press_start_renderer.py",
+            "unresolved_behavior": "Caller input provenance, glyph decoding, message asset ownership, and downstream display timing remain outside this renderer contract"
+          },
           "notes": "Recovers position setup, fixed message selection, and bit-2 side effect: nonzero input selects 0x1f370 and sets 0x502484 bit 2; zero input selects blank 0x1f390 and clears that bit."
         },
         {
