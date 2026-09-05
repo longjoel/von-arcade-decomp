@@ -1173,6 +1173,11 @@
             }
           ],
           "symbol": "sharc_opcode_0a_two_input_angle_service",
+          "modeling": {
+            "boundary": "SHARC input/output FIFOs, delayed register ordering, and fixed-angle helper scaling",
+            "test": "von/tools/test_recovered_sharc_opcode_0a.py",
+            "unresolved_behavior": "helper 0x20d68 edge behavior remains provisional outside the tested finite vectors"
+          },
           "notes": "The first FIFO word is staged in R1, the delayed second word is staged in R0, and helper 0x20d68 therefore receives (second, first). The result is atan2(second, first), multiplied by 0x4622f83d (32767/pi) and converted with FIX. Post-boot MAME responses for (1,0), (0,1), (1,1), and (-1,1) are 0x00000000, 0x00003fff, 0x00001fff, and 0x00005fff. The caller-level model matches these words; helper edge behavior remains provisional."
         },
         {
