@@ -6768,7 +6768,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm40",
-          "notes": "Recovers the lower-range sentinel-indexed e2040 pair at e3444 with bank-dependent tile choices and exact 0x129e28/0x129ea8 source address arithmetic; the 0x21f comparison remains a separate gate."
+          "notes": "Recovers the lower-range sentinel-indexed e2040 pair at e3444 with bank-dependent tile choices and exact 0x129e28/0x129ea8 source address arithmetic; the 0x21f comparison remains a separate gate.",
+          "modeling": {
+            "boundary": "Purely models the e3444 lower-range plan: compute offset = sentinel * 4, select sources 0x00129e28 + offset and 0x00129ea8 + offset, use e2040 for both calls, choose tiles 5/7 for bank_a nonzero or 1/3 otherwise, set count 2, mark the payload matched, and continue at 0x000e35a0.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The lower-range gate and separate 0x21f comparison, runtime sentinel/bank producers, source-table contents, e2040 execution, plan consumption, later 0x000e35a0 behavior, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-post-sentinel-route-partition",
