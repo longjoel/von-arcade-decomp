@@ -4797,8 +4797,13 @@
               "end": "0x0009ddac"
             }
           ],
-          "symbol": "recovered_geometry_third_flagged_state_packet_plan, recovered_geometry_third_clear_flag_packet_plan",
-          "notes": "Recovers the third +0x1df bit-1-gated command-29/19/18 packet and +0x1e6 clear packet, including frame-slot variants and readback publication; FP-derived words remain explicit inputs."
+        "symbol": "recovered_geometry_third_flagged_state_packet_plan, recovered_geometry_third_clear_flag_packet_plan",
+        "notes": "Recovers the third +0x1df bit-1-gated command-29/19/18 packet and +0x1e6 clear packet, including frame-slot variants and readback publication; FP-derived words remain explicit inputs.",
+        "modeling": {
+          "boundary": "i960 0x9db3c/0x9dc64 third state-packet pair covering bit-1-gated 13-word packet, nine-word clear packet, frame-slot variants, control/pointer publication, and explicit derived-word inputs",
+          "test": "von/tools/test_recovered_geometry_third_state_packets_9db3c.py",
+          "unresolved_behavior": "floating-point word derivation, actual FIFO/MMIO writes, board responses, and downstream third-packet consumers remain outside the paired packet plans"
+        }
         },
         {
           "id": "maincpu.geometry-post-state-gate-9ddac",
