@@ -9329,6 +9329,32 @@
             "unresolved_behavior": "Actual MMIO timing, FIFO depth behavior, and the source-table contents remain outside this pure upload schedule"
           },
           "notes": "Pure upload schedule for the 0x292d8 subroutine: writes 0x606 to 0x00800060, emits the two header words to the 0x00804000 program port, then pumps two words per iteration from the source pointer without advancing the port. The 0x294b0 setup call passes headers (0, 32) for 64 table words from 0x293b0. Entry saves the return link to g3 and clears g14, returning via bx (g3)."
+        },
+        {
+          "id": "maincpu.text-walk-dispatch-1d210",
+          "name": "text_walk_dispatch_1d210",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_text_walk_dispatch_1d210.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_text_walk_dispatch_1d210.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001d210",
+              "end": "0x0001d26c"
+            }
+          ],
+          "symbol": "recovered_text_walk_callee",
+          "modeling": {
+            "boundary": "Fixed-callee text walker route table: entries 0x1d210/0x1d230/0x1d250 select callees 0x1d090/0x1cf40/0x1cfe0 under the shared NUL-terminated walk shape",
+            "test": "von/tools/test_recovered_text_walk_dispatch_1d210.py",
+            "unresolved_behavior": "The three callee routines and their byte side effects remain unmodeled"
+          },
+          "notes": "Route table for the three fixed-callee instances of the 0x1d1b0 walk shape. Each entry tests the byte first, emits nonzero bytes with the byte in g0, and stops at NUL. Unknown entries resolve to 0."
         }
       ]
     },
