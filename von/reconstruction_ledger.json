@@ -10539,6 +10539,11 @@
             }
           ],
           "symbol": "opcode_49_normalized_state_window_predicate",
+          "modeling": {
+            "boundary": "Models the normal opcode-0x49 predicate: subtract state slots s0..s2 from input x/y/z, compute their 3D Euclidean distance, compare it strictly against s3 plus the fourth input threshold, and return 0 inside or 1 otherwise; state slot s4 is intentionally unused.",
+            "test": "von/tools/test_recovered_sharc_opcode_49.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent DM 0x30157 ownership/address mapping, exact SHARC RSQRTS rounding at boundaries, exceptional values beyond tested NaN behavior, output FIFO backpressure, delayed stores, and downstream consumers remain outside this bounded predicate model."
+          },
           "notes": "Runtime state upload [0,0,0,4,5] returns 1 for vector (3,4,0), distance 5, and 0 for vector (1,2,2), distance 3, at output PCs 0x20c41 and 0x20c45. State offset 4 is not read by this service; the strict comparison and normalized distance path are confirmed."
         },
         {
