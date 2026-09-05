@@ -11657,6 +11657,11 @@
             }
           ],
           "symbol": "recovered_panel15_plan",
+          "modeling": {
+            "boundary": "Models the explicit-position panel-15 route at (4,17): width g23+31 and height 5, copying source 0x02fe0f54 through 0x1dd10 when selected and using 0x1df70 clear otherwise",
+            "test": "von/tools/test_recovered_panel15_source_fill_route.py",
+            "unresolved_behavior": "Caller register provenance, source asset ownership, SHARC tile-RAM destination, and display timing remain outside this route contract"
+          },
           "notes": "Recovers explicit position (4,17), width g23+31, height 5, source 0x02fe0f54 via 0x1dd10 or 0x1df70 clear."
         },
         {
