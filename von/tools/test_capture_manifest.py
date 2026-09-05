@@ -34,7 +34,7 @@ def main() -> int:
             "hypothesis": "coverage is bounded", "expected_discriminator": "report is Tier A",
             "stimulus": {"kind": "input-free-attract", "seconds": 1, "phase": "stable-attract"},
             "checkpoints": ["reset", "scheduler"],
-            "configuration": {"set": "fixture", "mame_revision": "a" * 40,
+            "configuration": {"set": "vonj", "mame_revision": "a" * 40,
                                "patch_profile": "none", "execution_engine": "interpreter"},
             "command": ["mame", "vonj", "-video", "none",
                          "-cfg_directory", str(root / "cfg"),
@@ -183,6 +183,10 @@ def main() -> int:
         broken = copy.deepcopy(manifest)
         broken["configuration"]["mame_revision"] = "abc"
         assert any("configuration.mame_revision must be a 40-hex commit" in error
+                   for error in validate(broken, root))
+        broken = copy.deepcopy(manifest)
+        broken["command"][1] = "other-set"
+        assert any("command set does not match configuration.set" in error
                    for error in validate(broken, root))
         broken = copy.deepcopy(manifest)
         broken["isolation"] = []

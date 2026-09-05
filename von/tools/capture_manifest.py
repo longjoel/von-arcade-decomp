@@ -135,6 +135,9 @@ def validate(manifest: dict[str, Any], root: Path) -> list[str]:
     command = manifest.get("command")
     if not isinstance(command, list) or not command or not all(isinstance(item, str) and item for item in command):
         errors.append("command must be a non-empty string array")
+    elif (isinstance(configuration.get("set"), str) and len(command) >= 2
+          and command[1] != configuration["set"]):
+        errors.append("command set does not match configuration.set")
     def command_argument(flag: str) -> str | None:
         if not isinstance(command, list):
             return None
