@@ -193,6 +193,8 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
                 errors.append(
                     f"{where}: validated {asset.get('media_type')} assets require validated claims: "
                     + ", ".join(missing_claims))
+        elif status == "reference-capture" and any(value == "validated" for value in claims.values()):
+            errors.append(f"{where}: reference-capture assets cannot declare validated claims")
         evidence_ids = asset.get("evidence_ids", [])
         if not isinstance(evidence_ids, list):
             errors.append(f"{where}: evidence_ids must be an array")

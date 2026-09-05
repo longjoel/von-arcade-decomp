@@ -101,6 +101,18 @@ def main() -> int:
         broken["assets"][0]["status"] = "reference-capture"
         assert any("reference-capture is not valid" in error
                    for error in validate(broken, evidence, root))
+        reference = copy.deepcopy(pack)
+        reference["assets"][0]["media_type"] = "audio-sample"
+        reference["assets"][0]["status"] = "reference-capture"
+        reference["assets"][0]["claims"] = {
+            "audio_descriptor": "observed",
+            "source_bytes": "observed",
+        }
+        assert not validate(reference, evidence, root)
+        broken = copy.deepcopy(reference)
+        broken["assets"][0]["claims"]["audio_descriptor"] = "validated"
+        assert any("reference-capture assets cannot declare validated claims" in error
+                   for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
         broken["assets"][0]["claims"]["source_ranges"] = "candidate"
         assert any("require validated claims: source_ranges" in error
