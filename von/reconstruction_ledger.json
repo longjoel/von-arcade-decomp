@@ -1583,6 +1583,11 @@
             }
           ],
           "symbol": "sharc_helper_20d5d_table_state_base_derivation",
+          "modeling": {
+            "boundary": "SHARC helper table reads, controller-bias derivation, and delayed derived-pointer publication",
+            "test": "von/tools/test_recovered_sharc_helper_20d5d.py",
+            "unresolved_behavior": "downstream dispatcher handling of the derived addresses remains unresolved beyond the pointer contract"
+          },
           "notes": "Static listing recovers R0 as the M7 base, reads offsets 0x10 and 0x20, adds controller bias 0x01c00000, and publishes derived addresses at DM 0x30103 and DM 0x30104 with the second write in the delayed-return slot. The dumped vonj copro_data pair has zero words at both offsets, so base zero derives 0x01c00000 for both pointers; the later 0xbf030000 unmapped access is downstream dispatcher state."
         },
         {
