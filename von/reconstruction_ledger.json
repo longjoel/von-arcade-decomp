@@ -3193,7 +3193,12 @@
             }
           ],
           "symbol": "recovered_clear_g14_return_20160_plan",
-          "notes": "Recovers the indirect return through stub 0x20174 after clearing g14."
+          "notes": "Recovers the indirect return through stub 0x20174 after clearing g14.",
+          "modeling": {
+            "boundary": "i960 0x20160 clear-g14 epilogue and indirect return through stub 0x20174",
+            "test": "von/tools/test_recovered_clear_g14_return_20160.py",
+            "unresolved_behavior": "the caller-provided return context and live register-bank effects remain outside the portable return-plan descriptor"
+          }
         },
         {
           "id": "maincpu.profile-video-upload-201a0",
