@@ -6073,6 +6073,11 @@
               "end": "0x000795c4"
             }
           ],
+          "modeling": {
+            "boundary": "Models the static shared dispatcher boundary: the object state at 0x64 selects one of ten state arms within 0x79050–0x795c4, with the independently tested arm models providing the direct transition decisions before the common tail remap; observed PC coverage is reported separately.",
+            "test": "von/tools/test_analyze_object_state_coverage.py",
+            "unresolved_behavior": "The live object and related-pointer loads, 0xf5058 helper behavior, global/MMIO reads and writes, indirect dispatch execution, common-tail remap integration, and input-driven runtime correlation are not modeled by this static boundary."
+          },
           "notes": "Static boundary for the ten-state dispatch and state arms before the common return tail. It is called by 11 observed attract callers with 15 direct-call edges and updates global transition state at 0x504d98. The input-free 60-second PC log reaches state-table arms 0, 5, 8, and 9; the other arms remain unvisited in that scenario, but all ten arms now have separate tested pure models. Static writes are limited to direct transitions 1, 2, 7, 8, and 9; only the common tail can remap these to 10, 11, or 12 for object tag/state/caller (31, 3, 6). The entry receives the object pointer in g0, preserves it in r5, and obtains the related pointer in r4 from 0xf5058 using object+0x74. A bounded i960 diagnostic now samples this pointer handoff, object state, related tag, and emitted transition; input-driven runtime correlation remains separate.",
           "milestones": {
             "c-only-i960-attract-60s": {
