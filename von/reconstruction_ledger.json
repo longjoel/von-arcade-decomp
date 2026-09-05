@@ -6107,6 +6107,11 @@
               "end": "0x0007a218"
             }
           ],
+          "modeling": {
+            "boundary": "Models the static ten-entry secondary dispatcher boundary: object state selects the instruction-locked state arms through the 0x79d8c table, with shared exits assigning transitions 13, 14, or 15 as documented by the listing oracle and dedicated boundary test.",
+            "test": "von/tools/test_secondary_object_state_dispatch.py",
+            "unresolved_behavior": "The object/related-pointer handoff, floating comparison polarity, live timing and mode inputs, global transition publication, indirect arm execution, and input-driven pointer correlation remain runtime-validation targets."
+          },
           "notes": "Separate ten-entry object-state dispatcher. It preserves the object in r4, derives the related pointer through 0x74 and 0xf5058 into r5, dispatches on object state through 0x79d8c, and emits transitions 13, 14, or 15 from timing/mode/tag predicates. States 1-7 are instruction-locked by the static oracle: state 1 uses 0x40590000/0x4062c000 timing bands and tag/caller exits; state 2 uses 0x4062c000/0x40790000 timing bands and mode exits; state 3 gates caller 2/3 and related states 6/3; state 4 uses 0x40590000/0x40690000 and absolute caller-state selection; state 5 writes 13/14/15 to 0x504d98; state 6 uses related-state/0x504e4c gates and the 0x40568000..0x405b8000 window; state 7 uses related-tag/state/0x504d9c gates. Terminal state 8 writes 13, state 9 returns, and shared exits write 15 or 13. Its floating comparison polarity and pointer plumbing remain runtime-validation targets.",
           "milestones": {
             "c-only-i960-attract-60s": {
