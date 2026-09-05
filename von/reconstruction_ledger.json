@@ -10115,6 +10115,11 @@
             }
           ],
           "symbol": "sharc_opcode_38_packed_vector_geometry_service",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x38 projection: decode each input's low 16 bits with the recovered binary16-shaped sign/exponent/mantissa construction, then emit the row-vector v^T*M result using the supplied row-major 3x3 matrix and three output values.",
+            "test": "von/tools/test_recovered_sharc_opcode_38.py",
+            "unresolved_behavior": "FIFO production and wait timing, DM 0x30141 matrix ownership and address mapping, omitted half denormal/Inf/NaN special cases, floating-point rounding at SHARC instruction boundaries, output FIFO backpressure, and downstream consumers remain outside this bounded projection model."
+          },
           "notes": "Static listing and runtime probes recover three packed-vector inputs, DM 0x30141 decoding, persistent-matrix projection, and three streamed outputs with FLAG1 waits and delayed final store. The decode masks prove a binary16-shaped normal-coordinate format: sign bit 15, exponent bits 14..10, mantissa bits 9..0, with the ROM constructing an IEEE-754 exponent directly and omitting half denormal/Inf/NaN special cases. The matrix is row-major and the coefficient groups are columns 0,3,6 then 1,4,7 then 2,5,8, i.e. row-vector v^T*M. A diagonal probe emits 2,6,12 from matrix scale 2,3,4 and packed vector 1,2,3; a quarter-turn-Z probe emits approximately 2,-1,3, confirming the non-diagonal ordering."
         },
         {
