@@ -11576,6 +11576,11 @@
             }
           ],
           "symbol": "recovered_multi_region_clear_plan",
+          "modeling": {
+            "boundary": "Models the ordered multi-region clear helper as three 0x1df00 rectangles: (4,10,33x8), then (22,10,38x8), then (20,10,24x8)",
+            "test": "von/tools/test_recovered_multi_region_clear.py",
+            "unresolved_behavior": "The caller's panel-state provenance, SHARC tile-RAM ownership, and display timing remain outside this ordered clear contract"
+          },
           "notes": "Recovers three ordered 0x1df00 clears: (4,10,33x8), (22,10,38x8), and (20,10,24x8)."
         },
         {
