@@ -10569,6 +10569,11 @@
             }
           ],
           "symbol": "opcode_4a_branched_normalized_predicate",
+          "modeling": {
+            "boundary": "Models the normal opcode-0x4a branched predicate: subtract state slots s0..s2 from input x/y/z, return 1 immediately when the Y difference is positive, otherwise return 0 only when the 3D distance is strictly below s3 plus the fourth input threshold, and return 1 on failure.",
+            "test": "von/tools/test_recovered_sharc_opcode_4a.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent DM 0x30157 ownership/address mapping, exact SHARC compare/RSQRTS rounding, extra-input fallback transport and semantics, exceptional values beyond tested NaN behavior, and downstream consumers remain outside this bounded branched predicate model."
+          },
           "notes": "Runtime state [0,0,0,4,5] returns 1 for positive-y vector (3,4,0) through the extra-input fallback at 0x20c6f, and 0 for negative-y vector (1,-2,2), distance 3, through the normal strict-bound path at 0x20c73."
         },
         {
