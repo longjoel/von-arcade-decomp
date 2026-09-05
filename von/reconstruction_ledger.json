@@ -8218,7 +8218,12 @@
             }
           ],
           "symbol": "recovered_geometry_link_release_plan",
-          "notes": "Recovers the symmetric link-repair decisions for record offsets 0x14/0x18, 999-sentinel side-table targets, referenced-record targets, and the source reference-count decrement. Mapped writes and pool bookkeeping remain outside the pure plan."
+          "notes": "Recovers the symmetric link-repair decisions for record offsets 0x14/0x18, 999-sentinel side-table targets, referenced-record targets, and the source reference-count decrement. Mapped writes and pool bookkeeping remain outside the pure plan.",
+          "modeling": {
+            "boundary": "Purely models release link repair: route each 0x14/0x18 link either to the referenced record's opposite field or to the corresponding source side-table offset 0x5c8/0x5c4 when the link is 999, write the opposite link value, and decrement the reference count with 32-bit wraparound.",
+            "test": "von/tools/test_recovered_geometry_link_release.py",
+            "unresolved_behavior": "Does not perform mapped-memory writes, pool release/head bookkeeping, pointer traversal, concurrent ownership changes, or downstream record consumers."
+          }
         },
         {
           "id": "maincpu.geometry-control-selector-zero-pulse",
