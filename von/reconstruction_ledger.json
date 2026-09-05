@@ -2971,6 +2971,11 @@
           ],
           "symbol": "recovered_geometry_service_submit",
           "notes": "Reconstructs the fixed SHARC service packet, three response reads, forwarding of the first two responses plus the caller command to the geometry port, and the final completion word.",
+          "modeling": {
+            "boundary": "Models the deterministic service-submit contract: build and enqueue the 11-word SHARC packet, consume three response words, forward the first two responses and caller command after selecting geometry command offset 0xa0, and emit the packet completion word.",
+            "test": "von/tools/test_recovered_geometry_service.py",
+            "unresolved_behavior": "The focused test verifies the packet vectors only; live coprocessor FIFO responses, geometry-port MMIO effects, response timing, and caller synchronization remain unresolved."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
