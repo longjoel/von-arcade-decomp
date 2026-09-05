@@ -8299,7 +8299,12 @@
             }
           ],
           "symbol": "recovered_geometry_command_packet_variant",
-          "notes": "Recovers the sibling 0x202/18-word geometry packet with its distinct sum/difference ordering and fixed constants. Device-side interpretation remains outside the host model."
+          "notes": "Recovers the sibling 0x202/18-word geometry packet with its distinct sum/difference ordering and fixed constants. Device-side interpretation remains outside the host model.",
+          "modeling": {
+            "boundary": "Purely models the sibling 18-word geometry packet: preserve its distinct sum/difference ordering, fixed constants, and modulo-32-bit arithmetic, including the terminal zero word.",
+            "test": "von/tools/test_recovered_geometry_command_packet_variant.py",
+            "unresolved_behavior": "Does not model geometry-device interpretation, FIFO timing, response words, mapped I/O visibility, or caller synchronization after packet submission."
+          }
         },
         {
           "id": "maincpu.geometry-clip-dispatch-classifier",
