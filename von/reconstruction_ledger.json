@@ -6130,7 +6130,12 @@
             }
           ],
           "symbol": "recovered_object_state_random_selector",
-          "notes": "Recovers the post-random-step align/subtract residue and exact role table [1,1,2,2,3,3,5,6]. The separate 0x504dfc timing gate and object-pointer call are not included."
+          "notes": "Recovers the post-random-step align/subtract residue and exact role table [1,1,2,2,3,3,5,6]. The separate 0x504dfc timing gate and object-pointer call are not included.",
+          "modeling": {
+            "boundary": "i960 0x79664 random-role selector model covering low-three-bit residue reduction and exact role table [1,1,2,2,3,3,5,6]",
+            "test": "von/tools/test_recovered_object_state_random_selector.py",
+            "unresolved_behavior": "random-value production, the 0x504dfc timing gate, object-pointer callback, mapped role publication, and downstream object-state effects remain outside the pure selector model"
+          }
         },
         {
           "id": "maincpu.object-state-unified-dispatch",
