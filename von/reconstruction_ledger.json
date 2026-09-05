@@ -2489,6 +2489,11 @@
           ],
           "symbol": "recovered_audio_device_copy_plan",
           "notes": "Pure plans capture the two exact source/destination copy descriptors and the 52-entry eight-byte clear schedule. The unresolved device MMIO writes remain intentionally excluded.",
+          "modeling": {
+            "boundary": "i960 audio-device initialization copy descriptors and 52-entry eight-byte clear schedule",
+            "test": "von/tools/test_recovered_audio_helpers.py",
+            "unresolved_behavior": "device MMIO writes and hardware-side table consumption remain outside the pure planning contract"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
