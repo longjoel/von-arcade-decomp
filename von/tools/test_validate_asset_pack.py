@@ -63,6 +63,10 @@ def main() -> int:
         malformed_canonical["entries"][0]["canonical"] = "true"
         assert any("canonical must be boolean" in error for error in validate(
             pack, malformed_canonical, root))
+        path_evidence = copy.deepcopy(evidence)
+        path_evidence["entries"][0]["id"] = "von/build/capture.log"
+        assert any("id must be a non-path string" in error for error in validate(
+            pack, path_evidence, root))
         missing_verifier_hash = copy.deepcopy(evidence)
         del missing_verifier_hash["entries"][0]["verifier_sha256"]
         assert any("requires verifier_sha256" in error for error in validate(
@@ -138,7 +142,10 @@ def main() -> int:
         assert any("unknown canonical evidence" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
         broken["assets"][0]["evidence_ids"] = [{}]
-        assert any("non-empty strings" in error for error in validate(broken, evidence, root))
+        assert any("non-path strings" in error for error in validate(broken, evidence, root))
+        broken = copy.deepcopy(pack)
+        broken["assets"][0]["evidence_ids"] = ["von/build/capture.log"]
+        assert any("non-path strings" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
         broken["assets"][0]["evidence_ids"] = ["capture-v1", "capture-v1"]
         assert any("evidence_ids must be unique" in error for error in validate(broken, evidence, root))

@@ -34,6 +34,13 @@ def safe_path(path_text: Any) -> bool:
     return not path.is_absolute() and ".." not in path.parts
 
 
+def stable_id(value: Any) -> bool:
+    """Return whether an evidence ID is opaque and not a filesystem path."""
+    return (isinstance(value, str) and bool(value) and value not in {".", ".."}
+            and "/" not in value and "\\" not in value
+            and not Path(value).is_absolute())
+
+
 def rooted(root: Path, path_text: Any) -> Path | None:
     if not safe_path(path_text):
         return None
@@ -101,8 +108,8 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
             errors.append(f"{where}: entry must be an object")
             continue
         evidence_id = entry.get("id")
-        if not isinstance(evidence_id, str) or not evidence_id:
-            errors.append(f"{where}: id must be a non-empty string")
+        if not stable_id(evidence_id):
+            errors.append(f"{where}: id must be a non-path string")
         elif evidence_id in evidence_ids:
             errors.append(f"{where}: duplicate evidence id {evidence_id}")
         else:
@@ -202,8 +209,8 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         elif all(isinstance(item, str) for item in evidence_ids) and len(set(evidence_ids)) != len(evidence_ids):
             errors.append(f"{where}: evidence_ids must be unique")
         for evidence_id in evidence_ids:
-            if not isinstance(evidence_id, str) or not evidence_id:
-                errors.append(f"{where}: evidence_ids must contain non-empty strings")
+            if not stable_id(evidence_id):
+                errors.append(f"{where}: evidence_ids must contain non-path strings")
             elif evidence_id not in canonical_ids:
                 errors.append(f"{where}: unknown canonical evidence id {evidence_id}")
             elif canonical_entries[evidence_id].get("outcome") != "pass":
