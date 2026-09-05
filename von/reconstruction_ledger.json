@@ -1756,6 +1756,11 @@
             }
           ],
           "symbol": "sharc_opcode_1d_signed_fixed_point_pair_service",
+          "modeling": {
+            "boundary": "SHARC signed-angle FIFO input, raw IEEE-754 multiplier FIFO input, helper scaling, and paired output",
+            "test": "von/tools/test_recovered_sharc_opcode_1d.py",
+            "unresolved_behavior": "helper rounding and non-finite multiplier behavior remain provisional beyond the controlled finite pairs"
+          },
           "notes": "The first FIFO word is sign-extended from 16 bits, converted with the 0x38c9116d (pi/32767) scale, and sent through helper 0x20dc4. The delayed second FIFO word is loaded into R15 and is consumed through the aliased F15 register by the final F0 = F0 * F15 instruction; it is a raw IEEE-754 multiplier, not a second signed angle. A direct post-boot MAME probe returns 0x3f800000, 0x3fb50610, 0xbf000000, and 0xb3bbbd00 for four controlled angle/multiplier pairs. The recovered C model matches those words exactly; helper rounding and non-finite multiplier behavior remain provisional."
         },
         {
