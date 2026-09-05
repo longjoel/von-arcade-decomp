@@ -4553,8 +4553,13 @@
               "end": "0x0009d170"
             }
           ],
-          "symbol": "recovered_geometry_global_countdowns_plan",
-          "notes": "Recovers the three object-flag-controlled persistent counter resets/decrements at 0x562c9c, 0x562ca0, and 0x562ca4; the following board-update branch remains unresolved."
+        "symbol": "recovered_geometry_global_countdowns_plan",
+        "notes": "Recovers the three object-flag-controlled persistent counter resets/decrements at 0x562c9c, 0x562ca0, and 0x562ca4; the following board-update branch remains unresolved.",
+        "modeling": {
+          "boundary": "i960 0x9d0d0 geometry global-countdown plan covering three flag-gated persistent counters, frame-value reset, positive decrement, and nonpositive hold behavior",
+          "test": "von/tools/test_recovered_geometry_global_countdowns_9d0d0.py",
+          "unresolved_behavior": "actual persistent-memory writes, following board-update branch, and downstream countdown consumers remain outside the pure counter-transition plan"
+        }
         },
         {
           "id": "maincpu.geometry-board-update-gate-9d170",
