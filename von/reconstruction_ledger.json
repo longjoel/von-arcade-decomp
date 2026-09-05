@@ -11549,6 +11549,11 @@
             }
           ],
           "symbol": "recovered_panel11_plan/recovered_panel12_plan",
+          "modeling": {
+            "boundary": "Models the paired panel routes: fixed 7x2 transfers at (20,20), plus a current-position 20x2 route using source 0x02fe0cb0 or its clear path",
+            "test": "von/tools/test_recovered_panel11_panel12_routes.py",
+            "unresolved_behavior": "Caller position/state provenance, source asset ownership, SHARC tile-RAM destination, and display timing remain outside these paired route contracts"
+          },
           "notes": "Recovers the fixed paired 7x2 transfers at (20,20) and the current-position 20x2 source-or-clear route using source 0x02fe0cb0."
         },
         {
