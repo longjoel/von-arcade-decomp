@@ -8948,6 +8948,11 @@
             }
           ],
           "symbol": "recovered_text_string_walk",
+          "modeling": {
+            "boundary": "Models the pure NUL-terminated byte walk: bytes before the first NUL are dispatched exactly once, in order, to the supplied sink callback; an initially empty string emits nothing.",
+            "test": "von/tools/test_recovered_text_string_walk.py",
+            "unresolved_behavior": "The caller-selected sink, destination/text cursor state, string storage and validity, attributes, and downstream glyph/display effects are not modeled by this shared loop."
+          },
           "notes": "Production C captures the shared loop's NUL termination and one-byte-at-a-time sink dispatch; the selected sink remains caller-specific.",
           "milestones": {
             "c-only-i960-attract-60s": {
