@@ -11171,6 +11171,11 @@
             }
           ],
           "symbol": "recovered_status_panel_sequence_plan",
+          "modeling": {
+            "boundary": "Models the ordered three-stage status-panel sequence: 55x8 from 0x02fde9d0 at (column+2,row-1), 34x2 from 0x02fe1606 at (column+14,row-8), then 30x2 from 0x02fe158e at that final position via block copy or zero fill",
+            "test": "von/tools/test_recovered_status_panel_sequence.py",
+            "unresolved_behavior": "Source-buffer population, branch ownership for the copy-versus-fill choice, SHARC tile-RAM destination, and display timing remain outside this sequence contract"
+          },
           "notes": "Recovers the three-stage sequence: 0x2fde9d0 as 55x8 at (column+2,row-1), 0x2fe1606 as 34x2 at (column+14,row-8), then 0x2fe158e as 30x2 through 0x1dc90 or zero fill through 0x1df00 at that final position."
         },
         {
