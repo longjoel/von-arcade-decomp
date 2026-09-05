@@ -358,6 +358,7 @@ subsystem: example
 range: {start: 0x00000000, end: 0x00000000}
 checkpoint: scheduler-enters-attract
 stage: planned
+confidence: SPECULATIVE # KNOWN | LIKELY | SPECULATIVE, see below
 hypothesis: <one falsifiable statement>
 expected_discriminator: <specific event or state difference>
 entry_and_callers: <static and dynamic evidence>
@@ -366,8 +367,32 @@ outputs: <return values and ordered side effects>
 source: von/i960/recovered_example.c
 tests: []
 evidence_ids: []
-unresolved: []
+unresolved: [] # U-IDs from docs/unknowns.md where applicable
+provenance: [] # per-fixture: observed:<trace/checkpoint> or synthetic:<basis>
 ```
+
+## Confidence scale
+
+Every non-obvious semantic conclusion carries one confidence tag. Never
+silently promote a hypothesis into fact.
+
+| Tag | Meaning |
+| --- | --- |
+| `KNOWN` | Directly demonstrated by strong evidence (instruction-level mapping plus passing test). |
+| `LIKELY` | Multiple observations support it but alternatives remain (branch-semantics readings, lifecycle links). |
+| `SPECULATIVE` | Useful working hypothesis (naming, downstream consumers, fault behavior). |
+
+Ledger units record confidence in a `confidence` key next to `stage`.
+Test fixtures record provenance in their header: `observed:<trace or
+checkpoint>` when expected values come from original execution, or
+`synthetic:<basis>` when they are hand-derived (usually from the listing).
+Synthetic fixtures prove the implementation matches the reading, not the
+original; say so.
+
+Track numbered open questions in [unknowns.md](unknowns.md) and
+milestone completion criteria in [milestones.md](milestones.md). Run
+`scripts/preflight.sh` at session start; it reports required tools and
+advisory environment gaps without changing anything.
 
 Do not create comparison-only wrappers or no-op dependencies to increase a
 metric. A failed unit records its earliest failure and does not advance stage.

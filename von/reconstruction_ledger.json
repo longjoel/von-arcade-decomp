@@ -9986,6 +9986,7 @@
           "name": "clamp_store_29c08",
           "classification": "code",
           "stage": "integrated",
+          "confidence": "KNOWN",
           "sources": [
             "von/i960/recovered_clamp_store_29c08.c"
           ],
@@ -10025,6 +10026,7 @@
           "name": "upload_select_29d50",
           "classification": "code",
           "stage": "integrated",
+          "confidence": "LIKELY",
           "sources": [
             "von/i960/recovered_upload_select_29d50.c"
           ],
@@ -10064,6 +10066,7 @@
           "name": "upload_state_init_29d2c",
           "classification": "code",
           "stage": "integrated",
+          "confidence": "KNOWN",
           "sources": [
             "von/i960/recovered_upload_state_init_29d2c.c"
           ],
@@ -10096,6 +10099,7 @@
           "name": "blend_kernel_29dec",
           "classification": "code",
           "stage": "integrated",
+          "confidence": "KNOWN",
           "sources": [
             "von/i960/recovered_blend_kernel_29dec.c"
           ],
@@ -10128,6 +10132,7 @@
           "name": "blend_loop_schedule_29e68",
           "classification": "code",
           "stage": "integrated",
+          "confidence": "LIKELY",
           "sources": [
             "von/i960/recovered_blend_loop_schedule_29e68.c"
           ],
@@ -10160,6 +10165,7 @@
           "name": "blend_stride_schedule_29e4c",
           "classification": "code",
           "stage": "integrated",
+          "confidence": "LIKELY",
           "sources": [
             "von/i960/recovered_blend_stride_schedule_29e4c.c"
           ],
@@ -10200,6 +10206,7 @@
           "name": "direct_stride_schedule_29f60",
           "classification": "code",
           "stage": "integrated",
+          "confidence": "LIKELY",
           "sources": [
             "von/i960/recovered_direct_stride_schedule_29f60.c"
           ],
