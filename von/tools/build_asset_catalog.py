@@ -82,6 +82,10 @@ def main() -> int:
         if not isinstance(entry, dict):
             print("Asset catalog: asset entry must be an object")
             return 1
+        status = entry.get("status")
+        if status not in STATUSES:
+            print(f"Asset catalog: unsupported asset status: {status!r}")
+            return 1
         try:
             path = asset_path(args.asset_root, entry.get("path"), "asset")
         except ValueError as error:

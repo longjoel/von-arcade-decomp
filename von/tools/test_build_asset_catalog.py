@@ -37,6 +37,26 @@ def main():
         catalog = json.loads(output.read_text())
         assert catalog["counts"]["observed"] == 1
         assert catalog["counts"]["reference-capture"] == 1
+        valid_manifest = manifest.read_text()
+        manifest.write_text(json.dumps({"assets": [
+            {"id": "model", "displayName": "Model", "category": "props",
+             "status": "verified", "path": "/assets/model.gltf", "sourceTrace": "trace"},
+        ]}))
+        result = subprocess.run(
+            ["python3", TOOL, "--manifest", manifest, "--asset-root", root / "public",
+             "--output", output, "--root", root], capture_output=True, text=True, check=False)
+        assert result.returncode == 1
+        assert "unsupported asset status" in result.stdout
+        manifest.write_text(json.dumps({"assets": [
+            {"id": "model", "displayName": "Model", "category": "props",
+             "path": "/assets/model.gltf", "sourceTrace": "trace"},
+        ]}))
+        result = subprocess.run(
+            ["python3", TOOL, "--manifest", manifest, "--asset-root", root / "public",
+             "--output", output, "--root", root], capture_output=True, text=True, check=False)
+        assert result.returncode == 1
+        assert "unsupported asset status" in result.stdout
+        manifest.write_text(valid_manifest)
         outside = root.parent / f"outside-catalog-{root.name}.json"
         result = subprocess.run(
             ["python3", TOOL, "--manifest", manifest, "--asset-root", root / "public",
@@ -44,7 +64,7 @@ def main():
         assert result.returncode == 1
         assert "output path escapes root" in result.stdout
         traversal = root / "traversal.json"
-        traversal.write_text(json.dumps({"assets": [{"path": "../escape.gltf"}]}))
+        traversal.write_text(json.dumps({"assets": [{"status": "candidate", "path": "../escape.gltf"}]}))
         result = subprocess.run(
             ["python3", TOOL, "--manifest", traversal, "--asset-root", root / "public",
              "--output", root / "bad.json", "--root", root],
