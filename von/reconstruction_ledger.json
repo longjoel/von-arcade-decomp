@@ -1185,7 +1185,8 @@
             "von/tools/test_recovered_sharc_opcode_0b.py",
             "von/tools/probe_sharc_opcode_0b.lua",
             "third_party/mame-master/src/devices/cpu/sharc/sharc.cpp",
-            "third_party/mame-master/src/devices/cpu/sharc/sharcinternal.ipp"
+            "third_party/mame-master/src/devices/cpu/sharc/sharcinternal.ipp",
+            "sharc-precision-fixtures-v1"
           ],
           "ranges": [
             {
@@ -1194,6 +1195,11 @@
             }
           ],
           "symbol": "sharc_opcode_0b_vector_service",
+          "modeling": {
+            "boundary": "SHARC input/output FIFOs and RSQRTS lane arithmetic",
+            "test": "von/tools/test_recovered_sharc_opcode_0b.py",
+            "unresolved_behavior": "hardware status and exception timing outside the finite packet path"
+          },
           "notes": "Static listing recovers nine FIFO reads into R8,R9,R10,R12,R13,R14,R8,R8,R8, a three-round RSQRTS normalization path, and three output-FIFO writes from R0,R1,R2. A status-aware, dispatcher-aligned MAME probe reaches the service and confirms the finite baseline (3,4,12),(0,0,0),(1,1) -> 0xbf34b4b4, 0x3f34b4b4, 0xbd70f0f0. The ninth read at 0x2022c is consumed after the arithmetic operands are formed and does not affect that finite path. The corrected edge suite confirms canonical NaN output (0xffffffff in all lanes) for zero, degenerate, NaN, infinity, and denormal endpoint packets."
         },
         {
