@@ -6416,7 +6416,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm28",
-          "notes": "Recovers the bank-dependent four-tile plain e1f20 payload selected by the e3004 gate, including exact source banks and common e33f4 exit."
+          "notes": "Recovers the bank-dependent four-tile plain e1f20 payload selected by the e3004 gate, including exact source banks and common e33f4 exit.",
+          "modeling": {
+            "boundary": "Purely models the e3004 downstream plan: emit tiles 1, 3, 5, and 7; select the four exact source addresses for bank_a nonzero versus zero; set count to 4 and the common exit address to 0x000e33f4.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime producer and meaning of the bank gate are not modeled, nor are reads from the source tables, e1f20 execution, plan ownership, common e33f4 control flow, or the original video-memory/MMIO side effects."
+          }
         },
         {
           "id": "maincpu.video-dispatch-downstream-two-tile-split",
