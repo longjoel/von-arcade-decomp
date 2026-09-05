@@ -11527,6 +11527,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_status_record_seed_3f4e8.py"],
           "ranges": [{"start": "0x0003f4e8", "end": "0x0003f548"}],
           "symbol": "recovered_status_record_seed_3f4e8",
+          "modeling": {
+            "boundary": "Models the pure 0x3f4e8 selector-10 pool slice: scan 23 status halfwords for the first bit-15/free slot, return 23 without writes when none is available, otherwise seed selector 10, load table[10], clear helper_value, store caller g1 as low 16 bits at the field offset, and preserve caller g0.",
+            "test": "von/tools/test_recovered_status_record_seed_3f4e8.py",
+            "unresolved_behavior": "Pool-memory ownership, continuation/control flow, helper effects beyond the supplied output fields, and any MMIO or caller scheduling remain outside this bounded model."
+          },
           "notes": "Exact pure bounded slice of the selector-10 pool service: scans 23 signed status halfwords at 0x51ad10 with 0x24-byte stride, initializes the first bit-15/free slot, stores caller g1/g0 at offsets 6/8, and derives offset 2 from 0x3eca0[10]. Continuation and helper effects are excluded."
         },
         {
