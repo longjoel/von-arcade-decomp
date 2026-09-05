@@ -11684,6 +11684,11 @@
             }
           ],
           "symbol": "recovered_panel16_plan",
+          "modeling": {
+            "boundary": "Models the panel-16 route at origin (11,21): width g9+31 and height 8, copying source 0x02fdff54 through 0x1dc90 when selected and using 0x1df00 clear otherwise",
+            "test": "von/tools/test_recovered_panel16_source_fill_route.py",
+            "unresolved_behavior": "Caller register provenance, source asset ownership, SHARC tile-RAM destination, and display timing remain outside this route contract"
+          },
           "notes": "Recovers origin (11,21), width g9+31, height 8, source 0x02fdff54 via 0x1dc90 or 0x1df00 clear."
         },
         {
