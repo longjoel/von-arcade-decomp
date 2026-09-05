@@ -5291,6 +5291,11 @@
             }
           ],
           "symbol": "recovered_text_write_glyph_string",
+          "modeling": {
+            "boundary": "Models the string writer's mode scan and emission loop: default to font mode 1, switch to mode 0 when a lowercase ASCII byte follows the first byte, then emit each terminated string byte with zero attributes",
+            "test": "von/tools/test_recovered_text_control.py",
+            "unresolved_behavior": "Caller string provenance, mapped-ROM glyph data timing, downstream tile-RAM effects, and the active runtime caller graph remain outside this deterministic string-control model"
+          },
           "notes": "Recovers the 0x1da90 string loop: select glyph mode 1 unless a lowercase ASCII byte occurs after the first string byte, then emit each byte through the mapped-ROM glyph writer with zero attribute bits.",
           "milestones": {
             "c-only-i960-attract-60s": {
