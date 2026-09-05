@@ -10005,6 +10005,13 @@
             "test": "von/tools/test_recovered_clamp_store_29c08.py",
             "unresolved_behavior": "Actual controller values and downstream consumers remain outside this pure store schedule"
           },
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00029c08"
+              ]
+            }
+          },
           "notes": "Pure store schedule for the 0x29c08 triple: the bl/cmpible arms reduce to a signed minimum against 0x100."
         },
         {
@@ -10030,6 +10037,13 @@
             "boundary": "Upload prologue schedule: counter guard, six 4KB bank pointers, counter bump, direct vs blend dispatch on mode word",
             "test": "von/tools/test_recovered_upload_select_29d50.py",
             "unresolved_behavior": "Masked-blend pixel loops at 0x29dc0-0x2a0bc remain outside this pure prologue schedule"
+          },
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00029d50"
+              ]
+            }
           },
           "notes": "Pure prologue schedule for the 0x29d50 uploader: sub-3 counters return early, otherwise bank-select plus mode dispatch."
         },

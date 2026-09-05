@@ -1,9 +1,9 @@
 # Attract Reconstruction Worklist
 
 - Observed direct-call units: 262
-- Modeled integration queue: 75
+- Modeled integration queue: 77
 - Integrated or validated: 25
-- Untriaged: 162
+- Untriaged: 160
 
 | Entry | Edges | Triage | Work unit |
 | --- | ---: | --- | --- |
@@ -159,8 +159,8 @@
 | `0x000296d0` | 1 | untriaged |  |
 | `0x00029738` | 1 | untriaged |  |
 | `0x00029778` | 1 | untriaged |  |
-| `0x00029c08` | 1 | untriaged |  |
-| `0x00029d50` | 1 | untriaged |  |
+| `0x00029c08` | 1 | modeled-integration-queue | maincpu.clamp-store-29c08 |
+| `0x00029d50` | 1 | modeled-integration-queue | maincpu.upload-select-29d50 |
 | `0x0002b430` | 1 | untriaged |  |
 | `0x0002be30` | 1 | untriaged |  |
 | `0x0002d9a0` | 1 | untriaged |  |

@@ -2,10 +2,10 @@
   "schema_version": 1,
   "coverage_source": "von/build/attract-coverage/vonj-attract-60s.json",
   "discovered_units": 262,
-  "represented_units": 100,
-  "modeled_units": 75,
+  "represented_units": 102,
+  "modeled_units": 77,
   "integrated_units": 25,
-  "untriaged_units": 162,
+  "untriaged_units": 160,
   "ordering": "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality",
   "units": [
     {
@@ -1731,22 +1731,26 @@
     {
       "entry": "0x00029c08",
       "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
       "weight": null,
-      "work_unit": null,
-      "sources": []
+      "work_unit": "maincpu.clamp-store-29c08",
+      "sources": [
+        "von/i960/recovered_clamp_store_29c08.c"
+      ]
     },
     {
       "entry": "0x00029d50",
       "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
       "weight": null,
-      "work_unit": null,
-      "sources": []
+      "work_unit": "maincpu.upload-select-29d50",
+      "sources": [
+        "von/i960/recovered_upload_select_29d50.c"
+      ]
     },
     {
       "entry": "0x0002b430",
