@@ -2008,6 +2008,11 @@
             }
           ],
           "symbol": "recovered_io_command_plan",
+          "modeling": {
+            "boundary": "i960 controller command-byte construction from input-index and table-value bit fields",
+            "test": "von/tools/test_recovered_io.py",
+            "unresolved_behavior": "the subsequent 0x27f8 status wait and mapped controller bus behavior remain outside the pure command-plan contract"
+          },
           "notes": "Builds the 34-byte controller command: nine-byte 0x2aa0 prefix, five pairs selected by input-index bits 5..9, five pairs selected by table-value bits 15..11, and the fixed 01 01 51 d1 51 tail. The subsequent 0x27f8 status wait is intentionally outside the pure plan."
         },
         {
