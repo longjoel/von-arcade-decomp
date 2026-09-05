@@ -91,7 +91,25 @@ def main() -> int:
             cwd=ROOT, capture_output=True, text=True, check=False,
         )
         assert cli_result.returncode == 1
-        assert "output path must not be a symlink" in cli_result.stdout
+        assert "output path must not contain symlink components" in cli_result.stdout
+        linked_output_parent = temp / "linked-output-parent"
+        linked_output_parent.symlink_to(temp, target_is_directory=True)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--inventory", str(inventory_path),
+             "--output", str(linked_output_parent / "nested-plan.json")],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "output path must not contain symlink components" in cli_result.stdout
+        linked_inventory_parent = temp / "linked-inventory-parent"
+        linked_inventory_parent.symlink_to(temp, target_is_directory=True)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--inventory", str(linked_inventory_parent / inventory_path.name),
+             "--output", str(temp / "linked-inventory-plan.json")],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "inventory path must not contain symlink components" in cli_result.stdout
         malformed_inventory = temp / "malformed.json"
         malformed_inventory.write_text("{invalid\n", encoding="utf-8")
         cli_result = subprocess.run(

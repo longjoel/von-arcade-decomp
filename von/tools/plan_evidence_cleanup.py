@@ -21,6 +21,18 @@ CLASS_ACTIONS = {
 SHA256_LENGTH = 64
 
 
+def has_symlink_component(path: Path) -> bool:
+    """Return whether *path* or any of its lexical parents is a symlink."""
+    current = path.absolute()
+    while True:
+        if current.is_symlink():
+            return True
+        parent = current.parent
+        if parent == current:
+            return False
+        current = parent
+
+
 def inventory_digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -170,8 +182,8 @@ def main() -> int:
     args = parser.parse_args()
     root = Path.cwd().resolve()
     for label, path in (("inventory", args.inventory), ("output", args.output)):
-        if path.is_symlink():
-            print(f"Evidence cleanup plan: {label} path must not be a symlink")
+        if has_symlink_component(path):
+            print(f"Evidence cleanup plan: {label} path must not contain symlink components")
             return 1
         try:
             path.resolve().relative_to(root)
