@@ -3555,7 +3555,12 @@
             }
           ],
           "symbol": "recovered_text_strip_plan",
-          "notes": "Recovers centered strip arithmetic: amount=min(input*scale,width), with leading/middle/trailing repetitions and row-based destination 0x0100c000+(row<<6)."
+          "notes": "Recovers centered strip arithmetic: amount=min(input*scale,width), with leading/middle/trailing repetitions and row-based destination 0x0100c000+(row<<6).",
+          "modeling": {
+            "boundary": "i960 0x20a20 centered text-strip descriptor with clamped amount, three segment repetitions, and row-based destination",
+            "test": "von/tools/test_recovered_text_strip_builder.py",
+            "unresolved_behavior": "actual tile-memory writes and downstream strip rendering effects remain outside the pure arithmetic and segment plan"
+          }
         },
         {
           "id": "maincpu.hardware-strip-clear-20ae0",
