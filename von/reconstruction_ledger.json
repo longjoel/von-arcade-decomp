@@ -8386,6 +8386,11 @@
         {
           "id": "maincpu.geometry-result-builder",
           "name": "geometry_result_builder",
+          "modeling": {
+            "boundary": "Models the shared host-side result-builder contract: selector-indexed parameter lookup, command-0x38 request and three-response placement, flag-dependent reference-minus-response delta/fallback handling, common seven-word command-31 request, and final response storage at the paired record's +0x28 field.",
+            "test": "von/tools/test_recovered_geometry_result_delta.py",
+            "unresolved_behavior": "Live response values, mapped FIFO timing, SHARC device execution, selector-table semantics beyond the modeled addresses, and full caller/object state remain unresolved."
+          },
           "classification": "code",
           "stage": "modeled",
           "sources": [
