@@ -2291,6 +2291,11 @@
             }
           ],
           "symbol": "recovered_audio_queue_push",
+          "modeling": {
+            "boundary": "i960 audio-ring producer byte write and modulo-64 producer-index advance",
+            "test": "von/tools/test_recovered_audio_queue.py",
+            "unresolved_behavior": "interrupt-side draining and mapped sound-MMIO timing remain outside the pure ring mutation contract"
+          },
           "notes": "Writes one byte at the current producer index and advances it modulo 64. The interrupt path drains this ring to sound MMIO 0x009c0000.",
           "milestones": {
             "c-only-i960-attract-60s": {
