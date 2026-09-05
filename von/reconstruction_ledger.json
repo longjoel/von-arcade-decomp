@@ -10143,6 +10143,11 @@
             }
           ],
           "symbol": "sharc_opcode_39_packed_vector_table_copy",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x39 seeded table copy: derive the destination address as (input >> 2) + 0x01400000, write the fixed 0x05800b0b seed, then copy the 12 supplied table words in order to the following destination slots.",
+            "test": "von/tools/test_recovered_sharc_opcode_39.py",
+            "unresolved_behavior": "FIFO production and wait timing, source DM 0x30141 ownership, destination-field semantics and address validity, post-increment timing, delayed final-store ordering, and opcode-0x3a consumers remain outside this bounded copy model."
+          },
           "notes": "Static listing recovers one FIFO-derived destination address, a 0x05800b0b seed, and 12 post-increment copies from DM 0x30141 with the final store delayed after RTS; destination-field semantics remain provisional."
         },
         {
