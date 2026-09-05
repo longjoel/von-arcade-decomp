@@ -3062,6 +3062,11 @@
             }
           ],
           "symbol": "recovered_geometry_program_upload",
+          "modeling": {
+            "boundary": "Models the deterministic staging phase of the geometry upload: fill exactly 0x8000 words with 0x07800f0f in order before device and source-stream operations",
+            "test": "von/tools/test_recovered_geometry_program_fill.py",
+            "unresolved_behavior": "Geometry-device register sequencing, source-ROM program words, FIFO timing, upload acknowledgement, and post-upload device state remain outside this host-testable staging model"
+          },
           "notes": "Behavioral C reconstruction is linked and trace-confirmed; byte match not established.",
           "milestones": {
             "c-only-i960-attract-60s": {

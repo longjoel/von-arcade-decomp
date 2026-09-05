@@ -106,6 +106,16 @@ void recovered_sharc_bootstrap_upload(void)
     *SHARC_CONTROL = 0;
 }
 
+void recovered_geometry_program_fill(volatile u32 *staging,
+                                     u32 words,
+                                     u32 value)
+{
+    u32 index;
+
+    for (index = 0; index < words; ++index)
+        staging[index] = value;
+}
+
 void recovered_geometry_program_upload(void)
 {
     volatile u32 *staging = GEO_STAGING;
@@ -113,8 +123,8 @@ void recovered_geometry_program_upload(void)
     volatile const u16 *source = MAIN_DATA_SOURCE;
     u32 index;
 
-    for (index = 0; index < GEO_STAGING_WORDS; ++index)
-        staging[index] = 0x07800f0fU;
+    recovered_geometry_program_fill(staging, GEO_STAGING_WORDS,
+                                    0x07800f0fU);
 
     *GEO_CONTROL = 0x80000000U;
     *GEO_CONTROL = 0;
