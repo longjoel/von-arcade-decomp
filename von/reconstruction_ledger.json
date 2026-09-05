@@ -9674,6 +9674,36 @@
             "unresolved_behavior": "The ratio computation and all downstream bodies remain outside this pure routing decision"
           },
           "notes": "Pure four-way decision for the 0x7a3e0 head on object +0x64 and peer +0x74 states. Equality-only arms need no operand-order proof."
+        },
+        {
+          "id": "maincpu.ratio-duel-7a438",
+          "name": "ratio_duel_7a438",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_ratio_duel_7a438.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_ratio_duel_7a438.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007a438",
+              "end": "0x0007a4a4"
+            },
+            {
+              "start": "0x0007a4a8",
+              "end": "0x0007a514"
+            }
+          ],
+          "symbol": "recovered_ratio_duel_plan",
+          "modeling": {
+            "boundary": "Shared ratio-duel predicate for both arms: live flag plus object first/second strictly below peer first/second; win mode and callee are call-site parameters",
+            "test": "von/tools/test_recovered_ratio_duel_7a438.py",
+            "unresolved_behavior": "Zero divisors and NaN comparison outcomes remain outside this pure predicate plan"
+          },
+          "notes": "Pure predicate shared by the 0x7a438 (mode 10/0x7ad90) and 0x7a4a8 (mode 9/0x7a9f0) arms over sign-extended +0x1d0/+0x1d8 halfwords. divr divides src2/src1 per the MAME i960 core."
         }
       ]
     },

@@ -506,6 +506,14 @@ ratio computation; anything else takes the `0x7a4a8` arm. All arms test
 equality, so no operand-order proof is needed. The pure decision is in
 `recovered_route_head_7a3e0.c`; the downstream bodies stay outside.
 
+Both ratio arms (`0x7a438` reporting mode `10` through `0x7ad90`,
+`0x7a4a8` reporting mode `9` through `0x7a9f0`) share one predicate that
+needs the `0x504e2c` flag at `1`: the four `+0x1d0`/`+0x1d8` halfwords are
+sign-extended, converted with `cvtir`, and divided `src2/src1`, so each
+side is first/second. The win needs the object ratio strictly below the
+peer ratio (`cmpr`/`bge` skips otherwise). The pure predicate is in
+`recovered_ratio_duel_7a438.c`.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at
