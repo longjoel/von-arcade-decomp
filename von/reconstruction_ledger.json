@@ -6985,7 +6985,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm13",
-          "notes": "Recovers the five mirrored e2040 calls for tiles 21, 23, 25, 27, and 29 with exact ROM source addresses, followed by the normal e33f4 exit."
+          "notes": "Recovers the five mirrored e2040 calls for tiles 21, 23, 25, 27, and 29 with exact ROM source addresses, followed by the normal e33f4 exit.",
+          "modeling": {
+            "boundary": "Purely models the e2950 plan: emit tiles 21, 23, 25, 27, and 29 with sources 0x02fb7f90, 0x02fb8050, 0x02fb8110, 0x02fb81d0, and 0x02fb8290, and set the plan count to 5 before the shared video-dispatch continuation.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The five e2040 executions, plan consumption, shared e33f4 control flow, caller sequencing, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-conditional-plain-arm-6",
