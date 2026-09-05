@@ -1269,6 +1269,11 @@
             }
           ],
           "symbol": "sharc_opcode_0d_one_word_helper_boundary",
+          "modeling": {
+            "boundary": "SHARC one-word FIFO input, external-DM helper reads, and pointer-publication writes",
+            "test": "von/tools/test_recovered_sharc_opcode_0d.py",
+            "unresolved_behavior": "external-DM latency and helper side effects beyond the recovered pointer-publication contract remain unresolved"
+          },
           "notes": "Static listing and a four-input helper trace recover one FIFO word, helper 0x20d5d, and the delayed RTS at 0x270. The helper reads external DM at base + 0x01c00010 and base + 0x01c00020, adds 0x01c00000 to each fetched word, and publishes the results at DM 0x30103 and 0x30104. The following four-word state upload belongs to opcode 0x0e. The reusable pointer-publication contract is modeled in recovered_sharc_opcode_0d.c and covered by test_recovered_sharc_opcode_0d.py."
         },
         {
