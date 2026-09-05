@@ -11360,6 +11360,11 @@
             }
           ],
           "symbol": "recovered_panel5_source_fill_plan",
+          "modeling": {
+            "boundary": "Models the panel-5 route at column 2 and row 20: nonzero g0 copies source 0x02fe053a through 0x1dc10 with width g27+31 and height 5, while zero g0 selects 0x1df00 clear",
+            "test": "von/tools/test_recovered_panel5_source_fill_route.py",
+            "unresolved_behavior": "The caller's g0/g27 population, source asset ownership, SHARC tile-RAM destination, and display timing remain outside this route contract"
+          },
           "notes": "Recovers the column-2, row-20, (g27+31)x5 source-or-clear route: nonzero g0 uses source 0x02fe053a through 0x1dc10; zero g0 uses 0x1df00."
         },
         {
