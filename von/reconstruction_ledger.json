@@ -4526,8 +4526,13 @@
               "end": "0x00024f70"
             }
           ],
-          "symbol": "recovered_geometry_object_state_packet_plan",
-          "notes": "Recovers the 0x1cac8 lookup call, command-31 helper/object field interleave, 0x1e370 board-response consumer, and 0x504d50 status-latch update policy. The active path stores 0x5024e8 & 2; the zero-latch path stores the persistent g14 control word 0x101, not the incoming frame value. The flag-set branch explicitly computes related fields (+0x14,+0x18,+0x1c) minus response scratch words and mirrors each wrapped difference into both output records. The selector preamble is now modeled as signed-halfword record extraction at table 0x562436 with selector*3 indexing. The clear-flag branch now models signed fallback/object fields, persistent control-word copies, and the raw 0x562cb0 output word at their exact record offsets."
+        "symbol": "recovered_geometry_object_state_packet_plan",
+        "notes": "Recovers the 0x1cac8 lookup call, command-31 helper/object field interleave, 0x1e370 board-response consumer, and 0x504d50 status-latch update policy. The active path stores 0x5024e8 & 2; the zero-latch path stores the persistent g14 control word 0x101, not the incoming frame value. The flag-set branch explicitly computes related fields (+0x14,+0x18,+0x1c) minus response scratch words and mirrors each wrapped difference into both output records. The selector preamble is now modeled as signed-halfword record extraction at table 0x562436 with selector*3 indexing. The clear-flag branch now models signed fallback/object fields, persistent control-word copies, and the raw 0x562cb0 output word at their exact record offsets.",
+        "modeling": {
+          "boundary": "i960 0x24eb4 object-state packet plan covering lookup arguments, command-31 helper/object interleave, board-response consumer, and thresholded persistent status-latch update",
+          "test": "von/tools/test_recovered_geometry_object_state_packet_24eb4.py",
+          "unresolved_behavior": "actual lookup/FIFO/MMIO execution, response data, object-record writes, and downstream state-packet consumers remain outside the pure packet/latch plan"
+        }
         },
         {
           "id": "maincpu.geometry-global-countdowns-9d0d0",
