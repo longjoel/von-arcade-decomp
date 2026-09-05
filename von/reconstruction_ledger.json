@@ -11198,6 +11198,11 @@
             }
           ],
           "symbol": "recovered_fixed_panel_transfer_plan",
+          "modeling": {
+            "boundary": "Models the fixed attributed panel handoff at 0x1dc90: source 0x02fded40, width 6, height 8, using the current text position as the destination origin",
+            "test": "von/tools/test_recovered_fixed_panel_transfer.py",
+            "unresolved_behavior": "The source asset's population, SHARC tile-RAM ownership, and display timing remain outside this transfer descriptor"
+          },
           "notes": "Recovers the fixed 0x1dc90 handoff: source 0x02fded40, width 6, height 8, and current-position addressing."
         },
         {
