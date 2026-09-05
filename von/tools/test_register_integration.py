@@ -21,7 +21,7 @@ def main() -> int:
         }}
         ledger = {"images": [{"name": "maincpu", "work_units": [unit]}]}
         assert not register(ledger, "unit", "image.bin", "startup-init",
-                            "integration-test.py", root)
+                            "integration-test.py", root, run_test=True)
         assert unit["integration"] == {
             "image": "image.bin", "checkpoint": "startup-init",
             "test": "integration-test.py",
@@ -43,6 +43,11 @@ def main() -> int:
             broken, "unit", "missing.bin", "startup-init", "integration-test.py", root))
         assert any("missing or unsafe integration test" in error for error in register(
             broken, "unit", "image.bin", "startup-init", "missing.py", root))
+        failing = root / "failing-test.py"
+        failing.write_text("raise SystemExit('failed integration')\n", encoding="utf-8")
+        assert any("integration test" in error and "failed" in error for error in register(
+            broken, "unit", "image.bin", "startup-init", "failing-test.py", root,
+            run_test=True))
     print("PASS: integration evidence registration validates paths and lifecycle")
     return 0
 

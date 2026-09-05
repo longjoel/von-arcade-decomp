@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +31,8 @@ def safe_file(root: Path, value: Any) -> bool:
 
 
 def register(ledger: dict[str, Any], unit_id: str, image: str,
-             checkpoint: str, test: str, root: Path) -> list[str]:
+             checkpoint: str, test: str, root: Path,
+             run_test: bool = False) -> list[str]:
     if not isinstance(ledger, dict):
         return ["ledger must be an object"]
     images = ledger.get("images")
@@ -41,6 +44,16 @@ def register(ledger: dict[str, Any], unit_id: str, image: str,
         return [f"missing or unsafe integration image {image}"]
     if not safe_file(root, test):
         return [f"missing or unsafe integration test {test}"]
+    if run_test:
+        try:
+            completed = subprocess.run(
+                [sys.executable, str(root / test)], cwd=root,
+                capture_output=True, text=True, check=False, timeout=30)
+        except subprocess.TimeoutExpired:
+            return [f"integration test {test} timed out after 30 seconds"]
+        if completed.returncode:
+            detail = completed.stderr.strip() or completed.stdout.strip()
+            return [f"integration test {test} failed: {detail}"]
     matches = [
         unit for image_entry in images if isinstance(image_entry, dict)
         for unit in image_entry.get("work_units", [])
@@ -78,6 +91,8 @@ def main() -> int:
     parser.add_argument("--image", required=True)
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--test", required=True)
+    parser.add_argument("--run-test", action="store_true",
+                        help="run the integration test before writing evidence")
     parser.add_argument("--root", type=Path, default=Path.cwd())
     args = parser.parse_args()
     root = args.root.resolve()
@@ -86,7 +101,8 @@ def main() -> int:
     except (OSError, json.JSONDecodeError, TypeError, ValueError) as error:
         print(f"Integration registration: unable to read ledger: {error}")
         return 1
-    errors = register(ledger, args.unit, args.image, args.checkpoint, args.test, root)
+    errors = register(ledger, args.unit, args.image, args.checkpoint, args.test, root,
+                      args.run_test)
     if errors:
         for error in errors:
             print(f"- {error}")
