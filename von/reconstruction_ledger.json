@@ -9549,7 +9549,7 @@
           "id": "sharc.opcode-26-five-word-upload-service",
           "name": "opcode_26_five_word_upload_service",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -9564,6 +9564,11 @@
             }
           ],
           "symbol": "sharc_opcode_26_five_word_upload_service",
+          "modeling": {
+            "boundary": "Models the exact opcode-0x26 five-word upload: consume FIFO R0..R4 and store the raw words sequentially at DM 0x3013c..0x30140, including the final two delayed-return stores, without assigning unresolved field meanings.",
+            "test": "von/tools/test_sharc_opcode_26.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent DM ownership/address units, field semantics, delayed-store timing, and opcode-0x27 consumers remain outside this static upload model."
+          },
           "notes": "Static listing recovers five FIFO inputs into R0..R4 and sequential stores at DM 0x3013c..0x30140, with the final two stores in delayed-return slots; field meanings remain unresolved."
         },
         {
