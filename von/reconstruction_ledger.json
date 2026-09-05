@@ -10724,7 +10724,7 @@
           "id": "sharc.opcode-4d-zero-seed-behavior",
           "name": "opcode_4d_zero_seed_behavior",
           "classification": "behavior",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -10734,6 +10734,11 @@
             "von/tools/test_recovered_sharc_opcode_4d_seed_edges.py"
           ],
           "symbol": "opcode_4d_seed_edge_behavior",
+          "modeling": {
+            "boundary": "Models the observed zero-horizontal-seed edge only: for the recovered state window and vector (x,y,z,t)=(0,4,0,0), preserve the source path's initial RSQRTS singularity and terminal three-valued output 2; the edge fixture also guards that no unproven seed-sign branch is introduced.",
+            "test": "von/tools/test_recovered_sharc_opcode_4d_seed_edges.py",
+            "unresolved_behavior": "NaN/overflow seed propagation, other non-finite inputs, exact SHARC exceptional arithmetic, live output capture beyond the documented observation, and generalization from this single zero-seed case remain unresolved."
+          },
           "notes": "A live probe with the recovered state window shows zero seed (x,y,z,t)=(0,4,0,0) reaches NaN at the final comparison and emits 2. The earlier purported negative-seed sample (1,4,-2,1) actually has the Euclidean seed dx^2+dz^2=5 and reaches the finite normal path, correcting the prior cross-term interpretation. Finite real coordinates cannot produce a negative seed; NaN/overflow behavior remains provisional."
         },
         {
