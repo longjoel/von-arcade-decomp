@@ -2653,7 +2653,12 @@
             }
           ],
           "symbol": "recovered_host_fatal_halt",
-          "notes": "Represents the terminal 0x12d0 fatal path: flush register state and loop forever. The C implementation preserves its non-returning behavior; the architecture-specific flush instruction remains subject to ABI calibration."
+          "notes": "Represents the terminal 0x12d0 fatal path: flush register state and loop forever. The C implementation preserves its non-returning behavior; the architecture-specific flush instruction remains subject to ABI calibration.",
+          "modeling": {
+            "boundary": "i960 host fatal path terminal non-returning control flow after the 0x12d0 register flush",
+            "test": "von/tools/test_recovered_host_control.py",
+            "unresolved_behavior": "architecture-specific register flush encoding and host-side observation of the infinite loop remain outside the portable terminal marker"
+          }
         },
         {
           "id": "maincpu.host-service-request",
