@@ -11311,6 +11311,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_indexed_packet_8d5d0.py"],
           "ranges": [{"start": "0x0008d5d0", "end": "0x0008d6b8"}],
           "symbol": "recovered_geometry_indexed_packet_8d5d0",
+          "modeling": {
+            "boundary": "Models the pure 0x8d5d0 indexed-packet prefix: ten FIFO words using selectors 20, 21, 22, and 47; low-halfword negation for the first three values; bit-15 XOR for the final three values only when the normalized 16-bit count equals one; and the 12-byte next-record advance.",
+            "test": "von/tools/test_recovered_geometry_indexed_packet_8d5d0.py",
+            "unresolved_behavior": "The remaining packet and MMIO tail, live FIFO transport, and caller-side record iteration remain outside this modeled prefix."
+          },
           "notes": "Models the indexed variant prefix: selectors 20/21/22 with negated 16-bit values, selector 47, bit-15 XOR when normalized count equals one, and the 12-byte record advance. Remaining packet/MMIO tail is outside this modeled boundary."
         },
         {
