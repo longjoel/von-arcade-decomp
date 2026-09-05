@@ -3528,7 +3528,12 @@
             }
           ],
           "symbol": "recovered_attributed_status_route_209c0_plan",
-          "notes": "Recovers two current-position attributed source-or-clear routes with widths 28 and 27, both height 8."
+          "notes": "Recovers two current-position attributed source-or-clear routes with widths 28 and 27, both height 8.",
+          "modeling": {
+            "boundary": "i960 0x209c0 attributed status source-or-clear route descriptors for the 28- and 27-wide blocks",
+            "test": "von/tools/test_recovered_attributed_status_routes_209c0.py",
+            "unresolved_behavior": "attributed source/fill memory contents and downstream 0x1dc90/0x1df00 rendering effects remain outside the pure route plan"
+          }
         },
         {
           "id": "maincpu.text-strip-builder-20a20",
