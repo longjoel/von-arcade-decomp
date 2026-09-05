@@ -503,6 +503,13 @@ bottoms advance all six pointers by `0x180`, so every pair totals
 pair-2 asymmetry. The pure schedule is in
 `recovered_direct_stride_schedule_29f60.c`.
 
+The full lifecycle is chained in
+`von/tools/test_recovered_upload_cluster_e2e.py`: seed presets counter
+4, clamp parks the uploader, reseed plus prologue selects bank 4,
+direct and blend stride schedules span their banks over 8 passes, one
+inner loop contributes 32 kernel texels, and the run budgets exactly
+`8 x 3 x 32 = 768` stores.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
