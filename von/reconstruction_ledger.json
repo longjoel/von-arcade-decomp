@@ -1459,6 +1459,11 @@
             }
           ],
           "symbol": "sharc_opcode_14_scalar_state_projection_service",
+          "modeling": {
+            "boundary": "SHARC signed-scalar FIFO input, helper-derived rotation, and six matrix state-window writes",
+            "test": "von/tools/test_recovered_sharc_opcode_14.py",
+            "unresolved_behavior": "higher-level caller meaning and delayed-return integration remain provisional beyond the atomic rotation snapshots"
+          },
           "notes": "Static listing recovers one signed-16 FIFO input, helper pair 0x20dbe/0x20dc4 with scale 0x38c9116d, and six matrix writes at offsets 0x03,0x06,0x04,0x07,0x05,0x08. Runtime tracing confirms dispatch into 0x202f6 and execution through the helper pair and store sequence, including zero-valued scalar calls. The stores follow the live I7 state window (observed at bases 0x30200 and 0x3021b), explaining why a later readback is not a stable identity oracle. An atomic 0x10 -> 0x14(0) -> 0x11 snapshot returns matrix words 3f800000,0,0,0,3f7fffff,0,0,0,3f7fffff,0,0,0. An atomic 0x10 -> 0x14(0x4000) -> 0x11 snapshot returns [1,0,0 / -0,0,-1 / 0,1,0] with cosine 0xb8492eef, confirming the X-axis row-pair model row1' = cosine*row1 - sine*row2 and row2' = sine*row1 + cosine*row2. The sibling atomic snapshots confirm 0x15 as [cosine,0,sine / 0,1,0 / -sine,0,cosine] (Y-axis) and 0x16 as [cosine,-sine,0 / sine,cosine,0 / 0,0,1] (Z-axis). The final two writes are delayed-return slots; higher-level caller meaning remains provisional."
         },
         {
