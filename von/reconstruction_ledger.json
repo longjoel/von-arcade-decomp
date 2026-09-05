@@ -11846,6 +11846,11 @@
             }
           ],
           "symbol": "recovered_insert_coin_plan",
+          "modeling": {
+            "boundary": "Models insert-coin status rendering: set column/origin to g5+31 and row to g13+31, then select message 0x1f440 for nonzero input or blank 0x1f450 for zero input at 0x1d9e0 without mutating an additional flag",
+            "test": "von/tools/test_recovered_insert_coin_renderer.py",
+            "unresolved_behavior": "Caller input provenance, glyph decoding, message asset ownership, and downstream display timing remain outside this renderer contract"
+          },
           "notes": "Recovers position setup and fixed message selection: column/origin g5+31, row g13+31, and 0x1d9e0 receives 0x1f440 INSERT COIN(S) for nonzero input or blank 0x1f450 for zero input. No additional flag mutation occurs."
         },
         {
