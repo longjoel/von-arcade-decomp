@@ -5808,6 +5808,11 @@
           ],
           "symbol": "recovered_zero_16",
           "notes": "Recovers the exact 16-byte zero-fill loop beginning at g0, including the saved g14 continuation convention. Host-tested with guarded bytes before and after the destination.",
+          "modeling": {
+            "boundary": "i960 0xc5d48 fixed 16-byte clear model covering exactly sixteen consecutive destination-byte writes and no surrounding state",
+            "test": "von/tools/test_recovered_zero_16.py",
+            "unresolved_behavior": "caller-provided destination ownership, mapped-memory effects, continuation/register ABI details, and any protocol meaning of the cleared region remain outside the bounded memory-write model"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
