@@ -8655,6 +8655,11 @@
             }
           ],
           "symbol": "recovered_timing_sample_update",
+          "modeling": {
+            "boundary": "Models the deterministic timing wrapper update: every sample replaces the latest value; only profile 4 compares the sample against and tightens the supplied low and high extrema, while other profiles preserve both extrema.",
+            "test": "von/tools/test_recovered_timing_sample.py",
+            "unresolved_behavior": "The hardware poll leaf at 0x28de8, the runtime global addresses, sample acquisition timing, and consumers of the latest/extrema values are not modeled by this pure state update."
+          },
           "notes": "Recovers the deterministic wrapper around hardware poll leaf 0x28de8: always stores latest sample at 0x504c80, and for profile 4 updates low 0x1d00210/high 0x1d0020c extrema. Other profiles preserve extrema.",
           "milestones": {
             "c-only-i960-attract-60s": {
