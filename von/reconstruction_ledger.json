@@ -4283,8 +4283,13 @@
               "end": "0x00023cd8"
             }
           ],
-          "symbol": "recovered_geometry_cleanup_plan",
-          "notes": "Recovers the +0xa0/+0xa1/+0xa2 clears, 0x41200000 publication to 0x504d54/0x504d58, and 0x23cd8 return stub."
+        "symbol": "recovered_geometry_cleanup_plan",
+        "notes": "Recovers the +0xa0/+0xa1/+0xa2 clears, 0x41200000 publication to 0x504d54/0x504d58, and 0x23cd8 return stub.",
+        "modeling": {
+          "boundary": "i960 0x23ca0 geometry cleanup plan covering three object-byte clears, publication of the 0x41200000 constant to two state addresses, and return-stub target",
+          "test": "von/tools/test_recovered_geometry_cleanup_helper_23ca0.py",
+          "unresolved_behavior": "actual object/state memory writes, callers, and downstream cleanup consumers remain outside the pure cleanup descriptor"
+        }
         },
         {
           "id": "maincpu.geometry-position-delta-23ce8",
