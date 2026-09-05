@@ -9523,6 +9523,11 @@
             }
           ],
           "symbol": "sharc_opcode_25_two_result_fixed_point_projection_service",
+          "modeling": {
+            "boundary": "Models the finite opcode-0x25 angular projection: the packet lanes produce atan2(x,hypot(y,z)) and -atan2(y,z), both scaled by 32767/pi and converted with the observed signed floor/FIX behavior, including the y=0,z<0 canonical +32767 endpoint and the zero-horizontal -2^31 result.",
+            "test": "von/tools/test_recovered_sharc_opcode_25.py",
+            "unresolved_behavior": "FIFO ordering/timing, helper 0x20d68 internals, exact SHARC FIX and exceptional payload behavior beyond tested vectors, and downstream consumers of the two fixed-point outputs remain unresolved."
+          },
           "notes": "Static listing recovers FIFO order R1,R0,R2, three reciprocal-refinement rounds, helper 0x20d68, scale 0x4622f83d, and two FIX/output results with delayed-return handling. Runtime traces establish the finite angular contract as atan2(x,hypot(y,z)) and -atan2(y,z), scaled by 32767/pi and FIX-converted: x-axis emits canonical 0x80000000/0, z-axis emits 0/0, (1,2,3) emits 0x00000b05/0xffffe80b, and a signed quadrant sweep matches all four X/Z quadrants plus positive/negative Y axes. The ROM canonicalizes the y=0,z<0 endpoint to signed +32767 instead of a -pi encoding; zero-horizontal and other exceptional payload behavior remain provisional."
         },
         {
