@@ -444,6 +444,13 @@ The classifier at `0x183b8` gates three masked port words ordinally:
 with `g14` cleared. The pure function is in
 `recovered_port_classify_183b8.c`.
 
+The pump at `0x18538` drains a 16-entry byte ring at `0x504c60` (head
+`0x504c70`, tail `0x504c74`): a nonempty queue emits the head byte to
+`0x1c00008` and `0x503312` and advances the head modulo `16`, while an
+empty queue refreshes `0x504c78` from `0x502512` when they differ and
+emits its low byte to port `0`. The pure schedule is in
+`recovered_queue_pump_18538.c`.
+
 The plane-0 emitter at `0x1d090` masks the byte to `0x7f`, subtracts `32`,
 and sign-extends the low byte (`shlo 24`/`shri 24`, confirmed arithmetic in
 the MAME i960 core). Biased values `0x4b`/`0x54` emit the fixed control
