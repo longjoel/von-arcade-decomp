@@ -4337,8 +4337,13 @@
               "end": "0x00023ee8"
             }
           ],
-          "symbol": "recovered_geometry_board_setup_prefix_plan",
-          "notes": "Recovers the 0x800090/0x804000/0x804004 setup writes, three 0x884000 FIFO phases, repeated runtime-derived word, 58 packet tail, and 0x802008 readback publication to 0x801008+0x34; later polling/math remains unresolved."
+        "symbol": "recovered_geometry_board_setup_prefix_plan",
+        "notes": "Recovers the 0x800090/0x804000/0x804004 setup writes, three 0x884000 FIFO phases, repeated runtime-derived word, 58 packet tail, and 0x802008 readback publication to 0x801008+0x34; later polling/math remains unresolved.",
+        "modeling": {
+          "boundary": "i960 0x23d60 geometry-board setup prefix plan covering control-register setup, three FIFO packet phases, runtime-derived word placement, packet tail, and board readback publication address",
+          "test": "von/tools/test_recovered_geometry_board_setup_23d60.py",
+          "unresolved_behavior": "actual MMIO/FIFO writes, board readback value, later polling/math, and downstream pointer consumers remain outside the pure setup plan"
+        }
         },
         {
           "id": "maincpu.geometry-response-selector-23ef0",
