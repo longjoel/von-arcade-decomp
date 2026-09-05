@@ -2591,6 +2591,11 @@
           ],
           "symbol": "recovered_audio_device_buffer_copy",
           "notes": "Pure fixture-tested reconstruction of the 0x29ca0 nested loops: 96 rows, 64 32-bit words per row, and 0x200-byte row stride. Device-window ownership and MMIO semantics remain unresolved.",
+          "modeling": {
+            "boundary": "i960 audio device buffer copy over 96 rows of 64 32-bit words with 0x200-byte row stride",
+            "test": "von/tools/test_recovered_audio_helpers.py",
+            "unresolved_behavior": "device-window ownership and hardware MMIO semantics remain outside the pure buffer-copy contract"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
