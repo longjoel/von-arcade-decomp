@@ -9352,6 +9352,11 @@
             }
           ],
           "symbol": "sharc_opcode_1f_six_input_vector_length_service",
+          "modeling": {
+            "boundary": "Models the pure SHARC opcode-0x1f endpoint-distance service: six IEEE-754 endpoint words form three component differences, squared magnitude is accumulated, the local 128-entry RSQRTS seed and three rounded Newton correction groups produce the returned length word, and the zero vector returns canonical SHARC NaN.",
+            "test": "von/tools/test_recovered_sharc_opcode_1f.py",
+            "unresolved_behavior": "FIFO wait/output timing, SHARC register aliasing and DM mapping, runtime dispatch provenance, and semantic ownership of the endpoint fields remain outside the C model; the weak geometry-chain hint is not treated as correlated evidence."
+          },
           "notes": "Static listing recovers six FIFO inputs as three endpoint pairs, three component differences, squared-magnitude accumulation, three RSQRTS correction groups, and one output. The aliased F-register fields can look like a dz*dy cross-term under naive single-step reading, but the interpreter-backed forced runtime probe dispatches raw opcode 0x1f and records F0=0x43290000 (169.0) for differences (3,4,12), followed by output R0=0x414fffff immediately below 13.0. Additional forced vectors return 1.0 for a unit axis, 0x406b26a8 for the fractional case, and canonical SHARC NaN 0xffffffff for the zero vector. A shortened boundary probe through probe_sharc_opcode_1f_rounding.lua adds adjacent-ULP and large-magnitude vectors; the C model reproduces the live words 0x3fb504f4 for the asymmetric sqrt(2) case and 0x4bddb3d7 for the 0x4b800000 magnitude case. This confirms an endpoint Euclidean-length operation with seeded Newton refinement and SHARC-specific rounding. The semantic C model implements the endpoint distance, exact local 128-entry RSQRTS seed selection, three Newton correction groups, and zero-vector NaN behavior. The focused output trace now catches the final DM write at 0x20409, confirming that refined F0 is the returned word. Runtime response 0x3f000003 in the 2026-09-01 geometry chain remains only a weak, uncorrelated hint."
         },
         {
