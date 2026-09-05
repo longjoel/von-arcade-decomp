@@ -64,6 +64,13 @@ def main():
         assert result.returncode == 1
         assert "evidence must be canonical" in result.stdout
         (assets / "evidence.json").write_text(json.dumps({"id": "capture-v1", "canonical": True,
+                                                          "outcome": "fail"}), encoding="utf-8")
+        result = subprocess.run(
+            ["python3", TOOL, "--manifest", manifest, "--asset-root", root / "public",
+             "--output", output, "--root", root], capture_output=True, text=True, check=False)
+        assert result.returncode == 1
+        assert "outcome 'pass'" in result.stdout
+        (assets / "evidence.json").write_text(json.dumps({"id": "capture-v1", "canonical": True,
                                                           "outcome": "pass"}), encoding="utf-8")
         manifest.write_text(json.dumps({"assets": [
             {"id": "model", "displayName": "Model", "category": "props",

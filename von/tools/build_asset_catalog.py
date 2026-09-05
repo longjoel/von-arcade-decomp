@@ -128,6 +128,9 @@ def main() -> int:
             if not isinstance(evidence_document.get("id"), str) or not evidence_document.get("id"):
                 print(f"Asset catalog: evidence must have an id: {evidence}")
                 return 1
+            if evidence_document.get("outcome") != "pass":
+                print(f"Asset catalog: evidence must have outcome 'pass': {evidence}")
+                return 1
             if status in {"observed", "validated", "reference-capture"}:
                 if evidence_document.get("canonical") is not True:
                     print(f"Asset catalog: evidence must be canonical for status {status!r}")
