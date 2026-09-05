@@ -5396,9 +5396,14 @@
               "end": "0x0002898c"
             }
           ],
-          "symbol": "recovered_geometry_profile_constants",
-          "notes": "All 256 backup-byte inputs are tested against the nine direct IEEE-754 triples and the zero/out-of-range default. The continuation is bounded as a two-pass lookup-table generator targeting 0x01818000 and 0x0181c000, with extended i960 floating-point operations from 0x289d0-0x2aac intentionally left as a hardware/ABI-sensitive math boundary.",
-          "milestones": {
+        "symbol": "recovered_geometry_profile_constants",
+        "notes": "All 256 backup-byte inputs are tested against the nine direct IEEE-754 triples and the zero/out-of-range default. The continuation is bounded as a two-pass lookup-table generator targeting 0x01818000 and 0x0181c000, with extended i960 floating-point operations from 0x289d0-0x2aac intentionally left as a hardware/ABI-sensitive math boundary.",
+        "modeling": {
+          "boundary": "i960 0x28840 geometry profile selector plan covering nine direct backup-byte profiles, zero/out-of-range default selection, and IEEE-754 output triples",
+          "test": "von/tools/test_recovered_geometry_profile.py",
+          "unresolved_behavior": "subsequent two-pass table generation, mapped destinations, extended i960 floating-point/ABI operations, and hardware-visible profile effects remain outside the direct selector plan"
+        },
+        "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
                 "0x00028840"
