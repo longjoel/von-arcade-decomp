@@ -9277,6 +9277,32 @@
             "unresolved_behavior": "Actual CRC execution, backup-SRAM persistence, and the 0xf5d40 mismatch path remain outside this pure address/parameter plan"
           },
           "notes": "Pure checksum schedule for the 0x22f0 writer: index scales by ((i*33)*4-i)*4 = i*524 into the 0x01d00000 backup-SRAM window, checksums 34 bytes from base+0x16 with stride 1 through 0x3120, and stores the low 16 bits at base+0x14. Static callers at 0x3478/0x3504/0x3a18 pass index 0; the 0x2594/0x2604 verifiers mask both sides with 0xffff before comparing."
+        },
+        {
+          "id": "maincpu.adjusted-crc-probe-2080",
+          "name": "adjusted_crc_probe_2080",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_crc_probe_2080.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_crc_probe_2080.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00002080",
+              "end": "0x00002090"
+            }
+          ],
+          "symbol": "recovered_crc_probe_plan",
+          "modeling": {
+            "boundary": "Adjusted CRC probe schedule: pointer advances 12 bytes, 38-byte stride-1 CRC16 via 0x3120, low-16-bit comparison contract",
+            "test": "von/tools/test_recovered_crc_probe_2080.py",
+            "unresolved_behavior": "Actual CRC execution and the caller mismatch branches remain outside this pure pointer/parameter plan"
+          },
+          "notes": "Pure probe schedule for the 0x2080 helper: adds 12 to the incoming data pointer, checksums 38 bytes with stride 1 through 0x3120, and returns the checksum for a masked 16-bit comparison. Ten static call sites (0x20b0 through 0xf1af0) reload the stored slot with ldos and mask both sides with 0xffff before branching."
         }
       ]
     },

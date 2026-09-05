@@ -397,6 +397,13 @@ and `0x2604` verifiers reload the slot with `ldos`, mask both sides with
 `0x3478`, `0x3504`, and `0x3a18` all pass index `0`. The pure schedule is
 in `recovered_record_checksum_22f0.c`.
 
+The tiny probe at `0x2080` is the same CRC idiom without indexing: it adds
+`12` to the incoming pointer, calls `0x3120` with stride `1` and count
+`31+7`, and returns the checksum for the caller's masked 16-bit comparison.
+Ten static call sites (from `0x20b0` through `0xf1af0`) follow the
+`ldos` reload, `0xffff` mask on both sides, and mismatch branch. The pure
+schedule is in `recovered_crc_probe_2080.c`.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at
