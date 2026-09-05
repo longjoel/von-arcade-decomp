@@ -15,6 +15,18 @@ from typing import Any
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
+def has_symlink_component(path: Path) -> bool:
+    """Return whether *path* or any of its lexical parents is a symlink."""
+    current = path.absolute()
+    while True:
+        if current.is_symlink():
+            return True
+        parent = current.parent
+        if parent == current:
+            return False
+        current = parent
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -285,8 +297,8 @@ def main() -> int:
         ("state directory", args.state_directory),
     ))
     for label, path, directory in path_specs:
-        if path.is_symlink():
-            print(f"Capture manifest: {label} path must not be a symlink: {path}")
+        if has_symlink_component(path):
+            print(f"Capture manifest: {label} path must not contain symlink components: {path}")
             return 1
         try:
             path.resolve().relative_to(root)

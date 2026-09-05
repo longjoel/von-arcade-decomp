@@ -233,7 +233,22 @@ def main() -> int:
             cwd=root, capture_output=True, text=True, check=False,
         )
         assert cli_result.returncode == 1
-        assert "output path must not be a symlink" in cli_result.stdout
+        assert "output path must not contain symlink components" in cli_result.stdout
+        linked_output_parent = root / "linked-output-parent"
+        linked_output_parent.symlink_to(root, target_is_directory=True)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--output", str(linked_output_parent / "nested-output.json"),
+             "--root", str(root), "--id", "cli-v1-parent", "--objective", "objective",
+             "--hypothesis", "hypothesis", "--expected-discriminator", "discriminator",
+             "--seconds", "1", "--checkpoint", "reset", "--set", "fixture",
+             "--mame-revision", "abc", "--patch-profile", "none",
+             "--execution-engine", "interpreter", "--command", "mame",
+             "--cfg-directory", str(root / "cfg"), "--nvram-directory", str(root / "nvram"),
+             "--state-directory", str(root / "state")],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "output path must not contain symlink components" in cli_result.stdout
         cli_result = subprocess.run(
             [sys.executable, str(TOOL), "--output", str(root / "outside-input.json"),
              "--root", str(root), "--id", "cli-v2", "--objective", "objective",
@@ -247,6 +262,22 @@ def main() -> int:
         )
         assert cli_result.returncode == 1
         assert "artifact path escapes root" in cli_result.stdout
+        linked_artifact_parent = root / "linked-artifact-parent"
+        linked_artifact_parent.symlink_to(root, target_is_directory=True)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--output", str(root / "cli-parent-artifact.json"),
+             "--root", str(root), "--id", "cli-v3", "--objective", "objective",
+             "--hypothesis", "hypothesis", "--expected-discriminator", "discriminator",
+             "--seconds", "1", "--checkpoint", "reset", "--set", "fixture",
+             "--mame-revision", "abc", "--patch-profile", "none",
+             "--execution-engine", "interpreter", "--command", "mame",
+             "--cfg-directory", str(root / "cfg"), "--nvram-directory", str(root / "nvram"),
+             "--state-directory", str(root / "state"),
+             "--artifact", str(linked_artifact_parent / artifact_path.name)],
+            cwd=root, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "artifact path must not contain symlink components" in cli_result.stdout
     print("PASS: capture sidecar manifest hashes and provenance")
     return 0
 
