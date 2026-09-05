@@ -10,6 +10,13 @@ MAME trace object events: every sampled table triple matches the
 
 Reference table: main_data offset 0xbed828 (bus 0x02bed828), 19 part
 records, header at 0xbed800, next table at 0xbed948.
+
+A second layout (variant B) appears at 0xbed700: [tpa, oba, X] with
+tpa-range 0x004axxxx, e.g. tpa=004a0fd2 for oba=0091c255 (trace shows
+tha=tpa there). Its X field is undecoded: for oba=0091c02b the trace
+tpa (004a0e20) equals the previous record's X, not its own
+(004a1022). Some variant-B parts (009182dc) never submit in any
+capture: inactive roster models.
 """
 from __future__ import annotations
 

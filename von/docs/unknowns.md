@@ -74,11 +74,16 @@ records 12 bytes at a time and a record whose oba word is `<= 5`
 into dispatch slot `3*oba` at `0x562430`; larger obas skip it. A
 10-entry, 24-byte directory at maincpu 0xc9100 (`[range_end,
 range_start, struct_a, aux0, struct_b, aux1]`, struct count bounds
-the walk) indexes the table ranges. Still open: the 10-word header
-at 0xbed800 (OBA-like `0x91xxxx` values absent from the trace),
-`range_start`'s role, and the loop-entry zero check at 0xc9c9c.
-Tables are contiguous (`0xffffffff` separator, next table at
-0xbed948). Related: `decode_model_part_table.py`.
+the walk) indexes the table ranges. Loop-entry check closed: `r6`
+advances 12/iter (`ca12c`) so the zero-word test fires on the
+terminator. Tables are contiguous (`0xffffffff` separator, next
+table at 0xbed948); table 2 repeats the marker rhythm
+(11 triples, `[0,0,3]`, `[0,0,2]`, 1 triple, `[0,0,4]`, rest) and
+shares part 008964ba byte-identical across tables. Still open: the
+10-word header at 0xbed800 (its `0x91xxxx` values appear in no
+capture), `range_start`'s role, and variant-B's X field at 0xbed700
+(trace tpa sometimes equals the previous record's X).
+Related: `decode_model_part_table.py`.
 
 ## U-0007 — trace slot families are not models
 
