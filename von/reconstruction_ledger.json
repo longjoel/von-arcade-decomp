@@ -9400,7 +9400,7 @@
           "id": "sharc.opcode-20-state-tail-readback-service",
           "name": "opcode_20_state_tail_readback_service",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -9416,6 +9416,11 @@
             }
           ],
           "symbol": "sharc_opcode_20_state_tail_readback_service",
+          "modeling": {
+            "boundary": "Models the opcode-0x20 three-word persistent-tail readback: load the state pointer from DM 0x30101 and emit offsets 0x09, 0x0a, and 0x0b in order, with the first two explicit output waits and the final word occupying the delayed-return store.",
+            "test": "von/tools/test_sharc_opcode_20.py",
+            "unresolved_behavior": "State production and ownership, DM address-unit/bus semantics, FIFO request scheduling and backpressure, delayed-return timing, and consumers of the returned affine translation remain outside this static readback model."
+          },
           "notes": "Static listing recovers state pointer load from DM 0x30101, output of tail offsets 0x09 and 0x0a with waits, and delayed output of offset 0x0b. The focused runtime probe loads identity plus tail (10,20,30) through opcode 0x07, then confirms opcode 0x20 emits exact IEEE words 0x41200000, 0x41a00000, and 0x41f00000 at PCs 0x2040d, 0x20410, and 0x20414; this validates response ordering and the affine translation slots."
         },
         {
