@@ -10569,6 +10569,33 @@
             "unresolved_behavior": "Device-register effects downstream of 0x1800000 remain outside this pure publish contract"
           },
           "notes": "Pure schedule for the 0x1ccf8 MMIO doorbell leaf used across the service leaves."
+        },
+        {
+          "id": "maincpu.window-clear-1c618",
+          "name": "window_clear_1c618",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_window_clear_1c618.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_window_clear_1c618.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001c618",
+              "end": "0x0001cf4"
+            }
+          ],
+          "symbol": "recovered_window_clear_plan",
+          "modeling": {
+            "boundary": "Clear schedule: slot zeroing plus four fixed-count halfword window fills totaling 22544 halfwords",
+            "test": "von/tools/test_recovered_window_clear_1c618.py",
+            "unresolved_behavior": "Downstream consumers of the blanked windows remain outside this pure clear contract"
+          },
+          "notes": "Pure schedule for the 0x1c618 window-clear routine called across the service leaves."
         }
       ]
     },

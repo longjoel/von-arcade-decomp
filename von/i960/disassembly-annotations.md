@@ -590,6 +590,13 @@ halfword of `g0` to the device register at `0x1800000`, and returns
 through the saved link. The pure schedule is in
 `recovered_doorbell_1ccf8.c`.
 
+The frequently-called `0x1c618` routine zeroes eight halfword service
+slots plus two word slots with its cleared link, then blank-fills four
+halfword device windows (16384 at `0x1000000`, 4096 at `0x100c000`,
+2048 at `0x1008000`, 8 at `0x100a000`) — each countdown loop performs
+exactly its `setbit` count of stores — returning through the saved
+link. The pure schedule is in `recovered_window_clear_1c618.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
