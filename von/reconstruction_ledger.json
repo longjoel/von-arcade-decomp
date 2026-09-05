@@ -4364,8 +4364,13 @@
               "end": "0x000240dc"
             }
           ],
-          "symbol": "recovered_geometry_response_selector_plan",
-          "notes": "Recovers the distinct 0x503ca2/0x503ca0 guard, 0x503ca8 signed threshold routes, 0x2be0008 table index transforms, 0x40005c/0x49c980 fallback selection, and 0x884000 FIFO read boundary; later command-6 construction remains unresolved."
+        "symbol": "recovered_geometry_response_selector_plan",
+        "notes": "Recovers the distinct 0x503ca2/0x503ca0 guard, 0x503ca8 signed threshold routes, 0x2be0008 table index transforms, 0x40005c/0x49c980 fallback selection, and 0x884000 FIFO read boundary; later command-6 construction remains unresolved.",
+        "modeling": {
+          "boundary": "i960 0x23ef0 geometry response-selector plan covering signed state guards, quarter/third/half threshold routing, indexed table selection, fallback pointers, and FIFO read address",
+          "test": "von/tools/test_recovered_geometry_response_selector_23ef0.py",
+          "unresolved_behavior": "actual FIFO read value, response-table contents, later command-6 construction, and downstream geometry effects remain outside the pure selector plan"
+        }
         },
         {
           "id": "maincpu.geometry-clip-calls-240dc",
