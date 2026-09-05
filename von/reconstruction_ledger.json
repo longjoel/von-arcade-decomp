@@ -1099,6 +1099,11 @@
             }
           ],
           "symbol": "sharc_opcode_03_04_reciprocal_services",
+          "modeling": {
+            "boundary": "SHARC input/output FIFOs and RECIPS-based reciprocal/division arithmetic",
+            "test": "von/tools/test_sharc_reciprocal_services.py",
+            "unresolved_behavior": "non-finite exception semantics remain emulator-boundary evidence rather than hardware fidelity"
+          },
           "notes": "Static listing recovers two two-input/output handlers with RECIPS and three correction stages. Opcode 0x03 returns the numerator/denominator quotient through the ROM seed and three 32-bit correction boundaries; live responses are 2.0, 0.5, and -2.0 for (2.0,1.0), (1.0,2.0), and (-2.0,1.0). Opcode 0x04 stages the denominator in F2/R2 and computes numerator - quotient*denominator, normally zero but retaining a small reciprocal residual; the live (1.7, 1/3) case returns 0xb4000000. The finite recovered models share the RECIPS seed table with opcode 0x35. Bootstrap MODE1=0x18000 selects truncating 32-bit results. A direct MAME edge capture records 0xffffffff for 0x03 inputs 1/0, 1/+inf, NaN/1, and 1/NaN; 0/1 returns 0, +inf/1 preserves +inf, and the smallest positive denormal over 1 returns 0x00000001. Tested 0x04 inputs 1/0, 1/+inf, and NaN/1 likewise return 0xffffffff. The complete ten-vector result list is verified by von/tools/verify_sharc_reciprocal_edges.py. Repeating the probe with default DRC and -nodrc interpreter produced identical FIFO words, so there is no engine-specific discrepancy in this boundary set. These exception results are emulator-boundary evidence and remain provisional for hardware fidelity; the recovered C contracts intentionally cover finite operands only."
         },
         {
