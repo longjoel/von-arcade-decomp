@@ -8192,6 +8192,11 @@
               "end": "0x000027e8"
             }
           ],
+          "modeling": {
+            "boundary": "i960 ABI tail copies g14 into g0, clears g14, branches through g0, and reaches the following ret continuation",
+            "test": "von/tools/test_shared_abi_tail_return.py",
+            "unresolved_behavior": "processor return-link timing and caller-specific stack/register ownership remain outside this control-flow contract"
+          },
           "notes": "Shared ABI tail at 0x27d8 moves the bal return address from g14 to g0, clears g14, and branches through g0. It is reached by 13 observed attract call edges from text/texture initialization loops; no standalone C translation is appropriate.",
           "milestones": {
             "c-only-i960-attract-60s": {
