@@ -15,6 +15,19 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def has_symlink_component(path: Path, root: Path) -> bool:
+    try:
+        parts = path.relative_to(root).parts
+    except ValueError:
+        return True
+    current = root
+    for part in parts:
+        current /= part
+        if current.is_symlink():
+            return True
+    return False
+
+
 def register(
     manifest: dict, capture: dict, capture_path: Path, description: str,
     verifier: str, consumers: list[str], root: Path, ledger: dict | None = None,
@@ -43,7 +56,9 @@ def register(
         capture_relative = str(capture_path.resolve().relative_to(root.resolve()))
     except (OSError, RuntimeError, ValueError):
         capture_relative = ""
-    if not safe_path(capture_relative) or capture_path.is_symlink() or not capture_path.is_file():
+    if (not safe_path(capture_relative) or has_symlink_component(capture_path, root)
+            or rooted(root, capture_relative) is None
+            or capture_path.is_symlink() or not capture_path.is_file()):
         return [f"missing capture manifest {capture_path}"]
     try:
         stored_capture = json.loads(capture_path.read_text(encoding="utf-8"))
