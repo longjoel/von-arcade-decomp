@@ -6660,7 +6660,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm37",
-          "notes": "Recovers the sentinel-0x21f bank-dependent e2040 pair at e349c, with exact sources, tile choices, and e35a0 continuation; the preceding e3444 range gate remains caller-side."
+          "notes": "Recovers the sentinel-0x21f bank-dependent e2040 pair at e349c, with exact sources, tile choices, and e35a0 continuation; the preceding e3444 range gate remains caller-side.",
+          "modeling": {
+            "boundary": "Purely models the e349c sentinel payload: mark the payload matched, use e2040 twice with fixed sources 0x02fb5a10 and 0x02fb5ad0, select tiles 5/7 for bank_a nonzero or 1/3 otherwise, set count 2, and continue at 0x000e35a0.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The preceding e3444 range gate and runtime bank producer are not modeled, nor are e2040 execution, plan consumption, later 0x000e35a0 behavior, or original video-memory/MMIO side effects."
+          }
         },
         {
           "id": "maincpu.video-dispatch-sentinel-indexed-pair",
