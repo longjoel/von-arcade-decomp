@@ -1395,6 +1395,11 @@
             }
           ],
           "symbol": "sharc_opcode_12_state_tail_update_service",
+          "modeling": {
+            "boundary": "SHARC vector FIFO inputs, state-tail matrix accumulation, and delayed output writes",
+            "test": "von/tools/test_recovered_sharc_opcode_12.py",
+            "unresolved_behavior": "caller-level transform and delayed-return integration remain provisional beyond the tail-update contract"
+          },
           "notes": "Static listing recovers three FIFO inputs, reads state-tail offsets 0x09..0x0b, and performs tail[column] += sum(vector[row] * matrix[row,column]) across the nine coefficient slots before writing the tail back. The last two writes are delayed-return slots; the caller-level transform remains provisional."
         },
         {
