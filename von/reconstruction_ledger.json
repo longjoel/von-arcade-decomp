@@ -10392,6 +10392,11 @@
             }
           ],
           "symbol": "sharc_opcode_43_three_input_projection_service",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x43 projection: consume three supplied IEEE-float vector words, read a supplied row-major 3x3 state window, and emit the three column dot-products v^T*M in order while leaving state ownership and transport external.",
+            "test": "von/tools/test_sharc_opcode_43.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent DM 0x30150/state ownership and address mapping, SHARC instruction-level rounding, output FIFO backpressure and delayed store ordering, and downstream consumers remain outside this bounded projection model."
+          },
           "notes": "Runtime opcode 0x07 upload of row-major matrix values 1..9 followed by vector (10,20,30) emits 300.0, 360.0, and 420.0 at PCs 0x20b9a, 0x20b9c, and 0x20b9f, confirming column-dot-product output ordering and the persistent-state layout."
         },
         {
