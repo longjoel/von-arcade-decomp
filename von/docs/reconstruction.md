@@ -318,6 +318,12 @@ The required validation order is `unit`, `contract`, `trace`, `smoke`, then
 the corresponding generated result stale; report the stale state rather than
 copying an old result into this document.
 
+Gate before committing, never after: run ledger validation to a clean
+result first, then commit — a `validate && commit` chain that commits
+despite an error line is how a bad range once landed. Verify range
+endpoints numerically (`end > start`); near-identical hex addresses
+such as `0x1c6f4` vs `0x1cf4` are easy to confuse by eye.
+
 ## Engineering order
 
 1. Establish a clean baseline by running the currently stale trace, smoke, and
