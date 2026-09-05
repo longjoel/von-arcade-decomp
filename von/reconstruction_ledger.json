@@ -9572,6 +9572,11 @@
             }
           ],
           "symbol": "sharc_opcode_27_normalized_threshold_predicate_service",
+          "modeling": {
+            "boundary": "Models the opcode-0x27 weighted normalized-lane predicate: state origins and retained X/Z scales produce dx/dz and weighted magnitude, finite values at or below threshold emit dx/magnitude, dz/magnitude, 1, while threshold/NaN/overflow rejection emits three zeros.",
+            "test": "von/tools/test_recovered_sharc_opcode_27.py",
+            "unresolved_behavior": "FIFO and DM state-window timing, upstream opcode-0x26 publication, exact overflow payloads beyond tested nonfinite cases, and downstream consumers of the normalized lanes are not modeled here."
+          },
           "notes": "The listing recovers x/y/z in R12..R14, retained R0/R2 scales, dx=state[0]-x and dz=state[2]-z, weighted magnitude sqrt(R0*dx^2+R2*dz^2), and a GT comparison against state[3]. The normal path emits dx/m, dz/m, and delayed constant 1; the GT path emits three zero words at PCs 0x2056b, 0x2056d, and 0x20570. Live opcode-0x26 setup with unit scales, state (1,*,1,10,*), and input (0,0,0) emitted 0x3f3504f3 on both normalized lanes and 1 at output PCs 0x20563, 0x20565, and 0x20568. A new unordered-input probe shows NaN input and NaN threshold both emit the three-zero fallback, so the recovered model explicitly rejects nonfinite magnitude/threshold values rather than relying on C relational behavior. The finite and unordered contracts are implemented in recovered_sharc_opcode_27.c and tested; overflow payload details remain qualified."
         },
         {
