@@ -494,6 +494,15 @@ span exactly `8 x 0x200 = 0x1000` bytes — one full bank from the
 `recovered_blend_stride_schedule_29e4c.c`; pixel data and fault
 semantics stay unresolved.
 
+The mode-0 direct path at `0x29f60` reuses both kernel forms and the
+same 32x8 cadence, with its own dispatch and uniform strides: fade
+values at most zero take the `0x2a00c` fade form (factor = fade),
+anything above takes the scale form with `fade + 0x100`, and both outer
+bottoms advance all six pointers by `0x180`, so every pair totals
+`0x200` per pass — exactly one bank each, without the blend path's
+pair-2 asymmetry. The pure schedule is in
+`recovered_direct_stride_schedule_29f60.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero

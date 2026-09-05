@@ -10144,6 +10144,44 @@
             "unresolved_behavior": "Pixel data movement and multiply fault semantics remain outside this pure pointer/dispatch contract"
           },
           "notes": "Pure stride schedule joining the three inner loops: pairs 0/1 span exactly one 4KB prologue bank per run, pair 2 advances asymmetrically."
+        },
+        {
+          "id": "maincpu.direct-stride-schedule-29f60",
+          "name": "direct_stride_schedule_29f60",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_direct_stride_schedule_29f60.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_direct_stride_schedule_29f60.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00029f60",
+              "end": "0x00029f7c"
+            },
+            {
+              "start": "0x00029fe0",
+              "end": "0x0002a000"
+            },
+            {
+              "start": "0x0002a00c",
+              "end": "0x0002a01c"
+            },
+            {
+              "start": "0x0002a094",
+              "end": "0x0002a0b4"
+            }
+          ],
+          "symbol": "recovered_direct_stride_schedule_plan",
+          "modeling": {
+            "boundary": "Direct-path schedule: fade<=0 selects fade form else scale with fade+0x100; 8 passes with uniform 0x200 per-pair strides",
+            "test": "von/tools/test_recovered_direct_stride_schedule_29f60.py",
+            "unresolved_behavior": "Pixel data movement and multiply fault semantics remain outside this pure dispatch/pointer contract"
+          },
+          "notes": "Pure dispatch/stride schedule for the mode-0 direct path: every pair spans exactly one 4KB bank, unlike the blend path pair 2."
         }
       ]
     },
