@@ -56,6 +56,14 @@ bug: `WORKRAM + 0x20` on a `u32 *` lands on `0x00500080`, so
 `0x00500050..5c`; fixed to byte-relative `+0x20` in
 `reconstructed_main.c`. Rerun against a rebuilt image is pending.
 
+Verdict (M2 complete): rebuilt image + 50s vonjdev trace gives
+`upload-state: frame 30 stores=00000300 counter=00000005` and
+`check_upload_state.py` reports `PASS: frame 30 stores=768 counter=5
+dst==scale(src) on both samples`, matching the harness oracle exactly.
+Caveat: on vonjdev the `0x0181xxxx` source windows read zero, so the
+scale check holds trivially (`0==0`); a nonzero-source live
+confirmation still wants the original-ROM stream comparison.
+
 ## U-0005 — missing development captures
 
 The smoke gate fails on absent development captures (not regressions),
