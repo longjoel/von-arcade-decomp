@@ -10006,6 +10006,11 @@
             }
           ],
           "symbol": "opcode_41_lookup",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x41 byte lookup: derive the 32-bit word address as base + (operand >> 2), select byte lane operand&3 with a logical 8-bit shift, and return the masked low byte.",
+            "test": "von/tools/test_recovered_sharc_opcode_40_41.py",
+            "unresolved_behavior": "FIFO/source DM production, base-field ownership and SHARC DM address-unit conventions, memory access timing, logical versus protocol-level bounds, and floating-point consumers of the returned byte remain outside this bounded integer lookup model."
+          },
           "notes": "Static SHARC listing recovers base plus operand>>2 addressing, operand&3 byte-lane selection, logical right shift, 0xff masking, and one output byte. The following floating-point consumer is outside this integer service slice."
         },
         {
