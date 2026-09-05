@@ -7093,7 +7093,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm24",
-          "notes": "Recovers the control-only bank gate at e2e44: nonzero bank continues at e3008 and zero bank at e304c; no tile writes occur in this entry."
+          "notes": "Recovers the control-only bank gate at e2e44: nonzero bank continues at e3008 and zero bank at e304c; no tile writes occur in this entry.",
+          "modeling": {
+            "boundary": "Purely models the e2e44 control gate: return continuation 0x000e3008 when bank_a is nonzero and 0x000e304c when bank_a is zero, with no tile-plan or memory writes in this entry.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime bank producer, downstream continuation behavior, branch timing, and original control-flow/video-memory/MMIO effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-conditional-plain-arm-5",
