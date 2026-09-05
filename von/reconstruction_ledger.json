@@ -5018,6 +5018,11 @@
             }
           ],
           "symbol": "recovered_text_emit_glyph",
+          "modeling": {
+            "boundary": "Models glyph emission: normalize the character to 7 bits, reject outside the printable range, select the two-bit font bank and one of four glyph-table bases, read the eight-byte descriptor, write two tile rows with attributes, and advance the column",
+            "test": "von/tools/test_recovered_text_control.py",
+            "unresolved_behavior": "Caller character provenance, active integration routing, downstream tile-RAM display timing, and non-modeled glyph consumers remain outside this glyph-address model"
+          },
           "notes": "Recovers the glyph writer's 7-bit normalization, printable index range, two-bit font-bank selection, four glyph-table bases, eight-byte descriptor stride, two-row tile writes, attribute bits, and column advance. Every descriptor's mapped data pointer and width is validated against main_data; active caller integration remains separate.",
           "milestones": {
             "c-only-i960-attract-60s": {
