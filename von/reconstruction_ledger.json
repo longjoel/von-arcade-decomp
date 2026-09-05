@@ -1908,6 +1908,11 @@
             }
           ],
           "symbol": "_start_ip",
+          "modeling": {
+            "boundary": "i960 startup register-cache setup flushes registers, marks PFP, establishes the first spill frame, clears G14, and enters reconstructed_main",
+            "test": "von/tools/test_reconstructed_start.py",
+            "unresolved_behavior": "processor-specific flush/synmovq effects and exact spill-frame hardware timing remain outside the source-level startup contract"
+          },
           "notes": "Observed reset helper performs i960 register-cache setup: flush registers, mark PFP, and establish the first spill frame. This is processor ABI scaffolding rather than game logic; the replacement startup implements its required effect before entering C.",
           "milestones": {
             "c-only-i960-attract-60s": {
