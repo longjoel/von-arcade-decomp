@@ -5505,8 +5505,13 @@
           "sources": ["von/i960/recovered_object_state_descriptor_75f00.c"],
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_object_state_descriptor_75f00.py"],
           "ranges": [{"start": "0x00075f00", "end": "0x0007602c"}],
-          "symbol": "recovered_object_state_descriptor_75f00",
-          "notes": "Pure fixture-tested selector and descriptor copy from the original object initializer: selector-derived 9-entry table index, 0x48-byte record stride, and 18-word state copy. Downstream object/MMIO effects remain external."
+      "symbol": "recovered_object_state_descriptor_75f00",
+      "notes": "Pure fixture-tested selector and descriptor copy from the original object initializer: selector-derived 9-entry table index, 0x48-byte record stride, and 18-word state copy. Downstream object/MMIO effects remain external.",
+      "modeling": {
+        "boundary": "i960 0x75f00 object-state descriptor plan covering selector bounds, 0x48-byte record stride, and the 18-word selected-record copy",
+        "test": "von/tools/test_recovered_object_state_descriptor_75f00.py",
+        "unresolved_behavior": "original object initialization, downstream state consumers, MMIO/FIFO effects, and any caller-side descriptor interpretation remain outside the pure selector-and-copy plan"
+      }
         },
         {
           "id": "maincpu.geometry-frame-plan-28de8",
