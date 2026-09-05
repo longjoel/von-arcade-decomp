@@ -8272,7 +8272,12 @@
             }
           ],
           "symbol": "recovered_geometry_command_packet",
-          "notes": "Recovers the 0x202 control word and 18-word deterministic FIFO packet, including modulo-32-bit differences/sums and fixed command constants. Device-side packet semantics remain outside the host model."
+          "notes": "Recovers the 0x202 control word and 18-word deterministic FIFO packet, including modulo-32-bit differences/sums and fixed command constants. Device-side packet semantics remain outside the host model.",
+          "modeling": {
+            "boundary": "Purely models the command packet payload: emit the recovered 0x202 control word and 18 FIFO words, applying modulo-32-bit differences and sums and preserving the fixed command constants in their observed positions.",
+            "test": "von/tools/test_recovered_geometry_command_packet.py",
+            "unresolved_behavior": "Does not model geometry-device interpretation, FIFO timing, response words, mapped I/O visibility, or caller synchronization after packet submission."
+          }
         },
         {
           "id": "maincpu.geometry-command-packet-builder-variant",
