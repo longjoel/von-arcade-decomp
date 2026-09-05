@@ -1568,7 +1568,17 @@
             "von/build/disasm/vonj-sharc-bootstrap.lst",
             "von/tools/test_sharc_opcode_17.py",
             "von/tools/probe_sharc_opcode_17.lua",
-            "von/tools/probe_sharc_opcode_17_nonzero.lua"
+            "von/tools/probe_sharc_opcode_17_nonzero.lua",
+            "von/tools/test_sharc_opcode_17_nonzero.py",
+            "von/tools/test_sharc_opcode_17_prevalidation_contrast.py",
+            "von/tools/test_sharc_opcode_17_trace_analyzer.py",
+            "von/tools/verify_sharc_opcode_17_degenerate_trace.py",
+            "von/tools/verify_sharc_opcode_17_prevalidation_contrast.py",
+            "von/tools/verify_sharc_opcode_17_sentinel_geometry.py",
+            "von/i960/recovered_sharc_opcode_17.c",
+            "von/i960/recovered_sharc_opcode_17_projection.c",
+            "von/tools/test_recovered_sharc_opcode_17.py",
+            "von/tools/test_recovered_sharc_opcode_17_projection.py"
           ],
           "ranges": [
             {
@@ -1577,6 +1587,12 @@
             }
           ],
           "symbol": "sharc_opcode_17_streamed_geometry_service",
+          "stage": "modeled",
+          "modeling": {
+            "boundary": "SHARC three-word FIFO header selects a 16-word record table entry, copies four contiguous 3-word groups through the scratch window, gates each group with the signed 2x2 determinant, and emits nonzero helper results paired with the selected record value through the counted output stream",
+            "test": "von/tools/test_recovered_sharc_opcode_17_projection.py",
+            "unresolved_behavior": "coordinate semantics, natural record format, caller-level geometry meaning, and host/i960 opcode-0x17 relationship remain provisional"
+          },
           "notes": "Static listing recovers a three-word FIFO header, indexed 16-word record selection through DM 0x30103/0x30104, a 12-word scratch transfer plus mirrors of scratch offsets 0..2 into 0x0c..0x0e, a four-iteration signed 2x2 determinant gate whose zero branch emits no pair or count increment, and a streamed output pair [helper R0, selected-record R14] after the selected value is saved/restored across the nonzero call. SHARC parallel-assignment timing makes the gate expression exact: (R8-record[3])*(record[2]-record[5]) - (R9-record[5])*(record[0]-record[3]); the 12-word source is naturally four contiguous 3-word groups. The queued pairs are drained through an R15-counted loop with FLAG1_IN waits. The focused live probe reaches 0x2034a after 0x0d setup and validates the zero-record branch. The companion probe probe_sharc_opcode_17_nonzero.lua seeds DM 0x30103=0x30200, DM 0x30104=0x30300, a one-record table, and an asymmetric non-degenerate 12-word record; runtime reaches helper 0x20de1, exits at 0x20e4d, and emits 0x00000001, 0xbcdd67c8, 0x00000000 (count, -0.0270270258 helper result, selected record). This validates the live nonzero scratch/call/drain path and normal helper return; the static 0xbdcccccd (-0.1) sentinel path remains identified. Coordinate semantics and natural record format remain provisional. The instrumented 35-second twin capture contains repeated host-side 0x0d/0x17 writes but no SHARC 0x2034a or 0x20de1 execution, separating those writes as an i960/geometry command path. The i960 0x17 words are a separate geometry-packet layer; exact geometry field meaning remains provisional."
         },
         {
