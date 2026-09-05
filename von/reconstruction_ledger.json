@@ -6308,7 +6308,12 @@
             }
           ],
           "symbol": "recovered_object_state_four_route",
-          "notes": "Recovers the state-4 sign/timing split and mode/role/caller gates. The loaded 0x4072c000 value is dead in the effective compare; negative time has a caller>5 mode-bit-2 transition-9 path and a remaining transition-8 path gated by mode bit 1 and role<6, while nonnegative time uses only that mode/role gate."
+          "notes": "Recovers the state-4 sign/timing split and mode/role/caller gates. The loaded 0x4072c000 value is dead in the effective compare; negative time has a caller>5 mode-bit-2 transition-9 path and a remaining transition-8 path gated by mode bit 1 and role<6, while nonnegative time uses only that mode/role gate.",
+          "modeling": {
+            "boundary": "i960 0x79374 object-state four-arm model covering timer-sign routing, caller/mode/role gates, and direct transitions 7/8/9",
+            "test": "von/tools/test_recovered_object_state_four.py",
+            "unresolved_behavior": "mapped global reads/writes, object-pointer provenance, common-tail remapping, caller scheduling, and runtime timing source remain outside the pure state-arm model"
+          }
         },
         {
           "id": "maincpu.object-state-three-arm",
