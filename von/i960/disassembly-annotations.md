@@ -560,6 +560,11 @@ store, otherwise the counter decrements and the 22-store happens only
 from counter 1. The pure schedule is in
 `recovered_threshold_dispatch_1ba70.c`.
 
+Its head at `0x1ba30` chains four sub-calls (`0x1c618` on entry
+registers, `0x1ccf8` with 0, `0x2a4e0` and `0x1fa00` with `0x1013`),
+then presets `0x12c` to `0x503a04` and bumps `0x503a00` by one. The
+pure schedule is in `recovered_service_head_1ba30.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero

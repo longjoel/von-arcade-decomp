@@ -10434,6 +10434,33 @@
             "unresolved_behavior": "Sub-call body at 0x2a4e0 and the head block at 0x1ba30-0x1ba6c remain outside this pure tail contract"
           },
           "notes": "Pure tail schedule repeating the 0x1b9d0 dispatch shape with a threshold gate and constant terminal."
+        },
+        {
+          "id": "maincpu.service-head-1ba30",
+          "name": "service_head_1ba30",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_service_head_1ba30.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_service_head_1ba30.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001ba30",
+              "end": "0x0001ba6c"
+            }
+          ],
+          "symbol": "recovered_service_head_plan",
+          "modeling": {
+            "boundary": "Head schedule: ordered sub-call arguments, preset 0x12c at 0x503a04, bump of 0x503a00",
+            "test": "von/tools/test_recovered_service_head_1ba30.py",
+            "unresolved_behavior": "Sub-call bodies at 0x1c618/0x1ccf8/0x2a4e0/0x1fa00 remain outside this pure head contract"
+          },
+          "notes": "Pure head schedule for the 0x1ba30 service block: call chain arguments plus counter preset and bump."
         }
       ]
     },
