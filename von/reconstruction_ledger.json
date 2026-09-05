@@ -7357,7 +7357,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm12",
-          "notes": "Recovers the three mirrored e2040 calls for tiles 23, 25, and 27 plus the nonstandard e33e4 exit address."
+          "notes": "Recovers the three mirrored e2040 calls for tiles 23, 25, and 27 plus the nonstandard e33e4 exit address.",
+          "modeling": {
+            "boundary": "Purely models the e291c special-exit plan: emit tiles 23, 25, and 27 with sources 0x02fb8350, 0x02fb8410, and 0x02fb84d0, set count 3, and select continuation 0x000e33e4.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The three e2040 executions, plan consumption, nonstandard e33e4 continuation behavior, caller sequencing, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-plain-arm-single",
