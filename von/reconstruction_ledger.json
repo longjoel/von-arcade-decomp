@@ -4472,8 +4472,13 @@
               "end": "0x00024eb4"
             }
           ],
-          "symbol": "recovered_geometry_mode_zero_clip_calls_plan",
-          "notes": "Recovers the fixed 15-word FIFO prefix, frame/control publication, and four raw 0x701a0 calls at the common 0x24690 mode-zero branch target; subsequent object-state packet work remains separate."
+        "symbol": "recovered_geometry_mode_zero_clip_calls_plan",
+        "notes": "Recovers the fixed 15-word FIFO prefix, frame/control publication, and four raw 0x701a0 calls at the common 0x24690 mode-zero branch target; subsequent object-state packet work remains separate.",
+        "modeling": {
+          "boundary": "i960 0x24cc8 mode-zero geometry clip-call plan covering fixed FIFO prefix, frame/control publication, board readback address, and four raw 0x701a0 argument tuples",
+          "test": "von/tools/test_recovered_geometry_mode_zero_clip_calls_24cc8.py",
+          "unresolved_behavior": "actual FIFO/MMIO writes, clip-helper execution, board readback value, and subsequent object-state packets remain outside the pure mode-zero plan"
+        }
         },
         {
           "id": "maincpu.geometry-command6-loop-24690",
