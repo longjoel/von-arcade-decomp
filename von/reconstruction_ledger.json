@@ -7066,7 +7066,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm25",
-          "notes": "Recovers the unambiguous bank-A/bank-B plain tile payload pairs at e2e58/e2e7c and their e33f4 return. The exact entry-level branch-delay interpretation around e2e4c remains separate."
+          "notes": "Recovers the unambiguous bank-A/bank-B plain tile payload pairs at e2e58/e2e7c and their e33f4 return. The exact entry-level branch-delay interpretation around e2e4c remains separate.",
+          "modeling": {
+            "boundary": "Purely models the e2e4c nested payload: emit tiles 1 and 3, select sources 0x02fb3d90/0x02fb3e50 for bank_a nonzero or 0x02fb3f10/0x02fb3fd0 otherwise, set count 2, and return to 0x000e33f4.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The exact entry-level branch-delay interpretation around e2e4c, runtime bank producer, e1f20 execution, plan consumption, shared e33f4 control flow, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-control-gate",
