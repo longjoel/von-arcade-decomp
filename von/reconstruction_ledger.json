@@ -7147,7 +7147,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm22",
-          "notes": "Recovers the two bank-dependent six-tile plain e1f20 sequences at e2d2c, including exact source banks and the common e33f4 exit."
+          "notes": "Recovers the two bank-dependent six-tile plain e1f20 sequences at e2d2c, including exact source banks and the common e33f4 exit.",
+          "modeling": {
+            "boundary": "Purely models the e2d2c conditional plan: emit tiles 5, 7, 9, 11, 13, and 15; select the six exact bank-A or bank-B source addresses; set count 6 and common exit 0x000e33f4.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The runtime bank producer, e1f20 execution, plan consumption, shared e33f4 control flow, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-conditional-plain-arm-3",
