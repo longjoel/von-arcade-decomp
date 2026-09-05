@@ -5522,7 +5522,12 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_frame_plan_28de8.py"],
           "ranges": [{"start": "0x00028de8", "end": "0x00028e7c"}],
           "symbol": "recovered_geometry_frame_plan_28de8",
-          "notes": "Pure fixture-tested phase selection and status-bit polling contract; read/write command-window MMIO remains outside this boundary."
+          "notes": "Pure fixture-tested phase selection and status-bit polling contract; read/write command-window MMIO remains outside this boundary.",
+          "modeling": {
+            "boundary": "i960 0x28de8 geometry frame-plan model covering phase masking, alternating read/write offsets, status-bit completion, and bounded polling fallback",
+            "test": "von/tools/test_recovered_geometry_frame_plan_28de8.py",
+            "unresolved_behavior": "command-window MMIO reads and writes, hardware status timing, frame payload transfer, and caller-side phase publication remain outside the pure plan"
+          }
         },
         {
           "id": "maincpu.linked-list-append-298b8",
