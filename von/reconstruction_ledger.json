@@ -11144,6 +11144,11 @@
             }
           ],
           "symbol": "recovered_status_panel_builder_plan",
+          "modeling": {
+            "boundary": "Models the two status-panel block transfers: fixed 5x5 source 0x02fe01d4 at (4,10), followed by a 16-entry selected 8x5 source table at (28,20)",
+            "test": "von/tools/test_recovered_status_panel_builder.py",
+            "unresolved_behavior": "The panel caller's status-code ownership, SHARC tile-RAM destination, and display timing remain outside this transfer-plan contract"
+          },
           "notes": "Recovers the two block transfers: fixed 5x5 source 0x02fe01d4 at (4,10), followed by an 8x5 source selected at 0x02ea2010 + (((g0-0xd0)&0xf)*4) at (28,20)."
         },
         {
