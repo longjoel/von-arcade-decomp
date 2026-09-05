@@ -3582,7 +3582,12 @@
             }
           ],
           "symbol": "recovered_hardware_strip_clear_plan",
-          "notes": "Recovers fixed 0x0100d000 destination, 0x5ff halfword count, mode-dependent 0xffff/0 value, and zeroed fill register on return."
+          "notes": "Recovers fixed 0x0100d000 destination, 0x5ff halfword count, mode-dependent 0xffff/0 value, and zeroed fill register on return.",
+          "modeling": {
+            "boundary": "i960 0x20ae0 hardware-strip clear descriptor with fixed destination, halfword count, mode-dependent fill, and return cleanup",
+            "test": "von/tools/test_recovered_hardware_strip_clear.py",
+            "unresolved_behavior": "actual hardware/video-memory clear writes and caller-visible return-register context remain outside the pure clear plan"
+          }
         },
         {
           "id": "maincpu.weapon-record-dispatch-211f0",
