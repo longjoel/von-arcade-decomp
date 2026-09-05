@@ -11165,6 +11165,11 @@
             }
           ],
           "symbol": "recovered_text_status_render_plan",
+          "modeling": {
+            "boundary": "Models the state-preserving status-render frame and the stable nonzero-0x1d00034 route: emit the source word through the recovered text writer at column 1, row g13+31, width 19, and height 2",
+            "test": "von/tools/test_recovered_text_status_render_route.py",
+            "unresolved_behavior": "Other renderer branches, caller status provenance, live tile-RAM timing, and downstream display effects remain outside this bounded route model"
+          },
           "notes": "Recovers the 0x50-byte state-preserving frame and the stable nonzero-0x1d00034 route: source 0x02fd81ec is sent to 0x1dd10 with column 1, row g13+31, width 19, and height 2. Other renderer branches remain unresolved."
         },
         {
