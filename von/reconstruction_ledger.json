@@ -6904,7 +6904,12 @@
             }
           ],
           "symbol": "recovered_transition_selector_plan",
-          "notes": "Combines each valid selector's handler target with its mode-bit flag-write predicate; out-of-range selectors produce no target and no write. The mapped 0x504d84 store remains an integration boundary."
+          "notes": "Combines each valid selector's handler target with its mode-bit flag-write predicate; out-of-range selectors produce no target and no write. The mapped 0x504d84 store remains an integration boundary.",
+          "modeling": {
+            "boundary": "Purely composes the selector target and predicate adapters: publish the valid handler target, report a flag write only when the target is in range and its selector-specific mode predicate is true, and normalize the written flag value to 1; out-of-range selectors produce target 0 and no write.",
+            "test": "von/tools/test_recovered_transition_selector_dispatch.py",
+            "unresolved_behavior": "The mapped 0x00504d84 store, handler execution, action selection, downstream state mutations, and any caller sequencing around this combined plan are not modeled."
+          }
         },
         {
           "id": "maincpu.transition-action-data-tables",
