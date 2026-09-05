@@ -2710,6 +2710,11 @@
           ],
           "symbol": "recovered_host_interrupt_route",
           "notes": "Represents the common dispatcher prologue's source-mask clear and route selection for masks 1, 2, 0x80, 0x200, 0x400, and 0x800. The downstream system/text/fatal handlers remain separate dependencies; only the route contract is active in C.",
+          "modeling": {
+            "boundary": "i960 host interrupt source-mask route selection for system, fatal, text, audio, acknowledgment, and unhandled branches",
+            "test": "von/tools/test_recovered_host_control.py",
+            "unresolved_behavior": "downstream interrupt handlers and the source-mask MMIO clear remain outside the portable route contract"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
