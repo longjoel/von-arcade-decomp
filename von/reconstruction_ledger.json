@@ -11330,6 +11330,11 @@
           ],
           "ranges": [{"start": "0x0008dd40", "end": "0x0008dfb0"}],
           "symbol": "recovered_geometry_object_packet_8dd40",
+          "modeling": {
+            "boundary": "Models the pure 0x8dd40 object-state packet: thirteen FIFO words with selectors 5, 47, 22, 21, 20, and 58; low-halfword coordinate masking; response-dependent object-field selection; control/window writes and completion word; response read at 0x884000; output stores at +0x174/+0x17c; and bounded table address 0x562430 + index*12.",
+            "test": "von/tools/test_recovered_geometry_object_packet_8dd40.py",
+            "unresolved_behavior": "MMIO and device responses, outer caller setup, and ownership/consumption of the output and table destinations remain outside this packet model."
+          },
           "notes": "Pure object-state packet plan: FIFO selectors 5/47/22/21/20/58, masked record values, 0x8e238-dependent selection of object +0x4/+0x8, command-window words, output +0x174/+0x17c stores, and bounded 0x562430 table destination. MMIO and device response remain external."
         },
         {
