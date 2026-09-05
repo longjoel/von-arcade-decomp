@@ -55,6 +55,12 @@ def probe_state(path: Path) -> str | None:
 
 
 def relative_record(path: Path, root: Path) -> dict:
+    if path.is_symlink():
+        raise ValueError(f"inventory path must not be a symlink: {path}")
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, RuntimeError, ValueError) as error:
+        raise ValueError(f"inventory path escapes root: {path}") from error
     stat = path.stat()
     record = {
         "path": path.relative_to(root).as_posix(),
@@ -196,7 +202,22 @@ def main() -> int:
     parser.add_argument("--markdown", type=Path)
     args = parser.parse_args()
     root = args.root.resolve()
-    report = build_report(root)
+    for label, path in (("JSON output", args.json), ("Markdown output", args.markdown)):
+        if path is None:
+            continue
+        if path.is_symlink():
+            print(f"SHARC inventory: {label} path must not be a symlink: {path}")
+            return 1
+        try:
+            path.resolve().relative_to(root)
+        except (OSError, RuntimeError, ValueError):
+            print(f"SHARC inventory: {label} path escapes root: {path}")
+            return 1
+    try:
+        report = build_report(root)
+    except (OSError, RuntimeError, ValueError, KeyError, json.JSONDecodeError) as error:
+        print(f"SHARC inventory: {error}")
+        return 1
     encoded = json.dumps(report, indent=2) + "\n"
     if args.json:
         args.json.parent.mkdir(parents=True, exist_ok=True)
