@@ -11447,6 +11447,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_status_counter_add1_2b7e0.py"],
           "ranges": [{"start": "0x0002b7e0", "end": "0x0002b808"}],
           "symbol": "recovered_status_counter_add1_2b7e0",
+          "modeling": {
+            "boundary": "Models the pure 0x2b7e0 status-counter transition: add exactly one to a supplied 32-bit counter with target wraparound semantics, corresponding to the original global status update around 0x503a00.",
+            "test": "von/tools/test_recovered_status_counter_add1_2b7e0.py",
+            "unresolved_behavior": "The fixed callback, global-memory ownership, decrement/advance caller context, thresholds, and any MMIO effects remain outside this arithmetic model."
+          },
           "notes": "Original instructions load global 0x503a00, decrement/advance the local status by one, store it, and return through a fixed callback. Callback behavior is excluded."
         },
         {
