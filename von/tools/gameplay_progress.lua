@@ -124,6 +124,47 @@ local function geometry_state()
     end
 end
 
+-- M2 live upload-cluster observer: the reconstructed image runs one
+-- 768-store direct-path pass at startup (counter preset 4, fade 0x80,
+-- mode 0) and records stores, post-run counter, and two destination
+-- words at WORKRAM+0x20 slots 12..15. Sampled source words let the
+-- analyst check dst == scale(src) for the run. Change-triggered.
+local last_upload_state = nil
+
+local function upload_state()
+    if not space or not geometry_state_file then
+        return
+    end
+    local function read_word(address)
+        local ok, value = pcall(function() return space:read_u32(address) end)
+        if ok then
+            return value
+        end
+        return 0xffffffff
+    end
+    local stores = read_word(0x00500050)
+    local counter = read_word(0x00500054)
+    local dst_first = read_word(0x00500058)
+    local dst_last = read_word(0x0050005c)
+    local src_first = read_word(0x01814100)
+    local src_last = read_word(0x01814e7c)
+    local dst_first_live = read_word(0x01814000)
+    local dst_last_live = read_word(0x01814e7c)
+    local state = string.format(
+        "%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x",
+        stores, counter, dst_first, dst_last,
+        src_first, src_last, dst_first_live, dst_last_live)
+    if state ~= last_upload_state then
+        log_geometry_state(string.format(
+            "upload-state: frame %d stores=%08x counter=%08x " ..
+            "dst_first=%08x dst_last=%08x src_first=%08x src_last=%08x " ..
+            "live_first=%08x live_last=%08x",
+            frame, stores, counter, dst_first, dst_last,
+            src_first, src_last, dst_first_live, dst_last_live))
+        last_upload_state = state
+    end
+end
+
 -- Confirmed field names on the vonj driver (IN0/IN1/IN2).
 local FIELD_NAMES = {
     coin       = { ":IN0", "Coin 1" },
@@ -290,6 +331,7 @@ emu.register_periodic(function()
     -- ASCII text overlay.
     if frame % 30 == 0 then
         geometry_state()
+        upload_state()
         local ok, sum = pcall(tile_checksum)
         if ok then
             if sum ~= last_screen_hash then

@@ -34,6 +34,15 @@ static const unsigned char TEXT_MATCH_ENTRY[] = "MATCH ENTRY";
 #define WORKRAM ((volatile u32 *)0x00500000)
 
 u32 recovered_io_self_test(void);
+u32 recovered_upload_cluster_service(volatile unsigned *fade_slot,
+                                     volatile unsigned *counter_slot,
+                                     volatile unsigned *mode_slot,
+                                     volatile unsigned *base_src0,
+                                     volatile unsigned *base_dst0,
+                                     volatile unsigned *base_src1,
+                                     volatile unsigned *base_dst1,
+                                     volatile unsigned *base_src2,
+                                     volatile unsigned *base_dst2);
 void recovered_io_failure_prepare(void);
 void recovered_io_input_initialize(void);
 void recovered_io_service(void);
@@ -144,6 +153,30 @@ void i960_reconstructed_main(void)
     state[4] = 0x56494430UL; /* VID0 */
     recovered_text_font_asset_initialize();
     recovered_text_video_upload();
+    /* M2 live cluster call: seed the upload state the way the 0x29d2c
+     * setup tail does (counter preset past the sub-3 guard, direct
+     * path selected), then run one full pass over the mapped device
+     * windows. Expected: 768 stores, counter 5, every destination
+     * word the scale form of its source word. Results land in
+     * state[12..15] for the Lua upload-state observer. If these
+     * windows are unmapped the fault itself answers U-0004. */
+    {
+        volatile unsigned *fade_slot = (volatile unsigned *)0x0051a260;
+        volatile unsigned *counter_slot = (volatile unsigned *)0x0051a264;
+        volatile unsigned *mode_slot = (volatile unsigned *)0x0051a268;
+        volatile unsigned *dst0 = (volatile unsigned *)0x01814000;
+        *fade_slot = 0x80U;
+        *counter_slot = 4U;
+        *mode_slot = 0U;
+        state[12] = recovered_upload_cluster_service(
+            fade_slot, counter_slot, mode_slot,
+            (volatile unsigned *)0x01810100, (volatile unsigned *)0x01810000,
+            (volatile unsigned *)0x01814100, (volatile unsigned *)0x01814000,
+            (volatile unsigned *)0x01818100, (volatile unsigned *)0x01818000);
+        state[13] = *counter_slot;
+        state[14] = dst0[0];
+        state[15] = dst0[927];
+    }
     state[7] = recovered_object_state_runtime_tick();
     recovered_text_palette_initialize();
     /* The recovered texture loader is retained for offline analysis, but its
