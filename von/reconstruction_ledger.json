@@ -11041,6 +11041,11 @@
             }
           ],
           "symbol": "recovered_text_plane0_attributed_cell_plan",
+          "modeling": {
+            "boundary": "Models the explicit-position attributed plane-0 block writer: supplied column and row select the origin, width and height define the copied rectangle, rows use a 64-tile stride, and each cell receives forced 0xc000 attributes",
+            "test": "von/tools/test_recovered_text_plane0_attributed_block.py",
+            "unresolved_behavior": "SHARC tile-RAM ownership, source-buffer provenance, and display timing remain outside this host-side placement contract"
+          },
           "notes": "Recovers the explicit-position block geometry: column/row are supplied in g1/g2, width/height in g3/g4, destination rows use a 64-tile stride in plane 0x01000000, and each source halfword receives forced 0xc000 attributes."
         },
         {
