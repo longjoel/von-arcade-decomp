@@ -11522,6 +11522,11 @@
             }
           ],
           "symbol": "recovered_scoreboard_plan",
+          "modeling": {
+            "boundary": "Models scoreboard preparation: normalize bit 15, return early when (0x503a7c,0x5770f0)==(0,4), otherwise place the fixed background, two decimal digit pairs, separator, and suffix tiles using the 0x2ea1e50 table",
+            "test": "von/tools/test_recovered_scoreboard_renderer.py",
+            "unresolved_behavior": "Score input provenance, glyph decoding, source asset ownership, SHARC tile-RAM destination, and display timing remain outside this layout contract"
+          },
           "notes": "Recovers bit-15 normalization, the (503a7c,5770f0)==(0,4) early return, fixed background, two decimal digit pairs, separator, and suffix tile positions using the 0x2ea1e50 table."
         },
         {
