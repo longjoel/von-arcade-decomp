@@ -137,6 +137,14 @@ def main() -> int:
         linked_manifest["entries"][0]["verifier"] = "verify-link.py"
         assert any("missing verifier" in error for error in validate_lifecycle(
             linked_lifecycle, linked_manifest, lifecycle_root))
+        linked_directory = lifecycle_root / "linked-tools"
+        linked_directory.symlink_to(lifecycle_root)
+        nested_lifecycle = copy.deepcopy(lifecycle)
+        nested_lifecycle["images"][0]["work_units"][3]["verifier"] = "linked-tools/verify.py"
+        nested_manifest = copy.deepcopy(rooted_manifest)
+        nested_manifest["entries"][0]["verifier"] = "linked-tools/verify.py"
+        assert any("missing verifier" in error for error in validate_lifecycle(
+            nested_lifecycle, nested_manifest, lifecycle_root))
         stale_manifest = copy.deepcopy(rooted_manifest)
         stale_manifest["entries"][0]["verifier_sha256"] = "0" * 64
         assert any("verifier hash mismatch" in error for error in validate_lifecycle(

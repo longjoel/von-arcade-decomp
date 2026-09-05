@@ -59,7 +59,16 @@ def validate_lifecycle(
         if root is None:
             return True
         path = root / value
-        return not path.is_symlink() and path.is_file()
+        try:
+            relative_parts = path.relative_to(root).parts
+        except ValueError:
+            return False
+        current = root
+        for part in relative_parts:
+            current /= part
+            if current.is_symlink():
+                return False
+        return path.is_file()
 
     def verifier_hash_errors(where: str, entry: dict[str, Any]) -> None:
         digest = entry.get("verifier_sha256")
