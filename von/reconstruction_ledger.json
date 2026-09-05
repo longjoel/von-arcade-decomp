@@ -9619,6 +9619,35 @@
             "unresolved_behavior": "Actual walker execution and string-table ROM provenance remain outside this pure emit schedule"
           },
           "notes": "Pure emit schedule for the 0xe3830 decimal emitter with its 0xe3a10 alias: values above 99 share the '99' string; the rest render as a 0x30-biased digit pair."
+        },
+        {
+          "id": "maincpu.results-alias-thunks",
+          "name": "results_alias_thunks",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/disassembly-annotations.md"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst"
+          ],
+          "ranges": [
+            {
+              "start": "0x000e39f0",
+              "end": "0x000e39f4"
+            },
+            {
+              "start": "0x000e3a00",
+              "end": "0x000e3a04"
+            }
+          ],
+          "modeling": {
+            "boundary": "Pure alias thunks: 0xe39f0 forwards to the 0x1d1b0 walker and 0xe3a00 forwards to the 0x1d880 classifier, each returning directly with no argument shuffling",
+            "test": "von/tools/test_alias_thunks_e39f0.py",
+            "unresolved_behavior": "None; both bodies are a single call plus return"
+          },
+          "notes": "Tracked as ABI scaffolding like the 0x27d8 trampoline: no translation needed beyond naming the forwarding targets."
         }
       ]
     },

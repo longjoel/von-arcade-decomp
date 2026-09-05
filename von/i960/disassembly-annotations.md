@@ -494,6 +494,11 @@ as `0x30`-biased characters through the `0x1d310` walker with modes
 `(3, 0)`. The pure plan is in `recovered_decimal_emit_e3830.c`, which
 also covers the `0xe3a10` alias thunk.
 
+Two results-screen thunks are pure aliases needing no translation:
+`0xe39f0` calls the `0x1d1b0` walker and `0xe3a00` calls the `0x1d880`
+classifier, each returning directly. Both are tracked as ABI scaffolding
+like the `0x27d8` trampoline.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at
