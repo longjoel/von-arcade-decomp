@@ -5413,6 +5413,11 @@
             }
           ],
           "symbol": "recovered_texture_decompress",
+          "modeling": {
+            "boundary": "Models the texture decoder's bounded control and output contract: decode the recovered command stream, route palette/bank branches, write the traced halfwords, and clear/return the shared status latch without assigning it",
+            "test": "von/tools/verify_texture_decompress.py",
+            "unresolved_behavior": "Canonical capture identity, complete loader sequencing, later RAM overwrites, compiler/ABI byte equivalence, and downstream texture consumption remain outside this trace-backed decoder model"
+          },
           "notes": "Recovered production C matches all 64 original MAME debug write-trace records (address and halfword value) from the first texture stream. It also clears and returns the shared 0x00515080 status latch exactly as the ROM does; the decoder does not assign that latch itself. Post-load RAM snapshots are intentionally excluded because later loader calls overwrite the same windows. The bank-selection helper is forced inline; the pinned i960 build emits no callx to 0x38e0, preserving the decompressor return-link ABI. Secondary-route boundary vectors cover the 0x60000 threshold and all palette-table comparison branches. Byte-for-byte validation remains separate from these control-flow and routing checks.",
           "milestones": {
             "c-only-i960-attract-60s": {
