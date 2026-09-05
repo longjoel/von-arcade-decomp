@@ -7,6 +7,7 @@ import argparse
 import json
 from pathlib import Path
 
+from evidence_manifest import validate as validate_evidence
 from reconstruction_ledger import code_coverage, load, validate, validate_lifecycle
 
 
@@ -42,6 +43,10 @@ def main() -> int:
         return 1
     errors = validate(ledger, root)
     if args.strict_lifecycle:
+        errors.extend(
+            f"evidence manifest: {error}"
+            for error in validate_evidence(evidence, ledger, root)
+        )
         errors.extend(validate_lifecycle(ledger, evidence, root))
     if errors:
         print(f"Ledger validation: {len(errors)} error(s)")

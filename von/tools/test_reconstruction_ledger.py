@@ -15,6 +15,7 @@ from migrate_reconstruction_ledger import migrate
 from reconstruction_ledger import code_coverage, validate, validate_lifecycle
 
 
+ROOT = Path(__file__).resolve().parents[2]
 TOOL = Path(__file__).resolve().parent / "validate_reconstruction_ledger.py"
 
 
@@ -59,7 +60,7 @@ def main() -> int:
     broken = copy.deepcopy(ledger)
     broken["images"][0]["physical_ranges"].append({"id": "overlap", "start": "0x20", "end": "0x40", "classification": "code"})
     assert any("overlaps" in error for error in validate(broken))
-    with tempfile.TemporaryDirectory() as directory:
+    with tempfile.TemporaryDirectory(dir=ROOT) as directory:
         path = Path(directory) / "roundtrip.json"
         path.write_text(json.dumps(ledger), encoding="utf-8")
         assert json.loads(path.read_text(encoding="utf-8"))["schema_version"] == 2
@@ -79,6 +80,16 @@ def main() -> int:
         )
         assert cli_result.returncode == 1
         assert "unable to read validation document" in cli_result.stdout
+        malformed_evidence = Path(directory) / "malformed-evidence.json"
+        malformed_evidence.write_text('{"schema_version": 2, "entries": []}\n', encoding="utf-8")
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--strict-lifecycle",
+             str(ROOT / "von/reconstruction_ledger.json"),
+             "--evidence-manifest", str(malformed_evidence)],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "evidence manifest: schema_version must be 1" in cli_result.stdout
     lifecycle = {
         "schema_version": 2,
         "images": [{"name": "maincpu", "work_units": [
