@@ -2167,6 +2167,11 @@
             }
           ],
           "symbol": "recovered_io_normal_input_plan",
+          "modeling": {
+            "boundary": "i960 final fixed controller setup sequence emitted after the two-bank input schedule",
+            "test": "von/tools/test_recovered_io.py",
+            "unresolved_behavior": "per-byte mapped bus wait and controller timing remain outside the pure fixed-sequence plan"
+          },
           "notes": "Emits the fixed 21-byte sequence stored at 0x2890 to the 0x01c00000 controller port after the normal 0x2c10 two-bank schedule. The per-byte bus wait is outside the pure plan.",
           "milestones": {
             "c-only-i960-attract-60s": {
