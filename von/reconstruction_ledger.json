@@ -5489,8 +5489,13 @@
           "sources": ["von/i960/recovered_geometry_fifo_argument_plan_76240.c"],
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/i960/geometry-transform-fifo-findings.md", "von/tools/test_recovered_geometry_fifo_argument_plan_76240.py"],
           "ranges": [{"start": "0x00076240", "end": "0x00076340"}],
-          "symbol": "recovered_geometry_fifo_argument_plan_76240",
-          "notes": "Pure original-listing arithmetic only: sign-extend object +0x184, then form 16-bit-wrapped +/-0x6000 and center coordinate words. FIFO commands, hardware readbacks, and subsequent fixed-point/FPU transform are intentionally excluded because the bounded original-ROM capture does not establish their stateful response semantics."
+        "symbol": "recovered_geometry_fifo_argument_plan_76240",
+        "notes": "Pure original-listing arithmetic only: sign-extend object +0x184, then form 16-bit-wrapped +/-0x6000 and center coordinate words. FIFO commands, hardware readbacks, and subsequent fixed-point/FPU transform are intentionally excluded because the bounded original-ROM capture does not establish their stateful response semantics.",
+        "modeling": {
+          "boundary": "i960 0x76240 geometry FIFO-argument arithmetic plan covering signed-halfword coordinate extension and 16-bit-wrapped plus/minus 0x6000 and center words",
+          "test": "von/tools/test_recovered_geometry_fifo_argument_plan_76240.py",
+          "unresolved_behavior": "FIFO command emission, hardware readbacks, stateful responses, and subsequent fixed-point/FPU transform remain outside the bounded arithmetic plan"
+        }
         },
         {
           "id": "maincpu.object-state-descriptor-75f00",
