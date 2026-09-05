@@ -63,7 +63,7 @@ def main() -> int:
         try:
             inventory_path(escaped, root, set())
         except ValueError as error:
-            assert "must not be a symlink" in str(error)
+            assert "must not contain symlink components" in str(error)
         else:
             raise AssertionError("external inventory symlink was accepted")
         local_link = root / "local-link.log"
@@ -71,7 +71,7 @@ def main() -> int:
         try:
             inventory_path(local_link, root, set())
         except ValueError as error:
-            assert "must not be a symlink" in str(error)
+            assert "must not contain symlink components" in str(error)
         else:
             raise AssertionError("internal inventory symlink was accepted")
     with tempfile.TemporaryDirectory(dir=ROOT) as directory:
@@ -86,7 +86,17 @@ def main() -> int:
             cwd=ROOT, capture_output=True, text=True, check=False,
         )
         assert cli_result.returncode == 1
-        assert "output path must not be a symlink" in cli_result.stdout
+        assert "output path must not contain symlink components" in cli_result.stdout
+        linked_output_parent = temp_root / "linked-output-parent"
+        linked_output_parent.symlink_to(temp_root, target_is_directory=True)
+        cli_result = subprocess.run(
+            [sys.executable, str(TOOL), "--root", str(ROOT), "--path",
+             "von/tools/test_inventory_evidence.py", "--output",
+             str(linked_output_parent / "nested-output.json")],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert cli_result.returncode == 1
+        assert "output path must not contain symlink components" in cli_result.stdout
         malformed_relations = temp_root / "malformed-relations.json"
         malformed_relations.write_text("{invalid\n", encoding="utf-8")
         cli_result = subprocess.run(

@@ -12,6 +12,18 @@ from pathlib import Path
 from typing import Any
 
 
+def has_symlink_component(path: Path) -> bool:
+    """Return whether *path* or any of its lexical parents is a symlink."""
+    current = path.absolute()
+    while True:
+        if current.is_symlink():
+            return True
+        parent = current.parent
+        if parent == current:
+            return False
+        current = parent
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -38,8 +50,8 @@ def classify(path: str, tracked: bool) -> tuple[str, str]:
 
 
 def inventory_path(path: Path, root: Path, tracked_paths: set[str]) -> dict[str, Any]:
-    if path.is_symlink():
-        raise ValueError(f"inventory path must not be a symlink: {path}")
+    if has_symlink_component(path):
+        raise ValueError(f"inventory path must not contain symlink components: {path}")
     try:
         relative = str(path.resolve().relative_to(root.resolve()))
     except (OSError, RuntimeError, ValueError) as exc:
@@ -124,8 +136,8 @@ def main() -> int:
     args = parser.parse_args()
     root = args.root.resolve()
     for label, path in (("output", args.output), ("relations", args.relations)):
-        if path is not None and path.is_symlink():
-            print(f"Evidence inventory: {label} path must not be a symlink")
+        if path is not None and has_symlink_component(path):
+            print(f"Evidence inventory: {label} path must not contain symlink components")
             return 1
         if path is not None:
             try:
@@ -140,6 +152,9 @@ def main() -> int:
     files: list[Path] = []
     for requested in args.path:
         target = requested if requested.is_absolute() else root / requested
+        if has_symlink_component(target):
+            print(f"Evidence inventory: requested path must not contain symlink components: {requested}")
+            return 1
         if target.is_file():
             files.append(target)
         elif target.is_dir():
