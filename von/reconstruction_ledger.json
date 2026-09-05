@@ -1941,6 +1941,11 @@
             }
           ],
           "symbol": "recovered_io_self_test",
+          "modeling": {
+            "boundary": "Models the I/O self-test contract: write/read 0x4d, compare the low byte, store the failure state, and preserve the five-field reset at 0x2768 before input and queue initialization",
+            "test": "von/tools/test_recovered_io.py",
+            "unresolved_behavior": "Live board-I/O response timing, failure-path branching in the production image, and downstream boot scheduling remain outside this pure self-test model"
+          },
           "notes": "Observed during the input-free boot trace. Production C preserves the 0x4d write/read, low-byte comparison, failure-state store, and the 0x2768 failure branch's five-field reset before the recovered 0x2bb0 input initializer and queue initialization.",
           "milestones": {
             "c-only-i960-attract-60s": {
