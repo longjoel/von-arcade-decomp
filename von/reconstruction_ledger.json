@@ -9804,7 +9804,7 @@
           "id": "sharc.opcode-2f-packed-vector-tail-update-service",
           "name": "opcode_2f_packed_vector_tail_update_service",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -9820,6 +9820,11 @@
             }
           ],
           "symbol": "sharc_opcode_2f_packed_vector_tail_update_service",
+          "modeling": {
+            "boundary": "Models the opcode-0x2f packed-vector tail update: decode the three low-16-bit binary16-shaped coordinates through DM 0x30141, project them as a row vector through the persistent row-major matrix, and store the three column-dot-product results at tail offsets 0x09..0x0b in order.",
+            "test": "von/tools/test_sharc_opcode_2f.py",
+            "unresolved_behavior": "FIFO production and wait timing, exact packed exceptional decode behavior, persistent matrix/tail ownership, SHARC instruction rounding, delayed-store timing, and higher-level caller naming/consumers remain outside this bounded tail-update model."
+          },
           "notes": "Static listing and runtime probe recover three packed-vector inputs, the exact DM 0x30141 low-16-bit binary16-shaped decode, persistent-matrix column-dot-product accumulation, and tail stores at offsets 0x09..0x0b with delayed-return timing. A quarter-turn-Z matrix followed by packed (1,2,3) reads back approximately (2,-1,3) through opcode 0x20, confirming the row-vector v^T*M convention. Higher-level caller naming of the translation tail remains provisional."
         },
         {
