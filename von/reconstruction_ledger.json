@@ -3852,7 +3852,12 @@
             }
           ],
           "symbol": "recovered_status_grid_initializer_plan",
-          "notes": "Recovers the phase modulo 192 gate, 4x8 row-major origins, source 0x02fe8fc4, and paired 0x1de80/0x1de00 16x8 transfers."
+          "notes": "Recovers the phase modulo 192 gate, 4x8 row-major origins, source 0x02fe8fc4, and paired 0x1de80/0x1de00 16x8 transfers.",
+          "modeling": {
+            "boundary": "i960 0x227b0 phase-gated status-grid initializer with 32 row-major cells and paired transfer helpers",
+            "test": "von/tools/test_recovered_status_grid_initializer.py",
+            "unresolved_behavior": "actual grid memory writes and downstream 0x1de80/0x1de00 transfer effects remain outside the pure initializer plan"
+          }
         },
         {
           "id": "maincpu.status-patterned-fill-22840",
