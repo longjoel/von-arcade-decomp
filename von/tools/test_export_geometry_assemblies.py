@@ -19,9 +19,15 @@ def main():
                       "[:] vonj_geometry_object: time=1 tpa=0 tha=0 oba=00000000 count=0 mode=3 source=polygon-rom"]
         trace.write_text("\n".join(lines) + "\n")
         subprocess.run(["python3", TOOL, "--trace", trace, "--rom", rom, "--output-dir", output,
-                        "--time", "1", "--min-objects", "4", "--distance", "10"], check=True)
+                        "--time", "1", "--min-objects", "4", "--distance", "10", "--root", root], check=True)
         manifest = json.loads((output / "assemblies.json").read_text())
         if [(x["start_slot"], x["object_count"]) for x in manifest["assemblies"]] != [(0, 2), (2, 2)]:
             raise SystemExit("spatial assembly partition mismatch")
+        outside = root.parent / "outside-geometry-assemblies"
+        result = subprocess.run(
+            ["python3", TOOL, "--trace", trace, "--rom", rom, "--output-dir", outside,
+             "--root", root], capture_output=True, text=True, check=False)
+        assert result.returncode == 1
+        assert "output directory path escapes root" in result.stdout
     print("PASS: spatial ROM assembly extraction")
 if __name__ == "__main__": main()

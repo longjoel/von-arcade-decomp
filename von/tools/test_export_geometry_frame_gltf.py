@@ -35,7 +35,7 @@ def main() -> int:
         trace.write_text(trace_text)
         subprocess.run([
             "python3", TOOL, "--trace", trace, "--rom", rom, "--output", output,
-            "--time", "1", "--start-object", "1", "--max-objects", "1",
+            "--time", "1", "--start-object", "1", "--max-objects", "1", "--root", root,
         ], check=True)
         document = json.loads(output.read_text())
         if (document["extras"]["object_slots"], document["extras"]["object_start"],
@@ -43,6 +43,12 @@ def main() -> int:
             raise SystemExit("static assembly slice metadata or geometry is wrong")
         if document["nodes"][0]["name"] != "slot_001_oba_00000000":
             raise SystemExit("original submission slot was not retained")
+        outside = root.parent / "outside-geometry-frame.gltf"
+        result = subprocess.run(
+            ["python3", TOOL, "--trace", trace, "--rom", rom, "--output", outside,
+             "--root", root], capture_output=True, text=True, check=False)
+        assert result.returncode == 1
+        assert "output path escapes root" in result.stdout
     print("PASS: static ROM geometry assembly glTF export")
     return 0
 

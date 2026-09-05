@@ -30,6 +30,18 @@ MATRIX = re.compile(
 )
 
 
+def path_error(label: str, path: Path, root: Path, *, output: bool = False) -> str | None:
+    if path.is_symlink():
+        return f"{label} path must not be a symlink: {path}"
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, RuntimeError, ValueError):
+        return f"{label} path escapes root: {path}"
+    if not output and not path.is_file():
+        return f"missing {label}: {path}"
+    return None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--trace", type=Path, required=True)
@@ -48,7 +60,16 @@ def main() -> int:
                         help="skip this many submitted object slots")
     parser.add_argument("--max-objects", type=int,
                         help="export at most this many submitted object slots")
+    parser.add_argument("--root", type=Path, default=Path.cwd(),
+                        help="root that trace, ROM, and glTF output must remain within")
     args = parser.parse_args()
+    root = args.root.resolve()
+    for label, path, output in (("trace", args.trace, False), ("ROM", args.rom, False),
+                                ("output", args.output, True)):
+        error = path_error(label, path, root, output=output)
+        if error:
+            print(f"Geometry frame: {error}")
+            return 1
     if (args.start_object < 0 or
             (args.max_objects is not None and args.max_objects <= 0)):
         raise SystemExit("--start-object must be nonnegative and --max-objects positive")

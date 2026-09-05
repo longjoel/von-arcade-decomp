@@ -11,6 +11,18 @@ from pathlib import Path
 from export_geometry_triangle_build_gltf import select_geometry
 
 
+def path_error(label: str, path: Path, root: Path, *, output: bool = False) -> str | None:
+    if path.is_symlink():
+        return f"{label} path must not be a symlink: {path}"
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, RuntimeError, ValueError):
+        return f"{label} path escapes root: {path}"
+    if not output and not path.is_file():
+        return f"missing {label}: {path}"
+    return None
+
+
 def split_assemblies(objects, distance: float):
     """Keep submission order; begin an assembly when adjacent origins separate."""
     groups = []
@@ -37,7 +49,16 @@ def main() -> int:
     parser.add_argument("--min-objects", type=int, default=1)
     parser.add_argument("--distance", type=float, default=15.0,
                         help="world-space gap that begins the next assembly")
+    parser.add_argument("--root", type=Path, default=Path.cwd(),
+                        help="root that trace, ROM, and assembly outputs must remain within")
     args = parser.parse_args()
+    root = args.root.resolve()
+    for label, path, output in (("trace", args.trace, False), ("ROM", args.rom, False),
+                                ("output directory", args.output_dir, True)):
+        error = path_error(label, path, root, output=output)
+        if error:
+            print(f"Geometry assemblies: {error}")
+            return 1
     if args.distance <= 0.0:
         raise SystemExit("--distance must be positive")
     selected_time, objects = select_geometry(args.trace, args.time, args.tolerance,
@@ -52,7 +73,8 @@ def main() -> int:
         subprocess.run(["python3", exporter, "--trace", args.trace, "--rom", args.rom,
                         "--output", output, "--time", str(selected_time),
                         "--tolerance", str(args.tolerance), "--min-objects", str(args.min_objects),
-                        "--start-object", str(start), "--max-objects", str(len(group))], check=True)
+                        "--start-object", str(start), "--max-objects", str(len(group)),
+                        "--root", str(root)], check=True)
         manifest["assemblies"].append({"ordinal": ordinal, "start_slot": start,
             "object_count": len(group), "output": output.name,
             "obas": [f"{item[0]:08x}" for _, item in group]})
