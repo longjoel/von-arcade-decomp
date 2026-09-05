@@ -7806,6 +7806,11 @@
           ],
           "symbol": "recovered_video_expand_tile",
           "notes": "Production C expands 64 groups of three indexed bytes through the 0x5775b0 16-bit table into three tile planes at tile*0x200 byte slots. The source stride, 8-bit mask, plane roots, and 64-word output shape are static-audited and vector-tested; byte validation remains blocked on compiler/ABI calibration.",
+          "modeling": {
+            "boundary": "Purely models one non-mirrored 8x8 tile expansion: consume 64 three-byte source groups, look up each byte through the 256-entry 16-bit table, and write one 64-word plane triplet at the selected tile slot.",
+            "test": "von/tools/test_recovered_video_tiles.py",
+            "unresolved_behavior": "Does not model the original ROM/table memory mapping, video-RAM bus timing, compiler/ABI details of the i960 caller, or downstream palette and display consumption."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -7835,6 +7840,11 @@
           ],
           "symbol": "recovered_video_expand_tile_indexed",
           "notes": "Recovers the source-pointer lookup through 0x142e94[g1*4] and delegation to the mirrored e2040 tile expansion with g0 as tile selector. The wrapper has no additional transform; it is covered by the randomized tile test.",
+          "modeling": {
+            "boundary": "Purely models indexed dispatch: select source_table[source_index] and delegate the tile and lookup inputs to the mirrored 8x8 expansion without an additional transform.",
+            "test": "von/tools/test_recovered_video_tiles.py",
+            "unresolved_behavior": "Does not model the original 0x142e94 table memory, invalid-index behavior outside the tested table, video-RAM timing, or downstream display consumption."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -7863,6 +7873,11 @@
           ],
           "symbol": "recovered_video_expand_tile_mirrored",
           "notes": "Production C preserves the indexed 8x8 expansion and duplicates all three 64-word planes at +0x100 bytes within each tile slot, matching the additional stores in 0xe2040. Byte validation remains blocked on compiler/ABI calibration.",
+          "modeling": {
+            "boundary": "Purely models mirrored tile expansion: perform the indexed 8x8 plane triplet and duplicate each 64-word plane into the same tile slot at the +0x100-word mirrored half.",
+            "test": "von/tools/test_recovered_video_tiles.py",
+            "unresolved_behavior": "Does not model the original ROM/table memory mapping, video-RAM bus timing, compiler/ABI details of the i960 caller, or downstream palette and display consumption."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
