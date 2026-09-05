@@ -420,6 +420,17 @@ stop at the first NUL. The callees are `0x1d090`, `0x1cf40`, and `0x1cfe0`
 respectively; those callees remain unmodeled. The route table is in
 `recovered_text_walk_dispatch_1d210.c`.
 
+The plane-0 emitter at `0x1d090` masks the byte to `0x7f`, subtracts `32`,
+and sign-extends the low byte (`shlo 24`/`shri 24`, confirmed arithmetic in
+the MAME i960 core). Biased values `0x4b`/`0x54` emit the fixed control
+pairs `0x837c`/`0x837d` and `0x837e`/`0x837f`; anything above `0x5f` would
+be zeroed first (unreachable for masked input). Other bytes index the glyph
+table at `0x2ea0fd0`, so control bytes keep negative indices. Each glyph is
+a vertical tile pair in plane `0x01000000` with `0xc000` attributes, and the
+column in `0x504ce0` advances while at most `61`. The pure plan is in
+`recovered_glyph_emit_1d090.c`; the `0x1cf40`/`0x1cfe0` plane variants
+remain separate.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at

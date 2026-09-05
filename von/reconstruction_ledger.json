@@ -9355,6 +9355,32 @@
             "unresolved_behavior": "The three callee routines and their byte side effects remain unmodeled"
           },
           "notes": "Route table for the three fixed-callee instances of the 0x1d1b0 walk shape. Each entry tests the byte first, emits nonzero bytes with the byte in g0, and stops at NUL. Unknown entries resolve to 0."
+        },
+        {
+          "id": "maincpu.glyph-emit-1d090",
+          "name": "glyph_emit_1d090",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_glyph_emit_1d090.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_glyph_emit_1d090.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001d090",
+              "end": "0x0001d1a0"
+            }
+          ],
+          "symbol": "recovered_glyph_emit_plan",
+          "modeling": {
+            "boundary": "Plane-0 glyph emit schedule: 0x7f mask, -32 bias with sign extension, 0x4b/0x54 control pairs, glyph-table index, vertical tile pair with 0xc000 attributes, column advance capped at 61",
+            "test": "von/tools/test_recovered_glyph_emit_1d090.py",
+            "unresolved_behavior": "Actual glyph-table dereference, tile-RAM writes, and the 0x1cf40/0x1cfe0 plane variants remain outside this pure emit schedule"
+          },
+          "notes": "Pure emit schedule for the 0x1d090 renderer: biased 0x4b/0x54 select fixed control pairs 0x837c/d and 0x837e/f; other bytes index table 0x2ea0fd0 (negative for control bytes); each glyph is a vertical tile pair in plane 0x01000000 with 0xc000 attributes; column advances while at most 61."
         }
       ]
     },
