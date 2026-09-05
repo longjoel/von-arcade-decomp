@@ -10685,6 +10685,11 @@
             }
           ],
           "symbol": "recovered_sharc_opcode_4d_horizontal_seed",
+          "modeling": {
+            "boundary": "Models the exact pre-refinement opcode-0x4d horizontal scalar: after the recovered dx/dz values are supplied, square each and add them as dx² + dz², preserving the aliased-dz copy required by the source instruction sequence.",
+            "test": "von/tools/test_recovered_sharc_opcode_4d_horizontal_seed.py",
+            "unresolved_behavior": "Production of dx/dz from FIFO and persistent state, SHARC floating-point rounding/overflow behavior, subsequent RSQRTS refinement and singular cases, register alias timing, and downstream predicate decisions remain outside this bounded seed model."
+          },
           "notes": "After dx=x-state[0], dz=z-state[2], the 0x4d sequence forms dx^2 + dz^2 before RSQRTS. The d05 R4=R2 copy is essential because F2/R2 is the aliased dz register; d06 then squares dz. The numeric discriminator (dx,dz)=(3,4) yields 25, not the previously misread 21."
         },
         {
