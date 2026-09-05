@@ -10380,6 +10380,33 @@
             "unresolved_behavior": "Sub-call body at 0x2a4e0 and surrounding branch conditions remain outside this pure block contract"
           },
           "notes": "Pure schedule for the 0x1ba08 block: the stored link is the call resume address, a LIKELY reading of g14 flow."
+        },
+        {
+          "id": "maincpu.counter-dispatch-1b9d0",
+          "name": "counter_dispatch_1b9d0",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "LIKELY",
+          "sources": [
+            "von/i960/recovered_counter_dispatch_1b9d0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_counter_dispatch_1b9d0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001b9d0",
+              "end": "0x0001ba08"
+            }
+          ],
+          "symbol": "recovered_counter_dispatch_plan",
+          "modeling": {
+            "boundary": "Dispatch schedule: bit-5 call arg, flag-bit bypass, decrement store, link selection only from counter 1",
+            "test": "von/tools/test_recovered_counter_dispatch_1b9d0.py",
+            "unresolved_behavior": "Sub-call bodies at 0x1fa30/0x2a4e0 and the cmpdeci condition-code reading remain outside this pure dispatch contract"
+          },
+          "notes": "Pure dispatch schedule feeding the 0x1ba08 link block; the equality direction of bne after cmpdeci is order-free."
         }
       ]
     },

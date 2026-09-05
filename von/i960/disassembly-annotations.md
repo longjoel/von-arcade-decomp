@@ -547,6 +547,12 @@ and stores the call's own resume address `0x1ba10` (not the entry link)
 to `0x503a00`. The pure schedule is in
 `recovered_link_publish_1ba08.c`.
 
+Its dispatch head at `0x1b9d0` masks the `0x503a04` counter to bit 5
+for the `0x1fa30` call, then either jumps to the link block on flag
+`0x5024a4` bit 4 with no store, or decrements the counter in place and
+takes the link block only when the entry counter was exactly 1. The
+pure schedule is in `recovered_counter_dispatch_1b9d0.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
