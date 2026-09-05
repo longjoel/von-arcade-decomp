@@ -2325,6 +2325,11 @@
             }
           ],
           "symbol": "recovered_audio_send_u16",
+          "modeling": {
+            "boundary": "i960 audio command enqueue for special byte and normal 16-bit command encodings",
+            "test": "von/tools/test_recovered_audio_queue.py",
+            "unresolved_behavior": "mapped sound transport timing and host-control interrupt servicing remain outside the deterministic queue/encoding contract"
+          },
           "notes": "Queues special command 0xff as one byte or a normal 16-bit command as 0xae/high/low after reserving space, honors the observed mode/status suppression gate, and raises host control bit 10 to service the queue.",
           "milestones": {
             "c-only-i960-attract-60s": {
