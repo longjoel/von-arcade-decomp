@@ -10515,6 +10515,33 @@
             "unresolved_behavior": "Sub-call bodies at 0x1ffb0/0x2a4e0 remain outside this pure dispatch contract"
           },
           "notes": "Pure dispatch schedule for the 0x1bafc masked call block."
+        },
+        {
+          "id": "maincpu.nibble-expand-1bb90",
+          "name": "nibble_expand_1bb90",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_nibble_expand_1bb90.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_nibble_expand_1bb90.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001bb90",
+              "end": "0x0001bc1c"
+            }
+          ],
+          "symbol": "recovered_nibble_expand_word",
+          "modeling": {
+            "boundary": "Decoder kernel plus run schedule: per-halfword field expansion with overlapping OR accumulation, max(count, 0) passes with 2-byte strides",
+            "test": "von/tools/test_recovered_nibble_expand_1bb90.py",
+            "unresolved_behavior": "Glyph-table provenance and downstream consumers remain outside this pure decode contract"
+          },
+          "notes": "Pure decode kernel proven exhaustively over the full 16-bit input space against an independent bit mapping."
         }
       ]
     },

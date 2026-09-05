@@ -576,6 +576,14 @@ issues `0x1ffb0` with 1 plus `0x2a4e0` with `0x1342`, a 32 mask issues
 counter always bumps in place. The pure schedule is in
 `recovered_masked_call_1bafc.c`.
 
+Past the `0x1bb50` data table, the `0x1bb90` routine is a
+nibble-expansion decoder: each pass reassembles one halfword from
+scattered fields with overlapping OR accumulation
+(`out[10] = in[8] | in[14]` and friends), storing one expanded word
+per 2-byte step for `max(count, 0)` passes. The pure kernel and run
+schedule are in `recovered_nibble_expand_1bb90.c`, proven against an
+independently derived bit mapping over all 65536 inputs.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
