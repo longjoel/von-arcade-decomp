@@ -11873,6 +11873,11 @@
             }
           ],
           "symbol": "recovered_geometry_projection_y_window_passes",
+          "modeling": {
+            "boundary": "Models the inclusive signed fixed-point Y-window predicate: compare the selected transformed vector's Y against the related record's +0x0c base and +0x54 extent, with the duplicate 0xdf56c route preserving the same comparisons",
+            "test": "von/tools/test_recovered_geometry_projection_interval_gate_df120.py",
+            "unresolved_behavior": "Vector selection, record population, later command-26 weighted-residual semantics, and runtime geometry/MMIO effects remain outside this interval gate"
+          },
           "notes": "The selected transformed vector's Y component passes an inclusive signed fixed-point interval check against the related record's +0x0c base and +0x54 extent. The duplicate route at 0xdf56c preserves the same comparisons; later command-26 weighted-residual semantics remain unresolved."
         },
         {
