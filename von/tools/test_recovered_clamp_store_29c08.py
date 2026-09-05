@@ -36,13 +36,22 @@ with tempfile.TemporaryDirectory() as td:
             plan.clamp_max) == (0x51A260, 0x51A264, 0x51A268, 0x100)
     assert plan.stored == 0x50
 
-    plan_fn(0x200, ctypes.byref(plan))
-    assert plan.stored == 0x100
-    plan_fn(0x100, ctypes.byref(plan))
-    assert plan.stored == 0x100
-    plan_fn(-1000, ctypes.byref(plan))
-    assert plan.stored == -1000
-    plan_fn(-256, ctypes.byref(plan))
-    assert plan.stored == -256
+    def stored(value):
+        plan_fn(value, ctypes.byref(plan))
+        return plan.stored
+
+    # Ceiling arm: anything above 0x100 stores 0x100.
+    assert stored(0x200) == 0x100
+    assert stored(0x101) == 0x100
+    assert stored(0x100) == 0x100
+    # Floor arm: the pre-setbit g5 floor clamps below -256.
+    assert stored(-255) == -255
+    assert stored(-256) == -256
+    assert stored(-257) == -256
+    assert stored(-1000) == -256
+    assert stored(-0x80000000) == -256
+    # Interior values pass through, including the extremes' neighbors.
+    assert stored(0) == 0
+    assert stored(-1) == -1
 
 print("PASS: 0x29c08 clamp-store plan")

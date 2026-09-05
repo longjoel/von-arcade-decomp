@@ -19,7 +19,13 @@ void recovered_clamp_store_plan(s32 value,
     plan->zero_addr0 = 0x0051a264U;
     plan->zero_addr1 = 0x0051a268U;
     plan->clamp_max = 0x100;
-    /* The bl/cmpible pair reduces to a signed minimum: values below
-     * -256 keep the entry value, anything above 0x100 stores 0x100. */
-    plan->stored = value > plan->clamp_max ? plan->clamp_max : value;
+    /* Three-way signed clamp: bl takes the pre-setbit g5 floor of -256
+     * when value < -256, the cmpible arm keeps values through 0x100,
+     * and anything above stores the 0x100 ceiling. */
+    if (value < -256)
+        plan->stored = -256;
+    else if (value > plan->clamp_max)
+        plan->stored = plan->clamp_max;
+    else
+        plan->stored = value;
 }
