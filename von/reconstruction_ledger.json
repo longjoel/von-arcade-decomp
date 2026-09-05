@@ -3906,7 +3906,12 @@
             }
           ],
           "symbol": "recovered_status_tile_pattern_plan",
-          "notes": "Recovers the current-origin 16x7 pattern, 112 sequential 0xc000|0x1488+index values, plane 0x01000000, and modulo-64 row progression."
+          "notes": "Recovers the current-origin 16x7 pattern, 112 sequential 0xc000|0x1488+index values, plane 0x01000000, and modulo-64 row progression.",
+          "modeling": {
+            "boundary": "i960 0x228f0 current-origin 16-by-7 status tile pattern descriptor and modulo-64 destination progression",
+            "test": "von/tools/test_recovered_status_tile_pattern_228f0.py",
+            "unresolved_behavior": "actual tile-memory writes and downstream pattern rendering effects remain outside the pure tile/value plan"
+          }
         },
         {
           "id": "maincpu.status-wide-tile-patterns-22970-229e0",
