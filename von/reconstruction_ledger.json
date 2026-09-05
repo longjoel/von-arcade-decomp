@@ -10960,6 +10960,11 @@
             }
           ],
           "symbol": "recovered_text_status_glyph_plan",
+          "modeling": {
+            "boundary": "SHARC status glyph selector normalizes a seven-bit character, routes indices 41/42 to fixed sources, routes other valid indices through the descriptor table, and plans two-row output",
+            "test": "von/tools/test_recovered_text_status_glyph.py",
+            "unresolved_behavior": "mapped tile-RAM writes and downstream panel rendering remain outside the pure selector contract"
+          },
           "notes": "Recovers seven-bit character normalization and the index split: indices 41 and 42 select fixed sources 0x02fd7c90/0x02fd7c98, all other valid indices select descriptor entries at 0x02ea14d0 plus index*8, and the sink processes two rows. The current text-control test validates all four 96-entry descriptor banks, descriptor widths, glyph source ranges, and tile-address plans; only mapped tile-RAM writes remain outside the pure slice."
         },
         {
