@@ -10421,6 +10421,11 @@
             }
           ],
           "symbol": "opcode_45_three_input_three_result_helper",
+          "modeling": {
+            "boundary": "Models the normal opcode-0x45 spherical projection: convert the two signed-16 angle words with pi/32767 scaling, obtain sine/cosine values through the recovered helper path, and emit scale*sin(a), scale*cos(a)*cos(b), and -scale*cos(a)*sin(b) with the observed fixed-point/float bit patterns.",
+            "test": "von/tools/test_sharc_opcode_45.py",
+            "unresolved_behavior": "FIFO production and wait timing, helper exceptional/reduction behavior beyond the tested vectors, SHARC instruction-level rounding and register scheduling, output FIFO backpressure, delayed stores, and downstream consumers remain outside this bounded spherical-output model."
+          },
           "notes": "The first two FIFO words are signed-16 half-turn angle units (radians = word*pi/32767); the third is float scale s. Runtime (a,b)=(0x2000,0x4000), s=2 emits (1.4142475,-0.0000678,-1.4141798) at PCs 0x20bc6, 0x20bc9, and 0x20bcd, confirming spherical output ordering and negative-Z sign within fixed-point helper rounding."
         },
         {
