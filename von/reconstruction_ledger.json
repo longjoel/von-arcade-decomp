@@ -8442,6 +8442,11 @@
             }
           ],
           "symbol": "recovered_geometry_result_builder_9de50_plan",
+          "modeling": {
+            "boundary": "Models the 0x9de50 entry contract: selector-stride and parameter lookup, command-0x38 response placement, flag-set delta versus 0x562cde fallback, common command-31 seven-word framing, SHARC opcode-1f six-operand pairing, and final response storage at +0x28.",
+            "test": "von/tools/test_recovered_geometry_result_builder_9de50.py",
+            "unresolved_behavior": "Live FIFO response values and timing, mapped record writes, full selector-table semantics, and downstream SHARC/device state remain unresolved."
+          },
           "notes": "Records the high-fanout 0x9de50 entry as a member of the shared 0x38/result-copy/delta-or-fallback/common-31 builder family, including selector table, paired record offsets, the seven-word host request without the selector-derived table value, and the one-word host read at 0x9e240. The common decimal-31 request dispatches to SHARC opcode 0x1f at 0x203ea, which consumes exactly six FIFO operands as three endpoint pairs and emits one refined Euclidean length at 0x20409. Packet indices 1/4, 2/5, and 3/6 pair the reference fields at +0x14/+0x18/+0x1c with the response scratch fields at +0x40/+0x44/+0x48. The prior association with 0x20762 and an eight-input direct-tail response was a dispatch-table numbering error; 0x20762 is the separate opcode-0xca matrix/projection handler."
         },
         {
