@@ -2309,6 +2309,11 @@
             }
           ],
           "symbol": "recovered_signed_band",
+          "modeling": {
+            "boundary": "i960 low-16-bit signed input maps to ten ordered runtime bands with explicit positive and negative thresholds",
+            "test": "von/tools/test_recovered_runtime_math.py",
+            "unresolved_behavior": "caller-specific lookup-table meaning and integration into the attract image remain provisional beyond the exhaustive classifier contract"
+          },
           "notes": "High-frequency attract leaf. Production C sign-extends the low 16 bits and reproduces all ten threshold bands. Callers use the result as an index into gameplay and presentation lookup tables.",
           "milestones": {
             "c-only-i960-attract-60s": {
