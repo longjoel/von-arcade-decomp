@@ -2849,6 +2849,11 @@
           ],
           "symbol": "recovered_host_interrupt_mask_update",
           "notes": "Clears and re-arms a host interrupt mask, reloads timer MMIO for masks 4/8/16/32 with the observed values, and acknowledges the source through 0xe80000. The audio bit-10 service uses the same control transition.",
+          "modeling": {
+            "boundary": "Purely models the mask-update sequence: clear the source bit in the control mirror and MMIO register, reset and reload the corresponding timer for masks 4, 8, 16, or 32, re-arm the source bit in both control locations, and acknowledge with the complemented mask.",
+            "test": "von/tools/test_recovered_host_control.py",
+            "unresolved_behavior": "Does not model live timer/interrupt MMIO timing, interrupt delivery, vector dispatch, or caller-specific sequencing around the mask update."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
