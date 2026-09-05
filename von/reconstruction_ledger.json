@@ -1356,7 +1356,7 @@
           "id": "maincpu.opcode-10-identity-state-initializer",
           "name": "opcode_10_identity_state_initializer",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -1371,6 +1371,11 @@
             }
           ],
           "symbol": "sharc_opcode_10_identity_state_initializer",
+          "modeling": {
+            "boundary": "Models the exact opcode-0x10 identity initializer: through the state pointer at DM 0x30101, write a 12-word block with 1.0 at offsets 0, 4, and 8 and zero in every other slot, including delayed stores at offsets 0x0a and 0x0b.",
+            "test": "von/tools/test_sharc_opcode_10.py",
+            "unresolved_behavior": "Persistent state ownership/address semantics, delayed-return timing, caller/reset frequency, FIFO/dispatch scheduling, and downstream interpretation of the identity-plus-tail block remain outside this static initializer model."
+          },
           "notes": "Static listing recovers a 12-word identity block at the DM 0x30101 state pointer: 1.0 at offsets 0,4,8 and zero elsewhere. The last two writes are delayed-return slots; caller/reset frequency remains provisional."
         },
         {
