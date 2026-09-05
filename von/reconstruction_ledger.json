@@ -11014,6 +11014,11 @@
             }
           ],
           "symbol": "recovered_text_plane0_cell_plan",
+          "modeling": {
+            "boundary": "Models the plain plane-0 block writer: width-contiguous source halfwords map into rows with a 64-tile destination stride, with only bit 15 forced on each cell",
+            "test": "von/tools/test_recovered_text_plane0_block.py",
+            "unresolved_behavior": "SHARC tile-RAM address ownership, caller-selected source buffers, and downstream display timing remain outside this host-side geometry contract"
+          },
           "notes": "Recovers the plain width-by-height block geometry: source rows are width-contiguous, destination rows use a 64-tile stride in plane 0x01000000, and each source halfword receives only forced bit 15."
         },
         {
