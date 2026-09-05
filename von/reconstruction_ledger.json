@@ -6103,7 +6103,12 @@
             }
           ],
           "symbol": "recovered_object_state_tail",
-          "notes": "Recovers the common guarded transition remap: object +0x172 must equal 31, current object state must equal 3, and caller state must equal 6; pending transitions 8, 7, and 9 become 11, 10, and 12 respectively. Other values return unchanged."
+          "notes": "Recovers the common guarded transition remap: object +0x172 must equal 31, current object state must equal 3, and caller state must equal 6; pending transitions 8, 7, and 9 become 11, 10, and 12 respectively. Other values return unchanged.",
+          "modeling": {
+            "boundary": "i960 0x795c4 common object-state tail model covering the three guard fields, pending transitions 7/8/9 remapping, and unchanged fallback behavior",
+            "test": "von/tools/test_recovered_object_state_tail.py",
+            "unresolved_behavior": "caller return ABI, object-pointer provenance, mapped state writes, preceding state-arm semantics, and downstream transition consumption remain outside the pure remap model"
+          }
         },
         {
           "id": "maincpu.object-state-random-role-selector",
