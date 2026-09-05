@@ -11117,6 +11117,11 @@
             }
           ],
           "symbol": "recovered_text_video_upload_wrapper_plan",
+          "modeling": {
+            "boundary": "Models the fixed text-video upload handoff: source 0x01004000 transfers to 0x02fd2520 at 0x40 halfwords per row, with the caller row supplied as g17+31 using unsigned wraparound",
+            "test": "von/tools/test_recovered_text_video_upload_wrapper.py",
+            "unresolved_behavior": "The downstream video upload engine, source-buffer population, and display-side consumption remain outside this wrapper contract"
+          },
           "notes": "Recovers the fixed 0x1bc90 handoff: source 0x01004000, destination 0x02fd2520, 0x40 halfwords per row, and caller g17+31 rows with unsigned wraparound."
         },
         {
