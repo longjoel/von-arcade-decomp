@@ -9948,6 +9948,11 @@
             }
           ],
           "symbol": "sharc_opcode_34_eight_input_state_rebuild_service",
+          "modeling": {
+            "boundary": "Models the pure staged opcode-0x34 state rebuild: accumulate the first three FIFO vector inputs through the incoming 3x3 matrix, apply signed-16 Y then X rotations from R5/R6 using pi/32767 scaling, and accumulate the second three FIFO vector inputs through the updated matrix while preserving the supplied matrix and translation-tail state as the only mutable outputs.",
+            "test": "von/tools/test_recovered_sharc_opcode_34.py",
+            "unresolved_behavior": "FIFO wait/production, persistent DM state ownership and address mapping, helper-call rounding and scheduling details, delayed write ordering, SHARC register/DM timing, and downstream consumers remain outside this bounded transform model."
+          },
           "notes": "Static listing recovers eight FIFO inputs, persistent translation-tail loads, three signed-parameter helper chains with scale 0x38c9116d, interleaved 3x3 matrix rebuild, and delayed final state writes. Live identity-seeded single-field probes show R0/R1/R2 write translation X/Y/Z respectively and R13/R14/R15 write a second translation X/Y/Z group respectively. R5 and R6 are signed-16 helper inputs; R5=0x4000 produces the conventional Y-axis quarter-turn [c,0,+1 / 0,c,0 / -1,0,c], while R6=0x4000 produces the conventional X-axis quarter-turn [c,0,0 / 0,c,-1 / 0,+1,c], with c the helper near-zero residual. The recovered staged dataflow is tail += M_old*(R0,R1,R2), followed by M_new = Rx(R6)*Ry(R5)*M_old, followed by tail += M_new*(R13,R14,R15); this is modeled in von/i960/recovered_sharc_opcode_34.c and covered by von/tools/test_recovered_sharc_opcode_34.py."
         },
         {
