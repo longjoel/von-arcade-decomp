@@ -55,6 +55,7 @@ def main() -> int:
         assert report["registration"] == "discovery-only"
         assert report["capture_id"] == "fixture-attract-1"
         assert report["phase"] == "startup"
+        assert report["pc_log"] == "pcs"
         assert report["edge_semantics"] == "possible_static_edges"
         assert report["observed_entry_points"] == ["0x00000200"]
         assert len(report["possible_static_edges"]) == 1

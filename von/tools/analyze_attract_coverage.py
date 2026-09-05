@@ -148,6 +148,7 @@ def main() -> int:
             for start, end in ranges
         ],
     }
+    report["pc_log"] = str(args.pcs.resolve().relative_to(root))
     args.json.parent.mkdir(parents=True, exist_ok=True)
     args.json.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     markdown = (
