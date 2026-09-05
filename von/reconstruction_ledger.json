@@ -1785,6 +1785,11 @@
             }
           ],
           "symbol": "sharc_opcode_1e_cosine_times_float_service",
+          "modeling": {
+            "boundary": "SHARC signed-angle FIFO input, delayed raw floating multiplier input, cosine helper scaling, and output",
+            "test": "von/tools/test_recovered_sharc_opcode_1e.py",
+            "unresolved_behavior": "negative-angle and non-finite multiplier behavior remain provisional beyond the controlled finite vectors"
+          },
           "notes": "The first FIFO word is sign-extended and scaled by pi/32767, passed through helper 0x20dbe, and multiplied by the delayed raw F15 word. Post-boot MAME responses for (0,1.0), (0x4000,2.0), and (0x2000,1.0) are 0x3f7fffff, 0xb8c92eef, and 0x3f3503d8. The cosine-times-float model matches these words; negative-angle and non-finite multiplier behavior remain provisional."
         },
         {
