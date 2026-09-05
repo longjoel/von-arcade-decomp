@@ -8960,6 +8960,11 @@
               "end": "0x0000234c"
             }
           ],
+          "modeling": {
+            "boundary": "fixed text startup wrapper copies exactly 0x20c bytes from 0x01d00000 to 0x01d0020c through the recovered forward-copy primitive",
+            "test": "von/tools/test_recovered_memory.py",
+            "unresolved_behavior": "ROM table contents and exact wrapper instruction encoding remain provisional beyond the fixed address/length contract"
+          },
           "notes": "Fixed wrapper around 0xf5d40: copies 0x20c bytes from 0x01d00000 to 0x01d0020c. The source, destination, and length are all immediate/static and reuse the recovered forward-copy contract.",
           "milestones": {
             "c-only-i960-attract-60s": {
