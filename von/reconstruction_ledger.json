@@ -6931,7 +6931,12 @@
             }
           ],
           "symbol": "recovered_transition_action5_table_value",
-          "notes": "Recovers the ten action-5 values at 0x72690 and ten action-10 values at 0x72750, with bounded selector accessors; wrapper mapped writes remain separate."
+          "notes": "Recovers the ten action-5 values at 0x72690 and ten action-10 values at 0x72750, with bounded selector accessors; wrapper mapped writes remain separate.",
+          "modeling": {
+            "boundary": "Purely models both ten-entry action tables: action 5 values [8,12,12,12,12,13,13,13,19,8] and action 10 values [9,16,12,12,12,13,13,13,17,9], returning zero for unsigned selectors at or above 10.",
+            "test": "von/tools/test_recovered_transition_selector_dispatch.py",
+            "unresolved_behavior": "The original ROM/table storage access, action wrapper writes, mapped state effects, and consumers of the selected transition values are not modeled by this data unit."
+          }
         },
         {
           "id": "maincpu.transition-action-state-adapters",
