@@ -1669,6 +1669,11 @@
             }
           ],
           "symbol": "sharc_helper_20de1_streamed_geometry_interpolation_validation",
+          "modeling": {
+            "boundary": "SHARC scratch-vertex reads, reciprocal-refined interpolation branches, and scalar/caller-pair emission",
+            "test": "von/tools/test_sharc_helper_20de1.py",
+            "unresolved_behavior": "exact natural-coordinate mapping and caller-side clipping remain provisional beyond the controlled asymmetric probe"
+          },
           "notes": "Static listing recovers auxiliary-word snapshots at DM 0x30109..0x3010a, scratch-vertex reads from 0x3010b, edge/product arithmetic, reciprocal-refined denominator paths, equality/degenerate branches, the explicit scratch permutation 6..8 to 3..5, and fallback constant 0xbdcccccd. The normal path forms denominator F8-F12, refines it with RECIPS, and saves intermediate F15; the alternate path uses the corresponding F1/F5 and F4/F2 products. The 0x20e3a branch tests the post-schedule F2 = F9 - F14 subtraction, so its register-level sentinel condition is F9 == F14 under SHARC signed-zero equality; a previous direct record-coordinate formula was removed as unsupported. The caller's nonzero determinant admission test and emitted pair [helper R0, selected-record] show that R0 is a scalar interpolation/coordinate result rather than a boolean validator. The controlled asymmetric probe probe_sharc_opcode_17_nonzero.lua reaches 0x20de1, exits through 0x20e4d with 0xbcdd67c8 (-0.0270270258), and emits the caller stream 0x00000001, 0xbcdd67c8, 0x00000000. A rebuilt MAME capture with corrected F15 tracing supplies four normal pre-branch tuples F11=8.0, F13=1.0, F15=5.0. Exact natural coordinate mapping and caller-side clipping remain provisional."
         },
         {
