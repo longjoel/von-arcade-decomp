@@ -9658,6 +9658,11 @@
             }
           ],
           "symbol": "sharc_opcode_2a_persistent_matrix_scale_service",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x2a persistent-matrix mutation: the supplied scalar multiplies all nine matrix elements in order, covering the complete 3x3 writeback including the delayed final stores.",
+            "test": "von/tools/test_recovered_sharc_opcode_2a.py",
+            "unresolved_behavior": "FIFO and DM state-window timing, persistent-state address mapping, delayed-return scheduling, scalar caller meaning, and matrix readback consumers are not modeled by this elementwise helper."
+          },
           "notes": "Static listing recovers one FIFO scalar, floating-point multiplication against all nine persistent matrix elements, and complete 3x3 writeback at offsets 0x00..0x08, with the final two stores in delayed-return slots. A live identity-state probe with scalar 2.0 reads back exact 0x40000000 diagonal words, zero off-diagonals, and zero tail, confirming elementwise matrix scaling and readback ordering; scalar caller meaning remains provisional."
         },
         {
