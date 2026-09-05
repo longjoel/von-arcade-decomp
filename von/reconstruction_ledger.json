@@ -2455,6 +2455,11 @@
           ],
           "symbol": "recovered_audio_send_value_selector_zero",
           "notes": "Frames the low byte of the input as 0xa0, selector 0, value and submits the three-byte command through the shared ring-capacity and service-request path.",
+          "modeling": {
+            "boundary": "i960 selector-zero three-byte audio framing through shared ring-capacity/service-request path",
+            "test": "von/tools/test_recovered_audio_helpers.py",
+            "unresolved_behavior": "mapped sound transport timing and downstream service consumption remain outside the shared enqueue contract"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
