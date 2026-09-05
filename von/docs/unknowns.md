@@ -67,12 +67,18 @@ confirmation still wants the original-ROM stream comparison.
 ## U-0006 — model-table header and subgroup markers
 
 Model part tables are located and record-decoded (`main_data`
-0xbed828: 19 `[tpa, tha, oba]` records, all trace-verified), but the
-10-word header at 0xbed800 (OBA-like `0x91xxxx` and `0x49xxxx`
-values, `0x00 0x00 0xffffffff` terminator) and the in-table `[0, 0,
-3]`, `[0, 0, 2]`, `[0, 0, 4]` subgroup markers are undecoded. Tables
-are contiguous (`0xffffffff` separator, next table at 0xbed948).
-Related: `decode_model_part_table.py`.
+0xbed828: 19 `[tpa, tha, oba]` records, all trace-verified). Marker
+semantics are decoded from the 0xc9b50 consumer: the walker strides
+records 12 bytes at a time and a record whose oba word is `<= 5`
+(unsigned) takes the filing body, storing the parallel pose entry
+into dispatch slot `3*oba` at `0x562430`; larger obas skip it. A
+10-entry, 24-byte directory at maincpu 0xc9100 (`[range_end,
+range_start, struct_a, aux0, struct_b, aux1]`, struct count bounds
+the walk) indexes the table ranges. Still open: the 10-word header
+at 0xbed800 (OBA-like `0x91xxxx` values absent from the trace),
+`range_start`'s role, and the loop-entry zero check at 0xc9c9c.
+Tables are contiguous (`0xffffffff` separator, next table at
+0xbed948). Related: `decode_model_part_table.py`.
 
 ## U-0007 — trace slot families are not models
 

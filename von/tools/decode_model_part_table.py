@@ -52,6 +52,27 @@ def decode_records(words: list) -> list:
     return entries
 
 
+def decode_directory(words: list) -> list:
+    """Split raw words into 6-word directory entries.
+
+    Observed at maincpu 0xc9100 (10 entries): [range_end, range_start,
+    struct_a, aux0, struct_b, aux1]. The 0xc9b50 walker strides the
+    [tpa, tha, oba] records 12 bytes at a time from range_end, bounded
+    by the struct count; a record whose oba word is <= 5 takes the
+    filing body (parallel pose entry stored to dispatch slot 3*oba at
+    0x562430), larger obas skip it via the unsigned-greater branch.
+    """
+    entries = []
+    for cursor in range(0, len(words) // 6 * 6, 6):
+        chunk = words[cursor:cursor + 6]
+        entries.append({
+            "range_end": chunk[0], "range_start": chunk[1],
+            "struct_a": chunk[2], "aux0": chunk[3],
+            "struct_b": chunk[4], "aux1": chunk[5],
+        })
+    return entries
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rom-dir", type=Path, default=Path("von/artifacts"))

@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from decode_model_part_table import decode_records, load_main_data
+from decode_model_part_table import decode_directory, decode_records, load_main_data
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -40,6 +40,12 @@ def main():
     assert parts == EXPECTED_PARTS, f"part mismatch: {parts!r}"
     markers = [entry[1] for entry in entries if entry[0] == "marker"]
     assert markers == [3, 2, 4], f"marker mismatch: {markers!r}"
+    entries = decode_directory([
+        0x02bed8dc, 0x02bed81c, 0x021a48f0, 0x020ebca0, 0x021bbfc8, 0x0211a768,
+        0x02bedb1c, 0x02beda5c, 0x021a48f0, 0x020ebca0, 0x021bbfc8, 0x0211a768,
+    ])
+    assert [entry["range_end"] for entry in entries] == [0x02bed8dc, 0x02bedb1c]
+    assert entries[0]["struct_a"] == 0x021a48f0
     print(f"PASS: model part table ({len(parts)} parts, markers {markers})")
 
 
