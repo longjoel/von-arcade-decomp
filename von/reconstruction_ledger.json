@@ -7906,6 +7906,11 @@
           ],
           "symbol": "recovered_video_palette_lookup_initialize",
           "notes": "Production C recovers the selector-dependent step/offset table and all 256 lookup entries generated for the video tile expanders. The ten valid selector pairs, invalid-selector fallback, accumulator recurrence, and metadata stores are statically audited and exhaustively vector-tested; byte validation remains blocked on compiler/ABI calibration.",
+          "modeling": {
+            "boundary": "Purely models palette lookup generation: select one of ten step/offset pairs for selectors 1 through 10, use step 0xff and offset 0 otherwise, fill 256 entries with the recovered accumulator recurrence, store the selected metadata, and return the final entry.",
+            "test": "von/tools/test_recovered_video_palette.py",
+            "unresolved_behavior": "Does not model the original lookup-table memory address, mapped video consumers, compiler/ABI representation of the table, or downstream palette timing."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
