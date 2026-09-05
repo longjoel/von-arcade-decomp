@@ -10056,6 +10056,11 @@
             }
           ],
           "symbol": "sharc_opcode_36_four_input_state_service",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x36 state update: add the three supplied translation inputs to the prior translation tail, reset the 3x3 matrix to identity, and scale each diagonal element by the supplied R13 scalar while clearing all off-diagonal elements.",
+            "test": "von/tools/test_recovered_sharc_opcode_36.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent DM state ownership and address mapping, delayed write ordering, SHARC register/DM timing, and the next service's consumption of the emitted state remain outside this bounded update model."
+          },
           "notes": "Static listing recovers four FIFO inputs, persistent translation-tail reads and writes, identity matrix initialization, and parameterized matrix writeback with delayed final stores. Identity-seeded single-field probes show R0/R1/R2 contribute tail X/Y/Z respectively, while R13 uniformly scales the final matrix: R13=1.0 gives identity, R13=2.0 gives diagonal 2.0, and R13=0 gives a zero matrix."
         },
         {
