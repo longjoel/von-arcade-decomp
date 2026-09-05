@@ -11068,6 +11068,11 @@
             }
           ],
           "symbol": "recovered_text_plane0_fill_cell_plan",
+          "modeling": {
+            "boundary": "Models the explicit-position plane-0 rectangle fill: column and row select the origin, width and height bound the rectangle, rows use a 64-tile stride, and preserved g14 is written unchanged to each cell",
+            "test": "von/tools/test_recovered_text_plane0_fill.py",
+            "unresolved_behavior": "SHARC tile-RAM ownership, caller-provided fill state, and display timing remain outside this host-side placement contract"
+          },
           "notes": "Recovers the explicit-position rectangle fill: column/row are g0/g1, width/height are g2/g3, destination rows use a 64-tile stride in plane 0x01000000, and preserved g14 is stored unchanged."
         },
         {
