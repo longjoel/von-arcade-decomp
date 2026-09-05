@@ -2523,6 +2523,11 @@
           ],
           "symbol": "recovered_audio_service_table_reset_plan",
           "notes": "Pure plan captures the 24-entry 0xffff reset of the 0x00504c30 service table and the adjacent zero state write; no device protocol is inferred.",
+          "modeling": {
+            "boundary": "i960 audio service-table reset plan across 24 two-byte entries",
+            "test": "von/tools/test_recovered_audio_helpers.py",
+            "unresolved_behavior": "service-table consumers and device-side reset effects remain outside the pure address/value plan"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
