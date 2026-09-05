@@ -475,6 +475,13 @@ loops repeat it with `0x100 - fade` or `fade + 0x100` factors. The pure
 kernel is in `recovered_blend_kernel_29dec.c`; loop trip counts, pointer
 chasing, and fault semantics stay unresolved.
 
+The inner-loop counter block is a fixed trip schedule, shown canonically
+at `0x29e68`: the body runs first, then `addo r6,1 / cmpi 31,r6 / bge`
+exits once `31 >= r6` fails, giving exactly 32 passes with src/dst each
+advancing `32 x 4 = 0x80` bytes for 32 stores. The pure schedule is in
+`recovered_blend_loop_schedule_29e68.c`; the `0x180` stride fixups and
+the outer `r15` cadence stay unresolved.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero

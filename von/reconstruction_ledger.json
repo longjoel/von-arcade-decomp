@@ -10084,6 +10084,32 @@
             "unresolved_behavior": "Loop trip counts, pointer chasing, and multiply fault semantics remain outside this pure per-texel contract"
           },
           "notes": "Pure kernel for the 0x29dec blend loop, repeated with different factors across the other five blend loops and both direct-path loops."
+        },
+        {
+          "id": "maincpu.blend-loop-schedule-29e68",
+          "name": "blend_loop_schedule_29e68",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_blend_loop_schedule_29e68.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_blend_loop_schedule_29e68.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00029e68",
+              "end": "0x00029e98"
+            }
+          ],
+          "symbol": "recovered_blend_loop_schedule_plan",
+          "modeling": {
+            "boundary": "Inner-loop trip schedule: 32 passes, 32 stores, 0x80-byte src/dst advance per loop instance",
+            "test": "von/tools/test_recovered_blend_loop_schedule_29e68.py",
+            "unresolved_behavior": "0x180 stride fixups and outer r15 cadence remain outside this pure inner schedule"
+          },
+          "notes": "Pure trip schedule for the 0x29e68 plane-1 loop; the same counter block shape drives every other inner loop in the cluster."
         }
       ]
     },
