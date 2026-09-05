@@ -7,12 +7,16 @@ ledger `unresolved_behavior`.
 ## U-0001 — upload-cluster re-arm source
 
 After a `0x29c08` clamp zeroes `0x51a264`, the `0x29d50` uploader is
-parked (counter 0 < 3) until something re-seeds the state. One parking
-caller is now identified: the `0x1b960` leaf clamps 0 and publishes 25
-to `0x503a00` (`maincpu.park-store-1b960`). No caller in the recovered
-set has been shown to perform the re-seed.
+parked (counter 0 < 3) until something re-seeds the state. The re-arm
+mechanism is now identified: the `0x29c50` entry forces counter
+`0x29c9c` (active, huge bank) with a zero-floor clamp
+(`maincpu.rearm-store-29c50`), and its `0x29c58` entry takes the
+caller's link instead (link-valued at `0x1a7c0`, `0xdc338`, `0xdc77c`).
+What stays open is the trigger: no direct caller of the `0x29c50`
+entry is visible in maincpu.
 Related: `maincpu.clamp-store-29c08`, `maincpu.upload-select-29d50`,
-`maincpu.upload-state-init-29d2c`, `maincpu.park-store-1b960`.
+`maincpu.upload-state-init-29d2c`, `maincpu.park-store-1b960`,
+`maincpu.rearm-store-29c50`.
 
 ## U-0002 — pair-2 stride asymmetry rationale
 

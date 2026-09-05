@@ -443,10 +443,26 @@ caller link instead. The pure schedules are in
 `recovered_home_dispatch_1ef70.c`, `recovered_block_emit_1dc90.c`, and
 `recovered_block_fill_1df00.c`.
 
-The store triple at `0x29c08` reduces to a signed minimum: the `bl` and
-`cmpible` arms combine so the value at `0x51a260` is `min(g0, 0x100)`
-while `0x51a264`/`0x51a268` are zeroed (the link, already cleared).
-The pure schedule is in `recovered_clamp_store_29c08.c`.
+The store triple at `0x29c08` is a three-way signed clamp: the `bl`
+arm takes the pre-`setbit` `g5` floor of `-256` when `g0 < -256`, the
+`cmpible` arm keeps values through `0x100`, and anything above stores
+the `0x100` ceiling — while `0x51a264`/`0x51a268` receive the cleared
+link (zero). The pure schedule is in `recovered_clamp_store_29c08.c`.
+(Corrected from a minimum-only reading that mishandled below-`-256`
+inputs; the boundary test now pins both arms.)
+
+The neighboring routine at `0x29c50` re-arms the cluster: it loads
+`0x29c9c` into the link slot, clamps `g0` into `0x51a260` with a
+`0`-floor variant (`cmpi g0,0` sends negatives to 0, then the same
+`0x100` ceiling), stores the forced link to the counter at `0x51a264`
+— a huge `>= 3` value, so the next `0x29d50` call is active — and the
+entry `g1` to the mode slot, returning one-way through `bx(g2)` to the
+`ret` at `0x29c9c`. Its second entry at `0x29c58` skips the forced link
+so the counter takes the caller's link instead; the three callers there
+(`0x1a7c0`, `0xdc338`, `0xdc77c`) are link-valued. No direct caller of
+the `0x29c50` entry is visible in maincpu — the re-arm trigger stays
+open in U-0001. The pure schedule is in
+`recovered_rearm_store_29c50.c`.
 
 The uploader at `0x29d50` opens with a guard plus bank-select prologue:
 counters below 3 restore and return, otherwise the old counter shifted

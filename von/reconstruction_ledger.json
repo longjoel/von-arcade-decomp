@@ -10002,7 +10002,7 @@
           ],
           "symbol": "recovered_clamp_store_plan",
           "modeling": {
-            "boundary": "Clamp-store schedule: signed min(g0, 0x100) at 0x51a260 with zeroed 0x51a264/0x51a268 slots",
+            "boundary": "Clamp-store schedule: three-way clamp(g0, -256, 0x100) at 0x51a260 with zeroed 0x51a264/0x51a268 slots",
             "test": "von/tools/test_recovered_clamp_store_29c08.py",
             "unresolved_behavior": "Actual controller values and downstream consumers remain outside this pure store schedule"
           },
@@ -10272,6 +10272,33 @@
             "unresolved_behavior": "The re-arm source that unparks the uploader (U-0001) remains outside this pure leaf contract"
           },
           "notes": "Pure leaf schedule for the 0x1b960 parking caller: identifies one half of U-0001."
+        },
+        {
+          "id": "maincpu.rearm-store-29c50",
+          "name": "rearm_store_29c50",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "LIKELY",
+          "sources": [
+            "von/i960/recovered_rearm_store_29c50.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_rearm_store_29c50.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00029c50",
+              "end": "0x00029c9c"
+            }
+          ],
+          "symbol": "recovered_rearm_store_plan",
+          "modeling": {
+            "boundary": "Re-arm schedules for both entries: 0x29c50 forces counter 0x29c9c with a zero-floor clamp; 0x29c58 takes the caller link with the same clamp",
+            "test": "von/tools/test_recovered_rearm_store_29c50.py",
+            "unresolved_behavior": "No direct caller of the 0x29c50 entry is visible in maincpu, so the re-arm trigger stays open in U-0001"
+          },
+          "notes": "Pure re-arm schedules: the mechanism behind U-0001 is identified even though its trigger is not."
         }
       ]
     },
