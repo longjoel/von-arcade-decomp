@@ -3220,7 +3220,12 @@
             }
           ],
           "symbol": "recovered_video_profile_upload_plan",
-          "notes": "Recovers profile 0/1/other destination selection, fixed source 0x01004000, 0x40 halfwords per row, g17+31 rows, and 0x1bc90 dispatch."
+          "notes": "Recovers profile 0/1/other destination selection, fixed source 0x01004000, 0x40 halfwords per row, g17+31 rows, and 0x1bc90 dispatch.",
+          "modeling": {
+            "boundary": "i960 0x201a0 profile-selected video upload descriptor with fixed source, row geometry, and 0x1bc90 helper dispatch",
+            "test": "von/tools/test_recovered_video_profile_upload.py",
+            "unresolved_behavior": "the selected destination memory contents and live upload helper/MMIO effects remain outside the pure profile plan"
+          }
         },
         {
           "id": "maincpu.mixed-video-upload-20210",
