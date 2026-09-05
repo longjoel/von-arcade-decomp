@@ -8757,6 +8757,11 @@
             }
           ],
           "symbol": "recovered_text_alt_string_font_mode",
+          "modeling": {
+            "boundary": "Models the pure alternate glyph-string mode selector: an empty string or a string with no lowercase byte after its first byte selects mode 3; any lowercase ASCII byte after the first selects mode 2.",
+            "test": "von/tools/test_recovered_text_alt_string.py",
+            "unresolved_behavior": "The shared glyph emitter, zero-attribute writes, text destination state, runtime string storage, and display consumption are not modeled by this mode-selection helper."
+          },
           "notes": "Recovers the alternate glyph-string writer's lowercase scan and mode selection: mode 2 when a lowercase byte occurs after the first byte, mode 3 otherwise, followed by shared 0x1d310 emission with zero attributes.",
           "milestones": {
             "c-only-i960-attract-60s": {
