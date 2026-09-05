@@ -6796,7 +6796,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_post_route",
-          "notes": "Recovers the unsigned cmpobl sentinel partition: lower 0x200..0x21d, exact 0x21f, middle 0x400..0x41e, high 0x420..0x43f, and terminal bypass for the unsigned-wrap gaps and values at or above 0x440."
+          "notes": "Recovers the unsigned cmpobl sentinel partition: lower 0x200..0x21d, exact 0x21f, middle 0x400..0x41e, high 0x420..0x43f, and terminal bypass for the unsigned-wrap gaps and values at or above 0x440.",
+          "modeling": {
+            "boundary": "Purely models the unsigned post-route selector: classify sentinel values into lower (0x200..0x21d), exact 0x21f, middle (0x400..0x41e), high (0x420..0x43f), or terminal/done for unsigned-wrap gaps and all other values, using the cmpobl-equivalent unsigned arithmetic.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The caller's dispatch and terminal side effects, range-specific payload execution, and original control-flow/memory/MMIO behavior are not modeled."
+          }
         },
         {
           "id": "maincpu.object-action-timing-variant",
