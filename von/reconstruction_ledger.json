@@ -3362,6 +3362,11 @@
             }
           ],
           "symbol": "recovered_upload_20390_plan/recovered_panel17_plan",
+          "modeling": {
+            "boundary": "Models the pure 0x20390/0x203b0 panel-17 plan: fixed 0x1bc90 upload source/destination and 0x40-halfword rows derived as caller g17+31, plus the current-position 0x2fe0864 source with 0x1dc90 helper and 31x5 dimensions.",
+            "test": "von/tools/test_recovered_video_upload_20390_panel17.py",
+            "unresolved_behavior": "Upload-helper execution, device/MMIO transfer effects, source-buffer contents, and the caller’s current-position state remain outside this plan model."
+          },
           "notes": "Recovers the fixed 0x1bc90 upload to 0x01fccd20 with 0x40 halfwords and g17+31 rows, plus the current-position 0x2fe0864 31x5 attributed transfer."
         },
         {
