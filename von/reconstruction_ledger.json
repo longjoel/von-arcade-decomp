@@ -11603,6 +11603,11 @@
             }
           ],
           "symbol": "recovered_panel13_plan",
+          "modeling": {
+            "boundary": "Models the current-position panel-13 route: width g3+31 and height 5, copying source 0x02fe0b5c through 0x1dc10 when selected and using 0x1df00 clear otherwise",
+            "test": "von/tools/test_recovered_panel13_source_fill_route.py",
+            "unresolved_behavior": "Caller register provenance, source asset ownership, SHARC tile-RAM destination, and display timing remain outside this route contract"
+          },
           "notes": "Recovers the current-position source-or-clear route: width g3+31, height 5, source 0x02fe0b5c via 0x1dc10 or 0x1df00 clear."
         },
         {
