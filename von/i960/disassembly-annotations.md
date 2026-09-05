@@ -457,6 +457,14 @@ takes the bit-selected blend path at `0x29dc0`. The pure schedule is in
 `recovered_upload_select_29d50.c`; the long masked-blend loops stay
 unresolved.
 
+The setup tail at `0x29d2c` seeds that cluster: the caller link goes to
+both `0x51a260` and `0x51a268` while `0x51a264` is preset to 4, so the
+first `0x29d50` call is already past the sub-3 guard. Note the lifecycle
+link: a later `0x29c08` clamp overwrites `0x51a260` with `min(g0, 0x100)`
+and zeroes `0x51a264`/`0x51a268`, which parks the uploader (counter 0)
+until the state is re-seeded. The pure schedule is in
+`recovered_upload_state_init_29d2c.c`; who re-arms it stays unresolved.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero

@@ -10032,6 +10032,32 @@
             "unresolved_behavior": "Masked-blend pixel loops at 0x29dc0-0x2a0bc remain outside this pure prologue schedule"
           },
           "notes": "Pure prologue schedule for the 0x29d50 uploader: sub-3 counters return early, otherwise bank-select plus mode dispatch."
+        },
+        {
+          "id": "maincpu.upload-state-init-29d2c",
+          "name": "upload_state_init_29d2c",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_upload_state_init_29d2c.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_upload_state_init_29d2c.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00029d2c",
+              "end": "0x00029d48"
+            }
+          ],
+          "symbol": "recovered_upload_state_init_plan",
+          "modeling": {
+            "boundary": "Upload state seed: caller link to 0x51a260/0x51a268, counter preset to 4 so the first 0x29d50 call clears its guard",
+            "test": "von/tools/test_recovered_upload_state_init_29d2c.py",
+            "unresolved_behavior": "Who re-arms the cluster after a 0x29c08 clamp zeroes the counter remains outside this pure seed schedule"
+          },
+          "notes": "Pure seed schedule for the 0x29d2c setup tail: links the 0x29c08/0x29d50 cluster lifecycle (preset 4 = active, clamp-zeroed = parked)."
         }
       ]
     },
