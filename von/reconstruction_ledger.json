@@ -11549,6 +11549,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_input_byte_parser_3a38.py"],
           "ranges": [{"start": "0x00003a38", "end": "0x00003ad8"}],
           "symbol": "recovered_input_byte_parser_3a38",
+          "modeling": {
+            "boundary": "Models one pure 0x3a38 parser invocation: the empty/count-zero no-op, nonzero-count decrement and refill to seven with bounded status-bit set, first-byte decrement branches including underflow/zero/positive behavior, second-byte decrement, and the branch-identifying return value.",
+            "test": "von/tools/test_recovered_input_byte_parser_3a38.py",
+            "unresolved_behavior": "Indirect return mechanics, caller scheduling, input-source production, and any state consumers outside the supplied byte/count/status state remain unresolved."
+          },
           "notes": "Exact state transition for one parser call: empty first/second bytes leave state unchanged when count is zero; a nonzero count is decremented and replenishes both bytes to 7 while setting the selected status bit; otherwise the first byte is decremented, with zero clearing the selected bit and positive values also decrementing the second byte. The indirect return and caller scheduling are excluded."
         },
         {
