@@ -4499,8 +4499,13 @@
               "end": "0x00024cc8"
             }
           ],
-          "symbol": "recovered_geometry_command6_loop_plan",
-          "notes": "Bounds the signed 0x503a78 route, zero-based iteration, index-vs-0x503a6c and separate 0x5024e8 mask-bit-2 gate, and unit increment. Both 0x24788 and 0x248cc branches emit the six-word packet [5,19,computed0,computed1,1,58] before the 0x802008 readback and 0x801008 publication. The i960 long-real setup makes r4:r5 equal 600.0; both branches compute computed0=(float)(4.0/600.0) and computed1=(float)(r6/600.0) through divrl, then store the single-precision results. r6 is an incoming preserved register value, not a proven 0x701a0 clip return: cvtir/shrdi use it as an integer while later movr r6,fp0 consumes its raw single-precision bits. The host model preserves r6_bits and reinterprets it explicitly; upstream semantic provenance remains unresolved."
+        "symbol": "recovered_geometry_command6_loop_plan",
+        "notes": "Bounds the signed 0x503a78 route, zero-based iteration, index-vs-0x503a6c and separate 0x5024e8 mask-bit-2 gate, and unit increment. Both 0x24788 and 0x248cc branches emit the six-word packet [5,19,computed0,computed1,1,58] before the 0x802008 readback and 0x801008 publication. The i960 long-real setup makes r4:r5 equal 600.0; both branches compute computed0=(float)(4.0/600.0) and computed1=(float)(r6/600.0) through divrl, then store the single-precision results. r6 is an incoming preserved register value, not a proven 0x701a0 clip return: cvtir/shrdi use it as an integer while later movr r6,fp0 consumes its raw single-precision bits. The host model preserves r6_bits and reinterprets it explicitly; upstream semantic provenance remains unresolved.",
+        "modeling": {
+          "boundary": "i960 0x24690 command-6 loop plan covering signed route selection, zero-based iteration gates, six-word packet shape, normalized float results, readback address, and publication address",
+          "test": "von/tools/test_recovered_geometry_command6_loop_24690.py",
+          "unresolved_behavior": "provenance of preserved r6_bits, actual FIFO/readback/MMIO writes, loop-side object updates, and downstream command-6 consumers remain outside the pure loop and packet model"
+        }
         },
         {
           "id": "maincpu.geometry-object-state-packet-24eb4",
