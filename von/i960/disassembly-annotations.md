@@ -413,12 +413,13 @@ the fixed port address. The `0x294b0` call passes headers `(0, 32)` for 64
 table words from `0x293b0`. The pure schedule is in
 `recovered_fifo_upload_292d8.c`.
 
-The three entries at `0x1d210`, `0x1d230`, and `0x1d250` are fixed-callee
-instances of the `0x1d1b0` NUL-terminated walk shape: test the byte first,
-emit each nonzero byte with the byte in `g0` through the fixed callee, and
-stop at the first NUL. The callees are `0x1d090`, `0x1cf40`, and `0x1cfe0`
-respectively; those callees remain unmodeled. The route table is in
-`recovered_text_walk_dispatch_1d210.c`.
+The four entries at `0x1d1d0`, `0x1d210`, `0x1d230`, and `0x1d250` are
+fixed-callee instances of the `0x1d1b0` NUL-terminated walk shape: test
+the byte first, emit each nonzero byte with the byte in `g0` through the
+fixed callee, and stop at the first NUL. The callees are `0x1cea0`,
+`0x1d090`, `0x1cf40`, and `0x1cfe0` respectively; the last three callees
+are modeled as emitters while `0x1cea0` remains unmodeled. The route table
+is in `recovered_text_walk_dispatch_1d210.c`.
 
 The plane-0 emitter at `0x1d090` masks the byte to `0x7f`, subtracts `32`,
 and sign-extends the low byte (`shlo 24`/`shri 24`, confirmed arithmetic in

@@ -8,10 +8,11 @@ struct recovered_text_walk_route {
     u32 callee;
 };
 
-/* The three entries share one loop shape with the 0x1d1b0 walker: test
+/* The four entries share one loop shape with the 0x1d1b0 walker: test
  * the byte first, emit each nonzero byte through the fixed callee with
  * the byte in g0, and stop at the first NUL. Only the callee differs. */
-static const struct recovered_text_walk_route recovered_text_walk_routes[3] = {
+static const struct recovered_text_walk_route recovered_text_walk_routes[4] = {
+    { 0x0001d1d0U, 0x0001cea0U },
     { 0x0001d210U, 0x0001d090U },
     { 0x0001d230U, 0x0001cf40U },
     { 0x0001d250U, 0x0001cfe0U }
@@ -19,14 +20,14 @@ static const struct recovered_text_walk_route recovered_text_walk_routes[3] = {
 
 u32 recovered_text_walk_route_count(void)
 {
-    return 3U;
+    return 4U;
 }
 
 u32 recovered_text_walk_callee(u32 entry)
 {
     u32 index;
 
-    for (index = 0U; index < 3U; ++index) {
+    for (index = 0U; index < 4U; ++index) {
         if (recovered_text_walk_routes[index].entry == entry)
             return recovered_text_walk_routes[index].callee;
     }

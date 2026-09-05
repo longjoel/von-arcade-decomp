@@ -9344,17 +9344,21 @@
           ],
           "ranges": [
             {
+              "start": "0x0001d1d0",
+              "end": "0x0001d1ec"
+            },
+            {
               "start": "0x0001d210",
               "end": "0x0001d26c"
             }
           ],
           "symbol": "recovered_text_walk_callee",
           "modeling": {
-            "boundary": "Fixed-callee text walker route table: entries 0x1d210/0x1d230/0x1d250 select callees 0x1d090/0x1cf40/0x1cfe0 under the shared NUL-terminated walk shape",
+            "boundary": "Fixed-callee text walker route table: entries 0x1d1d0/0x1d210/0x1d230/0x1d250 select callees 0x1cea0/0x1d090/0x1cf40/0x1cfe0 under the shared NUL-terminated walk shape",
             "test": "von/tools/test_recovered_text_walk_dispatch_1d210.py",
             "unresolved_behavior": "The three callee routines and their byte side effects remain unmodeled"
           },
-          "notes": "Route table for the three fixed-callee instances of the 0x1d1b0 walk shape. Each entry tests the byte first, emits nonzero bytes with the byte in g0, and stops at NUL. Unknown entries resolve to 0."
+          "notes": "Route table for the four fixed-callee instances of the 0x1d1b0 walk shape. Each entry tests the byte first, emits nonzero bytes with the byte in g0, and stops at NUL. Unknown entries resolve to 0."
         },
         {
           "id": "maincpu.glyph-emit-1d090",

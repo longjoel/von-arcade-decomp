@@ -17,7 +17,8 @@ with tempfile.TemporaryDirectory() as td:
     lib.recovered_text_walk_callee.argtypes = [ctypes.c_uint32]
     lib.recovered_text_walk_callee.restype = ctypes.c_uint32
 
-    assert lib.recovered_text_walk_route_count() == 3
+    assert lib.recovered_text_walk_route_count() == 4
+    assert lib.recovered_text_walk_callee(0x1D1D0) == 0x1CEA0
     assert lib.recovered_text_walk_callee(0x1D210) == 0x1D090
     assert lib.recovered_text_walk_callee(0x1D230) == 0x1CF40
     assert lib.recovered_text_walk_callee(0x1D250) == 0x1CFE0
