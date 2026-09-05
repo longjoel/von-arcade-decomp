@@ -499,6 +499,13 @@ Two results-screen thunks are pure aliases needing no translation:
 classifier, each returning directly. Both are tracked as ABI scaffolding
 like the `0x27d8` trampoline.
 
+The head of `0x7a3e0` routes on the object's `+0x64` state and its peer's
+(`+0x74`): own `8` reports mode `11` through `0x78790`; peer `0`/`3`
+reports mode `9` through `0x7a9f0`; own `1`/`3`/`4`/`5` falls into the
+ratio computation; anything else takes the `0x7a4a8` arm. All arms test
+equality, so no operand-order proof is needed. The pure decision is in
+`recovered_route_head_7a3e0.c`; the downstream bodies stay outside.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at

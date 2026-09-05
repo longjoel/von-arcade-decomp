@@ -9648,6 +9648,32 @@
             "unresolved_behavior": "None; both bodies are a single call plus return"
           },
           "notes": "Tracked as ABI scaffolding like the 0x27d8 trampoline: no translation needed beyond naming the forwarding targets."
+        },
+        {
+          "id": "maincpu.route-head-7a3e0",
+          "name": "route_head_7a3e0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_route_head_7a3e0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_route_head_7a3e0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007a3e0",
+              "end": "0x0007a438"
+            }
+          ],
+          "symbol": "recovered_route_plan",
+          "modeling": {
+            "boundary": "Routing-head decision: own 8 reports mode 11 via 0x78790, peer 0/3 reports mode 9 via 0x7a9f0, own 1/3/4/5 enters the ratio path, else the 0x7a4a8 arm",
+            "test": "von/tools/test_recovered_route_head_7a3e0.py",
+            "unresolved_behavior": "The ratio computation and all downstream bodies remain outside this pure routing decision"
+          },
+          "notes": "Pure four-way decision for the 0x7a3e0 head on object +0x64 and peer +0x74 states. Equality-only arms need no operand-order proof."
         }
       ]
     },
