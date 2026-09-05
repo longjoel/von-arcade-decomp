@@ -448,6 +448,15 @@ The store triple at `0x29c08` reduces to a signed minimum: the `bl` and
 while `0x51a264`/`0x51a268` are zeroed (the link, already cleared).
 The pure schedule is in `recovered_clamp_store_29c08.c`.
 
+The uploader at `0x29d50` opens with a guard plus bank-select prologue:
+counters below 3 restore and return, otherwise the old counter shifted
+left 12 selects six 4KB source/dest pointers (`0x181x100`/`0x181x000`
+triples), the counter is bumped at `0x51a264`, and a zero mode word at
+`0x51a268` takes the direct path at `0x29f60` while any nonzero mode
+takes the bit-selected blend path at `0x29dc0`. The pure schedule is in
+`recovered_upload_select_29d50.c`; the long masked-blend loops stay
+unresolved.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero

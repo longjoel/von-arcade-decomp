@@ -10006,6 +10006,32 @@
             "unresolved_behavior": "Actual controller values and downstream consumers remain outside this pure store schedule"
           },
           "notes": "Pure store schedule for the 0x29c08 triple: the bl/cmpible arms reduce to a signed minimum against 0x100."
+        },
+        {
+          "id": "maincpu.upload-select-29d50",
+          "name": "upload_select_29d50",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_upload_select_29d50.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_upload_select_29d50.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00029d50",
+              "end": "0x00029dbc"
+            }
+          ],
+          "symbol": "recovered_upload_select_plan",
+          "modeling": {
+            "boundary": "Upload prologue schedule: counter guard, six 4KB bank pointers, counter bump, direct vs blend dispatch on mode word",
+            "test": "von/tools/test_recovered_upload_select_29d50.py",
+            "unresolved_behavior": "Masked-blend pixel loops at 0x29dc0-0x2a0bc remain outside this pure prologue schedule"
+          },
+          "notes": "Pure prologue schedule for the 0x29d50 uploader: sub-3 counters return early, otherwise bank-select plus mode dispatch."
         }
       ]
     },
