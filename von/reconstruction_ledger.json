@@ -3636,7 +3636,12 @@
             }
           ],
           "symbol": "recovered_weapon_three_point_plan",
-          "notes": "Recovers shared text prologue and three coordinate-derived 0x2674 marker writes for handlers 0x21240, 0x21314, and 0x213e8; table offsets are 0x114, 0x118, and 0x110."
+          "notes": "Recovers shared text prologue and three coordinate-derived 0x2674 marker writes for handlers 0x21240, 0x21314, and 0x213e8; table offsets are 0x114, 0x118, and 0x110.",
+          "modeling": {
+            "boundary": "i960 three-point weapon handler text descriptor and coordinate-derived marker destination plan",
+            "test": "von/tools/test_recovered_weapon_three_point_handlers.py",
+            "unresolved_behavior": "asset-pointer use, actual text/marker memory writes, and downstream weapon rendering effects remain outside the pure handler plan"
+          }
         },
         {
           "id": "maincpu.weapon-five-marker-handler-214bc",
