@@ -1867,7 +1867,7 @@
           "id": "maincpu.reset-startup",
           "name": "reset_startup",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/reconstructed_reset.c"
           ],
@@ -1882,6 +1882,11 @@
             }
           ],
           "symbol": "reconstructed_reset_entry",
+          "modeling": {
+            "boundary": "i960 startup establishes FP/PFP/SP, clears G14, calls reconstructed_main, and loops back to the reset entry",
+            "test": "von/tools/test_reconstructed_start.py",
+            "unresolved_behavior": "ROM table copies, compiler instruction shape, synmovq representation, and byte-level equivalence remain provisional beyond the startup ABI sequence"
+          },
           "notes": "Standalone C translation builds at the original address. Comparison result: 35/184 bytes equal; compiler shape and synmovq still prevent byte validation."
         },
         {
