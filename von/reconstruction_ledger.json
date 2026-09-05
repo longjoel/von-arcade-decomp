@@ -9689,7 +9689,7 @@
           "id": "sharc.opcode-2b-constant-success-status-service",
           "name": "opcode_2b_constant_success_status_service",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -9704,6 +9704,11 @@
             }
           ],
           "symbol": "sharc_opcode_2b_constant_success_status_service",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x2b status leaf: consume no payload and return the exact constant 32-bit status word 1 for the delayed output write.",
+            "test": "von/tools/test_recovered_sharc_opcode_2b_2d.py",
+            "unresolved_behavior": "Output FIFO readiness/backpressure, delayed-return timing, DM(I1,M0) transport, opcode dispatch, and caller interpretation of status 1 remain outside this constant leaf model."
+          },
           "notes": "Static listing recovers no input, output-FIFO readiness wait, delayed return, and constant success value 1 written to DM(I1,M0). The reusable C contract preserves the exact status word; caller interpretation remains unresolved."
         },
         {
