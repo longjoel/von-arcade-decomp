@@ -5837,6 +5837,11 @@
           ],
           "symbol": "recovered_comm_role_message",
           "notes": "Static closure separates the immediate board-present check on 0x1a14000 bit 0, a 60-sample handshake/reset phase, 0x700-byte buffer clears, external communication queries, retry state writes, and the exact five-way 0x5770b1 role-message selector (relay/master/slave/standalone/illegal). Pure role and board-present selectors are host-tested; mapped I/O, timing, formatting, and retry side effects remain hardware-facing.",
+          "modeling": {
+            "boundary": "i960 0xc5870 communication recovery selector model covering board-present bit interpretation and the five-way role-message classification for node roles 0 through 3 plus illegal values",
+            "test": "von/tools/test_recovered_comm_status.py",
+            "unresolved_behavior": "the 60-sample handshake, mapped I/O reads/writes, buffer clears, timing, formatting, retry state, and external communication queries remain outside the host-tested selector model"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
