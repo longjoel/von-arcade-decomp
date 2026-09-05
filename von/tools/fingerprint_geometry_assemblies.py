@@ -6,6 +6,17 @@ from pathlib import Path
 from export_geometry_frame_gltf import MATRIX, OBJECT
 from export_geometry_assemblies import split_assemblies
 
+def path_error(label, path, root, output=False):
+    if path.is_symlink():
+        return f"{label} path must not be a symlink: {path}"
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, RuntimeError, ValueError):
+        return f"{label} path escapes root: {path}"
+    if not output and not path.is_file():
+        return f"missing {label}: {path}"
+    return None
+
 def fingerprint(group):
     obas = [item[0] for _, item in group]
     digest = hashlib.sha256(b"".join(oba.to_bytes(4, "little") for oba in obas)).hexdigest()[:16]
@@ -36,11 +47,19 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--trace", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--root", type=Path, default=Path.cwd(),
+                        help="root that geometry trace and fingerprint output must remain within")
     parser.add_argument("--min-objects", type=int, default=1)
     parser.add_argument("--distance", type=float, default=15.0)
     parser.add_argument("--max-time", type=float)
     parser.add_argument("--family-overlap", type=float, default=0.7)
     args = parser.parse_args()
+    root = args.root.resolve()
+    for label, path, output in (("trace", args.trace, False), ("output", args.output, True)):
+        error = path_error(label, path, root, output)
+        if error:
+            print(f"Geometry fingerprints: {error}")
+            return 1
     if args.distance <= 0 or not 0 < args.family_overlap <= 1: raise SystemExit("invalid grouping bounds")
     current = (1.,0.,0.,0.,1.,0.,0.,0.,1.,0.,0.,0.)
     frames, identities = {}, {}
@@ -63,4 +82,4 @@ def main():
     output = {"trace": str(args.trace), "distance": args.distance, "family_overlap": args.family_overlap, "complete_frames": len(complete), "assemblies": assemblies, "families": family_summary(assemblies, args.family_overlap)}
     args.output.parent.mkdir(parents=True, exist_ok=True); args.output.write_text(json.dumps(output, indent=2) + "\n")
     print(f"fingerprinted {len(assemblies)} assemblies in {len(output['families'])} families across {len(complete)} frames")
-if __name__ == "__main__": main()
+if __name__ == "__main__": raise SystemExit(main())

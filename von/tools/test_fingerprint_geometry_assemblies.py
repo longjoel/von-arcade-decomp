@@ -9,8 +9,11 @@ def main():
    for x,oba in ((0,"00000001"),(1,"00000002"),(30,"00000003")):
     lines += [f"[:] vonj_geometry_matrix: time={time} m=1,0,0,0,1,0,0,0,1 t={x},0,0", f"[:] vonj_geometry_object: time={time} tpa=0 tha=0 oba={oba} count=0 mode=3 source=polygon-rom"]
   trace.write_text("\n".join(lines)+"\n")
-  subprocess.run(["python3",TOOL,"--trace",trace,"--output",output,"--min-objects","3","--distance","10"],check=True)
+  subprocess.run(["python3",TOOL,"--trace",trace,"--output",output,"--root",root,"--min-objects","3","--distance","10"],check=True)
   data=json.loads(output.read_text())
   if data["complete_frames"] != 2 or [x["frames"] for x in data["assemblies"]] != [2,2] or len(data["families"]) != 2: raise SystemExit("fingerprint frame tracking mismatch")
+  outside=root.parent/"outside-geometry-fingerprints.json"
+  result=subprocess.run(["python3",TOOL,"--trace",trace,"--output",outside,"--root",root],capture_output=True,text=True)
+  assert result.returncode == 1 and "output path escapes root" in result.stdout
  print("PASS: geometry assembly fingerprints")
 if __name__=="__main__": main()
