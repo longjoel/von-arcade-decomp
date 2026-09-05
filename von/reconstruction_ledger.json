@@ -8000,6 +8000,11 @@
           ],
           "symbol": "recovered_record_find_last_nonempty",
           "notes": "Production C recovers the backward scan over 32-byte records, first-byte occupancy test, zero-based result, and -1 empty result. It has 15 observed attract callers; static behavior is vector-tested, while byte validation remains blocked on compiler/ABI calibration.",
+          "modeling": {
+            "boundary": "Purely models a backward scan of fixed 32-byte records: inspect each record's first byte from count-1 through zero, return the highest occupied zero-based slot, and return -1 when no slot is occupied.",
+            "test": "von/tools/test_recovered_record_scan.py",
+            "unresolved_behavior": "Does not model the original record memory ownership, caller-specific record contents, compiler/ABI details, or downstream use of the selected slot."
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
