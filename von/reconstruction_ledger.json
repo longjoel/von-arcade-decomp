@@ -10713,6 +10713,11 @@
             }
           ],
           "symbol": "recovered_sharc_opcode_4d_refined_bound",
+          "modeling": {
+            "boundary": "Models the finite positive-seed opcode-0x4d refined bound: derive horizontal=sqrt(dx²+dz²), total=sqrt(horizontal²+dy²), form the normalized cosine/sine components, scale them by 2 and 1/3 times the fourth input, and return their Euclidean magnitude; return NaN for zero or non-finite seeds.",
+            "test": "von/tools/test_recovered_sharc_opcode_4d_refined_bound.py",
+            "unresolved_behavior": "Production of dx/dy/dz and the fourth input, exact SHARC helper and reciprocal-square-root rounding, signed fourth-input handling, overflow/NaN propagation beyond tested seeds, and integration with the terminal predicate remain outside this finite formula model."
+          },
           "notes": "For finite positive horizontal seeds, theta=atan2(dy,sqrt(dx^2+dz^2)) and F9=|fourth|*sqrt((2*cos(theta))^2+((1/3)*sin(theta))^2). The 2 and 1/3 factors are the state constants multiplied into the two reconstructed components before the final square/add/reciprocal-square-root refinement. Controlled traces reproduce the earlier coefficients 0.942809, 0.582983, and 1.229273. Zero/NaN and SHARC exceptional-value behavior remain provisional."
         },
         {
