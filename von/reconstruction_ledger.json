@@ -3744,7 +3744,12 @@
             }
           ],
           "symbol": "recovered_status_loop_entry_reset_plan",
-          "notes": "Recovers entry fill reset, nonnegative status-latch branch, four 0x8000 marker-state writes, and 0x01800000 clear; later status branches remain state-dependent."
+          "notes": "Recovers entry fill reset, nonnegative status-latch branch, four 0x8000 marker-state writes, and 0x01800000 clear; later status branches remain state-dependent.",
+          "modeling": {
+            "boundary": "i960 0x218f0 status-loop entry reset descriptor with latch branch, marker-state writes, and shared clear",
+            "test": "von/tools/test_recovered_status_loop_entry_reset.py",
+            "unresolved_behavior": "actual state/MMIO writes and later status-dependent branches remain outside the entry/reset plan"
+          }
         },
         {
           "id": "maincpu.status-low-latch-upload-2196c",
