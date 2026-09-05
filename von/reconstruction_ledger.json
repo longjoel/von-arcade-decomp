@@ -5002,9 +5002,14 @@
               "end": "0x0001bcd0"
             }
           ],
-          "symbol": "recovered_text_video_copy_rows",
-          "notes": "Recovers the shared video helper's row loop: forward-copy halfwords*2 bytes once per row, advance source by 0x80 bytes, and advance destination by halfwords*2 bytes.",
-          "milestones": {
+        "symbol": "recovered_text_video_copy_rows",
+        "notes": "Recovers the shared video helper's row loop: forward-copy halfwords*2 bytes once per row, advance source by 0x80 bytes, and advance destination by halfwords*2 bytes.",
+        "modeling": {
+          "boundary": "i960 0x1bc90 text video row-transfer plan covering per-row forward copy length, fixed source stride, and destination stride",
+          "test": "von/tools/test_recovered_text_video.py",
+          "unresolved_behavior": "actual source/destination mapped-memory ownership, caller upload setup, and hardware-visible video effects remain outside the pure row-transfer helper"
+        },
+        "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
                 "0x0001bc90"
