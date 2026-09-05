@@ -1942,6 +1942,11 @@
             }
           ],
           "symbol": "recovered_io_input_initialize",
+          "modeling": {
+            "boundary": "i960 input-index table initialization and deterministic controller byte-plan emission",
+            "test": "von/tools/test_recovered_io.py",
+            "unresolved_behavior": "mapped bus timing and hardware-side transmission remain unresolved beyond the pure index and byte-plan contract"
+          },
           "notes": "Initializes 30 halfwords at 0x00502400 with 0..29 and 30 halfwords at 0x00502440 with 30..59. It emits the 21-byte 0x2830 sequence 30 times and the 9-byte 0x2980 sequence 60 times to 0x01c00000. Pure index and byte-plan behavior is vector-tested; mapped bus timing is not modeled.",
           "milestones": {
             "c-only-i960-attract-60s": {
