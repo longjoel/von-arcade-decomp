@@ -78,14 +78,24 @@ def main() -> int:
         print("Asset catalog: manifest assets must be an array")
         return 1
     entries = []
+    seen_ids: set[str] = set()
     for entry in manifest["assets"]:
         if not isinstance(entry, dict):
             print("Asset catalog: asset entry must be an object")
             return 1
+        for field in ("id", "displayName", "category", "path"):
+            if not isinstance(entry.get(field), str) or not entry.get(field):
+                print(f"Asset catalog: missing asset {field}")
+                return 1
         status = entry.get("status")
         if status not in STATUSES:
             print(f"Asset catalog: unsupported asset status: {status!r}")
             return 1
+        asset_id = entry["id"]
+        if asset_id in seen_ids:
+            print(f"Asset catalog: duplicate asset id {asset_id!r}")
+            return 1
+        seen_ids.add(asset_id)
         if status in {"observed", "validated", "reference-capture"} and not entry.get("evidencePath"):
             print(f"Asset catalog: missing evidencePath for status {status!r}")
             return 1

@@ -52,6 +52,26 @@ def main():
         assert "missing evidencePath for status 'observed'" in result.stdout
         manifest.write_text(json.dumps({"assets": [
             {"id": "model", "displayName": "Model", "category": "props",
+             "status": "candidate", "path": "/assets/model.gltf", "sourceTrace": "trace"},
+            {"id": "model", "displayName": "Duplicate", "category": "props",
+             "status": "candidate", "path": "/assets/model.gltf", "sourceTrace": "trace"},
+        ]}))
+        result = subprocess.run(
+            ["python3", TOOL, "--manifest", manifest, "--asset-root", root / "public",
+             "--output", output, "--root", root], capture_output=True, text=True, check=False)
+        assert result.returncode == 1
+        assert "duplicate asset id" in result.stdout
+        manifest.write_text(json.dumps({"assets": [
+            {"id": "model", "category": "props",
+             "status": "candidate", "path": "/assets/model.gltf", "sourceTrace": "trace"},
+        ]}))
+        result = subprocess.run(
+            ["python3", TOOL, "--manifest", manifest, "--asset-root", root / "public",
+             "--output", output, "--root", root], capture_output=True, text=True, check=False)
+        assert result.returncode == 1
+        assert "missing asset displayName" in result.stdout
+        manifest.write_text(json.dumps({"assets": [
+            {"id": "model", "displayName": "Model", "category": "props",
              "status": "verified", "path": "/assets/model.gltf", "sourceTrace": "trace"},
         ]}))
         result = subprocess.run(
@@ -76,7 +96,10 @@ def main():
         assert result.returncode == 1
         assert "output path escapes root" in result.stdout
         traversal = root / "traversal.json"
-        traversal.write_text(json.dumps({"assets": [{"status": "candidate", "path": "../escape.gltf"}]}))
+        traversal.write_text(json.dumps({"assets": [{
+            "id": "escape", "displayName": "Escape", "category": "props",
+            "status": "candidate", "path": "../escape.gltf",
+        }]}))
         result = subprocess.run(
             ["python3", TOOL, "--manifest", traversal, "--asset-root", root / "public",
              "--output", root / "bad.json", "--root", root],
