@@ -5155,6 +5155,11 @@
             }
           ],
           "symbol": "recovered_text_startup_asset_transfer_plan",
+          "modeling": {
+            "boundary": "Models the fixed startup asset-transfer schedule: select the profile-specific record sequence, expand and byte-swap source blocks, emit the 0x9999 fill, and append the four color-table expansions with their exact destination metadata",
+            "test": "von/tools/test_recovered_text_video.py",
+            "unresolved_behavior": "ROM asset provenance, live bus/DMA timing, caller profile selection beyond the modeled inputs, and downstream display consumption remain outside this deterministic transfer-plan model"
+          },
           "notes": "Captures and executes the 0x1bda0 loader's fixed profile-dependent asset-transfer schedule. Zero profile yields 20 records and every nonzero input yields 17: block expansions, ROM halfword byte swaps, a 0x9999 fill, and four final color-table expansions. All 37 distinct records are host-tested; reconstructed_main now invokes the zero-profile schedule. Runtime attract validation remains pending.",
           "milestones": {
             "c-only-i960-attract-60s": {
