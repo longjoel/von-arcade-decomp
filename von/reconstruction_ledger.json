@@ -9851,6 +9851,11 @@
             }
           ],
           "symbol": "sharc_opcode_31_projection_state_service",
+          "modeling": {
+            "boundary": "Models the externally emitted opcode-0x31 projection: signed-16 R10/R9 angles form the recovered Ry(-R10)*Rx(-R9) matrix, the direct R13/R14/R15 vector is transformed, and the direct translation tail is added before the three outputs are published.",
+            "test": "von/tools/test_recovered_sharc_opcode_31.py",
+            "unresolved_behavior": "FIFO/DM timing, intermediate identity/state writeback layout, exact SHARC helper residuals, and caller-level meaning of the direct vector and translation fields remain provisional."
+          },
           "notes": "Static listing recovers eight FIFO inputs, identity initialization at DM 0x30180, three tail writes, two signed-parameter helper chains with scale 0x38c9116d, matrix rebuild, and three output-FIFO values with delayed final output. A live packet with direct tail (1,2,3) and all five remaining fields zero emits exact 1.0, 2.0, and 3.0 at PCs 0x207c1, 0x207c3, and delayed 0x207c6. Serialized state tracing shows isolated R10=0x4000 ending in the conventional Y-axis quarter-turn [c,0,+1 / 0,c,0 / -1,0,c], while isolated R9=0x4000 ends in the conventional X-axis quarter-turn [c,0,0 / 0,c,+1 / 0,-1,c]. Direct-field output tracing with neutral rotations shows R13=1.0, R14=1.0, and R15=1.0 changing the output from (1,2,3) to (2,2,3), (1,3,3), and (1,2,4), proving that R13..R15 are vector components for the final matrix-vector accumulation, not matrix coefficients."
         },
         {
