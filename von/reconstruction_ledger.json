@@ -8515,7 +8515,7 @@
           "id": "maincpu.geometry-object-packet-prefix",
           "name": "geometry_object_packet_prefix",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "sources": [
             "von/i960/recovered_geometry_object_packet.c"
           ],
