@@ -404,6 +404,15 @@ Ten static call sites (from `0x20b0` through `0xf1af0`) follow the
 `ldos` reload, `0xffff` mask on both sides, and mismatch branch. The pure
 schedule is in `recovered_crc_probe_2080.c`.
 
+The subroutine at `0x292d8` is the geometry program-port word pump used by
+the `0x294b0`/`0x295d0` setup family (reached via `bal` from `0x29564` and
+`0x29634`). It saves the return link into `g3`, clears `g14`, writes `0x606`
+to `0x00800060`, emits the two header words (`g0`, `g1`) to the `0x00804000`
+port, then loops `g1` times storing two words per iteration from `(g2)` to
+the fixed port address. The `0x294b0` call passes headers `(0, 32)` for 64
+table words from `0x293b0`. The pure schedule is in
+`recovered_fifo_upload_292d8.c`.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at

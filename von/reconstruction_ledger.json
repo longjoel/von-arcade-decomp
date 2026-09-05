@@ -9303,6 +9303,32 @@
             "unresolved_behavior": "Actual CRC execution and the caller mismatch branches remain outside this pure pointer/parameter plan"
           },
           "notes": "Pure probe schedule for the 0x2080 helper: adds 12 to the incoming data pointer, checksums 38 bytes with stride 1 through 0x3120, and returns the checksum for a masked 16-bit comparison. Ten static call sites (0x20b0 through 0xf1af0) reload the stored slot with ldos and mask both sides with 0xffff before branching."
+        },
+        {
+          "id": "maincpu.geometry-port-word-pump-292d8",
+          "name": "geometry_port_word_pump_292d8",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_fifo_upload_292d8.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_fifo_upload_292d8.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000292d8",
+              "end": "0x0002932c"
+            }
+          ],
+          "symbol": "recovered_fifo_upload_plan",
+          "modeling": {
+            "boundary": "Geometry-port word pump schedule: device select, two header words, then two FIFO words per pair-count iteration with a fixed port address",
+            "test": "von/tools/test_recovered_fifo_upload_292d8.py",
+            "unresolved_behavior": "Actual MMIO timing, FIFO depth behavior, and the source-table contents remain outside this pure upload schedule"
+          },
+          "notes": "Pure upload schedule for the 0x292d8 subroutine: writes 0x606 to 0x00800060, emits the two header words to the 0x00804000 program port, then pumps two words per iteration from the source pointer without advancing the port. The 0x294b0 setup call passes headers (0, 32) for 64 table words from 0x293b0. Entry saves the return link to g3 and clears g14, returning via bx (g3)."
         }
       ]
     },
