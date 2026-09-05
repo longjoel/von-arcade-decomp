@@ -4580,8 +4580,13 @@
               "end": "0x0009d1ec"
             }
           ],
-          "symbol": "recovered_geometry_board_update_gate_plan",
-          "notes": "Recovers board reset/control writes, state-bit-0 gate, and five-word command-5 FIFO prefix; state-dependent command-19 branches remain unresolved."
+        "symbol": "recovered_geometry_board_update_gate_plan",
+        "notes": "Recovers board reset/control writes, state-bit-0 gate, and five-word command-5 FIFO prefix; state-dependent command-19 branches remain unresolved.",
+        "modeling": {
+          "boundary": "i960 0x9d170 geometry-board update gate plan covering reset/control addresses, state-bit-0 enablement, and five-word command-5 FIFO prefix",
+          "test": "von/tools/test_recovered_geometry_board_update_gate_9d170.py",
+          "unresolved_behavior": "actual MMIO/FIFO writes and state-dependent command-19 branches remain outside the pure update-gate plan"
+        }
         },
         {
           "id": "maincpu.geometry-command19-branch-9d1ec",
