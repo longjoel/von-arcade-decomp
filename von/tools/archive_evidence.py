@@ -13,6 +13,18 @@ from pathlib import Path
 from typing import Any
 
 
+def has_symlink_component(path: Path) -> bool:
+    """Return whether *path* or any of its lexical parents is a symlink."""
+    current = path.absolute()
+    while True:
+        if current.is_symlink():
+            return True
+        parent = current.parent
+        if parent == current:
+            return False
+        current = parent
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -37,8 +49,8 @@ def validate_metadata(metadata: dict[str, Any]) -> list[str]:
             errors.append(f"missing {section} file {path_text}")
             continue
         path = Path(path_text)
-        if path.is_symlink():
-            errors.append(f"{section} file must not be a symlink")
+        if has_symlink_component(path):
+            errors.append(f"{section} path must not contain symlink components")
             continue
         if not path.is_file():
             errors.append(f"missing {section} file {item.get('path')}")
@@ -73,21 +85,21 @@ def main() -> int:
     parser.add_argument("--metadata", type=Path,
                         help="write source/archive hashes and sizes to this JSON file")
     args = parser.parse_args()
-    if args.capture.is_symlink():
-        print("Evidence archive: capture source must not be a symlink", file=sys.stderr)
+    if has_symlink_component(args.capture):
+        print("Evidence archive: capture source path must not contain symlink components", file=sys.stderr)
         return 1
     if not args.capture.is_file():
         print(f"Evidence archive: missing capture source: {args.capture}", file=sys.stderr)
         return 1
-    if args.archive.is_symlink():
-        print("Evidence archive: archive directory must not be a symlink", file=sys.stderr)
+    if has_symlink_component(args.archive):
+        print("Evidence archive: archive directory path must not contain symlink components", file=sys.stderr)
         return 1
-    if args.metadata and args.metadata.is_symlink():
-        print("Evidence archive: metadata path must not be a symlink", file=sys.stderr)
+    if args.metadata and has_symlink_component(args.metadata):
+        print("Evidence archive: metadata path must not contain symlink components", file=sys.stderr)
         return 1
     quarantine = Path("von/build/evidence/quarantine")
-    if args.quarantine and quarantine.is_symlink():
-        print("Evidence archive: quarantine directory must not be a symlink", file=sys.stderr)
+    if args.quarantine and has_symlink_component(quarantine):
+        print("Evidence archive: quarantine directory path must not contain symlink components", file=sys.stderr)
         return 1
     try:
         payload = args.capture.read_bytes()
@@ -97,8 +109,8 @@ def main() -> int:
     digest = hashlib.sha256(payload).hexdigest()
     args.archive.mkdir(parents=True, exist_ok=True)
     target = args.archive / f"{digest}.gz"
-    if target.is_symlink():
-        print("Evidence archive: digest target must not be a symlink", file=sys.stderr)
+    if has_symlink_component(target):
+        print("Evidence archive: digest target path must not contain symlink components", file=sys.stderr)
         return 1
     if target.exists():
         try:
@@ -116,8 +128,8 @@ def main() -> int:
     if args.quarantine:
         quarantine.mkdir(parents=True, exist_ok=True)
         preserved = quarantine / args.capture.name
-        if preserved.is_symlink():
-            print("Evidence archive: quarantine target must not be a symlink", file=sys.stderr)
+        if has_symlink_component(preserved):
+            print("Evidence archive: quarantine target path must not contain symlink components", file=sys.stderr)
             return 1
         if preserved.exists():
             try:

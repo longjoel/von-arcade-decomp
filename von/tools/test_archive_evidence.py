@@ -61,7 +61,15 @@ def main() -> int:
             cwd=ROOT, capture_output=True, text=True, check=False,
         )
         assert linked.returncode != 0
-        assert "must not be a symlink" in linked.stderr
+        assert "symlink components" in linked.stderr
+        linked_archive_parent = root / "linked-archive-parent"
+        linked_archive_parent.symlink_to(archive, target_is_directory=True)
+        linked_archive_parent_run = subprocess.run(
+            [sys.executable, str(TOOL), str(source), "--archive", str(linked_archive_parent / "nested")],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert linked_archive_parent_run.returncode != 0
+        assert "archive directory path" in linked_archive_parent_run.stderr
         linked_source_archive = root / "source-link.ndjson"
         linked_source_archive.symlink_to(source)
         linked_source_run = subprocess.run(
@@ -70,7 +78,16 @@ def main() -> int:
             cwd=ROOT, capture_output=True, text=True, check=False,
         )
         assert linked_source_run.returncode != 0
-        assert "capture source must not be a symlink" in linked_source_run.stderr
+        assert "capture source path" in linked_source_run.stderr
+        linked_source_parent = root / "linked-source-parent"
+        linked_source_parent.symlink_to(root, target_is_directory=True)
+        linked_source_parent_run = subprocess.run(
+            [sys.executable, str(TOOL), str(linked_source_parent / source.name),
+             "--archive", str(root / "source-parent-archive")],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert linked_source_parent_run.returncode != 0
+        assert "capture source path" in linked_source_parent_run.stderr
         missing_source_run = subprocess.run(
             [sys.executable, str(TOOL), str(root / "missing-events.ndjson"),
              "--archive", str(root / "missing-source-archive")],
@@ -85,7 +102,7 @@ def main() -> int:
             cwd=ROOT, capture_output=True, text=True, check=False,
         )
         assert linked_directory_run.returncode != 0
-        assert "archive directory must not be a symlink" in linked_directory_run.stderr
+        assert "archive directory path" in linked_directory_run.stderr
         wrong_target = archive / "not-content-addressed.gz"
         wrong_target.write_bytes(target.read_bytes())
         wrong_name = json.loads(json.dumps(record))
@@ -101,7 +118,7 @@ def main() -> int:
         linked_source.symlink_to(source)
         linked_metadata = json.loads(json.dumps(record))
         linked_metadata["source"]["path"] = str(linked_source)
-        assert any("source file must not be a symlink" in error
+        assert any("source path must not contain symlink components" in error
                    for error in validate_metadata(linked_metadata))
         linked_metadata_path = root / "linked-metadata.json"
         linked_metadata_path.symlink_to(metadata)
@@ -111,7 +128,16 @@ def main() -> int:
             cwd=ROOT, capture_output=True, text=True, check=False,
         )
         assert linked_metadata_run.returncode != 0
-        assert "metadata path must not be a symlink" in linked_metadata_run.stderr
+        assert "metadata path" in linked_metadata_run.stderr
+        linked_metadata_parent = root / "linked-metadata-parent"
+        linked_metadata_parent.symlink_to(root, target_is_directory=True)
+        linked_metadata_parent_run = subprocess.run(
+            [sys.executable, str(TOOL), str(source), "--archive", str(archive),
+             "--metadata", str(linked_metadata_parent / "nested.json")],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        assert linked_metadata_parent_run.returncode != 0
+        assert "metadata path" in linked_metadata_parent_run.stderr
         quarantine_root = root / "quarantine-collision-cwd"
         collision_source = quarantine_root / "collision.ndjson"
         collision_archive = quarantine_root / "archive"
@@ -127,6 +153,20 @@ def main() -> int:
         )
         assert collision_run.returncode != 0
         assert "quarantine target payload mismatch" in collision_run.stderr
+        quarantine_parent_cwd = root / "quarantine-parent-cwd"
+        (quarantine_parent_cwd / "von/build").mkdir(parents=True)
+        quarantine_real = root / "quarantine-real-evidence"
+        quarantine_real.mkdir()
+        (quarantine_parent_cwd / "von/build/evidence").symlink_to(
+            quarantine_real, target_is_directory=True
+        )
+        quarantine_parent_run = subprocess.run(
+            [sys.executable, str(TOOL), str(source), "--archive", str(root / "quarantine-parent-archive"),
+             "--quarantine"],
+            cwd=quarantine_parent_cwd, capture_output=True, text=True, check=False,
+        )
+        assert quarantine_parent_run.returncode != 0
+        assert "quarantine directory path" in quarantine_parent_run.stderr
     print("PASS: evidence archive emits reproducible source and blob metadata")
     return 0
 
