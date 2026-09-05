@@ -1423,6 +1423,11 @@
             }
           ],
           "symbol": "sharc_opcode_13_state_matrix_writeback_service",
+          "modeling": {
+            "boundary": "SHARC scale-vector FIFO inputs, three-row matrix writeback, and delayed state-output writes",
+            "test": "von/tools/test_recovered_sharc_opcode_13.py",
+            "unresolved_behavior": "caller-level transform meaning and delayed-return integration remain provisional beyond the row-scaling contract"
+          },
           "notes": "Static listing recovers three FIFO inputs, scales existing matrix row 0 by R0, row 1 by R1, and row 2 by R2, and writes all nine words back to state offsets 0x00..0x08. The final two writes are delayed-return slots. The exact row-scaling model is tested; caller-level transform meaning remains provisional."
         },
         {
