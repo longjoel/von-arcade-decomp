@@ -31,7 +31,8 @@ def main() -> int:
             "basis": {"romset_hash": "a" * 64, "map_revision": "map", "capture_id": "capture-v1", "tool_revision": "tool"},
             "assets": [{"id": "fighter", "media_type": "model", "status": "validated",
                         "payload": "fighter.glb", "sha256": hashlib.sha256(payload.read_bytes()).hexdigest(),
-                        "claims": {"geometry": "validated", "identity": "candidate"},
+                        "claims": {"geometry": "validated", "source_ranges": "validated",
+                                   "transform_association": "validated", "identity": "candidate"},
                         "evidence_ids": ["capture-v1"], "verifiers": ["verify-fighter"],
                         "verifier_results": {"verify-fighter": "pass"}}],
         }
@@ -96,6 +97,10 @@ def main() -> int:
         broken = copy.deepcopy(pack)
         broken["assets"][0]["status"] = "verified"
         assert any("invalid status" in error for error in validate(broken, evidence, root))
+        broken = copy.deepcopy(pack)
+        broken["assets"][0]["claims"]["source_ranges"] = "candidate"
+        assert any("require validated claims: source_ranges" in error
+                   for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
         broken["assets"][0]["media_type"] = "unknown-media"
         assert any("unsupported media_type" in error for error in validate(broken, evidence, root))

@@ -19,6 +19,12 @@ CLAIM_NAMES = {
 }
 MEDIA_TYPES = {"model", "texture", "audio-sample", "audio-sequence", "video", "image"}
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
+VALIDATED_CLAIMS = {
+    "model": ("geometry", "source_ranges", "transform_association"),
+    "texture": ("textures", "source_ranges"),
+    "audio-sample": ("audio_descriptor", "source_bytes"),
+    "audio-sequence": ("audio_sequence",),
+}
 
 
 def safe_path(path_text: Any) -> bool:
@@ -173,6 +179,16 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
                  or not isinstance(value, str) or value not in CLAIM_STATUSES
                  for name, value in claims.items()):
             errors.append(f"{where}: claims must use the supported claim/status vocabulary")
+        elif status == "validated":
+            required_claims = VALIDATED_CLAIMS.get(asset.get("media_type"), ())
+            if not any(value == "validated" for value in claims.values()):
+                errors.append(f"{where}: validated assets require at least one validated claim")
+            missing_claims = [name for name in required_claims
+                              if claims.get(name) != "validated"]
+            if missing_claims:
+                errors.append(
+                    f"{where}: validated {asset.get('media_type')} assets require validated claims: "
+                    + ", ".join(missing_claims))
         evidence_ids = asset.get("evidence_ids", [])
         if not isinstance(evidence_ids, list):
             errors.append(f"{where}: evidence_ids must be an array")
