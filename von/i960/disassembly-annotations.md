@@ -433,6 +433,11 @@ arm takes `0x2bb0`/`0x2c10`/`0x2da0` (`call`) except `0x2cb0`, whose
 nonzero arm is also `bal` to `0x2cf8`. The pure table is in
 `recovered_flag_dispatch_2c70.c`.
 
+The predicate at `0x18438` matches the ordered pairs `(0,1)`, `(1,0)`,
+`(2,3)`, and `(3,2)`, returning the boolean in `g0` through the saved
+link in `g2` (`g14` cleared on entry). The pure function is in
+`recovered_pair_match_18438.c`.
+
 The plane-0 emitter at `0x1d090` masks the byte to `0x7f`, subtracts `32`,
 and sign-extends the low byte (`shlo 24`/`shri 24`, confirmed arithmetic in
 the MAME i960 core). Biased values `0x4b`/`0x54` emit the fixed control

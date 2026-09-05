@@ -9772,6 +9772,32 @@
             "unresolved_behavior": "The eight forwarding targets and their input effects remain outside this pure dispatch table"
           },
           "notes": "Pure route table for the 0x2c70/0x2c90/0x2cb0/0x2d60 dispatcher family over the shared input flag. 0x2cd8/0x2d88 targets remain unmodeled."
+        },
+        {
+          "id": "maincpu.pair-match-18438",
+          "name": "pair_match_18438",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_pair_match_18438.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_pair_match_18438.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00018438",
+              "end": "0x0001846c"
+            }
+          ],
+          "symbol": "recovered_pair_match",
+          "modeling": {
+            "boundary": "Pair-swap predicate: matches ordered pairs (0,1), (1,0), (2,3), (3,2) and reports the boolean through the saved link",
+            "test": "von/tools/test_recovered_pair_match_18438.py",
+            "unresolved_behavior": "Caller link timing and downstream consumers remain outside this pure predicate"
+          },
+          "notes": "Pure boolean matcher for the 0x18438 ordered-pair chain. Entry saves g14 to g2 and clears g14 per the shared tail convention."
         }
       ]
     },
