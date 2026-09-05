@@ -10450,6 +10450,11 @@
             }
           ],
           "symbol": "opcode_46_seven_word_state_upload",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x46 seven-word state upload: copy FIFO words R0..R3 and R5..R6 unchanged into state slots 0..3 and 5..6, and store the bit-preserving sign-negation of R4 in slot 4.",
+            "test": "von/tools/test_recovered_sharc_opcode_46.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent DM 0x30150 ownership/address mapping, delayed store ordering, SHARC floating-point pipeline timing beyond the sign-bit equivalence, and opcode-0x47/downstream consumers remain outside this bounded upload model."
+          },
           "notes": "Static listing recovers seven FIFO inputs and the exact upload mapping s[0..3]=R0..R3, s[4]=-R4, s[5..6]=R5..R6 into DM 0x30150, including the two delayed stores. The reusable bit-preserving C model captures the sign-bit negation, including signed-zero and NaN payload behavior. The controlled opcode-0x47 predicate probe validates the negated s[4] value as the stored lower bound."
         },
         {
