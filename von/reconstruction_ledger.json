@@ -11441,6 +11441,11 @@
             }
           ],
           "symbol": "recovered_panel8_plan/recovered_panel9_plan",
+          "modeling": {
+            "boundary": "Models the paired panel routes: panel 8 copies source 0x02fe1170 through 0x1dc90 at (7,10) with width g17+31 and height 5; panel 9 uses source 0x02fe0d42 through 0x1dc10 at (5,10) with width g22+31 and selects 0x1df00 when its route condition is clear",
+            "test": "von/tools/test_recovered_panel8_panel9_routes.py",
+            "unresolved_behavior": "The caller register population, source asset ownership, SHARC tile-RAM destination, and display timing remain outside these paired route contracts"
+          },
           "notes": "Recovers panel8 at (7,10), width g17+31, source 0x02fe1170 via 0x1dc90, and panel9 at (5,10), width g22+31, source 0x02fe0d42 via 0x1dc10 or 0x1df00 clear."
         },
         {
