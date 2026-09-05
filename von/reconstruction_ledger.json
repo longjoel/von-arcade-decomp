@@ -4607,8 +4607,13 @@
               "end": "0x0009d334"
             }
           ],
-          "symbol": "recovered_geometry_command19_branch_plan",
-          "notes": "Recovers command-19 payload variants, object-flag/counter branch conditions, helper calls, and 0x562c90 rearm side effects."
+        "symbol": "recovered_geometry_command19_branch_plan",
+        "notes": "Recovers command-19 payload variants, object-flag/counter branch conditions, helper calls, and 0x562c90 rearm side effects.",
+        "modeling": {
+          "boundary": "i960 0x9d1ec command-19 branch plan covering payload variants, object-flag/countdown routing, helper-call arguments, display call, and rearm counter transition",
+          "test": "von/tools/test_recovered_geometry_command19_branch_9d1ec.py",
+          "unresolved_behavior": "actual FIFO writes, helper/display execution, persistent counter/object-memory writes, and downstream command-19 consumers remain outside the pure branch plan"
+        }
         },
         {
           "id": "maincpu.geometry-flagged-state-packet-9d334",
