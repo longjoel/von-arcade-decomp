@@ -3344,7 +3344,12 @@
             }
           ],
           "symbol": "recovered_profile_upload_panel_plan",
-          "notes": "Recovers the three profile-specific upload destinations, selector preservation, and subsequent 0x1fff0 panel dispatch."
+          "notes": "Recovers the three profile-specific upload destinations, selector preservation, and subsequent 0x1fff0 panel dispatch.",
+          "modeling": {
+            "boundary": "i960 0x203d0 profile upload and panel-wrapper descriptor selection through the 0x1bc90/0x1dc90/0x1df00 helpers",
+            "test": "von/tools/test_recovered_profile_upload_panel_wrappers.py",
+            "unresolved_behavior": "actual upload/panel memory writes and downstream helper rendering effects remain outside the pure wrapper plan"
+          }
         },
         {
           "id": "maincpu.upload-20460-panel18",
