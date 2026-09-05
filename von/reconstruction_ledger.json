@@ -4040,8 +4040,13 @@
               "end": "0x00023504"
             }
           ],
-          "symbol": "recovered_status_mode_renderer_plan",
-          "notes": "Recovers the 0x503a7c gate, accepted 0-4/7/9 modes, low-nibble draw condition, 0x1dd80 2x4 source-table route, modulo table-state advance, and -2 modulo-0x200 status update."
+        "symbol": "recovered_status_mode_renderer_plan",
+        "notes": "Recovers the 0x503a7c gate, accepted 0-4/7/9 modes, low-nibble draw condition, 0x1dd80 2x4 source-table route, modulo table-state advance, and -2 modulo-0x200 status update.",
+        "modeling": {
+          "boundary": "i960 0x23410 status-mode renderer plan covering gate and mode eligibility, source-table selection, 2x4 draw geometry, generator-state advance, and status-state update",
+          "test": "von/tools/test_recovered_status_mode_renderer_23410.py",
+          "unresolved_behavior": "actual mode-table reads, source-table contents, helper rendering, and video-memory writes remain outside the pure renderer plan"
+        }
         },
         {
           "id": "maincpu.status-string-glyph-23560",
