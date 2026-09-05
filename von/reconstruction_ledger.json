@@ -2557,6 +2557,11 @@
           ],
           "symbol": "recovered_audio_device_record_index",
           "notes": "Purely recovers the 23-record source/destination schedule and selector/exponent/mask index arithmetic before the unresolved ROM table read and device writes. Fixture vectors cover the schedule and 327,680 index cases; MMIO execution remains excluded.",
+          "modeling": {
+            "boundary": "i960 audio record source/destination schedule and masked selector index arithmetic before the ROM table read",
+            "test": "von/tools/test_recovered_audio_helpers.py",
+            "unresolved_behavior": "ROM table contents and subsequent device MMIO writes remain outside the recovered pure arithmetic and schedule contract"
+          },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
