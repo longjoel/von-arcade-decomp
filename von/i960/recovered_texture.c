@@ -24,19 +24,25 @@ int recovered_texture_decompress(volatile const u8 *source,
 void recovered_text_set_position(u32 column, u32 row);
 void recovered_text_write_string(volatile const u8 *text);
 
-void recovered_texture_initializer(void)
+/* Deterministic table/ramp portion of the 0x28548 initializer. */
+void recovered_texture_initialize_tables(volatile u16 *ramp_destination,
+                                         volatile u16 *table_destination,
+                                         volatile const u8 *table_source)
 {
     u32 index;
 
-    /* Two adjacent 127-entry ramps, values floor(index / 2). */
     for (index = 1; index <= 0x7f; ++index)
-        TEXTURE_RAM0[index - 1] = (u16)(index >> 1);
+        ramp_destination[index - 1] = (u16)(index >> 1);
     for (index = 1; index <= 0x7f; ++index)
-        TEXTURE_RAM0[0x7f + index - 1] = (u16)(index >> 1);
-
-    /* The i960 loop copies 0x2080 bytes as halfword stores. */
+        ramp_destination[0x7f + index - 1] = (u16)(index >> 1);
     for (index = 0; index <= 0x207f; ++index)
-        TEXTURE_RAM1[index] = TEXTURE_TABLE[index];
+        table_destination[index] = (u16)table_source[index];
+}
+
+void recovered_texture_initializer(void)
+{
+    recovered_texture_initialize_tables(TEXTURE_RAM0, TEXTURE_RAM1,
+                                        TEXTURE_TABLE);
 }
 
 /* Recovered from i960 loader/profile setup routine 0x00028120. */

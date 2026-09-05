@@ -5357,6 +5357,11 @@
             }
           ],
           "symbol": "recovered_texture_initializer",
+          "modeling": {
+            "boundary": "Models the deterministic texture initializer tables: write two adjacent 127-entry floor(index/2) ramps and copy the 0x2080-byte source table into ordered halfword destinations",
+            "test": "von/tools/test_recovered_texture_initializer.py",
+            "unresolved_behavior": "Mapped texture-RAM ownership, bus timing, source-ROM provenance, and downstream texture-loader consumption remain outside this host-testable table transform"
+          },
           "notes": "Production C reconstruction is linked into the reconstructed image and preserves the two ramps plus the 0x2080-byte table copy. A standalone candidate previously matched 17/172 bytes; byte validation is blocked on compiler/ABI calibration.",
           "milestones": {
             "c-only-i960-attract-60s": {
