@@ -3825,7 +3825,12 @@
             }
           ],
           "symbol": "recovered_status_upper_latch_plan",
-          "notes": "Recovers latch 21-95 source 0x02fda1d0 0x1dc10 0x40x4 render at row 4*latch-84 and the ordered eight-address clear for values above 95."
+          "notes": "Recovers latch 21-95 source 0x02fda1d0 0x1dc10 0x40x4 render at row 4*latch-84 and the ordered eight-address clear for values above 95.",
+          "modeling": {
+            "boundary": "i960 0x21a1c upper-latch render/clear selection with masked generator state and ordered eight-address clear",
+            "test": "von/tools/test_recovered_status_upper_latch_routes.py",
+            "unresolved_behavior": "actual state writes, render upload effects, and upper-latch clear MMIO behavior remain outside the pure route plan"
+          }
         },
         {
           "id": "maincpu.status-grid-initializer-227b0",
