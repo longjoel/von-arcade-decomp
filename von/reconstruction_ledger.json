@@ -3933,7 +3933,12 @@
             }
           ],
           "symbol": "recovered_status_wide_tile_pattern_plan",
-          "notes": "Recovers sequential 23x2, 29x2, and 19x2 current-origin patterns, source indices 0x3db0/0x3d10/0x3f40, bases 0x01000000/0x01000034, and 0xc000 attribute forcing across 0x22970-0x22c60."
+          "notes": "Recovers sequential 23x2, 29x2, and 19x2 current-origin patterns, source indices 0x3db0/0x3d10/0x3f40, bases 0x01000000/0x01000034, and 0xc000 attribute forcing across 0x22970-0x22c60.",
+          "modeling": {
+            "boundary": "i960 0x22970-0x22c60 wide status-tile pattern descriptors for 23x2, 29x2, and 19x2 variants",
+            "test": "von/tools/test_recovered_status_wide_tile_patterns.py",
+            "unresolved_behavior": "actual tile-memory writes and downstream wide-pattern rendering effects remain outside the pure pattern/value plan"
+          }
         },
         {
           "id": "maincpu.plane-full-clear-thunks-22c70-22cb0",
