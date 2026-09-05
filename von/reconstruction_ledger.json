@@ -3879,7 +3879,12 @@
             }
           ],
           "symbol": "recovered_status_patterned_fill_plan",
-          "notes": "Recovers the non-192-phase row<=1 patterned fill of 192 groups and the modulo-0x200 0x504d28/0x504d2a generator update."
+          "notes": "Recovers the non-192-phase row<=1 patterned fill of 192 groups and the modulo-0x200 0x504d28/0x504d2a generator update.",
+          "modeling": {
+            "boundary": "i960 0x22840 phase/row-gated patterned fill descriptor with 192 groups and modulo-0x200 generator updates",
+            "test": "von/tools/test_recovered_status_patterned_fill.py",
+            "unresolved_behavior": "actual fill-memory writes and downstream generator/rendering effects remain outside the pure patterned-fill plan"
+          }
         },
         {
           "id": "maincpu.status-tile-pattern-228f0",
