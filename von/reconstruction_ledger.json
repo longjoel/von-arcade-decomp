@@ -11380,6 +11380,11 @@
             {"start": "0x00029778", "end": "0x000297a8"}
           ],
           "symbol": "recovered_pointer_table_init_29738",
+          "modeling": {
+            "boundary": "Models the pure linked-list initialization shared by 0x29738 and 0x29778: generate 64 contiguous next pointers from a supplied head and stride, with the final node link cleared to zero; the recovered call-site constants are heads 0x5150c0/0x5190c0 and strides 0x40/0x100.",
+            "test": "von/tools/test_pointer_table_init_29738.py",
+            "unresolved_behavior": "Allocator ownership, destination memory effects, synchronization, and any MMIO or callers that consume the initialized lists remain outside this schedule model."
+          },
           "notes": "Both original helpers initialize exactly 64 contiguous nodes by storing the next node at +0x0c, then clear the terminal link. 0x29738 uses stride 0x40 from head 0x5150c0; 0x29778 uses stride 0x100 from head 0x5190c0. The pure schedule excludes allocator/MMIO ownership."
         },
         {
