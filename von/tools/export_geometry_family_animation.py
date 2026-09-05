@@ -6,8 +6,19 @@ from pathlib import Path
 from export_geometry_animation_gltf import parse_mesh, transform_trs
 from export_geometry_frame_gltf import MATRIX, OBJECT
 
+def path_error(label, path, root, output=False):
+ if path.is_symlink(): return f"{label} path must not be a symlink: {path}"
+ try: path.resolve().relative_to(root.resolve())
+ except (OSError, RuntimeError, ValueError): return f"{label} path escapes root: {path}"
+ if not output and not path.is_file(): return f"missing {label}: {path}"
+ return None
+
 def main():
- p=argparse.ArgumentParser(description=__doc__); p.add_argument('--fingerprints',type=Path,required=True); p.add_argument('--family',required=True); p.add_argument('--trace',type=Path,required=True); p.add_argument('--rom',type=Path,required=True); p.add_argument('--output',type=Path,required=True); p.add_argument('--min-objects',type=int,default=1); a=p.parse_args()
+ p=argparse.ArgumentParser(description=__doc__); p.add_argument('--fingerprints',type=Path,required=True); p.add_argument('--family',required=True); p.add_argument('--trace',type=Path,required=True); p.add_argument('--rom',type=Path,required=True); p.add_argument('--output',type=Path,required=True); p.add_argument('--min-objects',type=int,default=1); p.add_argument('--root',type=Path,default=Path.cwd()); a=p.parse_args()
+ root=a.root.resolve()
+ for label,path,output in (('fingerprints',a.fingerprints,False),('trace',a.trace,False),('ROM',a.rom,False),('output',a.output,True)):
+  error=path_error(label,path,root,output)
+  if error: print(f'Geometry family animation: {error}'); return 1
  d=json.loads(a.fingerprints.read_text()); fam=next((x for x in d['families'] if x['family']==a.family),None)
  if not fam: raise SystemExit('family not found')
  canonical=[int(x,16) for x in fam['canonical_obas']]; start=fam['first_slot']; current=(1.,0.,0.,0.,1.,0.,0.,0.,1.,0.,0.,0.); frames={}
@@ -33,4 +44,4 @@ def main():
    oi=len(accessors); accessors.append({'bufferView':add(data),'componentType':5126,'count':len(times),'type':typ}); samplers.append({'input':ti,'output':oi,'interpolation':'LINEAR'}); channels.append({'sampler':len(samplers)-1,'target':{'node':slot,'path':path}})
  out={'asset':{'version':'2.0','generator':'von export_geometry_family_animation.py'},'scene':0,'scenes':[{'nodes':list(range(len(nodes)))}],'nodes':nodes,'meshes':meshes,'animations':[{'name':a.family,'samplers':samplers,'channels':channels}],'buffers':[{'byteLength':len(blob),'uri':'data:application/octet-stream;base64,'+base64.b64encode(blob).decode()}],'bufferViews':views,'accessors':accessors,'extras':{'family':a.family,'frames':len(times),'start_time':times[0],'end_time':times[-1]}}
  a.output.parent.mkdir(parents=True,exist_ok=True); a.output.write_text(json.dumps(out,indent=2)+'\n'); print(f'wrote {len(nodes)} nodes and {len(times)} clean family frames to {a.output}')
-if __name__=='__main__': main()
+if __name__=='__main__': raise SystemExit(main())
