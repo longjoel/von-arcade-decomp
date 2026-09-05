@@ -2720,6 +2720,11 @@
             }
           ],
           "symbol": "recovered_audio_initialize_scsp",
+          "modeling": {
+            "boundary": "Models SCSP audio queue initialization: reset both 64-byte FIFO indices, fill the FIFO with 0x99, issue the six observed SCSP control writes with five short delays, and send the 0xff startup command",
+            "test": "von/tools/test_recovered_audio_helpers.py",
+            "unresolved_behavior": "SCSP device response timing, command consumer behavior, live audio transport, and runtime caller scheduling remain outside this initializer contract"
+          },
           "notes": "Initializes both 64-byte FIFO indices, fills the FIFO with 0x99, performs the six observed SCSP control writes with the five short delays, then sends the 0xff startup command.",
           "milestones": {
             "c-only-i960-attract-60s": {
