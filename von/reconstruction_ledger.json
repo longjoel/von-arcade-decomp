@@ -2286,6 +2286,11 @@
             }
           ],
           "symbol": "recovered_host_queue_initialize",
+          "modeling": {
+            "boundary": "Models host byte-queue initialization: fill the 16-byte queue with 0xff, clear both indices, and write both 0x00ff sentinels before conditional runtime use",
+            "test": "von/tools/test_recovered_io.py",
+            "unresolved_behavior": "Board-I/O failure-path reachability, queue ownership, concurrent producer/consumer timing, and downstream input scheduling remain outside this initializer model"
+          },
           "notes": "Observed on the board-I/O failure path. Production C fills the 16-byte queue with 0xff, clears both indices, and writes both 0x00ff sentinels. It is conditionally integrated after the reconstructed I/O self-test.",
           "milestones": {
             "c-only-i960-attract-60s": {
