@@ -4742,8 +4742,13 @@
               "end": "0x0009d9a0"
             }
           ],
-          "symbol": "recovered_geometry_second_clear_flag_packet_plan",
-          "notes": "Recovers the +0x1e2-derived command-19/18 packet, readback publication, and +0x1dd-selected frame-slot/pointer variants; extended FP derivation remains an explicit input."
+        "symbol": "recovered_geometry_second_clear_flag_packet_plan",
+        "notes": "Recovers the +0x1e2-derived command-19/18 packet, readback publication, and +0x1dd-selected frame-slot/pointer variants; extended FP derivation remains an explicit input.",
+        "modeling": {
+          "boundary": "i960 0x9d858 second clear-flag packet plan covering command-19/18 packet shape, derived-word input, readback/pointer publication, and flag-selected frame slots and tails",
+          "test": "von/tools/test_recovered_geometry_second_clear_flag_packet_9d858.py",
+          "unresolved_behavior": "extended-FP derivation, actual FIFO/MMIO writes, board response, and downstream frame-slot consumers remain outside the pure packet plan"
+        }
         },
         {
           "id": "maincpu.geometry-command19-branch-9d9a0",
