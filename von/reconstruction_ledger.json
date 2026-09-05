@@ -11479,6 +11479,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_progress_dispatch_2ba44.py"],
           "ranges": [{"start": "0x0002ba44", "end": "0x0002ba84"}],
           "symbol": "recovered_progress_dispatch_2ba44",
+          "modeling": {
+            "boundary": "Models the pure 0x2ba44 dispatch decision after caller-side progress&31 indexing: return reset-to-one when callback is null or when service mode is 2 with callback 0xe3ab0; otherwise preserve the callback path with reset flag zero.",
+            "test": "von/tools/test_recovered_progress_dispatch_2ba44.py",
+            "unresolved_behavior": "The caller’s table lookup, callback invocation, progress storage, MMIO effects, and service-side behavior remain outside this dispatch decision model."
+          },
           "notes": "After caller-side progress&31 table lookup, original code resets progress to 1 when callback is null, or when service mode is 2 and callback is 0xe3ab0; otherwise it invokes the callback. Callback/MMIO effects are excluded."
         },
         {
