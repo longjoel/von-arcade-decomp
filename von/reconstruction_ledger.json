@@ -6156,7 +6156,12 @@
             }
           ],
           "symbol": "recovered_object_state_dispatch",
-          "notes": "Integrates the separately recovered ten state arms behind an explicit context carrying timer, global words, object fields, related-object fields, and caller state. It preserves state-0 no-write fallthroughs and routes states 0..9; pointer lifecycle and startup invocation remain outside the pure behavioral adapter."
+          "notes": "Integrates the separately recovered ten state arms behind an explicit context carrying timer, global words, object fields, related-object fields, and caller state. It preserves state-0 no-write fallthroughs and routes states 0..9; pointer lifecycle and startup invocation remain outside the pure behavioral adapter.",
+          "modeling": {
+            "boundary": "i960 0x79050 unified object-state dispatcher model covering explicit context routing, ten state-arm selection for states 0 through 9, terminal handling, and invalid-state no-write behavior",
+            "test": "von/tools/test_recovered_object_state_dispatch.py",
+            "unresolved_behavior": "original pointer derivation, startup integration, mapped global transition publication, input-driven object lifecycle, and runtime caller provenance remain outside the context-based behavioral adapter"
+          }
         },
         {
           "id": "maincpu.object-state-zero-arm",
