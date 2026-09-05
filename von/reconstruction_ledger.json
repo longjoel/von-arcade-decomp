@@ -5490,6 +5490,11 @@
             }
           ],
           "symbol": "recovered_texture_loader_profile_setup",
+          "modeling": {
+            "boundary": "Models the two-bank texture loader outcome contract: propagate the first nonzero decompressor status, otherwise propagate the second, and on failure store state B=0 and state A=5 while leaving success state untouched",
+            "test": "von/tools/test_recovered_texture_loader_profile_result.py",
+            "unresolved_behavior": "Mapped texture-bank ownership, decompressor timing, text/MMIO effects, source-ROM provenance, and caller scheduling remain outside this host-testable outcome/state boundary"
+          },
           "notes": "Production C now preserves the static loader messages and their text positioning, both decoder calls, swapped destination windows, saved second-source pointer, and error-state contract. The plain-string text helper recovers 0x1cac8/0x1cc40/0x1ccd0 only; general printf-style formatting remains outside this slice. The reconstructed runtime reaches INIT with texture_status=0 after this path executes. Byte validation is blocked on compiler/ABI calibration.",
           "milestones": {
             "c-only-i960-attract-60s": {

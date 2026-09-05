@@ -24,6 +24,21 @@ int recovered_texture_decompress(volatile const u8 *source,
 void recovered_text_set_position(u32 column, u32 row);
 void recovered_text_write_string(volatile const u8 *text);
 
+/* Deterministic outcome/state portion of the two-bank loader. */
+int recovered_texture_loader_profile_result(int first_status,
+                                            int second_status,
+                                            volatile u32 *state_a,
+                                            volatile u32 *state_b)
+{
+    int status = first_status != 0 ? first_status : second_status;
+
+    if (status != 0) {
+        *state_b = 0;
+        *state_a = 5;
+    }
+    return status;
+}
+
 /* Deterministic table/ramp portion of the 0x28548 initializer. */
 void recovered_texture_initialize_tables(volatile u16 *ramp_destination,
                                          volatile u16 *table_destination,
@@ -73,7 +88,7 @@ int recovered_texture_loader_profile_setup(void)
     }
 
 failed:
-    *GEOMETRY_STATE_B = 0;
-    *GEOMETRY_STATE_A = 5;
-    return status;
+    return recovered_texture_loader_profile_result(status, 0,
+                                                   GEOMETRY_STATE_A,
+                                                   GEOMETRY_STATE_B);
 }
