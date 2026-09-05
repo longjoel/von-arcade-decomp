@@ -6389,7 +6389,12 @@
             }
           ],
           "symbol": "recovered_object_state_terminal_route",
-          "notes": "The state-8 and state-9 arms unconditionally write transition 7 to 0x504d98 before entering the common tail. They have no additional field, timer, or mode reads; all other dispatch values are left unchanged by the isolated pure route."
+          "notes": "The state-8 and state-9 arms unconditionally write transition 7 to 0x504d98 before entering the common tail. They have no additional field, timer, or mode reads; all other dispatch values are left unchanged by the isolated pure route.",
+          "modeling": {
+            "boundary": "Purely models the terminal dispatch arms: accept only current_object_state 8 or 9, write transition 7, return success, and leave every other state and the sentinel transition unchanged. The common tail is treated as unable to remap these arms because their current state is not 3.",
+            "test": "von/tools/test_recovered_object_state_terminal.py",
+            "unresolved_behavior": "The runtime source and storage of current_object_state and the transition field at 0x504d98 are not modeled. Entry dispatch, common-tail side effects beyond the state guard, downstream handling of transition 7, and original memory/MMIO behavior remain unresolved."
+          }
         },
         {
           "id": "maincpu.video-dispatch-downstream-four-tile-split",
