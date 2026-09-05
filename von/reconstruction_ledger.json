@@ -7492,7 +7492,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm7",
-          "notes": "Recovers jump-table arm 7 as one mirrored tile-expander call for tile 11 with its exact ROM source address, followed by the common e33f4 exit."
+          "notes": "Recovers jump-table arm 7 as one mirrored tile-expander call for tile 11 with its exact ROM source address, followed by the common e33f4 exit.",
+          "modeling": {
+            "boundary": "Purely models jump-table arm 7: emit one tile ID 11 from source 0x02fb75d0 and set count to 1 before the shared continuation.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The mirrored tile-expander execution, plan consumption, common e33f4 control flow, caller sequencing, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-arm6",
