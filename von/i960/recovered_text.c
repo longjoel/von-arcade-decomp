@@ -110,6 +110,15 @@ void recovered_text_emit_char(u8 character)
     }
 }
 
+u32 recovered_text_string_length(volatile const u8 *text)
+{
+    u32 length = 0;
+
+    while (text[length] != 0)
+        ++length;
+    return length;
+}
+
 void recovered_text_write_string(volatile const u8 *text)
 {
     u8 character;

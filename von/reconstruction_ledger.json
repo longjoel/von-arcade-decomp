@@ -3247,6 +3247,11 @@
             }
           ],
           "symbol": "recovered_text_write_string",
+          "modeling": {
+            "boundary": "Models the string writer's bounded NUL-terminated byte walk and exact stop condition, independently of the per-character glyph/MMIO side effects",
+            "test": "von/tools/test_recovered_text_string_length.py",
+            "unresolved_behavior": "Per-character dispatch, text-state transitions, glyph-table reads, tile-RAM writes, and caller string provenance remain outside this string-walk model"
+          },
           "notes": "Observed during input-free startup and integrated for static loader messages. Production C preserves the NUL-terminated byte walk and per-character dispatch."
         },
         {
