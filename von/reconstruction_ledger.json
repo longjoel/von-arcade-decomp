@@ -11463,6 +11463,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_progress_mapping_2b870.py"],
           "ranges": [{"start": "0x0002b870", "end": "0x0002b930"}],
           "symbol": "recovered_progress_mapping_2b870",
+          "modeling": {
+            "boundary": "Models the pure 0x2b870 progress transition: map progress 0..15 to 0x200-(progress<<5), odd progress 17..31 to 2*(progress-32), all other values to zero, advance progress with 32-bit wraparound, and flag the 0x503a00 counter increment only when prior progress is 0x80.",
+            "test": "von/tools/test_recovered_progress_mapping_2b870.py",
+            "unresolved_behavior": "MMIO/message calls, fixed writes, global counter ownership, and downstream display consumers remain outside this mapping model."
+          },
           "notes": "Pure portion maps progress <=15 to 0x200-(progress<<5), odd 17..31 to 2*(progress-32), and all other values to zero; advances progress by one and increments 0x503a00 only when the prior value is 0x80. MMIO/message calls and fixed writes are excluded."
         },
         {
