@@ -3166,7 +3166,12 @@
             }
           ],
           "symbol": "recovered_text_video_upload",
-          "notes": "Recovers the 0x20180 fixed upload: source 0x01004000, destination pointer slot 0x02fd61d0, 0x40 halfwords per row, and 0x40 rows, dispatched through the recovered row-copy loop."
+          "notes": "Recovers the 0x20180 fixed upload: source 0x01004000, destination pointer slot 0x02fd61d0, 0x40 halfwords per row, and 0x40 rows, dispatched through the recovered row-copy loop.",
+          "modeling": {
+            "boundary": "i960 fixed text-video upload descriptor and its 64-by-64 halfword row-copy dispatch",
+            "test": "von/tools/test_recovered_text_video.py",
+            "unresolved_behavior": "destination pointer contents and live video-memory MMIO effects remain outside the pure upload descriptor contract"
+          }
         },
         {
           "id": "maincpu.clear-g14-return-thunk-20160",
