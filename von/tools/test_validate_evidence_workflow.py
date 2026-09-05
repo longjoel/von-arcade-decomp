@@ -41,7 +41,15 @@ def main() -> int:
         linked_evidence.symlink_to(root / "von/evidence/manifest.json")
         errors = validate_workflow(
             root, root / "von/reconstruction_ledger.json", linked_evidence, run_verifiers=True)
-        assert any("evidence: document path must not be a symlink" in error for error in errors)
+        assert any("evidence: document path must not contain symlink components" in error
+                   for error in errors)
+        linked_document_parent = Path(directory) / "linked-document-parent"
+        linked_document_parent.symlink_to(root / "von/evidence", target_is_directory=True)
+        errors = validate_workflow(
+            root, root / "von/reconstruction_ledger.json",
+            linked_document_parent / "manifest.json")
+        assert any("evidence: document path must not contain symlink components" in error
+                   for error in errors)
     errors = validate_workflow(
         root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
         check_generated=True, generated_coverage_path=root / "von/build/attract-coverage/vonj-attract-60s.json",
@@ -82,7 +90,8 @@ def main() -> int:
             generated_worklist_path=root / "von/attract_worklist.json",
             generated_status_path=root / "von/generated-status.md",
         )
-        assert any("generated coverage path must not be a symlink" in error for error in errors)
+        assert any("generated coverage path must not contain symlink components" in error
+                   for error in errors)
     unsafe = {
         "schema_version": 1,
         "entries": [{"id": "unsafe", "canonical": True, "verifier": "/tmp/not-a-verifier.py"}],
@@ -129,7 +138,13 @@ def main() -> int:
         errors = validate_workflow(
             root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
             asset_pack_path=linked_pack)
-        assert any("must not be a symlink" in error for error in errors)
+        assert any("must not contain symlink components" in error for error in errors)
+        linked_pack_parent = Path(directory) / "linked-pack-parent"
+        linked_pack_parent.symlink_to(root / "von/evidence", target_is_directory=True)
+        errors = validate_workflow(
+            root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
+            asset_pack_path=linked_pack_parent / "manifest.json")
+        assert any("must not contain symlink components" in error for error in errors)
     print("PASS: combined evidence workflow gates ledger and lifecycle validation")
     return 0
 

@@ -15,6 +15,18 @@ from reconstruction_ledger import load, validate as validate_ledger, validate_li
 from validate_asset_pack import validate as validate_pack
 
 
+def has_symlink_component(path: Path) -> bool:
+    """Return whether *path* or any of its lexical parents is a symlink."""
+    current = path.absolute()
+    while True:
+        if current.is_symlink():
+            return True
+        parent = current.parent
+        if parent == current:
+            return False
+        current = parent
+
+
 def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
                       strict_lifecycle: bool = False, asset_pack_path: Path | None = None,
                       run_verifiers: bool = False, rom_manifest_path: Path | None = None,
@@ -24,10 +36,10 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
                       generated_coverage_path: Path | None = None,
                       generated_worklist_path: Path | None = None,
                       generated_status_path: Path | None = None,
-                      generated_comparison_path: Path | None = None) -> list[str]:
+    generated_comparison_path: Path | None = None) -> list[str]:
     def read_document(path: Path, label: str) -> tuple[object, list[str]]:
-        if path.is_symlink():
-            return {}, [f"{label}: document path must not be a symlink: {path}"]
+        if has_symlink_component(path):
+            return {}, [f"{label}: document path must not contain symlink components: {path}"]
         try:
             path.resolve().relative_to(root.resolve())
         except (OSError, RuntimeError, ValueError):
@@ -65,8 +77,10 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
     if strict_lifecycle:
         errors.extend(f"lifecycle: {error}" for error in validate_lifecycle(ledger, evidence, root))
     if asset_pack_path:
-        if asset_pack_path.is_symlink():
-            errors.append(f"asset-pack: pack path must not be a symlink: {asset_pack_path}")
+        if has_symlink_component(asset_pack_path):
+            errors.append(
+                f"asset-pack: pack path must not contain symlink components: {asset_pack_path}"
+            )
         else:
             try:
                 asset_pack_path.resolve().relative_to(root.resolve())
@@ -98,8 +112,10 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
                 generated_paths.append(("comparison", generated_comparison_path))
             unsafe_paths = []
             for label, path in generated_paths:
-                if path.is_symlink():
-                    unsafe_paths.append(f"generated {label} path must not be a symlink: {path}")
+                if has_symlink_component(path):
+                    unsafe_paths.append(
+                        f"generated {label} path must not contain symlink components: {path}"
+                    )
                     continue
                 try:
                     path.resolve().relative_to(root.resolve())
