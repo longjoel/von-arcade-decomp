@@ -9251,6 +9251,32 @@
               ]
             }
           }
+        },
+        {
+          "id": "maincpu.record-checksum-writer-22f0",
+          "name": "record_checksum_writer_22f0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_record_checksum_22f0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_record_checksum_22f0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000022f0",
+              "end": "0x00002320"
+            }
+          ],
+          "symbol": "recovered_record_checksum_plan",
+          "modeling": {
+            "boundary": "Backup-SRAM record checksum schedule: stride-524 record select, 34-byte stride-1 CRC16 via 0x3120, low-16-bit checksum slot two bytes before the data",
+            "test": "von/tools/test_recovered_record_checksum_22f0.py",
+            "unresolved_behavior": "Actual CRC execution, backup-SRAM persistence, and the 0xf5d40 mismatch path remain outside this pure address/parameter plan"
+          },
+          "notes": "Pure checksum schedule for the 0x22f0 writer: index scales by ((i*33)*4-i)*4 = i*524 into the 0x01d00000 backup-SRAM window, checksums 34 bytes from base+0x16 with stride 1 through 0x3120, and stores the low 16 bits at base+0x14. Static callers at 0x3478/0x3504/0x3a18 pass index 0; the 0x2594/0x2604 verifiers mask both sides with 0xffff before comparing."
         }
       ]
     },

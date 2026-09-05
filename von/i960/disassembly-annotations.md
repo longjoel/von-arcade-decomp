@@ -386,6 +386,17 @@ reduces modulo `5`, and stores that value at `0x504d00` unless the reduced
 value is `4`; that case stores `0x503a98+4` instead. The ABI-level plan is in
 `recovered_hud_reset_22d30.c`.
 
+The adjacent writer at `0x22f0` checksums one backup-SRAM record per call.
+The index scales as `((i*33)*4-i)*4` (`shlo 5`, `addo`, `shlo 2`, `subo`,
+`shlo 2`), giving a 524-byte stride into the `0x01d00000` window. It loads
+the data address `0x1d00016+r4`, calls the `0x3120` CRC16 helper with
+stride `1` and count `31+3`, then stores the result with `stos` at
+`0x1d00014+r4`. The short store keeps only the low 16 bits: the `0x2594`
+and `0x2604` verifiers reload the slot with `ldos`, mask both sides with
+`0xffff`, and take the `0xf5d40` path on mismatch. Static callers at
+`0x3478`, `0x3504`, and `0x3a18` all pass index `0`. The pure schedule is
+in `recovered_record_checksum_22f0.c`.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at
