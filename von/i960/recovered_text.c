@@ -65,11 +65,21 @@ void recovered_memory_copy_forward(volatile u8 *destination,
                                    u32 bytes);
 void recovered_host_fatal_halt(void);
 
+void recovered_text_set_position_state(volatile u32 *origin,
+                                       volatile u32 *column_state,
+                                       volatile u32 *row_state,
+                                       u32 column,
+                                       u32 row)
+{
+    *origin = column;
+    *column_state = column;
+    *row_state = row;
+}
+
 void recovered_text_set_position(u32 column, u32 row)
 {
-    *TEXT_STATE_ORIGIN = column;
-    *TEXT_STATE_COLUMN = column;
-    *TEXT_STATE_ROW = row;
+    recovered_text_set_position_state(
+        TEXT_STATE_ORIGIN, TEXT_STATE_COLUMN, TEXT_STATE_ROW, column, row);
 }
 
 void recovered_text_emit_char(u8 character)

@@ -3188,6 +3188,11 @@
             }
           ],
           "symbol": "recovered_text_set_position",
+          "modeling": {
+            "boundary": "Models the text position setter's three ordered state stores: copy the requested column into origin and current-column state, then store the requested row",
+            "test": "von/tools/test_recovered_text_position_state.py",
+            "unresolved_behavior": "Mapped state ownership, caller coordinate provenance, MMIO timing, and subsequent glyph/tile effects remain outside this host-testable state update"
+          },
           "notes": "Observed during input-free startup and integrated into the reconstructed texture loader. Production C preserves origin, column, and row stores.",
           "milestones": {
             "c-only-i960-attract-60s": {
