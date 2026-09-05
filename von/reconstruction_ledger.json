@@ -4634,8 +4634,13 @@
               "end": "0x0009d454"
             }
           ],
-          "symbol": "recovered_geometry_flagged_state_packet_plan",
-          "notes": "Recovers the bit-1-gated command-29/response/command-19/18 packet, state-nibble masking, frame pair, and readback publication; the clear-flag floating-point path remains unresolved."
+        "symbol": "recovered_geometry_flagged_state_packet_plan",
+        "notes": "Recovers the bit-1-gated command-29/response/command-19/18 packet, state-nibble masking, frame pair, and readback publication; the clear-flag floating-point path remains unresolved.",
+        "modeling": {
+          "boundary": "i960 0x9d334 flagged-state packet plan covering bit-1 gating, state-nibble masking, 13-word command/response packet, frame/control publication, and board-response inputs",
+          "test": "von/tools/test_recovered_geometry_flagged_state_packet_9d334.py",
+          "unresolved_behavior": "actual FIFO/MMIO writes, clear-flag floating-point path, response production, and downstream state consumers remain outside the pure flagged-packet plan"
+        }
         },
         {
           "id": "maincpu.geometry-clear-flag-packet-9d454",
