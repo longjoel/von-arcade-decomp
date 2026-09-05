@@ -597,6 +597,11 @@ halfword device windows (16384 at `0x1000000`, 4096 at `0x100c000`,
 exactly its `setbit` count of stores — returning through the saved
 link. The pure schedule is in `recovered_window_clear_1c618.c`.
 
+The small leaf at `0x1c700` does the same job once: 4096 zero
+halfwords at the caller-supplied destination, same countdown shape,
+same one-way link return. The pure schedule is in
+`recovered_register_fill_1c700.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero

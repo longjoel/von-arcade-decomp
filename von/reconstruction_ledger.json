@@ -10596,6 +10596,33 @@
             "unresolved_behavior": "Downstream consumers of the blanked windows remain outside this pure clear contract"
           },
           "notes": "Pure schedule for the 0x1c618 window-clear routine called across the service leaves."
+        },
+        {
+          "id": "maincpu.register-fill-1c700",
+          "name": "register_fill_1c700",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_register_fill_1c700.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_register_fill_1c700.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001c700",
+              "end": "0x0001c72c"
+            }
+          ],
+          "symbol": "recovered_register_fill_plan",
+          "modeling": {
+            "boundary": "Fill schedule: 4096 zero halfwords at the caller destination with matching end pointer",
+            "test": "von/tools/test_recovered_register_fill_1c700.py",
+            "unresolved_behavior": "Downstream consumers of the blanked region remain outside this pure fill contract"
+          },
+          "notes": "Pure schedule for the 0x1c700 single-window fill leaf."
         }
       ]
     },
