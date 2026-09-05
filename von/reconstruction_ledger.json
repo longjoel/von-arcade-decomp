@@ -10171,6 +10171,11 @@
             }
           ],
           "symbol": "sharc_opcode_3a_table_copy_output_service",
+          "modeling": {
+            "boundary": "Models the pure opcode-0x3a seeded table copy and output selection: derive the destination as (input >> 2) + 0x01400000, write the fixed 0x05800b0b seed followed by all 12 table words, and expose the twelfth table word as the output value.",
+            "test": "von/tools/test_recovered_sharc_opcode_3a.py",
+            "unresolved_behavior": "FIFO production and wait timing, source DM 0x30101/0x30141 ownership, destination/protocol field semantics, output FIFO backpressure, delayed store ordering, terminal 0x01407fff behavior, and downstream consumers remain outside this bounded copy/output model."
+          },
           "notes": "Static listing recovers one FIFO-derived destination, seeded 12-word table copy, FLAG1 output wait, and final copied-word output/store in delayed-return slots; protocol field semantics remain provisional."
         },
         {
