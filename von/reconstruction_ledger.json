@@ -3420,7 +3420,12 @@
             }
           ],
           "symbol": "recovered_status_block_route_plan",
-          "notes": "Recovers three current-position source-or-clear blocks of widths 16, 16, and 28, all height 4."
+          "notes": "Recovers three current-position source-or-clear blocks of widths 16, 16, and 28, all height 4.",
+          "modeling": {
+            "boundary": "i960 0x20660 status-block source-or-clear route descriptors with current-position origin and route-specific widths",
+            "test": "von/tools/test_recovered_status_block_routes_20660.py",
+            "unresolved_behavior": "source/fill memory contents and downstream block-render helper effects remain outside the pure route descriptor"
+          }
         },
         {
           "id": "maincpu.status-block-routes-206f0-207d8",
