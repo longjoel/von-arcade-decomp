@@ -2821,7 +2821,12 @@
             }
           ],
           "symbol": "recovered_host_interrupt_acknowledge",
-          "notes": "Recovers the common dispatcher acknowledgement tail: write ~mask to 0xe80000, then OR the source mask back into the 0x501cd0 mirror and 0xe80004 MMIO control register."
+          "notes": "Recovers the common dispatcher acknowledgement tail: write ~mask to 0xe80000, then OR the source mask back into the 0x501cd0 mirror and 0xe80004 MMIO control register.",
+          "modeling": {
+            "boundary": "Purely models the acknowledgement transition: produce the bitwise complement of the source mask for the acknowledge register, then re-arm the control mirror and MMIO value by OR-ing the source mask into the prior control value.",
+            "test": "von/tools/test_recovered_host_control.py",
+            "unresolved_behavior": "Does not model live interrupt-controller timing, MMIO visibility, vector dispatch, or the caller-specific sequencing around the acknowledgement tail."
+          }
         },
         {
           "id": "maincpu.host-interrupt-mask-update",
