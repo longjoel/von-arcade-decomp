@@ -1295,7 +1295,7 @@
           "id": "maincpu.opcode-0e-state-upload-service",
           "name": "opcode_0e_state_upload_service",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
             "von/i960/disassembly-annotations.md"
           ],
@@ -1310,6 +1310,11 @@
             }
           ],
           "symbol": "sharc_opcode_0e_state_upload_service",
+          "modeling": {
+            "boundary": "Models the exact opcode-0e four-word state upload: consume FIFO R0..R3 and store the raw words at DM 0x30105..0x30108 in order, with the final two stores occupying delayed-return slots.",
+            "test": "von/tools/test_sharc_opcode_0e.py",
+            "unresolved_behavior": "FIFO production and wait timing, persistent DM ownership/address units, delayed-store timing, field semantics, and opcode-0f consumers remain outside this static upload model."
+          },
           "notes": "Static listing recovers four FIFO reads into R0,R1,R2,R3 and stores at DM 0x30105..0x30108; the final two stores occupy delayed-return slots."
         },
         {
