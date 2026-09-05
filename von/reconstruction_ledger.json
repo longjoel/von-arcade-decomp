@@ -6265,6 +6265,11 @@
             }
           ],
           "symbol": "recovered_object_state_seven_route",
+          "modeling": {
+            "boundary": "Models the pure state-7 transition classifier: unrelated-state inputs select 7; related state 4 selects 9 for low global state when mode bit 2 is set, and for high global state selects 8 for caller states through 3 with mode bit 1 or otherwise selects 9 for caller states above 1 with mode bit 2; all other cases select 7 and the helper returns success.",
+            "test": "von/tools/test_recovered_object_state_seven.py",
+            "unresolved_behavior": "The surrounding dispatcher’s object-pointer plumbing, global and related-object memory reads, transition publication, and runtime timing/input correlation are not modeled by this pure arm helper."
+          },
           "notes": "Recovers the related-state-4 gate, global-state split at 3, and caller/mode selection of direct transitions 7, 8, or 9. The current state is 7, so the common tail does not remap the result."
         },
         {
