@@ -438,6 +438,12 @@ The predicate at `0x18438` matches the ordered pairs `(0,1)`, `(1,0)`,
 link in `g2` (`g14` cleared on entry). The pure function is in
 `recovered_pair_match_18438.c`.
 
+The classifier at `0x183b8` gates three masked port words ordinally:
+`[g0-0x2001] <= 0x3ffe` reports `3`, `[g0+0xa000] <= 0x4000` reports `0`,
+`[g0+0x5fff] <= 0x3ffe` reports `2`, otherwise `1`. The link moves to `g1`
+with `g14` cleared. The pure function is in
+`recovered_port_classify_183b8.c`.
+
 The plane-0 emitter at `0x1d090` masks the byte to `0x7f`, subtracts `32`,
 and sign-extends the low byte (`shlo 24`/`shri 24`, confirmed arithmetic in
 the MAME i960 core). Biased values `0x4b`/`0x54` emit the fixed control

@@ -9798,6 +9798,32 @@
             "unresolved_behavior": "Caller link timing and downstream consumers remain outside this pure predicate"
           },
           "notes": "Pure boolean matcher for the 0x18438 ordered-pair chain. Entry saves g14 to g2 and clears g14 per the shared tail convention."
+        },
+        {
+          "id": "maincpu.port-classify-183b8",
+          "name": "port_classify_183b8",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_port_classify_183b8.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_port_classify_183b8.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000183b8",
+              "end": "0x00018420"
+            }
+          ],
+          "symbol": "recovered_port_classify",
+          "modeling": {
+            "boundary": "Port-word classifier: three ordinal greater-than gates over masked words at -0x2001/+0xa000/+0x5fff reporting classes 3/0/2/1",
+            "test": "von/tools/test_recovered_port_classify_183b8.py",
+            "unresolved_behavior": "Actual port contents and downstream consumers remain outside this pure classifier"
+          },
+          "notes": "Pure four-class predicate for the 0x183b8 port-word chain. Entry saves g14 to g1 and clears g14."
         }
       ]
     },
