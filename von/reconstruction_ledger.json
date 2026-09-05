@@ -3987,7 +3987,12 @@
             }
           ],
           "symbol": "recovered_hud_reset_plan",
-          "notes": "Recovers the 0x0100c940 grouped ffff fill, four HUD-state clears, masked modulo-5 generator selection, and 0x503a98+4 fallback when the reduced value is 4."
+          "notes": "Recovers the 0x0100c940 grouped ffff fill, four HUD-state clears, masked modulo-5 generator selection, and 0x503a98+4 fallback when the reduced value is 4.",
+          "modeling": {
+            "boundary": "i960 0x22d30 HUD reset descriptor with grouped fill, four state clears, and masked modulo-5 generator fallback",
+            "test": "von/tools/test_recovered_hud_reset_22d30.py",
+            "unresolved_behavior": "actual HUD-memory/state writes and caller-visible generator side effects remain outside the pure reset plan"
+          }
         },
         {
           "id": "maincpu.status-strip-reset-23510",
