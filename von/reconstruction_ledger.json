@@ -9589,6 +9589,36 @@
             "unresolved_behavior": "The ten 0x83xxx table targets and their object effects remain outside this pure gate schedule"
           },
           "notes": "Pure gate schedule for 0x81e60: pre-call needs mode 4, sub-mode 10, and a nonzero flag; the table needs only the flag and a state within 0-9. The entry object passes through r4."
+        },
+        {
+          "id": "maincpu.decimal-emit-e3830",
+          "name": "decimal_emit_e3830",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_decimal_emit_e3830.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_decimal_emit_e3830.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000e3830",
+              "end": "0x000e3878"
+            },
+            {
+              "start": "0x000e3a10",
+              "end": "0x000e3a14"
+            }
+          ],
+          "symbol": "recovered_decimal_emit_plan",
+          "modeling": {
+            "boundary": "Saturating decimal emit schedule: ordinal compare against 99, shared '99' string via 0x1d9e0, digit pair via 0x1d310, plus the 0xe3a10 alias thunk",
+            "test": "von/tools/test_recovered_decimal_emit_e3830.py",
+            "unresolved_behavior": "Actual walker execution and string-table ROM provenance remain outside this pure emit schedule"
+          },
+          "notes": "Pure emit schedule for the 0xe3830 decimal emitter with its 0xe3a10 alias: values above 99 share the '99' string; the rest render as a 0x30-biased digit pair."
         }
       ]
     },

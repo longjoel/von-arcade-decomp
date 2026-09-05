@@ -487,6 +487,13 @@ The gate at `0x81e60` calls `0x84d90` only when mode `0x5039f4` is `4`,
 The entry object still sits in `r4` for the target. The pure plan is in
 `recovered_dispatch_gate_81e60.c`; the ten `0x83xxx` targets stay outside.
 
+The decimal emitter at `0xe3830` compares its input ordinally against
+`99`: larger values emit the shared `"99"` string at `0xe3824` through
+the `0x1d9e0` walker, while values `0-99` emit `value/10` and `value%10`
+as `0x30`-biased characters through the `0x1d310` walker with modes
+`(3, 0)`. The pure plan is in `recovered_decimal_emit_e3830.c`, which
+also covers the `0xe3a10` alias thunk.
+
 The reset helper at `0x23510` first calls `0x1dfd0` with source `0`, width
 `64`, height `4`, and row count `caller_g14+31`. It then clears the two state
 halfwords at `0x504d26` and `0x504d24`, followed by `0xfff` zero halfwords at
