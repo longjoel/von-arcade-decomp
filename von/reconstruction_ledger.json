@@ -1975,6 +1975,11 @@
             }
           ],
           "symbol": "recovered_io_sample_input",
+          "modeling": {
+            "boundary": "i960 input-sample control state transform and sampled-halfword latch",
+            "test": "von/tools/test_recovered_io.py",
+            "unresolved_behavior": "higher-level input meaning and mapped bus timing remain outside this deterministic state-transform slice"
+          },
           "notes": "Models the deterministic state transform after the 0x1c00010 control write: status_3f0=input_byte & port_low, status_480=port_low, status_481=input_byte, status_482=~port_low, and the sampled halfword is latched to 0x1c0000a. Higher-level input meaning and bus timing remain outside the slice.",
           "milestones": {
             "c-only-i960-attract-60s": {
