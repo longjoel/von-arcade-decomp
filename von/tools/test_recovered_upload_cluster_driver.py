@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Drive the executable upload-cluster driver against array windows.
 
+Provenance: synthetic (array pattern plus integer oracles re-derived
+from the listing); no trace-derived vectors.
+
+
 Compiles von/i960/recovered_upload_cluster.c with the proven kernel
 unit and executes full 768-store runs, checking every destination word
 against independent integer oracles laid out with the exact strided

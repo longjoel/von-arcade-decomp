@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Validate the recovered 0x29c08 clamp-store plan."""
+"""Validate the recovered 0x29c08 clamp-store plan.
+
+Provenance: synthetic (vonj-maincpu.lst 0x29c08-0x29c4c); no
+trace-derived vectors. Proves the code matches the reading, not the original.
+"""
 import ctypes
 import pathlib
 import subprocess

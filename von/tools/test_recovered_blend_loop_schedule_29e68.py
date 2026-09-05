@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Validate the 0x29e68 blend inner-loop schedule."""
+"""Validate the 0x29e68 blend inner-loop schedule.
+
+Provenance: synthetic (vonj-maincpu.lst 0x29e68-0x29e98); no
+trace-derived vectors. Proves the code matches the reading, not the original.
+"""
 import ctypes
 import pathlib
 import subprocess

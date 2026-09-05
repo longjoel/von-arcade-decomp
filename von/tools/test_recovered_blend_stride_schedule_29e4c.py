@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Validate the 0x29d50 outer-cadence stride schedule."""
+"""Validate the 0x29d50 outer-cadence stride schedule.
+
+Provenance: synthetic (vonj-maincpu.lst 0x29e4c/0x29ec8/0x29f44 sites);
+no trace-derived vectors. Proves the code matches the reading, not the original.
+"""
 import ctypes
 import pathlib
 import subprocess

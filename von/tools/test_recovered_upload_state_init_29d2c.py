@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Validate the recovered 0x29d2c upload-state initializer."""
+"""Validate the recovered 0x29d2c upload-state initializer.
+
+Provenance: synthetic (vonj-maincpu.lst 0x29d2c-0x29d48); no
+trace-derived vectors. Proves the code matches the reading, not the original.
+"""
 import ctypes
 import pathlib
 import subprocess

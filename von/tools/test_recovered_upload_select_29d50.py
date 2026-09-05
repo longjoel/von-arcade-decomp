@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Validate the recovered 0x29d50 upload-select prologue."""
+"""Validate the recovered 0x29d50 upload-select prologue.
+
+Provenance: synthetic (vonj-maincpu.lst 0x29d50-0x29dbc); no
+trace-derived vectors. Proves the code matches the reading, not the original.
+"""
 import ctypes
 import pathlib
 import subprocess

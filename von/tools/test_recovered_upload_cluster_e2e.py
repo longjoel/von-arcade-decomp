@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """End-to-end lifecycle of the 0x29c08/0x29d50 upload cluster.
 
+Provenance: synthetic (chains the synthetic unit oracles above); no
+trace-derived vectors.
+
+
 Chains the recovered pure units the way the listing executes them:
 seed (0x29d2c) -> clamp (0x29c08) parks the uploader -> reseed ->
 prologue guard and bank select (0x29d50) -> direct or blend stride

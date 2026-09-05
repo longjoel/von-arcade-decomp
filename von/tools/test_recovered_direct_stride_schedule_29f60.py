@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Validate the mode-0 direct-path dispatch and stride schedule."""
+"""Validate the mode-0 direct-path dispatch and stride schedule.
+
+Provenance: synthetic (vonj-maincpu.lst 0x29f60/0x29fe0/0x2a00c/0x2a094
+sites); no trace-derived vectors. Proves the code matches the reading,
+not the original.
+"""
 import ctypes
 import pathlib
 import subprocess

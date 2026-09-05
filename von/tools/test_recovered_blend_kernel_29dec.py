@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Validate the 0x29d50 per-texel blend kernel against integer oracles."""
+"""Validate the 0x29d50 per-texel blend kernel against integer oracles.
+
+Provenance: synthetic (vonj-maincpu.lst 0x29dec-0x29e1c canonical
+instance); no trace-derived vectors. Proves the code matches the
+reading, not the original.
+"""
 import ctypes
 import pathlib
 import subprocess
