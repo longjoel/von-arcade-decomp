@@ -98,6 +98,10 @@ def main() -> int:
         broken["assets"][0]["status"] = "verified"
         assert any("invalid status" in error for error in validate(broken, evidence, root))
         broken = copy.deepcopy(pack)
+        broken["assets"][0]["status"] = "reference-capture"
+        assert any("reference-capture is not valid" in error
+                   for error in validate(broken, evidence, root))
+        broken = copy.deepcopy(pack)
         broken["assets"][0]["claims"]["source_ranges"] = "candidate"
         assert any("require validated claims: source_ranges" in error
                    for error in validate(broken, evidence, root))

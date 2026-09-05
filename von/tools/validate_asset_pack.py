@@ -156,6 +156,10 @@ def validate(pack: dict[str, Any], evidence: dict[str, Any], root: Path,
         status = asset.get("status")
         if status not in STATUSES:
             errors.append(f"{where}: invalid status {status!r}")
+        elif status == "reference-capture" and asset.get("media_type") not in {
+                "audio-sample", "audio-sequence", "video", "image"}:
+            errors.append(
+                f"{where}: reference-capture is not valid for {asset.get('media_type')}")
         payload_text = asset.get("payload")
         payload = rooted(root, payload_text)
         if payload is None or payload.is_symlink() or not payload.is_file():
