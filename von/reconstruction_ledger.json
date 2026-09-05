@@ -6281,7 +6281,12 @@
             }
           ],
           "symbol": "recovered_object_state_two_route",
-          "notes": "Recovers the global-state-5/mode-bit-1 fast path and the sign-based timing fallback. Negative timing selects direct 9 for caller<=4 with mode bit 2, otherwise 8 only for mode bit 1 and role>6; nonnegative timing selects 9 only for caller>2 with mode bit 2. The loaded 0x4072c000 constant is not used by the effective compare."
+          "notes": "Recovers the global-state-5/mode-bit-1 fast path and the sign-based timing fallback. Negative timing selects direct 9 for caller<=4 with mode bit 2, otherwise 8 only for mode bit 1 and role>6; nonnegative timing selects 9 only for caller>2 with mode bit 2. The loaded 0x4072c000 constant is not used by the effective compare.",
+          "modeling": {
+            "boundary": "i960 0x791fc object-state two-arm model covering global-state/mode fast path, timer-sign routing, caller/mode/role predicates, and direct transitions 7/8/9",
+            "test": "von/tools/test_recovered_object_state_two.py",
+            "unresolved_behavior": "mapped global reads/writes, object-pointer provenance, common-tail remapping, caller scheduling, and runtime timing source remain outside the pure state-arm model"
+          }
         },
         {
           "id": "maincpu.object-state-four-arm",
