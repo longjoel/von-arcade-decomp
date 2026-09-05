@@ -8,6 +8,10 @@ import math
 from pathlib import Path
 
 
+STATUSES = ("legacy-unreviewed", "candidate", "observed", "validated",
+            "rejected", "reference-capture")
+
+
 def path_error(label: str, path: Path, root: Path, *, directory: bool = False,
                allow_missing: bool = False) -> str | None:
     if path.is_symlink():
@@ -104,7 +108,7 @@ def main() -> int:
         entries.append(record)
     catalog = {"version": 1, "assets": entries,
                "counts": {status: sum(entry["status"] == status for entry in entries)
-                          for status in ("verified", "candidate", "rejected")}}
+                          for status in STATUSES}}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(catalog, indent=2) + "\n")
     print(f"cataloged {len(entries)} assets: {catalog['counts']}")
