@@ -5223,6 +5223,11 @@
             }
           ],
           "symbol": "recovered_text_video_control_write_plan",
+          "modeling": {
+            "boundary": "Models the video-control bootstrap's fixed helper request, clear operation, and ten ordered bus/state writes, including the exact profile-dependent values returned in the host-test plan",
+            "test": "von/tools/test_recovered_text_video.py",
+            "unresolved_behavior": "Live mapped-bus side effects, hardware clear timing, caller state provenance beyond modeled profiles, and downstream video-controller behavior remain outside this write-plan model"
+          },
           "notes": "Recovers and executes the 0x1c220 video-control bootstrap's fixed 0x1c730 helper request and ten direct bus/state writes around the 0x1c618 clear call. The reconstructed startup invokes it with the zero-profile caller state; all records are host-tested. Runtime attract validation remains pending.",
           "milestones": {
             "c-only-i960-attract-60s": {
