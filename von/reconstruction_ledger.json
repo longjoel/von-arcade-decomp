@@ -9734,6 +9734,44 @@
             "unresolved_behavior": "Actual glyph-table dereference and tile-RAM writes remain outside this pure emit schedule"
           },
           "notes": "Pure emit schedule for the 0x1cea0 renderer: plane-0 base with forced bank attributes from its own glyph table. Completes the four-emitter family."
+        },
+        {
+          "id": "maincpu.flag-dispatch-2c70",
+          "name": "flag_dispatch_2c70",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_flag_dispatch_2c70.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_flag_dispatch_2c70.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00002c70",
+              "end": "0x00002c88"
+            },
+            {
+              "start": "0x00002c90",
+              "end": "0x00002ca8"
+            },
+            {
+              "start": "0x00002cb0",
+              "end": "0x00002cc8"
+            },
+            {
+              "start": "0x00002d60",
+              "end": "0x00002d78"
+            }
+          ],
+          "symbol": "recovered_flag_dispatch_target",
+          "modeling": {
+            "boundary": "Input flag dispatch table: four entries test 0x5023e0 and forward to fixed targets with per-arm bal/call link kinds",
+            "test": "von/tools/test_recovered_flag_dispatch_2c70.py",
+            "unresolved_behavior": "The eight forwarding targets and their input effects remain outside this pure dispatch table"
+          },
+          "notes": "Pure route table for the 0x2c70/0x2c90/0x2cb0/0x2d60 dispatcher family over the shared input flag. 0x2cd8/0x2d88 targets remain unmodeled."
         }
       ]
     },

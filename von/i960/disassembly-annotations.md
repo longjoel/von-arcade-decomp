@@ -426,6 +426,13 @@ The fourth sibling at `0x1cea0` pairs plane `0x01000000` with the forced
 shifted gate and column-wrap contract. The pure plan is in
 `recovered_glyph_emit_p0a_1cea0.c`, completing the emitter family.
 
+Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
+same `0x5023e0` flag and forward with no argument shuffling: the zero arm
+takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
+arm takes `0x2bb0`/`0x2c10`/`0x2da0` (`call`) except `0x2cb0`, whose
+nonzero arm is also `bal` to `0x2cf8`. The pure table is in
+`recovered_flag_dispatch_2c70.c`.
+
 The plane-0 emitter at `0x1d090` masks the byte to `0x7f`, subtracts `32`,
 and sign-extends the low byte (`shlo 24`/`shri 24`, confirmed arithmetic in
 the MAME i960 core). Biased values `0x4b`/`0x54` emit the fixed control
