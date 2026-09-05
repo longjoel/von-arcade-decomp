@@ -5612,6 +5612,11 @@
             }
           ],
           "symbol": "recovered_geometry_frame_submission",
+          "modeling": {
+            "boundary": "geometry frame submission selects the prior phase window, polls status bit 2 until completion, toggles phase, and selects the new write window",
+            "test": "von/tools/test_recovered_geometry_frame_plan_28de8.py",
+            "unresolved_behavior": "live MMIO polling timing, frame-buffer ownership, and compiler/ABI byte equivalence remain provisional beyond the deterministic phase-plan contract"
+          },
           "notes": "Static audit against 0x28de8-0x28e7c confirms prior-phase read selection, polling until status bit 2 changes, phase toggle, and new-phase write selection. The polling condition was corrected from the prior inverse C condition. Byte validation is blocked on compiler/ABI calibration.",
           "milestones": {
             "c-only-i960-attract-60s": {
