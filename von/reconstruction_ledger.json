@@ -3501,7 +3501,12 @@
             }
           ],
           "symbol": "recovered_attributed_status_route_plan",
-          "notes": "Recovers eight current-position attributed source-or-clear routes with widths 24,31,g5+31,g3+31,28,24,29,29 and heights 8,8,8,4,8,8,8,8."
+          "notes": "Recovers eight current-position attributed source-or-clear routes with widths 24,31,g5+31,g3+31,28,24,29,29 and heights 8,8,8,4,8,8,8,8.",
+          "modeling": {
+            "boundary": "i960 0x20840 attributed status source-or-clear route descriptors with caller-derived widths and route-specific heights",
+            "test": "von/tools/test_recovered_attributed_status_routes_20840.py",
+            "unresolved_behavior": "attributed source/fill memory contents and downstream 0x1dc90/0x1df00 rendering effects remain outside the pure route plan"
+          }
         },
         {
           "id": "maincpu.attributed-status-routes-209c0-20a18",
