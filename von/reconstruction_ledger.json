@@ -4715,8 +4715,13 @@
               "end": "0x0009d858"
             }
           ],
-          "symbol": "recovered_geometry_second_flagged_state_packet_plan",
-          "notes": "Recovers the +0x1dd bit-1-gated command-29/19/18 packet, duplicated derived word, (g14,0x40009c) frame, and readback publication; the +0x1e2 clear path remains unresolved."
+        "symbol": "recovered_geometry_second_flagged_state_packet_plan",
+        "notes": "Recovers the +0x1dd bit-1-gated command-29/19/18 packet, duplicated derived word, (g14,0x40009c) frame, and readback publication; the +0x1e2 clear path remains unresolved.",
+        "modeling": {
+          "boundary": "i960 0x9d730 second flagged-state packet plan covering bit-1 gating, masked state parameter, duplicated derived-word packet, frame publication, and board readback input",
+          "test": "von/tools/test_recovered_geometry_second_flagged_state_packet_9d730.py",
+          "unresolved_behavior": "actual FIFO/MMIO writes, +0x1e2 clear path, response production, and downstream second-packet consumers remain outside the pure packet plan"
+        }
         },
         {
           "id": "maincpu.geometry-second-clear-flag-packet-9d858",
