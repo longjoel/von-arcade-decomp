@@ -10326,6 +10326,33 @@
             "unresolved_behavior": "Sub-call bodies at 0x1c618/0x1ccf8/0x2a4e0 and link mechanics remain outside this pure store contract"
           },
           "notes": "Pure store schedule for the 0x1b980 parking leaf: a second clamp-0 parker with service-table constants."
+        },
+        {
+          "id": "maincpu.slot-forward-1b940",
+          "name": "slot_forward_1b940",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_slot_forward_1b940.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_slot_forward_1b940.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001b940",
+              "end": "0x0001b95c"
+            }
+          ],
+          "symbol": "recovered_slot_forward_plan",
+          "modeling": {
+            "boundary": "Halfword forward schedule: bit-preserving copy plus sign-extended and constant sub-call arguments, calls caller-owned",
+            "test": "von/tools/test_recovered_slot_forward_1b940.py",
+            "unresolved_behavior": "Sub-call bodies at 0x1fe90/0x2a4e0 remain outside this pure forward contract"
+          },
+          "notes": "Pure forward schedule for the 0x1b940 service leaf, adjacent to the parking leaves."
         }
       ]
     },

@@ -537,6 +537,11 @@ publishes service-table constants around two caller-owned sub-calls:
 `0x577170`. Link/return mechanics stay caller-owned. The pure schedule
 is in `recovered_service_publish_1b980.c`.
 
+Just above, the `0x1b940` leaf forwards the service halfword at
+`0x503a80` to `0x5032f4` (bit-preserving), hands its sign extension to
+the `0x1fe90` sub-call, and passes 3 to `0x2a4e0`. The pure schedule
+is in `recovered_slot_forward_1b940.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
