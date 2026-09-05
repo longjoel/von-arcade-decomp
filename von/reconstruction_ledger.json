@@ -8554,6 +8554,11 @@
             }
           ],
           "symbol": "recovered_geometry_result_builder_9eab0_plan",
+          "modeling": {
+            "boundary": "Models the 0x9eab0 sibling contract: shared command-0x38 projection and default initialization of 0xffffe000 at output +0x0c and paired-record +0x06, flag-set command-10 linked-record delta packet, flag-clear object+0x184 source, common command-31 framing, and command-29/30 follow-ups with sign-bit transformation and selector-table output placement.",
+            "test": "von/tools/test_recovered_geometry_result_builder_9eab0.py",
+            "unresolved_behavior": "Live FIFO response values and timing, mapped object and linked-record writes, complete selector-table semantics beyond the modeled addresses, and downstream SHARC/device state remain unresolved."
+          },
           "notes": "Recovers the 0x9eab0 sibling: shared command-0x38 projection and command-31/29/30 tail, unconditional default 0xffffe000 at output +0x0c and paired-record +0x06, flag-set command-10 packet [10, linked.+0x1c-response2, linked.+0x14-response0] at output +0x0e/+paired +0x08, and flag-clear source object+0x184. Its command-29 NOTBIT 31 transform toggles only bit 31. Final response and selector-table placements remain +0x28, +0x14, and +0x24."
         },
         {
