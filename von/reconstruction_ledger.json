@@ -2099,6 +2099,11 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_io.py"],
           "ranges": [{"start": "0x00002990", "end": "0x00002ab0"}],
           "symbol": "recovered_io_setup_plan, recovered_io_command_plan",
+          "modeling": {
+            "boundary": "i960 indexed controller setup/command byte-plan construction with bounded table selection",
+            "test": "von/tools/test_recovered_io.py",
+            "unresolved_behavior": "controller port writes and status-wait timing remain external to the pure indexed upload schedule"
+          },
           "notes": "Pure indexed controller upload schedule: fixed 0x2980 setup, indexed 0x2aa0 command construction, and bounded byte-plan behavior. Port writes and status waits remain external."
         },
         {
