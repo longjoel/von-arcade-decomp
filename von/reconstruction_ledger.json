@@ -12278,6 +12278,11 @@
             }
           ],
           "symbol": "recovered_geometry_dual_distance_accepts",
+          "modeling": {
+            "boundary": "Models the post-gate residual predicate: issue the two axis-separated SHARC opcode-0x1f distance queries, then accept exactly when CMPR(first, second) followed by BGE is false, i.e. first < second; equal, greater, and NaN comparisons reject",
+            "test": "von/tools/test_recovered_geometry_dual_distance_predicate_df2f4.py",
+            "unresolved_behavior": "Live SHARC/FIFO transport, upstream command-10/28/27 vector production, related-record multiplicands, and downstream residual action remain outside this predicate model"
+          },
           "notes": "The post-gate residual tail issues two SHARC opcode-0x1f distance queries with axis-separated endpoint pairs, then rejects on CMPR(first, second) followed by BGE. Acceptance is exactly first < second; equal, greater, or NaN results reject. Decimal commands 10/28/27 dispatch to SHARC 0x0a/0x1c/0x1b before the pair; g6 is related +0x58 times the opcode-0x1c result, and g5 is related +0x58 times related +0x5c times the opcode-0x1b result. The second packet uses selected Z and affine Z. Initialization at 0x278b4 copies descriptor words 0x67c/0x680/0x684/0x688 into related-record offsets +0x54/+0x58/+0x5c/+0x60; 0x67c -> +0x54 is confirmed as the inclusive Y-window extent, while 0x680/+0x58 and 0x684/+0x5c remain unnamed per-geometry multiplicands. Sibling handlers at 0xdf6a0, 0xdf948, 0xdfbf0, and 0xe00cc repeat the +0x58 primary scaling and +0x58*+0x5c companion product. No direct +0x60 load was found in the current main-CPU listing, so that adjacent copied field is excluded from the residual model."
         }
       ]
