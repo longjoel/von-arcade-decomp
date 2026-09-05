@@ -6362,7 +6362,12 @@
             }
           ],
           "symbol": "recovered_object_state_five_route",
-          "notes": "Recovers the visited state-5 timing bands and caller/mode gates. Negative timing selects 8 on mode bit 1 else 7; the middle band selects 9 only for caller states above 3 with mode bit 2; the final band has the exact caller-state 0/1..4/5..9 split and prioritizes mode bit 1 for the latter group. All outputs are direct 7, 8, or 9 writes."
+    "notes": "Recovers the visited state-5 timing bands and caller/mode gates. Negative timing selects 8 on mode bit 1 else 7; the middle band selects 9 only for caller states above 3 with mode bit 2; the final band has the exact caller-state 0/1..4/5..9 split and prioritizes mode bit 1 for the latter group. All outputs are direct 7, 8, or 9 writes.",
+    "modeling": {
+      "boundary": "Purely models the state-5 transition write: decode timer_bits as a float, select the negative, below-3.640625, or final timing band, apply the caller_state partitions and mode bits 1/2, write transition 7/8/9, and return success. The modeled arm is not remapped by the shared tail because its current state is 5.",
+      "test": "von/tools/test_recovered_object_state_five.py",
+      "unresolved_behavior": "The runtime source of the timer, caller_state, and 0x504e30 mode bits is not modeled, including the ROM's 0x40590000 load noted by the recovered source. Downstream consumers of transition 7/8/9, surrounding object-state dispatch, and the original memory/MMIO side effects remain unresolved."
+    }
         },
         {
           "id": "maincpu.object-state-terminal-arms",
