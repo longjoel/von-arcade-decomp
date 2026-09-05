@@ -8915,6 +8915,11 @@
             }
           ],
           "symbol": "recovered_text_two_digit",
+          "modeling": {
+            "boundary": "Models the pure two-digit decimal formatter: nonnegative values 0 through 99 emit zero-padded ASCII digits, values above 99 saturate to 99, and negative values return failure without emitting digits.",
+            "test": "von/tools/test_recovered_text_two_digit.py",
+            "unresolved_behavior": "The observed caller-side value domain, glyph emission/storage, output cursor or attributes, and handling outside the tested nonnegative formatter contract are not modeled by this helper."
+          },
           "notes": "Production C captures the two-digit decimal formatter's 0..99 behavior and saturation above 99; negative inputs are outside the observed caller contract.",
           "milestones": {
             "c-only-i960-attract-60s": {
