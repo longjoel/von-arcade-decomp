@@ -8526,6 +8526,11 @@
             }
           ],
           "symbol": "recovered_geometry_result_builder_9e880_plan",
+          "modeling": {
+            "boundary": "Models the 0x9e880 object-state result-builder contract: shared command-0x38 response scratch, flag-set command-10 packet from linked-record deltas, flag-clear sources at object offsets +0x184 and +0x34, common command-31 distance framing, and command-29/30 follow-ups with sign-bit transformation and state-indexed table outputs.",
+            "test": "von/tools/test_recovered_geometry_result_builder_9e880.py",
+            "unresolved_behavior": "Live FIFO response values and timing, mapped object and linked-record writes, complete selector/state-table semantics beyond the modeled addresses, and downstream SHARC/device state remain unresolved."
+          },
           "notes": "Recovers the 0x9e880 object-state result builder: shared command-0x38 projection, flag-set command-10 packet [10, linked.+0x1c-response2, linked.+0x14-response0] through the linked record at object+0x74, flag-clear source object+0x184 plus object+0x34, common command-31 distance response at output +0x28, and command-29/30 follow-ups storing outputs at +0x18 and +0x20 with selector-table values at +0x14 and +0x24. The command-29 NOTBIT 31 response transform toggles only bit 31."
         },
         {
