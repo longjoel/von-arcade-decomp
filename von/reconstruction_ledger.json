@@ -4310,8 +4310,13 @@
               "end": "0x00023d5c"
             }
           ],
-          "symbol": "recovered_geometry_position_delta_plan",
-          "notes": "Recovers signed +0x1d0/+0x1d2/+0x1d4 arithmetic, i960 compare-source ordering, negative-result suppression through 0x503a60, halfword writeback, and callers at 0x23d88/0x273f4/0x274a4."
+        "symbol": "recovered_geometry_position_delta_plan",
+        "notes": "Recovers signed +0x1d0/+0x1d2/+0x1d4 arithmetic, i960 compare-source ordering, negative-result suppression through 0x503a60, halfword writeback, and callers at 0x23d88/0x273f4/0x274a4.",
+        "modeling": {
+          "boundary": "i960 0x23ce8 geometry position-delta plan covering signed limit selection, compare-source ordering, global-gated negative suppression, halfword writeback, and return stub",
+          "test": "von/tools/test_recovered_geometry_position_delta_23ce8.py",
+          "unresolved_behavior": "actual object-memory writes, caller-specific meaning of the three inputs, and downstream geometry consumers remain outside the pure delta helper"
+        }
         },
         {
           "id": "maincpu.geometry-board-setup-prefix-23d60",
