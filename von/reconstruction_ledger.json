@@ -10299,6 +10299,33 @@
             "unresolved_behavior": "No direct caller of the 0x29c50 entry is visible in maincpu, so the re-arm trigger stays open in U-0001"
           },
           "notes": "Pure re-arm schedules: the mechanism behind U-0001 is identified even though its trigger is not."
+        },
+        {
+          "id": "maincpu.service-publish-1b980",
+          "name": "service_publish_1b980",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_service_publish_1b980.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_service_publish_1b980.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001b980",
+              "end": "0x0001b9c4"
+            }
+          ],
+          "symbol": "recovered_service_publish_plan",
+          "modeling": {
+            "boundary": "Fixed-input leaf schedule: clamp-0 park plus three service-table constant stores around caller-owned sub-calls",
+            "test": "von/tools/test_recovered_service_publish_1b980.py",
+            "unresolved_behavior": "Sub-call bodies at 0x1c618/0x1ccf8/0x2a4e0 and link mechanics remain outside this pure store contract"
+          },
+          "notes": "Pure store schedule for the 0x1b980 parking leaf: a second clamp-0 parker with service-table constants."
         }
       ]
     },

@@ -531,6 +531,12 @@ so the clamp stores 0 (parking the uploader), publishes 25 to
 `0x503a00`, and saves the link at `0x5024c6`. The pure schedule is in
 `recovered_park_store_1b960.c`; the re-arm source stays open (U-0001).
 
+A second parking leaf at `0x1b980` does the same clamp-0 park, then
+publishes service-table constants around two caller-owned sub-calls:
+`0x14a` to `0x503a04`, 16 to `0x503a00`, and `-1` (from `subo 1,0`) to
+`0x577170`. Link/return mechanics stay caller-owned. The pure schedule
+is in `recovered_service_publish_1b980.c`.
+
 Four input dispatchers (`0x2c70`, `0x2c90`, `0x2cb0`, `0x2d60`) test the
 same `0x5023e0` flag and forward with no argument shuffling: the zero arm
 takes `0x27b8`/`0x2798`/`0x2cd8`/`0x2d88` (all `bal`), while the nonzero
