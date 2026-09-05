@@ -36,7 +36,8 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
                       generated_coverage_path: Path | None = None,
                       generated_worklist_path: Path | None = None,
                       generated_status_path: Path | None = None,
-    generated_comparison_path: Path | None = None) -> list[str]:
+    generated_comparison_path: Path | None = None,
+                      run_model_tests: bool = False) -> list[str]:
     def read_document(path: Path, label: str) -> tuple[object, list[str]]:
         if has_symlink_component(path):
             return {}, [f"{label}: document path must not contain symlink components: {path}"]
@@ -76,6 +77,30 @@ def validate_workflow(root: Path, ledger_path: Path, evidence_path: Path,
                 errors.append(f"verifier {entry['id']} failed: {detail}")
     if strict_lifecycle:
         errors.extend(f"lifecycle: {error}" for error in validate_lifecycle(ledger, evidence, root))
+    if run_model_tests and isinstance(ledger, dict):
+        model_tests = {
+            unit.get("modeling", {}).get("test")
+            for image in ledger.get("images", [])
+            if isinstance(image, dict)
+            for unit in image.get("work_units", [])
+            if isinstance(unit, dict) and isinstance(unit.get("modeling"), dict)
+            and isinstance(unit.get("modeling", {}).get("test"), str)
+        }
+        for test in sorted(model_tests):
+            test_path = rooted(root, test)
+            if test_path is None or test_path.is_symlink() or not test_path.is_file():
+                errors.append(f"modeling test {test} skipped: unsafe or missing path")
+                continue
+            try:
+                completed = subprocess.run([sys.executable, str(test_path)], cwd=root,
+                                           capture_output=True, text=True, check=False,
+                                           timeout=30)
+            except subprocess.TimeoutExpired:
+                errors.append(f"modeling test {test} timed out after 30 seconds")
+                continue
+            if completed.returncode:
+                detail = completed.stderr.strip() or completed.stdout.strip()
+                errors.append(f"modeling test {test} failed: {detail}")
     if asset_pack_path:
         if has_symlink_component(asset_pack_path):
             errors.append(
@@ -158,11 +183,14 @@ def main() -> int:
     parser.add_argument("--comparison", type=Path,
                         help="optional comparison input used by the generated worklist")
     parser.add_argument("--run-verifiers", action="store_true")
+    parser.add_argument("--run-model-tests", action="store_true",
+                        help="execute every modeling.test referenced by the ledger")
     args = parser.parse_args()
     errors = validate_workflow(args.root, args.ledger, args.evidence, args.strict_lifecycle,
                                args.asset_pack, args.run_verifiers, args.rom_manifest,
                                args.tool_revision, args.map_revision, args.check_generated,
-                               args.coverage, args.worklist, args.status, args.comparison)
+                               args.coverage, args.worklist, args.status, args.comparison,
+                               args.run_model_tests)
     if errors:
         print(f"Evidence workflow validation: {len(errors)} error(s)")
         for error in errors:

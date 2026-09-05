@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import copy
 import tempfile
 from pathlib import Path
 
@@ -19,6 +20,25 @@ def main() -> int:
         root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
         run_verifiers=True,
     )
+    with tempfile.TemporaryDirectory(dir=root) as directory:
+        temp = Path(directory)
+        model_test = temp / "model-test.py"
+        model_test.write_text("print('model test pass')\n", encoding="utf-8")
+        ledger = json.loads((root / "von/reconstruction_ledger.json").read_text(encoding="utf-8"))
+        ledger["images"] = [copy.deepcopy(ledger["images"][0])]
+        ledger["images"][0]["work_units"] = [
+            copy.deepcopy(ledger["images"][0]["work_units"][0])
+        ]
+        ledger["images"][0]["work_units"][0]["modeling"]["test"] = str(
+            model_test.relative_to(root))
+        ledger_path = temp / "ledger.json"
+        evidence_path = temp / "evidence.json"
+        ledger_path.write_text(json.dumps(ledger), encoding="utf-8")
+        evidence_path.write_text('{"schema_version": 1, "entries": []}\n', encoding="utf-8")
+        assert not validate_workflow(root, ledger_path, evidence_path, run_model_tests=True)
+        model_test.write_text("raise SystemExit('model test failed')\n", encoding="utf-8")
+        errors = validate_workflow(root, ledger_path, evidence_path, run_model_tests=True)
+        assert any("modeling test" in error and "failed" in error for error in errors)
     errors = validate_workflow(
         root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
         strict_lifecycle=True,
