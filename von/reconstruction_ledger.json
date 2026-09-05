@@ -11399,6 +11399,11 @@
           ],
           "ranges": [{"start": "0x0002b5b0", "end": "0x0002b5dc"}],
           "symbol": "recovered_geometry_template_copy_2b5b0",
+          "modeling": {
+            "boundary": "Models the pure 0x2b5b0 template copy: copy 21 words (five four-word blocks plus the final word) from the supplied source vector to the destination vector and derive destination base 0x51c5b0 + index*100.",
+            "test": "von/tools/test_recovered_geometry_template_copy_2b5b0.py",
+            "unresolved_behavior": "Surrounding allocation, destination-memory ownership, caller validation, and device-side consumers of the copied template remain outside this model."
+          },
           "notes": "Original code computes destination 0x51c5b0 + index*100, copies five 4-word template blocks from 0x2aa80..0x2aac0, and stores the final 0x2aad0 word at +0x50. The model excludes surrounding allocation and device calls."
         },
         {
