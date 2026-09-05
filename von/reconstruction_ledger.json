@@ -7384,7 +7384,12 @@
             }
           ],
           "symbol": "recovered_video_dispatch_arm11",
-          "notes": "Recovers the one-call plain e1f20 arm at 0xe2908 for tile 11 from 0x02fb75d0, followed by the common e33f4 exit."
+          "notes": "Recovers the one-call plain e1f20 arm at 0xe2908 for tile 11 from 0x02fb75d0, followed by the common e33f4 exit.",
+          "modeling": {
+            "boundary": "Purely models the e2908 plan: emit one tile ID 11 from source 0x02fb75d0 and set count to 1 before the shared video-dispatch continuation.",
+            "test": "von/tools/test_recovered_video_dispatch.py",
+            "unresolved_behavior": "The e1f20 execution, plan consumption, common e33f4 control flow, caller sequencing, and original video-memory/MMIO side effects are not modeled."
+          }
         },
         {
           "id": "maincpu.video-dispatch-plain-arm",
