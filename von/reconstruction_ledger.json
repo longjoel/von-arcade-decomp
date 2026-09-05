@@ -11356,6 +11356,11 @@
             }
           ],
           "symbol": "recovered_geometry_batch_packet_8d400",
+          "modeling": {
+            "boundary": "Models the pure 0x8d400 per-record host contract: thirteen FIFO words with selectors 5, 47, 22, 21, 20, and 58; low-halfword coordinate/parameter masking; control 0x101 at 0x800010; four geometry-window words at 0x804000..0x80400c; completion word 6; readback at 0x802008; FIFO read at 0x884000; and publication of readback+0x34 at 0x801008.",
+            "test": "von/tools/test_recovered_geometry_batch_packet_8d400.py",
+            "unresolved_behavior": "Device/MMIO effects and response production, outer batch iteration, and downstream consumers of the published readback remain outside this host-side model."
+          },
           "notes": "Pure per-record contract for the fixed FIFO sequence [5,47, masked coordinates 4/6/8,22,coordinate 2,21,coordinate 0,20,parameter,58,0x802008 readback], followed by 0x101 at 0x800010, record/window words at 0x804000..0x80400c, and completion 6. The 0x884000 readback and device/MMIO effects remain external to the host model."
         },
         {
