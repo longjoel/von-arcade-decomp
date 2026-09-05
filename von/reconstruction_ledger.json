@@ -9461,6 +9461,11 @@
             }
           ],
           "symbol": "sharc_opcode_23_vector_normalization_state_update_service",
+          "modeling": {
+            "boundary": "Models the tested opcode-0x23 normalization and finite state-update kernels: three inputs are normalized with the local RSQRTS/refinement path and negated Y output, then the Y-up frame is post-multiplied into the existing column-major 3x3 state with the recovered lane ordering.",
+            "test": "von/tools/test_recovered_sharc_opcode_23.py",
+            "unresolved_behavior": "FIFO/output timing, DM state-pointer mapping, exact SHARC NaN payloads for the x=z=0 degeneracy, runtime packet-chain ownership, and gameplay coordinate semantics remain unresolved."
+          },
           "notes": "Static listing recovers three FIFO inputs, an exact x*x+y*y+z*z accumulation, reciprocal-square-root refinement, normalized x/y/z lanes with a negated y before state update, a store at DM 0x30180, and interleaved writes covering persistent state offsets 0x00..0x08. The reusable direction and state-update kernels are implemented in recovered_sharc_opcode_23.c and tested on axis vectors, including the ROM's explicit Y-negation negative-zero behavior, and on (3,4,12) -> (0x3e6c4ec4,0xbe9d89d8,0x3f6c4ec4). A seeded runtime store probe proves the state tail constructs a Y-up frame with rows (z,0,-x)/h, (-x*y/h,h,-z*y/h), and (x,y,z), where h=sqrt(x*x+z*z), then post-multiplies the existing column-major state by that frame. The PC-filtered trace resolves the pointer cell DM 0x30101 to state buffer 0x30200 and validates x-axis quarter-turn, z-axis identity, diagonal (1,2,3) frame, and y-axis propagation of 0xffffffff. Runtime capture reaches the host emitter at i960 0xcaf08 on both cabinets with 0x23 operands c1baa9ac/4116147b/416256d4, followed by 0x12 operands 42995595/bd23d70a/c234ef6a and 0x0a operands 416256d4/41baa9ac. The observed eleven-word ordering is captured by the recovered packet-chain helper; later FIFO responses are attributed only to those subsequent services."
         },
         {
