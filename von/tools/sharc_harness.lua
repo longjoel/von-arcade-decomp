@@ -29,6 +29,9 @@
 --   VON_SHARC_STILL_FRAMES  same-PC frames that count as blocked (default 30)
 --   VON_SHARC_DM_WINDOWS    "base:len,..." hex snapshot windows
 --                          (default "30000:400,0:100")
+--   VON_SHARC_POKES        "addr=val,..." hex DM fixtures, written after
+--                          the pre-snapshot in EVERY run (injected and
+--                          baseline alike) so subtraction stays valid
 --   VON_SHARC_LOG          JSONL output path (required)
 --
 -- One JSON object per line: {type="trial", ...} and a final {type="done"}.
@@ -77,6 +80,22 @@ local function parse_windows(text)
 end
 
 local WINDOWS = parse_windows(os.getenv("VON_SHARC_DM_WINDOWS"))
+
+local function parse_pokes(text)
+    local pokes = {}
+    if text and text ~= "" then
+        for item in string.gmatch(text .. ",", "([^,]+),") do
+            local addr, val = string.match(item, "^([^=]+)=([^=]+)$")
+            if addr and val then
+                pokes[#pokes + 1] = { addr = tonumber(addr, 16),
+                    val = tonumber(val, 16) }
+            end
+        end
+    end
+    return pokes
+end
+
+local POKES = parse_pokes(os.getenv("VON_SHARC_POKES"))
 
 local log_file = nil
 local main_space = nil
@@ -161,6 +180,9 @@ local function start_trial(t)
     idle_return_frame = nil
     trial.drain = nil
     snapshot = take_snapshot()
+    for _, poke in ipairs(POKES) do
+        pcall(function() sharc_data:write_u32(poke.addr, poke.val) end)
+    end
     if t.opcode == 0xFD then
         local n = t.words[1] or 4
         local vals = {}

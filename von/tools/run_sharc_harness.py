@@ -42,7 +42,8 @@ def trial_count(spec: str) -> int:
     return sum(1 for item in spec.split(";") if item.strip())
 
 
-def run_boot(spec: str, tag: str, settle: int, run_frames: int) -> Path:
+def run_boot(spec: str, tag: str, settle: int, run_frames: int,
+             pokes: str = "") -> Path:
     log_path = Path(f"/tmp/sharc_harness_{os.getpid()}_{tag}.jsonl")
     oslog_path = Path(f"/tmp/sharc_harness_{os.getpid()}_{tag}.oslog")
     env = dict(os.environ)
@@ -52,6 +53,8 @@ def run_boot(spec: str, tag: str, settle: int, run_frames: int) -> Path:
     env["VON_SHARC_LOG"] = str(log_path)
     env["VON_SHARC_SETTLE_FRAMES"] = str(settle)
     env["VON_SHARC_RUN_FRAMES"] = str(run_frames)
+    if pokes:
+        env["VON_SHARC_POKES"] = pokes
     trials = trial_count(spec)
     cmd = [str(MAME_BIN), "vonj", "-rompath", str(ROMPATH),
            "-video", "none", "-sound", "none", "-oslog",
@@ -123,13 +126,18 @@ def main() -> int:
     ap.add_argument("--settle", type=int, default=400)
     ap.add_argument("--run-frames", type=int, default=600)
     ap.add_argument("--no-judge", action="store_true")
+    ap.add_argument("--pokes", default="",
+                    help="DM fixtures as addr=val,... (hex, no 0x)")
     args = ap.parse_args()
 
     n = trial_count(args.spec)
     base_spec = ";".join([BASELINE_OP] * n)
-    log_a = run_boot(args.spec, "injA", args.settle, args.run_frames)
-    log_b = run_boot(args.spec, "injB", args.settle, args.run_frames)
-    log_base = run_boot(base_spec, "base", args.settle, args.run_frames)
+    log_a = run_boot(args.spec, "injA", args.settle, args.run_frames,
+                     args.pokes)
+    log_b = run_boot(args.spec, "injB", args.settle, args.run_frames,
+                     args.pokes)
+    log_base = run_boot(base_spec, "base", args.settle, args.run_frames,
+                        args.pokes)
 
     trials_a, prob_a = load_trials(log_a)
     trials_b, prob_b = load_trials(log_b)
@@ -167,10 +175,12 @@ def main() -> int:
         if t_a.get("outcome") != t_b.get("outcome"):
             verdict["verdict"] = "UNSTABLE"
             verdict["note"] = "outcomes disagree across injected runs"
+            verdict["unstable"] = unstable
         elif unstable:
             verdict["verdict"] = "UNSTABLE"
             verdict["note"] = (f"{len(unstable)} addresses disagree across "
                                f"injected runs (e.g. {unstable[:5]})")
+            verdict["unstable"] = unstable
         else:
             ok_counts["agree"] += 1
             outcome = t_a.get("outcome", "")
@@ -212,7 +222,8 @@ def main() -> int:
                 verdict["failures"] = failures
         verdicts.append(verdict)
 
-    report = {"spec": args.spec, "agreement": ok_counts,
+    report = {"spec": args.spec, "pokes": args.pokes,
+              "agreement": ok_counts,
               "problems": problems, "verdicts": verdicts}
     if args.out:
         out_path = Path(args.out)

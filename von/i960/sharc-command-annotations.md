@@ -40,22 +40,47 @@
 
 ## Opcode `0x04` — entry `0x2015b` (18 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>`): two-word FIFO service returning
+  the division round-trip residual `R0 - (R0/R12)*R12`: `(1.0, 2.0)` and
+  `(3.0, 2.0)` both return `0.0` with no DM effects. Bare (no args) it parks
+  at its entry FLAG0 wait (`blocked-02015b`). Run with
+  `python3 von/tools/run_sharc_harness.py --spec "08;04:3f800000,40000000;fd:8"`.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 18 words; 10 float writes.
 
 ## Opcode `0x05` — entry `0x2016d` (34 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>`): 12-word upload-record advance.
+  Copies the 12 words at the `DM(0x30101)` pointer forward by 12 (observed
+  `0x30200-0x3020b` → `0x3020c-0x30217` verbatim, deterministic across boots,
+  source-varying probes re-copy the new source every time). No FIFO I/O.
+  Caveat: the static counter gate (`DM(0x30100) < 7`) never tripped in eight
+  consecutive runs, and the counter/pointer bookkeeping stores have no
+  snapshot-visible effect in steady state (boot-time stores do land), so the
+  gate is statically documented but dynamically unconfirmed — suspect a MAME
+  SHARC-core visibility quirk for absolute-DM bookkeeping, needs a core-level
+  test. Run with `python3 von/tools/run_sharc_harness.py --spec "08;07:<12 words>;05"`.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 34 words.
 
 ## Opcode `0x06` — entry `0x2018f` (10 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>` + static body): upload-counter
+  decrement (`DM(0x30100) -= 1`, early RTS when already zero). Dynamically a
+  no-op in every probe: no DM effects, no FIFO output, returns to idle —
+  consistent with the counter reading 0 (same bookkeeping-visibility caveat
+  as `0x05`). A gate-reopen probe (`05` x N, `06`, fresh-source `07`, `05`)
+  could not distinguish a real decrement from a no-op because the counter is
+  snapshot-invisible; the decrement is statically clear but dynamically
+  unconfirmed.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 10 words.
 
 ## Opcode `0x07` — entry `0x20199` (38 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>`): 12-word state-upload service.
+  Reads twelve FIFO words into `R0-R11` and stores them verbatim at the
+  `DM(0x30101)` pointer (`0x30200-0x3020b` after `08` init); feeding
+  `1.0-12.0` produced exactly those twelve words in DM, deterministic across
+  boots. No FIFO output. Bare-run behavior unprobed; the static body opens
+  with FLAG0 waits, so it should park waiting for args like `0x04` does.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 38 words.
 
 ## Opcode `0x08` — entry `0x201bf` (5 words)

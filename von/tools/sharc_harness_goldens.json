@@ -16,6 +16,23 @@
     "outcome": "returned",
     "effects_empty": true
   },
+  "04": {
+    "_comment": "division-residual service: 0.0 out for (1,2) and (3,2) via FIFO, no DM effects",
+    "outcome": "returned",
+    "effects_empty": true
+  },
+  "05": {
+    "_comment": "upload-record advance: outcome pinned; write-set is source-dependent so only the return is judged",
+    "outcome": "returned"
+  },
+  "06": {
+    "_comment": "counter decrement: dynamically a no-op (counter snapshot-invisible); outcome pinned",
+    "outcome": "returned"
+  },
+  "07": {
+    "_comment": "12-word upload: write-set is input-dependent so only the return is judged",
+    "outcome": "returned"
+  },
   "08": {
     "_comment": "service-state init: effect set pinned after first validated run",
     "outcome": "returned",
