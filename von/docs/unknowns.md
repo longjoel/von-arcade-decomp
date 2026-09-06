@@ -194,3 +194,24 @@ The smoke gate fails on absent development captures (not regressions),
 and the SHARC sweep producers plus the exact 50s geometry oracle
 capture are still missing. Trace-derived fixtures are blocked on these.
 Related: smoke suite, `VON_GEOMETRY_SELECT_SECONDS` traces.
+
+## U-0010 — STF SHARC firmware vs von recovered SHARC (external reference)
+
+Sonic the Fighters SHARC firmware (Model 2, ADSP-21062) is published
+with official Sega COP labels: 136 `Fn_*` handlers (`cpres1`, COP
+math engine, dispatch `N*0x00800101`) plus the 32-entry GEO renderer
+(`cpres2`, index `(cmd>>23)&0x1F`). Verdict on transfer to von:
+namespace collision, not firmware conflict. Von's
+`recovered_sharc_opcode_NN` files are ADSP-2106x *instruction*-level
+models for the MAME precision effort (0x35 = RECIPS seed, 0x41 =
+byte-lane extract, 0x0f poll, 0x1d multi-op) and geometry-protocol
+models (0x09 caller packet to `0x884000`), not COP dispatch handlers;
+sampled behaviors (09/35/41) therefore do not contradict STF's
+`Fn_y_rot` / `Fn_st_unit_mat` / `Fn_kage_leave_x_axis`. Von's constant
+submit opcode `0x00800101` reads as GEO index 1 (OBJECT) under STF's
+GEO grammar. Unresolved: whether von's COP dispatch order matches
+STF's (no assembler available for byte comparison; von's 11,038-word
+upload window packing unreconciled against 4,954 + 3,117 PM words).
+Any transferred label must be marked external/unverified-against-von
+per handbook provenance. Source kept out of tree (`/tmp/stf-sharc`).
+Related: `mame-sharc-precision-upstream.md`, `recovered_sharc_opcode_*`.
