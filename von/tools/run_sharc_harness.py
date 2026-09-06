@@ -196,6 +196,19 @@ def main() -> int:
                     verdict["verdict"] = "UNJUDGED"
                     verdict["note"] = (f"golden scoped to specs preceded by "
                                        f"{golden['only_when_preceded_by']}")
+            if golden is not None and "only_when_args" in golden:
+                twords = [(w or "").lower() for w in t_a.get("words", [])]
+                if twords != [a.lower() for a in golden["only_when_args"]]:
+                    scoped_out = True
+                    verdict["verdict"] = "UNJUDGED"
+                    verdict["note"] = "golden scoped to specs with trial args %s" % (
+                        golden["only_when_args"],)
+            if golden is not None and "only_when_pokes" in golden:
+                if args.pokes != golden["only_when_pokes"]:
+                    scoped_out = True
+                    verdict["verdict"] = "UNJUDGED"
+                    verdict["note"] = "golden scoped to specs with pokes %r" % (
+                        golden["only_when_pokes"],)
             if golden is None or scoped_out:
                 if "verdict" not in verdict:
                     verdict["verdict"] = "UNJUDGED"

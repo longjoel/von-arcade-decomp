@@ -14,12 +14,48 @@
   "03": {
     "_comment": "division service with 1.0, 2.0: result leaves via the output FIFO (not DM), so the DM effect set is empty; judged only under a spec that feeds it two args",
     "outcome": "returned",
+    "only_when_args": ["3f800000", "40000000"],
     "effects_empty": true
   },
   "04": {
     "_comment": "division-residual service: 0.0 out for (1,2) and (3,2) via FIFO, no DM effects",
     "outcome": "returned",
+    "only_when_args": ["3f800000", "40000000"],
     "effects_empty": true
+  },
+  "0e": {
+    "_comment": "4-word parameter store to DM 0x30105-0x30108; exact set pinned for the canonical probe words",
+    "outcome": "returned",
+    "only_when_args": ["11111111", "22222222", "33333333", "44444444"],
+    "effects_exact": {
+      "30105": "00000000->11111111",
+      "30106": "00000000->22222222",
+      "30107": "00000000->33333333",
+      "30108": "00000000->44444444"
+    }
+  },
+  "11": {
+    "_comment": "12-word state readback: no DM writes of its own (cumulative footprint comes from the preceding 07), returns to idle; drain content proved manually",
+    "outcome": "returned"
+  },
+  "10": {
+    "_comment": "12-word diagonal-identity init over a garbage-prefilled upload record",
+    "outcome": "returned",
+    "only_when_pokes": "30200=deadbeef,30201=deadbeef,30202=deadbeef,30203=deadbeef,30204=deadbeef,30205=deadbeef,30206=deadbeef,30207=deadbeef,30208=deadbeef,30209=deadbeef,3020a=deadbeef,3020b=deadbeef",
+    "effects_exact": {
+      "30200": "deadbeef->3f800000",
+      "30201": "deadbeef->00000000",
+      "30202": "deadbeef->00000000",
+      "30203": "deadbeef->00000000",
+      "30204": "deadbeef->3f800000",
+      "30205": "deadbeef->00000000",
+      "30206": "deadbeef->00000000",
+      "30207": "deadbeef->00000000",
+      "30208": "deadbeef->3f800000",
+      "30209": "deadbeef->00000000",
+      "3020a": "deadbeef->00000000",
+      "3020b": "deadbeef->00000000"
+    }
   },
   "05": {
     "_comment": "upload-record advance: outcome pinned; write-set is source-dependent so only the return is judged",

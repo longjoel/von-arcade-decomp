@@ -115,7 +115,14 @@
 
 ## Opcode `0x0e` — entry `0x20271` (13 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>`): four-word FIFO parameter store.
+  Reads four FIFO words into `R0-R3` and stores them verbatim to absolute DM
+  `0x30105-0x30108` (the last two stores sit in the RTS delay slots and still
+  execute). Feeding `0x11111111-0x44444444` produced exactly those four words
+  in DM, deterministic across boots; pinned by the `0e` golden. Notably, these
+  absolute-DM stores ARE snapshot-visible, unlike the `0x30100/0x30101`
+  bookkeeping of `0x05/0x06/0x08` — the visibility quirk is address-specific,
+  not a general absolute-store failure.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 13 words.
 
 ## Opcode `0x0f` — entry `0x2027e` (16 words)
@@ -125,12 +132,22 @@
 
 ## Opcode `0x10` — entry `0x2028e` (16 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>`): 12-word diagonal-identity
+  initializer. Writes `1.0` at upload-record offsets 0, 4, 8 and `0.0` at the
+  other nine words (`DM(I7+0..11)` with `I7 = DM(0x30101)`), no FIFO I/O.
+  Over a garbage-prefilled record the full 12-word pattern lands verbatim;
+  pinned by the `10` golden.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 16 words.
 
 ## Opcode `0x11` — entry `0x2029e` (39 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>`): 12-word state readback to the
+  output FIFO. Streams the twelve words at the `DM(0x30101)` pointer out
+  through `I1` with FLAG1 flow control (plus a 13th delay-slot write),
+  no FIFO input. Uploading `1.0-12.0` via `07` then running `11` drains those
+  exact twelve words back host-side — a full FIFO→DM→FIFO round trip that
+  cross-validates `07`. Run with
+  `python3 von/tools/run_sharc_harness.py --spec "08;07:<12 words>;11;fd:16"`.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 39 words.
 
 ## Opcode `0x12` — entry `0x202c5` (23 words)
