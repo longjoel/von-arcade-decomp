@@ -32,7 +32,10 @@
 
 ## Opcode `0x03` — entry `0x2014b` (16 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>`): two-word FIFO division service.
+  Fed `1.0, 2.0` after an `08` init it returns to idle with no DM effects
+  and queues `0.5` (`0x3f000000`) on the output FIFO: first/second. Run with
+  `python3 von/tools/run_sharc_harness.py --spec "08;03:3f800000,40000000;fd:8"`.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 16 words; 8 float writes.
 
 ## Opcode `0x04` — entry `0x2015b` (18 words)

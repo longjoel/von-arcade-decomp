@@ -6,9 +6,15 @@
     "effects_empty": true
   },
   "fd": {
-    "_comment": "output-FIFO drain after the 00 trial: must contain 3.0 (1.0+2.0), proving the add handler really executed and was not just idle persistence",
+    "_comment": "output-FIFO drain after the 00 trial: must contain 3.0 (1.0+2.0), proving the add handler really executed and was not just idle persistence; only judged when the preceding trial is 00",
     "outcome": "returned",
+    "only_when_preceded_by": ["00"],
     "drain_must_contain": ["40400000"]
+  },
+  "03": {
+    "_comment": "division service with 1.0, 2.0: result leaves via the output FIFO (not DM), so the DM effect set is empty; judged only under a spec that feeds it two args",
+    "outcome": "returned",
+    "effects_empty": true
   },
   "08": {
     "_comment": "service-state init: effect set pinned after first validated run",

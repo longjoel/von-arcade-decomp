@@ -178,8 +178,17 @@ def main() -> int:
                 pc = int(outcome.split("-")[1], 16)
                 verdict["blocked_pc_in_flag_wait"] = pc in waits
             golden = goldens.get(opcode)
-            if golden is None:
-                verdict["verdict"] = "UNJUDGED"
+            scoped_out = False
+            if golden is not None and "only_when_preceded_by" in golden:
+                prev = verdicts[-1].get("opcode") if verdicts else None
+                if prev not in golden["only_when_preceded_by"]:
+                    scoped_out = True
+                    verdict["verdict"] = "UNJUDGED"
+                    verdict["note"] = (f"golden scoped to specs preceded by "
+                                       f"{golden['only_when_preceded_by']}")
+            if golden is None or scoped_out:
+                if "verdict" not in verdict:
+                    verdict["verdict"] = "UNJUDGED"
             else:
                 failures = []
                 if outcome != golden.get("outcome"):
