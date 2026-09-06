@@ -9210,7 +9210,7 @@
             "test": "von/tools/test_recovered_text_two_digit.py",
             "unresolved_behavior": "The observed caller-side value domain, glyph emission/storage, output cursor or attributes, and handling outside the tested nonnegative formatter contract are not modeled by this helper."
           },
-          "notes": "Production C captures the two-digit decimal formatter's 0..99 behavior and saturation above 99; negative inputs are outside the observed caller contract.",
+          "notes": "Production C captures the two-digit decimal formatter's 0..99 behavior and saturation above 99; negative inputs are outside the observed caller contract. Trace validation blocked on evidence: no formatter-attributable tile output exists in any capture (all observed digit runs are font-table uploads, and late attract/gameplay tile traffic is also font data); needs a HUD-text capture with known values or RAM snapshots of formatter output buffers.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -12544,14 +12544,15 @@
           "id": "sharc.text-plane0-attributed-block-writer",
           "name": "text_plane0_attributed_block_writer",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "trace-validated",
           "sources": [
             "von/i960/recovered_text_plane0_attributed_block.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
             "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_text_plane0_attributed_block.py"
+            "von/tools/test_recovered_text_plane0_attributed_block.py",
+            "von/tools/test_text_plane0_attributed_trace.py"
           ],
           "ranges": [
             {
@@ -12563,9 +12564,9 @@
           "modeling": {
             "boundary": "Models the explicit-position attributed plane-0 block writer: supplied column and row select the origin, width and height define the copied rectangle, rows use a 64-tile stride, and each cell receives forced 0xc000 attributes",
             "test": "von/tools/test_recovered_text_plane0_attributed_block.py",
-            "unresolved_behavior": "SHARC tile-RAM ownership, source-buffer provenance, and display timing remain outside this host-side placement contract"
+            "unresolved_behavior": "Source-buffer provenance and caller dimension selection remain outside this contract; tile-RAM writes are trace-validated by von/tools/test_text_plane0_attributed_trace.py"
           },
-          "notes": "Recovers the explicit-position block geometry: column/row are supplied in g1/g2, width/height in g3/g4, destination rows use a 64-tile stride in plane 0x01000000, and each source halfword receives forced 0xc000 attributes."
+          "notes": "Recovers the explicit-position block geometry: column/row are supplied in g1/g2, width/height in g3/g4, destination rows use a 64-tile stride in plane 0x01000000, and each source halfword receives forced 0xc000 attributes. Trace-validated against 38 observed writes (origin col 41 row 44, 19x2, +64 stride, source round-trips through the 0xc000 mask)."
         },
         {
           "id": "sharc.text-plane0-fill-writer",
