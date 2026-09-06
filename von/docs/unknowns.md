@@ -85,6 +85,32 @@ capture), `range_start`'s role, and variant-B's X field at 0xbed700
 (trace tpa sometimes equals the previous record's X).
 Related: `decode_model_part_table.py`.
 
+## U-0008 — fighter/stage selection chain into the model directory
+
+Static chain recovered end to end: caller state → permutation table
+at maincpu 0xc9278 (`[0,0,0,4,5,2,1,7,6,3,0,4,3,7,1,2,6,5,...]`,
+three callers at 0xcb7dc/0xcbc24/0xcc084) → 0xc9b50 walker. Mapped
+value 5/7 selects special tables 0xc91c0/0xc91d8 when mode global
+0x503a08 is 0, else directory entry `g0` (10 entries, roster-sized).
+Values never exceed 7, so bosses 8/9 (Jaguarandi, Z-Gradt) arrive by
+another path. Mode writers at 0x18a34-0x18a98 store 1/3/loop values
+from NVRAM byte 0x1d00028; exact mode semantics open, as is which
+game-state field feeds the permutation index.
+Related: roster block at 0x181f0, stage banners at 0x210xx.
+
+## U-0009 — roster and stage order
+
+Program image holds a 10-name roster at 0x181f0 (TEMJIN, VIPER2,
+BELGDOR, RAIDEN, DORKAS, FEIYEN, APHARMD, BAL-BAS-BOW, JAGUARANDI,
+Z-GRADT) with a name-pointer table after it, 16-byte fighter slots
+at 0x19380, and 10 stage banners at 0x210xx (AIRPORT, DEATH TRAP,
+WATERFRONT, GREEN HILLS, RUINS, SPACE DOCK, MOON BASE, FLOODED CITY,
+NIRVANA, SECRET BASE) followed by a glyph-ID table. Bosses sit at
+roster positions 8-9. Stage↔fighter pairing unproven: no capture has
+printed a banner, and the tracer cap (131072 object events, MAME
+patch 0007) blinds every trace past ~50s.
+Related: U-0008, `trace-geometry-select.sh`.
+
 ## U-0007 — trace slot families are not models
 
 Proven by measurement: a 404-family slot-co-occurrence export put 19

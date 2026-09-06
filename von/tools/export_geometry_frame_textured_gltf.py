@@ -64,6 +64,25 @@ def select_frame(trace: Path, requested_time: float | None,
     return selected_time, objects
 
 
+def filter_obas(objects, object_slots, raw_list):
+    """Keep frame objects whose OBA is in the hex list, preserving order."""
+    wanted = set()
+    for raw in raw_list:
+        try:
+            wanted.add(int(raw, 16))
+        except ValueError:
+            raise SystemExit(f"--oba is not hex: {raw}")
+    kept = [(item, slot) for item, slot in zip(objects, object_slots)
+            if item[0] in wanted]
+    if not kept:
+        raise SystemExit("no model obas in frame")
+    missing = wanted - {item[0] for item, _ in kept}
+    if missing:
+        raise SystemExit("frame is missing model obas: " +
+                         ", ".join(f"{oba:08x}" for oba in sorted(missing)))
+    return zip(*kept)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--trace", type=Path, required=True)
@@ -88,6 +107,9 @@ def main() -> int:
                         help="maximum submitted object slots to export")
     parser.add_argument("--exclude-object", type=int, action="append", default=[],
                         help="relative object slot to omit after --start-object")
+    parser.add_argument("--oba", action="append", default=[],
+                        help="hex polygon address to keep (repeatable); "
+                             "restricts the frame to a ROM model part list")
     args = parser.parse_args()
 
     selected_time, objects = select_frame(
@@ -109,6 +131,8 @@ def main() -> int:
             zip(objects, object_slots)) if relative_slot not in excluded])
     if not objects:
         raise SystemExit("object slice is empty")
+    if args.oba:
+        objects, object_slots = filter_obas(objects, object_slots, args.oba)
     geometry = args.rom.read_bytes()
     texture_rom = args.texture_rom.read_bytes()
     primary = args.bank_primary.read_bytes()
