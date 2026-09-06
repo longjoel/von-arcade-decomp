@@ -58,6 +58,28 @@ end
 local frame = 0
 local space
 local fields = {}
+local SNAPSHOT_FRAME = tonumber(os.getenv("VON_PROGRESS_RAM_SNAPSHOT") or "0")
+local SNAPSHOT_PATH = os.getenv("VON_PROGRESS_RAM_SNAPSHOT_PATH")
+local snapshot_done = false
+
+local function ram_snapshot()
+    if snapshot_done or not space or not SNAPSHOT_PATH then
+        return
+    end
+    snapshot_done = true
+    local out = assert(io.open(SNAPSHOT_PATH, "w"))
+    for address = 0x00500000, 0x005fffff, 4 do
+        local ok, value = pcall(function() return space:read_u32(address) end)
+        if ok then
+            out:write(string.format("%08x %08x\n", address, value))
+        end
+        if address % 0x10000 == 0 then
+            out:flush()
+        end
+    end
+    out:close()
+    log("progress: ram snapshot written")
+end
 local last_screen_hash = nil
 local pressed_until = {}
 local last_geometry_state
@@ -199,6 +221,11 @@ local function setup()
             return false
         end
     end
+    for key, _ in pairs(FIELD_NAMES) do
+        if not fields[key] then
+            log("progress: missing optional field " .. key)
+        end
+    end
     log("progress: fields resolved")
     return true
 end
@@ -268,6 +295,25 @@ end
 if AUTO_START then
     schedule[#schedule + 1] = { frame = START_FRAME + SELECT_STEPS * 45, key = "start" }
 end
+-- Late select navigation: cursor moves after the select screen opens
+-- (post-start), then an optional second start press confirms.
+local LATE_STEPS = tonumber(os.getenv("VON_PROGRESS_SELECT_LATE_STEPS") or "0")
+local LATE_KEY = os.getenv("VON_PROGRESS_SELECT_LATE_KEY") or "right"
+local LATE_AT = tonumber(os.getenv("VON_PROGRESS_SELECT_AT") or tostring(START_FRAME))
+for step = 1, LATE_STEPS do
+    schedule[#schedule + 1] = { frame = LATE_AT + step * 45, key = LATE_KEY }
+end
+local CONFIRM_FRAME = tonumber(os.getenv("VON_PROGRESS_CONFIRM_FRAME") or "0")
+local CONFIRM_KEY = os.getenv("VON_PROGRESS_CONFIRM_KEY") or "start"
+if CONFIRM_FRAME > 0 then
+    schedule[#schedule + 1] = { frame = CONFIRM_FRAME, key = CONFIRM_KEY }
+end
+local CONFIRM_COUNT = tonumber(os.getenv("VON_PROGRESS_CONFIRM_COUNT") or "0")
+for step = 1, CONFIRM_COUNT do
+    schedule[#schedule + 1] = {
+        frame = CONFIRM_FRAME + step * 45, key = CONFIRM_KEY,
+    }
+end
 local schedule_index = 1
 
 -- Combat phase: cycle the left stick around the compass and pulse both shot
@@ -325,6 +371,10 @@ emu.register_periodic(function()
                 or "right_shot"
             press(key, frame + 20)
         end
+    end
+
+    if SNAPSHOT_FRAME > 0 and frame == SNAPSHOT_FRAME then
+        ram_snapshot()
     end
 
     -- Poll the tilemap once per second: checksum change detection plus any
