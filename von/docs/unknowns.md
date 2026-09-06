@@ -209,9 +209,15 @@ models (0x09 caller packet to `0x884000`), not COP dispatch handlers;
 sampled behaviors (09/35/41) therefore do not contradict STF's
 `Fn_y_rot` / `Fn_st_unit_mat` / `Fn_kage_leave_x_axis`. Von's constant
 submit opcode `0x00800101` reads as GEO index 1 (OBJECT) under STF's
-GEO grammar. Unresolved: whether von's COP dispatch order matches
-STF's (no assembler available for byte comparison; von's 11,038-word
-upload window packing unreconciled against 4,954 + 3,117 PM words).
-Any transferred label must be marked external/unverified-against-von
-per handbook provenance. Source kept out of tree (`/tmp/stf-sharc`).
+GEO grammar. Dispatch-order match RESOLVED NEGATIVE by table
+structure (no assembler needed): von's SHARC command table
+(`vonj-sharc-bootstrap.lst` slots `0x99`-`0xE6`, asserted by
+`test_sharc_dispatch_table.py`) holds 78 entries for opcodes
+`0x00`-`0x4D` with handlers at PM `0x20133`-`0x20CF8`, while STF's
+holds 136 entries (`0x00`-`0x87`) at `0x20360`-`0x2126B`; positional
+agreement is 0/78 with only 4 shared addresses (likely stubs).
+Von's COP library is smaller, tighter-packed, and differently ordered:
+no `Fn_*` label transfers by index. Von's table location (DM
+`0x30300` constant boundary) also differs from STF's (DM `0x30000`
+dispatch). Source kept out of tree (`/tmp/stf-sharc`).
 Related: `mame-sharc-precision-upstream.md`, `recovered_sharc_opcode_*`.
