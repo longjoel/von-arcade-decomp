@@ -1,0 +1,18 @@
+{
+  "_comment": "Goldens for the isolated SHARC handler harness (agree-subtract-compare). effects lists contain postA==postB!=baseline entries as addr:base->injected. Frames and PC samples are never compared: sub-frame handlers are invisible to per-frame PC polling.",
+  "00": {
+    "_comment": "add service with 1.0, 2.0: result leaves via the output FIFO (not DM), so the DM effect set is empty; outcome proves inject->dispatch->handler->idle",
+    "outcome": "returned",
+    "effects_empty": true
+  },
+  "fd": {
+    "_comment": "output-FIFO drain after the 00 trial: must contain 3.0 (1.0+2.0), proving the add handler really executed and was not just idle persistence",
+    "outcome": "returned",
+    "drain_must_contain": ["40400000"]
+  },
+  "08": {
+    "_comment": "service-state init: effect set pinned after first validated run",
+    "outcome": "returned",
+    "effects_empty": false
+  }
+}
