@@ -1,0 +1,32 @@
+--- a/src/devices/cpu/i960/i960.cpp
++++ b/src/devices/cpu/i960/i960.cpp
+@@ -79,6 +79,14 @@
+ 
+ void i960_cpu_device::i960_write_dword_unaligned(uint32_t address, uint32_t data)
+ {
++	static unsigned vonj_tile_control_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) &&
++		(address >= 0x01800000) && (address < 0x01800010) &&
++		(vonj_tile_control_trace_count < 4096))
++	{
++		logerror("vonj_tile_control: pc=%08x address=%08x data=%08x\n", m_PIP, address, data);
++		vonj_tile_control_trace_count++;
++	}
+ 	if (!DWORD_ALIGNED(address))
+ 	{
+ 		m_program.write_byte(address, data & 0xff);
+@@ -110,6 +118,14 @@
+ 
+ void i960_cpu_device::i960_write_word_unaligned(uint32_t address, uint16_t data)
+ {
++	static unsigned vonj_tile_control_word_trace_count;
++	if ((machine().system().name == std::string_view("vonj")) &&
++		(address >= 0x01800000) && (address < 0x01800010) &&
++		(vonj_tile_control_word_trace_count < 4096))
++	{
++		logerror("vonj_tile_control: pc=%08x address=%08x data=%04x\n", m_PIP, address, data);
++		vonj_tile_control_word_trace_count++;
++	}
+ 	static unsigned vonj_texture_write_trace_count;
+ 	if ((machine().system().name == std::string_view("vonj")) &&
+ 		(address >= 0x11000000) && (address < 0x11400000) &&
