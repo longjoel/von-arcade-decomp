@@ -3284,7 +3284,7 @@
             }
           ],
           "symbol": "recovered_text_write_tile_control",
-          "notes": "Preserves the helper's single 32-bit write of its input to tile/control MMIO address 0x01800000.",
+          "notes": "Preserves the helper's single 32-bit write of its input to tile/control MMIO address 0x01800000. Trace validation blocked on instrumentation: no current trace patch observes MMIO writes (0x01800000 appears in no capture); needs a MAME MMIO-write trace plus rebuild.",
           "modeling": {
             "boundary": "Purely models the tile-control bus contract: pass the 32-bit input through unchanged and target MMIO address 0x01800000.",
             "test": "von/tools/test_recovered_text_control.py",
@@ -5224,7 +5224,7 @@
             }
           ],
         "symbol": "recovered_text_video_copy_rows",
-        "notes": "Recovers the shared video helper's row loop: forward-copy halfwords*2 bytes once per row, advance source by 0x80 bytes, and advance destination by halfwords*2 bytes.",
+        "notes": "Recovers the shared video helper's row loop: forward-copy halfwords*2 bytes once per row, advance source by 0x80 bytes, and advance destination by halfwords*2 bytes. Trace validation blocked on instrumentation: no tile-plane stores from 0x1bc90-0x1bcd0 appear in attract (its traffic is RAM-to-RAM, invisible to current patches); needs a work-RAM write trace plus rebuild.",
         "modeling": {
           "boundary": "i960 0x1bc90 text video row-transfer plan covering per-row forward copy length, fixed source stride, and destination stride",
           "test": "von/tools/test_recovered_text_video.py",
