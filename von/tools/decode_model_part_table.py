@@ -25,6 +25,20 @@ triples, same marker family, tpa-range 0x0009cxxx/0x0009c8xx, verified
 table at main_data 0xbe0ff8 shares the shape with tpa-range
 0x0056xxxx. Structurally identical to variant A, so decode_records
 covers it.
+
+Offsets are bus addresses minus the 0x02000000 main_data base: the
+special-5 table hangs off directory-adjacent pointer 0x02bee530, i.e.
+offset 0xbee530, inside the two loaded pairs. It decodes with clean
+marker rhythm but holds 00a8xxxx/00adxxxx parts, not the picked
+fighter's 00a1 set: no loader extension was needed. Conversely, two
+trace-submitted picked-fighter triples (oba=00a1c916/00a1cd5d) exist
+in NO media chip under the validated 2-way interleave (exhaustive
+half-word search; method validated by an aligned c96d hit): submitted
+triples can be runtime-derived. Both sit at constant deltas from
+stored table-2 records (oba -87, tpa -76 from 00a1c96d/00a1cdb4),
+consistent with the walker computing record addresses
+(`lda 0x0(g6)[g4],r8` with a `mulo` term) rather than loading them
+verbatim.
 """
 from __future__ import annotations
 
