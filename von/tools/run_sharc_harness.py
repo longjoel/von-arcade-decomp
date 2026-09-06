@@ -223,6 +223,9 @@ def main() -> int:
                     if effects != golden["effects_exact"]:
                         failures.append("effects differ from golden")
                 need_drain = golden.get("drain_must_contain")
+                if isinstance(need_drain, dict):
+                    prev = verdicts[-1].get("opcode") if verdicts else None
+                    need_drain = need_drain.get(prev)
                 if need_drain is not None:
                     drain = t_a.get("drain") or []
                     if isinstance(drain, str):

@@ -17,17 +17,27 @@
 
 ## Opcode `0x00` — entry `0x20133` (8 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<probe>` + `observed:<harness>`): two-word
+  FIFO add service. Reads two FIFO words into `R0/R1`, emits `F0+F1` to the
+  output FIFO: `1.0, 2.0` → `3.0`, captured both by the scalar probe
+  (`von/tools/probe_sharc_scalar_services.lua`) and by harness drain
+  (`08;00:3f800000,40000000;fd:8`, pinned by goldens). No DM effects.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 8 words; 1 float writes.
 
 ## Opcode `0x01` — entry `0x2013b` (8 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<probe>`): two-word FIFO subtract service.
+  Same shape as `0x00` with `F0-F1`: `2.0, 1.0` → `1.0`
+  (`von/tools/probe_sharc_scalar_services.lua`). No DM effects (static body
+  writes output FIFO only).
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 8 words; 1 float writes.
 
 ## Opcode `0x02` — entry `0x20143` (8 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<probe>`): two-word FIFO multiply service.
+  Same shape as `0x00` with `F0*F1`: `0.5, 2.0` → `1.0`
+  (`von/tools/probe_sharc_scalar_services.lua`). No DM effects (static body
+  writes output FIFO only).
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 8 words; 1 float writes.
 
 ## Opcode `0x03` — entry `0x2014b` (16 words)
@@ -85,7 +95,11 @@
 
 ## Opcode `0x08` — entry `0x201bf` (5 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>` + static body): service-state init.
+  Zeros the upload counter `DM(0x30100)` and points the upload pointer
+  `DM(0x30101)` at `0x30200` (the last two slot writes sit in the RTS delay
+  slots); every harness spec opens with it, and it returns to idle with no
+  other effects. No FIFO I/O.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 5 words.
 
 ## Opcode `0x09` — entry `0x201c4` (77 words)
@@ -266,7 +280,10 @@
 
 ## Opcode `0x26` — entry `0x20532` (17 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>`): five-word FIFO parameter store.
+  Reads five FIFO words into `R0-R4` and stores them verbatim to absolute DM
+  `0x3013c-0x30140` (same delayed-store shape as `0x21`); pinned by
+  exact-effects golden for the canonical probe words. No FIFO output.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 17 words.
 
 ## Opcode `0x27` — entry `0x20543` (47 words)
@@ -311,7 +328,14 @@
 
 ## Opcode `0x2f` — entry `0x206e1` (48 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>`): three-word fixed-point
+  interpolation service over the upload record. Reads three FIFO words,
+  combines them against the tables at `DM(0x30141)` and the record at the
+  `DM(0x30101)` pointer (integer shifts, AND/OR masking, then float MAC
+  accumulation in `F8/F9/F10`), and writes the three results back into
+  record offsets 9-11: with a `1.0-12.0` record and `0x10000` x3 args the
+  tail moved `+0x180/+0x1e0/+0x240`. No FIFO output. Run with
+  `python3 von/tools/run_sharc_harness.py --spec "08;07:<12 words>;2f:00010000,00010000,00010000"`.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 48 words; 10 float writes.
 
 ## Opcode `0x30` — entry `0x20711` (81 words)

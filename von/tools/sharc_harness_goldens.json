@@ -6,10 +6,26 @@
     "effects_empty": true
   },
   "fd": {
-    "_comment": "output-FIFO drain after the 00 trial: must contain 3.0 (1.0+2.0), proving the add handler really executed and was not just idle persistence; only judged when the preceding trial is 00",
+    "_comment": "output-FIFO drain after a scalar trial, keyed by predecessor opcode: 3.0 after 00 (1.0+2.0), 1.0 after 01 (2.0-1.0) and 02 (0.5*2.0)",
     "outcome": "returned",
-    "only_when_preceded_by": ["00"],
-    "drain_must_contain": ["40400000"]
+    "only_when_preceded_by": ["00", "01", "02"],
+    "drain_must_contain": {
+      "00": ["40400000"],
+      "01": ["3f800000"],
+      "02": ["3f800000"]
+    }
+  },
+  "01": {
+    "_comment": "subtract service with 2.0, 1.0: result via output FIFO, no DM effects",
+    "outcome": "returned",
+    "only_when_args": ["40000000", "3f800000"],
+    "effects_empty": true
+  },
+  "02": {
+    "_comment": "multiply service with 0.5, 2.0: result via output FIFO, no DM effects",
+    "outcome": "returned",
+    "only_when_args": ["3f000000", "40000000"],
+    "effects_empty": true
   },
   "03": {
     "_comment": "division service with 1.0, 2.0: result leaves via the output FIFO (not DM), so the DM effect set is empty; judged only under a spec that feeds it two args",
@@ -44,6 +60,22 @@
   },
   "20": {
     "_comment": "3-word tail readback: FIFO output only, no DM writes; drain content proved manually",
+    "outcome": "returned"
+  },
+  "26": {
+    "_comment": "5-word parameter store to DM 0x3013c-0x30140; exact set pinned for the canonical probe words",
+    "outcome": "returned",
+    "only_when_args": ["11111111", "22222222", "33333333", "44444444", "55555555"],
+    "effects_exact": {
+      "3013c": "00000000->11111111",
+      "3013d": "00000000->22222222",
+      "3013e": "00000000->33333333",
+      "3013f": "00000000->44444444",
+      "30140": "00000000->55555555"
+    }
+  },
+  "2f": {
+    "_comment": "3-word interpolation over the upload record: DM writes are input- and table-dependent, so only the return is judged; deltas proved manually",
     "outcome": "returned"
   },
   "21": {
