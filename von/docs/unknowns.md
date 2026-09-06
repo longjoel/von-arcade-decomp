@@ -150,8 +150,15 @@ textures), first submitting at t=27.7s in the VS scene while the enemy
 is still absent, pick-independent with constant counts; silent
 00918xxx/00917xxx records are other stages' chunks (or inactive
 models). Variant-B sits below directory entry 0 and uses X-linked
-records, so the arena bypasses the fighter directory path; its serving
-walker is unidentified.
+records, so the arena bypasses the fighter directory path. The arena
+serving path is the 0x19960-block stage loader: `g6=[0x503a80]`
+(stage arena ID, 0 in all captures), struct `&0x194a0[g6*32]` (32
+bytes) plus param `[0x195e0+r5*8]` are copied to the RAM descriptor at
+0x504ca0/0x504cb0/0x504cc0, verified live by snapshot at frame 2100
+(bytes match the listing: 07 count, +/-60.0 bounds 0xc2700000 /
+0x42700000, 0x7fff). Sibling block at 0x198d8 handles the banner side
+(`[0x503a84]` -> 0x5770f0). The per-record X-chain traversal function
+itself is unidentified.
 Still open: exact cursor start/repeat math, the semantics of the
 confirm-time byte at 0x503a98 (0/4/5 across tap runs but NOT the table
 selector: a run latched 0 yet served the picked fighter), positional
