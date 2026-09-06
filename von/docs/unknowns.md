@@ -135,12 +135,28 @@ Closed end to end by live select experiments (single-tap series with
   timing, not content). VS-screen text ("ENCOUNTER!" at 0x21050) is
   rendered by 0x21ebc/0x220e0 double-indirectly via RAM pointer
   0x5770f0.
+Stage leg closed by the same runs plus static reads. The stage index
+lives at RAM 0x503a84 and reads 0 in every snapshot (select, VS,
+match, all picks): writer at 0x198d8 stores it (`ld 0x503a84,g5` ..
+`st g5,0x5770f0`, NVRAM-gated) for the VS text renderer, which reads
+the banner double-indirectly via 0x5770f0. Banner strings in ROM order
+start AIRPORT @0x21065, DEATH TRAP, WATERFRONT, ... so stage-1 (index
+0) is AIRPORT by positional indexing (medium confidence: the
+double-indirect scale was not fully traced). Per-stage definition
+structs at 0x194a0 (32 bytes each) with a u16-pair param table at
+0x195e0. The stage-1 arena body is variant-B records at 0xbed700: the
+submitted 0091cxxx set IS variant-B's oba column (tpa 004axxxx stage
+textures), first submitting at t=27.7s in the VS scene while the enemy
+is still absent, pick-independent with constant counts; silent
+00918xxx/00917xxx records are other stages' chunks (or inactive
+models). Variant-B sits below directory entry 0 and uses X-linked
+records, so the arena bypasses the fighter directory path; its serving
+walker is unidentified.
 Still open: exact cursor start/repeat math, the semantics of the
 confirm-time byte at 0x503a98 (0/4/5 across tap runs but NOT the table
-selector: a run latched 0 yet served the picked fighter), the stage-1
-banner name, and which caller serves the arena (caller 1 takes a
-constant-style index, callers 2-3 struct fields: P1/enemy/arena
-assignment unproven).
+selector: a run latched 0 yet served the picked fighter), positional
+banner indexing proof, the arena serving walker, stage-2+ index
+increment (unobserved), and special-5 table content (unloaded chips).
 
 ## U-0009 — roster and stage order
 
