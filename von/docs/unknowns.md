@@ -98,6 +98,50 @@ from NVRAM byte 0x1d00028; exact mode semantics open, as is which
 game-state field feeds the permutation index.
 Related: roster block at 0x181f0, stage banners at 0x210xx.
 
+Closed end to end by live select experiments (single-tap series with
+1-frame holds plus held-stick runs, work-RAM snapshots at
+0x503a00/256, geometry time-distribution):
+- Coin at frame 900 opens machine select; the cursor starts on Temjin
+  (table-1 preview serves from boot). One-frame stick taps do NOT move
+  the cursor (Temjin preview continues uninterrupted, latch quirk
+  below); held stick moves it with key-repeat and the 3D preview
+  follows: cursor leaves Temjin ~frame 1230 and 00a1-family parts
+  start submitting at t=20.5s.
+- Start at frame 1500 confirms: P1 IS the previewed fighter. Its parts
+  submit continuously from preview (20.5s) through the VS screen into
+  the match (to tracer cap ~44.5s). The stage-1 enemy is fixed Temjin
+  per the level order: Temjin-exclusive parts vanish while the cursor
+  is away and return at t=35s when the enemy enters; the default run
+  (no cursor motion) is a Temjin mirror.
+- The walker disassembly (0xc9b50, see vonj-maincpu.lst) is fully
+  decoded: `g4=[0x503a08]`; if mode==0 and g0==5 use special table
+  0xc91c0, if mode==0 and g0==7 use 0xc91d8, else entry g0 of the
+  24-byte directory at 0xc9100 (`g0*24`; entry0 heads [02bed8dc,
+  02bed81c, ...] in the table-1 neighborhood). The record loop strides
+  the table,
+  files pose entries on oba<=5 markers, stops on the zero-word
+  terminator, and streams everything to the geometry board at
+  0x884000. Callers: 0xcb7dc takes the perm index in g1 (then zeroes
+  g1/g2/g3); 0xcbc24/0xcc084 load it from a fighter-struct field
+  (`ld 0x48(g5)[g6],g4`) with g1=r6/r7 and g3&1.
+- Special table 0xc91d8 references 0x02a1c7e4 (the 00a1 family);
+  0xc91c0 heads [02bee530, 02bee488, ...] in chips the table decoder
+  does not load yet. Enemy-side Temjin body parts (0x9e52xx-0x9e56xx)
+  come from variant-C program-image tables (e.g. 0x5694), not
+  main_data: P1 serves main_data tables, the enemy serves variant-C.
+- Stage 1 is fixed regardless of P1 pick: non-fighter arena/effect
+  families are identical across default and picked runs (the only
+  match-1 delta, four 008f31xx obas, appears in every capture: window
+  timing, not content). VS-screen text ("ENCOUNTER!" at 0x21050) is
+  rendered by 0x21ebc/0x220e0 double-indirectly via RAM pointer
+  0x5770f0.
+Still open: exact cursor start/repeat math, the semantics of the
+confirm-time byte at 0x503a98 (0/4/5 across tap runs but NOT the table
+selector: a run latched 0 yet served the picked fighter), the stage-1
+banner name, and which caller serves the arena (caller 1 takes a
+constant-style index, callers 2-3 struct fields: P1/enemy/arena
+assignment unproven).
+
 ## U-0009 — roster and stage order
 
 Program image holds a 10-name roster at 0x181f0 (TEMJIN, VIPER2,

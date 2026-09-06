@@ -17,6 +17,14 @@ tha=tpa there). Its X field is undecoded: for oba=0091c02b the trace
 tpa (004a0e20) equals the previous record's X, not its own
 (004a1022). Some variant-B parts (009182dc) never submit in any
 capture: inactive roster models.
+
+Variant C lives in the program image (e.g. 0x5694): [tpa, tpa, oba]
+triples, same marker family, tpa-range 0x0009cxxx/0x0009c8xx, verified
+4/4 against trace (tpa==tha: flat-shaded). Stage-1 enemy body parts
+(0x9e52xx-0x9e56xx) come from here, not main_data; the bb weapon
+table at main_data 0xbe0ff8 shares the shape with tpa-range
+0x0056xxxx. Structurally identical to variant A, so decode_records
+covers it.
 """
 from __future__ import annotations
 

@@ -28,6 +28,10 @@ local TARGET_FRAMES = SECONDS * 60
 local CAPTURE_START_FRAME = tonumber(os.getenv("VON_PROGRESS_CAPTURE_START_FRAME") or "0")
 local LOG_PATH = os.getenv("VON_PROGRESS_LOG") or "vonj-progress-lua.log"
 local GEOMETRY_STATE_LOG_PATH = os.getenv("VON_PROGRESS_GEOMETRY_STATE_LOG")
+local RAM_SNAP_FRAME = tonumber(os.getenv("VON_PROGRESS_RAM_SNAP_FRAME") or "0")
+local RAM_SNAP_PATH = os.getenv("VON_PROGRESS_RAM_SNAP_PATH")
+local RAM_SNAP_BASE = tonumber(os.getenv("VON_PROGRESS_RAM_SNAP_BASE") or "0x00500000")
+local RAM_SNAP_LEN = tonumber(os.getenv("VON_PROGRESS_RAM_SNAP_LEN") or "4096")
 
 local TILE_BASE = 0x01000000
 local ROWS = 64
@@ -314,6 +318,7 @@ for step = 1, CONFIRM_COUNT do
         frame = CONFIRM_FRAME + step * 45, key = CONFIRM_KEY,
     }
 end
+local HOLD_FRAMES = tonumber(os.getenv("VON_PROGRESS_HOLD_FRAMES") or "8")
 local schedule_index = 1
 
 -- Combat phase: cycle the left stick around the compass and pulse both shot
@@ -336,13 +341,38 @@ emu.register_periodic(function()
 
     release_expired()
 
+    local snap_suffix = nil
+    if RAM_SNAP_PATH and RAM_SNAP_FRAME > 0
+        and frame >= RAM_SNAP_FRAME and frame % 400 == 0
+        and frame <= RAM_SNAP_FRAME + 1600 then
+        snap_suffix = string.format("-%d", frame)
+    end
+    if snap_suffix then
+        local out = io.open(RAM_SNAP_PATH .. snap_suffix .. ".txt", "w")
+        if out then
+            for addr = RAM_SNAP_BASE, RAM_SNAP_BASE + RAM_SNAP_LEN - 1, 16 do
+                local row = { string.format("%08x:", addr) }
+                for off = 0, 15 do
+                    local ok, v = pcall(function()
+                        return space:read_u8(addr + off)
+                    end)
+                    row[#row + 1] = ok and string.format(" %02x", v) or " ??"
+                end
+                out:write(table.concat(row) .. "\n")
+            end
+            out:close()
+            log(string.format("progress: ram snapshot frame %d -> %s", frame,
+                RAM_SNAP_PATH))
+        end
+    end
+
     while schedule_index <= #schedule and frame >= schedule[schedule_index].frame do
         local step = schedule[schedule_index]
         log(string.format("progress: frame %d press %s", frame, step.key))
         if step.key == "start" then
             log("progress: machine selection confirmed; pre-match scene begins")
         end
-        press(step.key, frame + 8)
+        press(step.key, frame + (HOLD_FRAMES))
         schedule_index = schedule_index + 1
     end
 
