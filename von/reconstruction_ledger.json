@@ -9223,13 +9223,14 @@
           "id": "maincpu.text-string-byte-dispatch",
           "name": "text_string_byte_dispatch",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "trace-validated",
           "sources": [
             "von/i960/recovered_text_string_walk.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_string_walk.py"
+            "von/tools/test_recovered_text_string_walk.py",
+            "von/tools/test_text_boot_dispatch_trace.py"
           ],
           "ranges": [
             {
@@ -9241,9 +9242,9 @@
           "modeling": {
             "boundary": "Models the pure NUL-terminated byte walk: bytes before the first NUL are dispatched exactly once, in order, to the supplied sink callback; an initially empty string emits nothing.",
             "test": "von/tools/test_recovered_text_string_walk.py",
-            "unresolved_behavior": "The caller-selected sink, destination/text cursor state, string storage and validity, attributes, and downstream glyph/display effects are not modeled by this shared loop."
+            "unresolved_behavior": "The caller-selected sink, string storage and validity, and per-string cursor positioning remain outside this shared loop; sink-to-tile mapping is trace-validated by von/tools/test_text_boot_dispatch_trace.py"
           },
-          "notes": "Production C captures the shared loop's NUL termination and one-byte-at-a-time sink dispatch; the selected sink remains caller-specific.",
+          "notes": "Production C captures the shared loop's NUL termination and one-byte-at-a-time sink dispatch; the selected sink remains caller-specific. Trace-validated against 404 boot-text tile writes in 14 positioned segments spelling the uploader and warning strings verbatim.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
