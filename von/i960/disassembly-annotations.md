@@ -5943,3 +5943,149 @@ with source `0x02fd0cd4` and dimensions `19` by `2`. Zero `g0` calls the
 word from preserved `g14` and does not load a source pointer. The pure setup
 plan and wraparound cases are covered by
 `von/tools/test_recovered_text_mode_setup.py`.
+
+## Fighter/Stage Selection Chain
+
+Backfill of the live select-to-match work (commits `210cccf` through
+`1ef9dca`; full narrative in `docs/unknowns.md` U-0008/U-0009).
+Confidence tags follow the reconstruction handbook (`KNOWN` /
+`LIKELY` / `SPECULATIVE`); provenance is `observed:<trace>` for values
+from original execution and `synthetic:<listing>` for readings of
+`von/build/disasm/vonj-maincpu.lst`.
+
+### Model walker: `0x000c9b50` (`KNOWN`)
+
+Relevant listing shape (entry select):
+
+```text
+c9b5c  ld   0x503a08,g4
+c9b64  cmpibe 0,g4,0xc9b78
+c9b68  cmpibne 5,g0,0xc9b78
+c9b6c  lda  0xc91c0,r9
+c9b74  b    0xc9ba4
+c9b78  ld   0x503a08,g4
+c9b80  cmpibe 0,g4,0xc9b94
+c9b84  cmpibne 7,g0,0xc9b94
+c9b88  lda  0xc91d8,r9
+c9b94  shlo 1,g0,g4
+c9b98  addo g0,g4,g4
+c9b9c  lda  0xc9100[g4*8],r9
+```
+
+When the mode global at `0x503a08` is 0 and the permutation-mapped
+value `g0` is 5/7, `r9` takes special tables `0xc91c0`/`0xc91d8`;
+otherwise `r9` takes directory entry `g0` (`g0*24` byte offset into
+`0xc9100`). The record loop strides the table, files pose entries on
+`oba <= 5` markers, stops on the zero-word terminator, and streams to
+the geometry board at `0x884000`. Table contents verified
+triple-by-triple against trace submissions
+(`observed:vonj-geometry-select-*.trace` via
+`von/tools/decode_model_part_table.py`).
+
+### Walker callers: `0x000cb7dc`, `0x000cbc24`, `0x000cc084` (`KNOWN` shape)
+
+Caller 1 loads the mapped value with an incoming index register, then
+zeroes `g1/g2/g3` before the call:
+
+```text
+cb7d0  ld   0xc9278[g1*4],g0
+cb7d8  mov  0,g1
+cb7dc  call 0xc9b50
+```
+
+Callers 2–3 load the permutation index from a fighter-struct field and
+pass struct-derived `g1` (`r6`/`r7`) with `g3 & 1`:
+
+```text
+cbc04  ld   0x48(g5)[g6],g4
+cbc14  ld   0xc9278[g4*4],g0
+cbc1c  mov  r6,g1
+cbc20  and  g3,1,g3
+cbc24  call 0xc9b50
+```
+
+Which caller serves P1, enemy, or arena is `SPECULATIVE` (U-0008):
+caller 1 takes a constant-style index while callers 2–3 take struct
+fields, but no caller attribution trace exists (Lua exposes no CPU
+register reads; `cpu.state` probes all fail).
+
+### Permutation table: `0x000c9278` (`KNOWN` contents, `LIKELY` role)
+
+`[0,0,0,4,5,2,1,7,6,3,0,4,3,7,1,2,6,5,...]` (`synthetic:<listing>`).
+Mapped values never exceed 7, so roster slots 8–9 (Jaguarandi,
+Z-Gradt) arrive by another path. The exact cursor-to-index math is
+open (U-0008): held-stick repeats confound the count.
+
+### Model directory: `0x000c9100` (`KNOWN` entries, `LIKELY` bounds)
+
+Six-word (24-byte) entries of bus pointers. Entry 0 heads
+`[02bed8dc, 02bed81c, 021a48f0, 020ebca0, 021bbfc8, 0211a768]`, the
+table-1 neighborhood (`synthetic:<listing>`); entries 1–6 step through
+`02bedb1c/02bedc48/02bedea0/02bee0f8/02bee428/02bee218` with struct
+words shared in pairs. Special table `0xc91d8` references `0x02a1c7e4`
+(the `00a1` family); special-5 table at bus `0x02bee530` (offset
+`0xbee530`) decodes with clean marker rhythm but holds
+`00a8xxxx`/`00adxxxx` parts. Word 2 of each entry is a struct pointer
+the walker dereferences for loop bounds (`ld 0x8(r9),g5` at `0xc9bd4`).
+
+### P1 select-state struct: RAM `0x00500540` (`KNOWN`, observed)
+
+Found by GameShark-style differential search
+(`von/tools/memsearch.py`: snapshot, change state, narrow):
+twin structs at `0x500540` (P1) / `0x500580` (P2) plus a shadow copy at
+`0x5005d0`. The cursor/fighter byte at +`0x10` (`0x500550`) reads `02`
+with the cursor on the default, advances only while taps land
+(`02→05→08` across tap groups), and holds otherwise; its value at
+confirm predicts the served table family
+(`observed:msel/msel2/ram_r2 snapshots`). One-frame stick taps do not
+move the cursor (Temjin preview continues uninterrupted). The
+confirm-time byte at `0x503a98` is explicitly NOT the table selector
+(a run latched 0 yet served the picked fighter).
+
+### Stage loader: `0x00019960` and banner writer `0x000198d8` (`KNOWN`)
+
+The arena path indexes 32-byte stage structs at `0x194a0` by
+`g6=[0x503a80]` (0 in all captures) with params from
+`[0x195e0+r5*8]`, copying the descriptor to RAM
+`0x504ca0/0x504cb0/0x504cc0`:
+
+```text
+19960  ld   0x503a80,g6
+19970  shlo 5,g6,g4
+19974  lda  0x194a0(g4),g4
+1997c  ldq  (g4),r4
+19980  ldq  0x10(g4),g0
+1998c  ld   0x195e0[r5*8],g4
+19998  stq  g0,0x504cb0
+199a0  stq  r4,0x504ca0
+199a8  st   g4,0x504cc0
+```
+
+Verified live by frame-2100 snapshot (`observed:stage-2100.txt`):
+bytes match the listing (count `07`, bounds `0xc2700000` /
+`0x42700000` = -60.0/+60.0, `0x7fff`). The sibling banner block
+stores the stage index for the VS renderer:
+
+```text
+198ac  ld   0x503a84,g5
+198d0  ld   0x195e0[g5*8],g6
+198d8  st   g5,0x5770f0
+```
+
+Stage index `0x503a84` reads 0 in every snapshot, so stage-1 is the
+first ROM banner (`AIRPORT @0x21065`) by positional indexing
+(`LIKELY`; the double-indirect scale was not fully traced).
+Per-stage u16-pair params at `0x195e0`
+(`[0x100a,0x1351],[0x1006,0x1358],...`).
+
+### Variant-B stage store: bus `0x02bed700` (`KNOWN` contents/role)
+
+`[tpa, oba, X]` records, tpa-range `0x004axxxx`. The submitted
+`0091cxxx` set IS variant-B's oba column: first submits at t=27.7s in
+the VS scene with the enemy absent, pick-independent with constant
+counts (`observed:vonj-geometry-select-70s.trace`). Silent
+`00918xxx`/`00917xxx` records are other stages' chunks or inactive
+models. The region continues into a variant-C header, a variant-C
+Temjin block (`009e` parts, enemy-side), and per-side table copies
+(P tpas `000cxxxx`, P2-color `0059xxxx` variants). The per-record
+X-chain traversal function is unidentified (`SPECULATIVE` mechanism).
