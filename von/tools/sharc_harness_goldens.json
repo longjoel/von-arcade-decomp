@@ -38,6 +38,27 @@
     "_comment": "12-word state readback: no DM writes of its own (cumulative footprint comes from the preceding 07), returns to idle; drain content proved manually",
     "outcome": "returned"
   },
+  "19": {
+    "_comment": "counter readback: FIFO output only, no DM writes; drain content (0, then 3) proved manually",
+    "outcome": "returned"
+  },
+  "20": {
+    "_comment": "3-word tail readback: FIFO output only, no DM writes; drain content proved manually",
+    "outcome": "returned"
+  },
+  "21": {
+    "_comment": "6-word parameter store to DM 0x30136-0x3013b; exact set pinned for the canonical probe words",
+    "outcome": "returned",
+    "only_when_args": ["aaaa1111", "bbbb2222", "cccc3333", "dddd4444", "eeee5555", "ffff6666"],
+    "effects_exact": {
+      "30136": "00000000->aaaa1111",
+      "30137": "00000000->bbbb2222",
+      "30138": "00000000->cccc3333",
+      "30139": "00000000->dddd4444",
+      "3013a": "00000000->eeee5555",
+      "3013b": "00000000->ffff6666"
+    }
+  },
   "10": {
     "_comment": "12-word diagonal-identity init over a garbage-prefilled upload record",
     "outcome": "returned",

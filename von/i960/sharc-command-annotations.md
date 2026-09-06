@@ -188,7 +188,12 @@
 
 ## Opcode `0x19` — entry `0x20397` (4 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>`): upload-counter readback. After a
+  FLAG1 wait it emits `DM(0x30100)` to the output FIFO: the drain is `0`
+  after `08` init and `3` after three `05` runs — proving `05`'s increments
+  stick core-side even though Lua-space pokes to `0x30100` do not land
+  (harness quirk, see `0x05`). No FIFO input, no DM writes. Run with
+  `python3 von/tools/run_sharc_harness.py --spec "08;05;05;05;19;fd:2"`.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 4 words.
 
 ## Opcode `0x1a` — entry `0x2039b` (27 words)
@@ -223,12 +228,20 @@
 
 ## Opcode `0x20` — entry `0x2040a` (11 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>`): 3-word upload-record tail
+  readback. Emits `DM(I7+9..11)` (the last three words at the `DM(0x30101)`
+  pointer) to the output FIFO with FLAG1 flow control: after uploading
+  `1.0-12.0` the drain is `10.0, 11.0, 12.0`. No FIFO input, no DM writes.
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 11 words.
 
 ## Opcode `0x21` — entry `0x20415` (20 words)
 
-- Behavior: no recovered model (open).
+- Behavior (`LIKELY`, `observed:<harness>`): six-word FIFO parameter store.
+  Reads six FIFO words into `R0-R5` and stores them verbatim to absolute DM
+  `0x30136-0x3013b` (the last two stores sit in the RTS delay slots and still
+  execute); pinned by exact-effects golden for the canonical probe words. No
+  FIFO output. Bare (no args) it should park at its entry FLAG0 wait
+  (static body opens with FIFO waits; unprobed bare).
 - Structure (`SPECULATIVE`, `synthetic:<listing>`): size 20 words.
 
 ## Opcode `0x22` — entry `0x20429` (66 words)
