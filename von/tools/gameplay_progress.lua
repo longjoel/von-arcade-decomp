@@ -231,6 +231,53 @@ local function setup()
         end
     end
     log("progress: fields resolved")
+    local tap_addr = tonumber(os.getenv("VON_MEM_TAP_ADDR") or "0")
+    local tap_count = tonumber(os.getenv("VON_MEM_TAP_COUNT") or "8")
+    if tap_addr > 0 then
+        local cpu = manager.machine.devices[":maincpu"]
+        if os.getenv("VON_MEM_TAP_DEBUG") then
+            local probes = {
+                ["colon-PC"] = function() return cpu:state("PC") end,
+                ["colon-0"] = function() return cpu:state(0) end,
+                ["dot-PC"] = function() return cpu.state("PC") end,
+            }
+            for name, fn in pairs(probes) do
+                local ok, res = pcall(fn)
+                local info = ok and type(res) or "ERR"
+                local val = ""
+                if ok and type(res) == "table" then
+                    local okv, v = pcall(function() return res.value end)
+                    val = okv and (" value=" .. tostring(v)) or ""
+                elseif ok then
+                    val = " =" .. tostring(res)
+                end
+                log(string.format("progress: cpustate %s: %s%s", name,
+                    info, val))
+            end
+        end
+        local hits = 0
+        local tap
+        tap = space:install_read_tap(tap_addr, tap_addr + 3, "selwatch",
+            function(offset, data, mask)
+                hits = hits + 1
+                local pc = "?"
+                local ok, st = pcall(function()
+                    return cpu.state("PC").value
+                end)
+                if ok then
+                    pc = string.format("0x%x", st)
+                end
+                log(string.format(
+                    "progress: memtap hit %d addr=0x%x pc=%s frame=%d",
+                    hits, tap_addr, pc, frame))
+                if hits >= tap_count and tap then
+                    space:uninstall_read_tap(tap)
+                    log("progress: memtap removed")
+                end
+                return data
+            end)
+        log(string.format("progress: memtap installed at 0x%x", tap_addr))
+    end
     return true
 end
 
@@ -341,11 +388,23 @@ emu.register_periodic(function()
 
     release_expired()
 
+    -- Comma-separated explicit snapshot frames
+    -- (VON_PROGRESS_RAM_SNAP_FRAMES="1300,1400,1500"); falls back to the
+    -- legacy single-frame-plus-400s window when unset.
     local snap_suffix = nil
-    if RAM_SNAP_PATH and RAM_SNAP_FRAME > 0
-        and frame >= RAM_SNAP_FRAME and frame % 400 == 0
-        and frame <= RAM_SNAP_FRAME + 1600 then
-        snap_suffix = string.format("-%d", frame)
+    if RAM_SNAP_PATH then
+        local frames_raw = os.getenv("VON_PROGRESS_RAM_SNAP_FRAMES")
+        if frames_raw then
+            for tok in string.gmatch(frames_raw, "([^,]+)") do
+                if frame == tonumber(tok) then
+                    snap_suffix = string.format("-%d", frame)
+                end
+            end
+        elseif RAM_SNAP_FRAME > 0
+            and frame >= RAM_SNAP_FRAME and frame % 400 == 0
+            and frame <= RAM_SNAP_FRAME + 1600 then
+            snap_suffix = string.format("-%d", frame)
+        end
     end
     if snap_suffix then
         local out = io.open(RAM_SNAP_PATH .. snap_suffix .. ".txt", "w")
