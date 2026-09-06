@@ -9907,13 +9907,14 @@
           "id": "maincpu.block-emit-1dc90",
           "name": "block_emit_1dc90",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "trace-validated",
           "sources": [
             "von/i960/recovered_block_emit_1dc90.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
-            "von/tools/test_recovered_block_emit_1dc90.py"
+            "von/tools/test_recovered_block_emit_1dc90.py",
+            "von/tools/test_block_emit_1dc90_trace.py"
           ],
           "ranges": [
             {
@@ -9925,9 +9926,9 @@
           "modeling": {
             "boundary": "Block string emit schedule: rows x width halfwords with 0xc000 attributes from the cursor slot in plane 0",
             "test": "von/tools/test_recovered_block_emit_1dc90.py",
-            "unresolved_behavior": "Actual string contents and tile-RAM writes remain outside this pure emit schedule"
+            "unresolved_behavior": "Source string provenance and the caller's width/rows/column/row selection remain outside this schedule; tile-RAM writes are trace-validated by von/tools/test_block_emit_1dc90_trace.py"
           },
-          "notes": "Pure emit schedule for the 0x1dc90 block emitter over rows x width halfwords with a 64-slot row stride."
+          "notes": "Pure emit schedule for the 0x1dc90 block emitter over rows x width halfwords with a 64-slot row stride. Trace-validated against 38 observed tile writes (2x19 rows at slot 0x0b29, +64 stride, 0xc000 attributes)."
         },
         {
           "id": "maincpu.block-fill-1df00",
