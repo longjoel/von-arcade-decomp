@@ -30,9 +30,17 @@ def main() -> int:
     parser.add_argument("--events", type=int, default=64)
     parser.add_argument("--skip", type=int, default=0,
                         help="skip this many parser opcodes before comparing")
+    parser.add_argument("--skip-original", type=int, default=None,
+                        help="skip this many opcodes on the original side "
+                             "(defaults to --skip)")
+    parser.add_argument("--skip-reconstructed", type=int, default=None,
+                        help="skip this many opcodes on the reconstructed side "
+                             "(defaults to --skip)")
     args = parser.parse_args()
-    original = load(args.original, args.events, args.skip)
-    reconstructed = load(args.reconstructed, args.events, args.skip)
+    skip_original = args.skip if args.skip_original is None else args.skip_original
+    skip_reconstructed = args.skip if args.skip_reconstructed is None else args.skip_reconstructed
+    original = load(args.original, args.events, skip_original)
+    reconstructed = load(args.reconstructed, args.events, skip_reconstructed)
     if original == reconstructed and len(original) == args.events:
         print(f"geometry parser opcode prefix: PASS ({args.events} ordered opcodes)")
         return 0
