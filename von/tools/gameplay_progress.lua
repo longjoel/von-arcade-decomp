@@ -239,7 +239,7 @@ local function setup()
             local probes = {
                 ["colon-PC"] = function() return cpu:state("PC") end,
                 ["colon-0"] = function() return cpu:state(0) end,
-                ["dot-PC"] = function() return cpu.state("PC") end,
+                ["bracket-pc"] = function() return cpu.state["pc"].value end,
             }
             for name, fn in pairs(probes) do
                 local ok, res = pcall(fn)
@@ -262,9 +262,9 @@ local function setup()
                 hits = hits + 1
                 local pc = "?"
                 local ok, st = pcall(function()
-                    return cpu.state("PC").value
+                    return cpu.state["CURPC"].value
                 end)
-                if ok then
+                if ok and type(st) == "number" then
                     pc = string.format("0x%x", st)
                 end
                 log(string.format(
