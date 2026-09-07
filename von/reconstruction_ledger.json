@@ -10864,6 +10864,43 @@
             "unresolved_behavior": "Downstream consumers of the blanked region remain outside this pure fill contract"
           },
           "notes": "Pure schedule for the 0x1c700 single-window fill leaf."
+        },
+        {
+          "id": "maincpu.stage-selector-75d90",
+          "name": "stage_selector_75d90",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_stage_selector_75d90.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_stage_selector_75d90.py", "von/build/stage5-fleet/stage-trace.log"],
+          "ranges": [{"start": "0x00075d90", "end": "0x00075fe4"}],
+          "symbol": "stage_selector_stamp",
+          "modeling": {
+            "boundary": "Models the 0x75d90 selector core: mode byte to g7 (1/2/3 to 8/30/2 else 4), g5-plus-ordinal index with the 0x5039f4 gate and 0x503a6c increment, seven-arm jump table to g6 (1, 2/3, 8, 32, 64, 64, 99), takeover-vs-divisor stamp to 0x504dbc with min(dbc+0x50,300) to 0x504dc0, g14/r4 passthrough stores, and the 160.0f/1/5 constant stores.",
+            "test": "von/tools/test_recovered_stage_selector_75d90.py",
+            "unresolved_behavior": "The nested call at 0x76030, divisor-word provenance at 9*g6*g7, the g0 bout-struct sub-checks, and MMIO mode-byte ownership remain outside this selector-core contract; the 0x75fe4 18-word row copy is covered by maincpu.object-state-descriptor-75f00."
+          },
+          "notes": "Operand order pinned by two anchors: the r4 = 0 - 1 sentinel fixates arithmetic, and the 0x504dc0 clamp (112/108/208 in spawn dumps, never 300 except S5) fixates compare-flags-plus-bge; together they prove the jump table is live (g6 1/2/3/8/32/64/64/99) rather than the always-99 misreading. Takeover (signed a80 > b80 or nonzero 0x503a74) explains why single-cell ordinal forces failed.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": ["0x00075d90"]
+            }
+          }
+        }
+        ,{
+          "id": "maincpu.stage-post-setup-86240",
+          "name": "stage_post_setup_86240",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_stage_post_setup_86240.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_stage_post_setup_86240.py", "von/i960/boot-path.md"],
+          "ranges": [{"start": "0x00086240", "end": "0x00086624"}],
+          "symbol": "recovered_stage_threshold_normalize_86240",
+          "modeling": {
+            "boundary": "Models the deterministic threshold normalization at 0x86248-0x86338 and active/previous snapshot protocol at 0x8633c-0x86434.",
+            "test": "von/tools/test_recovered_stage_post_setup_86240.py",
+            "unresolved_behavior": "Stage working-table clears and mode-specific payload writes from 0x86438-0x86620, exact global-field ownership, and caller-visible hardware effects remain outside this bounded prefix."
+          },
+          "notes": "The two literal families and timing/stage gates are transcribed from the original listing; snapshot state is represented explicitly rather than assigning names to the four threshold words."
         }
       ]
     },
@@ -13922,20 +13959,20 @@
           "notes": "After caller-side progress&31 table lookup, original code resets progress to 1 when callback is null, or when service mode is 2 and callback is 0xe3ab0; otherwise it invokes the callback. Callback/MMIO effects are excluded."
         },
         {
-          "id": "maincpu.stage-selector-75d90",
-          "name": "stage_selector_75d90",
+          "id": "maincpu.stage-row-copy-75fe4",
+          "name": "stage_row_copy_75fe4",
           "classification": "code",
           "stage": "modeled",
-          "sources": ["von/i960/recovered_stage_selector_75d90.c"],
-          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_stage_selector_75d90.py", "von/build/stage5-fleet/stage-trace.log"],
-          "ranges": [{"start": "0x00075d90", "end": "0x00075fe4"}],
-          "symbol": "stage_selector_stamp",
+          "sources": ["von/i960/recovered_stage_row_copy_75fe4.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_stage_row_copy_75fe4.py", "von/build/romrows/t.log"],
+          "ranges": [{"start": "0x00075fe4", "end": "0x00076030"}],
+          "symbol": "stage_row_copy",
           "modeling": {
-            "boundary": "Models the 0x75d90 selector core: mode byte to g7 (1/2/3 to 8/30/2 else 4), g5-plus-ordinal index with the 0x5039f4 gate and 0x503a6c increment, seven-arm jump table to g6 (1, 2/3, 8, 32, 64, 64, 99), takeover-vs-divisor stamp to 0x504dbc with min(dbc+0x50,300) to 0x504dc0, g14/r4 passthrough stores, and the 160.0f/1/5 constant stores.",
-            "test": "von/tools/test_recovered_stage_selector_75d90.py",
-            "unresolved_behavior": "The row-copy tail from 0x75fe4 (72-byte rows at 0x72050), the nested call at 0x76030, divisor-word provenance at 9*g6*g7, the g0 bout-struct sub-checks, and MMIO mode-byte ownership remain outside this selector-core contract."
+            "boundary": "Models the 0x75fe4 row-copy tail: row address 0x72050 plus 72 times word[0x64(g0)], four 16-byte quad copies plus one 8-byte long copy (72 bytes) to 0x504dd4, with the eight-row ROM table and lookup bundled.",
+            "test": "von/tools/test_recovered_stage_row_copy_75fe4.py",
+            "unresolved_behavior": "The index-to-stage mapping behind word[0x64(g0)] (S3 to row 4, S4 to row 2, warped S4 to row 0), per-word row semantics, and the nested call at 0x76030 with everything after it remain outside this copy contract."
           },
-          "notes": "Operand order pinned by two anchors: the r4 = 0 - 1 sentinel fixates arithmetic, and the 0x504dc0 clamp (112/108/208 in spawn dumps, never 300 except S5) fixates compare-flags-plus-bge; together they prove the jump table is live (g6 1/2/3/8/32/64/64/99) rather than the always-99 misreading. Takeover (signed a80 > b80 or nonzero 0x503a74) explains why single-cell ordinal forces failed."
+          "notes": "ROM rows read live (probe_rom_rows.lua); whole-row matches against spawn dumps pin S3 to row 4 (both attempts), S4 to row 2, warped S4 to row 0. Continues reuse the row, so the S3 0x20/0x1c split lives outside this copy. Word +0x0c varies per row and is not the plain stage ordinal."
         },
         {
           "id": "maincpu.status-record-init-3ecd0",

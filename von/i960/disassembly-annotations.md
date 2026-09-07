@@ -6237,6 +6237,28 @@ cheat. `0x504dbc` matches the `0x75D90` jump-table outputs
 (-60/+60) are exactly the round-start posts (player `(0,0,-60)`,
 CPU `(0,0,+60)`), snapped 3 frames after each FIGHT call.
 
+The bounded C recovery in `recovered_stage_selector_75d90.c` now follows the
+selector's three linked tables: mode byte `0x1d00021` produces `g7` values
+`8/30/2/4`, the setup/index fields produce the stage ordinal used to select
+`g6` values `1/2/3/8/32/64`, and the `g6*g7` product is either used directly
+or scaled by the signed divisor path at `0x75ea4`. The following `+0x50`
+clamp reproduces the observed `0x504dc0` values, including the stage-5 clamp
+to `300`. The modeled tail also preserves the low-halfword stores and the
+`r4 - 1` sentinel pair. The `0x75fe4` row-copy transfer is connected to
+`recovered_object_state_descriptor_75f00.c`: it selects an 18-word
+(`0x48`-byte) row at `0x72050` indexed by `word[0x64(g0)]` and copies it to
+`0x504dd4+`. Only the nested call at `0x76030` remains outside these bounded
+models.
+
+The nested call is now connected statically to `0x86240`. Its entry consumes
+the stage globals produced by the selector (`0x503a80`, `0x504dbc`,
+`0x503a74`, `0x503a6c`, and `0x503a70`), normalizes the four-word and two-word
+threshold groups at `0x509b20`/`0x509b30`, maintains active/previous snapshots
+at `0x509b40`/`0x509b60`, and then initializes indexed stage tables. The
+threshold clamp and snapshot prefix are documented in `boot-path.md`; no C
+translation is promoted yet because the live register-to-field mapping and the
+mode-specific table payload remain unresolved.
+
 Warp verified live (`von/build/force_stage.lua`, dual-cell hold plus
 synchronous rewrite taps): ord=3 loads S4 content into slot 1 (VS
 card `SAV-07-D VR.BELGDOR`, `GREEN HILLS`, `4th. MISSION`, BGM `4e`,
@@ -6264,9 +6286,23 @@ divisor word at absolute `9*g6*g7` is doubled and divided signed by
 20 (S3 continues re-roll it 320 to 280, hence `0x20` vs `0x1c`).
 Entry registers read back as `g14` = 0 / `r4` = 0 in every dump.
 Modeled in `von/i960/recovered_stage_selector_75d90.c`, tested by
-`von/tools/test_recovered_stage_selector_75d90.py`. Open tail from
-`0x75fe4`: 72-byte rows at `0x72050` indexed by `word[0x64(g0)]`
-copied to `0x504dd4+`, plus the nested call at `0x76030`.
+`von/tools/test_recovered_stage_selector_75d90.py`.
+
+### Stage-row copy: `0x00075fe4` (`KNOWN`, modeled to `0x76030`)
+
+`g4 = word[0x64(g0)]`, `g4 = 0x72050 + 72*g4`, then four 16-byte
+quad copies plus one 8-byte long copy (72 bytes) to `0x504dd4`
+(`ldq`/`ldl` widths). ROM rows read live
+(`von/build/probe_rom_rows.lua`); whole-row dump matches pin S3 to
+row 4 (both attempts, so continues reuse the row), S4 to row 2, and
+the warped S4-in-slot-1 to row 0 — the row is not the stage
+content (the warp played S4 ballistics off row 0). Row word `+0x0c`
+(3/2/3/3/2/3/3/3) is not the plain ordinal. The index-to-stage map
+behind `word[0x64(g0)]` stays open. Modeled in
+`von/i960/recovered_stage_row_copy_75fe4.c` with the eight-row
+table, tested by
+`von/tools/test_recovered_stage_row_copy_75fe4.py`. Open: the
+nested call at `0x76030` and everything after it.
 
 Replay-methodology notes: a write tap installed once from `setup()`
 at frame 1 never fires; installing it from the every-frame poll
