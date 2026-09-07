@@ -24,8 +24,11 @@ PRIVATE_THUNK = {
 # The staged entry: loads 0x2d5c into g14 and falls through into the sampler
 # body at 0x2cf8 (owned by maincpu.io-failure-input-sampler), whose first
 # instruction moves the staged continuation into g2 for the bx (g2) at 0x2d58.
+# The staged path returns through the ret at 0x2d5c, claimed here as the
+# setup's continuation (the direct bal entry returns via its own link).
 STAGED_ENTRY = {0x2CF0: "lda\t0x2d5c,g14"}
 SHARED_BODY_HEAD = {0x2CF8: "mov\tg14,g2"}
+STAGED_RETURN = {0x2D5C: "ret"}
 
 # The attested direct entry: flag-dispatch calls the sampler head without
 # staging g2 (its bal sits inside maincpu.flag-dispatch-2c70's 0x2cb0 arm).
@@ -60,7 +63,8 @@ def main() -> int:
     program = parse_listing(text)
     missing = [f"{address:#x}: {expected}"
                for address, expected in {**PRIVATE_THUNK, **STAGED_ENTRY,
-                                         **SHARED_BODY_HEAD, **DIRECT_ENTRY}.items()
+                                         **SHARED_BODY_HEAD, **STAGED_RETURN,
+                                         **DIRECT_ENTRY}.items()
                if program.get(address) != expected]
     if missing:
         raise SystemExit("sampler-entry thunk contract missing: " + "; ".join(missing))
