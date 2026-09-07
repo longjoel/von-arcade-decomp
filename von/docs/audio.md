@@ -76,3 +76,51 @@ promote a complete song.
 
 The full pack schema, cleanup policy, and viewer rollout are in
 [Evidence and assets plan](evidence-and-assets-plan.md).
+
+## i960 audio-queue command correlation (manual bout, 2026-09-07)
+
+Run: `SDL_VIDEODRIVER=dummy bin/von vonj -playback manual-01.inp
+-autoboot_script von/tools/replay_input_health.lua -seconds_to_run 260`
+with `VON_IH_LOG`, `VON_IH_POS=1`, and a write tap over the queue header
+plus ring (`VON_IH_WTAP_ADDR=0x51aa70`, `VON_IH_WTAP_END=0x51aabf`).
+Log: `von/build/audio-queue/manual-02/input-audio.log` (14957 frames,
+7593 queue writes, 2116 input/health lines; fresh NVRAM).
+
+Protocol (new producer-side facts):
+
+- Enqueue PC is always `0x2a4cc`; index commits from `0x2a4d4`;
+  consumer acks trail in the same frame from PC `0x1720`, so commands
+  take effect near-immediately. Queue init (fill `0x99`, one `0xff`)
+  runs from `0x2a8b8`-`0x2a8c4` at f=271; `0x99` is the idle marker.
+- Each datum byte is stored through a widening u16/u24/u32 idiom at
+  the same slot, one index bump per store. Group stores per
+  (frame, slot) and read the significant byte of each store.
+- Vocabulary is an `AE`-prefixed family (`AE`, `AE 11`, `AE 11 XX`,
+  `AE 12`, `AE 12 XX`) plus lone suffixes (`11 15`, `15`, `12 00`,
+  `00`, `1f`, `21`, ...). The 68k `decode_sound_sequences.py`
+  3-byte packet shape matches the 3-datum groups.
+
+Stage structure of this run (teleports to spawn): S1 f=3178,
+S2 f=8009, S3 f=12841 (~4830 frames each, inputs live throughout).
+
+Findings:
+
+- FIGHT call, 3/3 stages, timing-exact one frame before spawn:
+  S1 `[13,50]`@3177, S2 `[AE,13,51]`@8008, S3 `[52]`@12840.
+  Per-stage IDs ascend `50/51/52`; each occurs exactly once.
+- Stage-intro cluster in the ~120 frames before each spawn, same
+  shape every time: `[AE,00,02]`/`[AE,00,03]`+`[00,02]` (probable
+  stop/fade of previous audio), then `[AE,13,XX]` variants
+  (S1 `3f`, S2 `41,4c`, S3 `4d`), then the FIGHT call above.
+  `[AE,13,XX]` is the BGM/sequence-start family with a per-stage ID.
+- Hit SFX are NOT isolated: no vocabulary item clusters within ±8
+  frames of the 51 damage events above chance, and input proximity
+  is at chance. Impact sounds likely enqueue at attack launch
+  (frames before the health drop), so the next pass must correlate
+  against button-bit presses with a launch-to-impact window, using
+  `von/tools/map_input_bits.py` to isolate buttons from stick
+  wiggles.
+
+Open: name every ID through the 68k `$603dbc` high-nibble dispatch
+(handler -> sequence/stream -> sample); confirm BGM-vs-jingle
+assignment of the `[AE,13,XX]` IDs against SCSP key-ons.
