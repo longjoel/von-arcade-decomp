@@ -1433,6 +1433,19 @@ invokes the SCSP initializer after geometry startup, so the bounded audio
 startup sequence is part of the generated runtime rather than a disconnected
 translation.
 
+A full-bout write tap over `0x0051aa70-0x0051aabf`
+(`von/build/audio-queue/manual-02/input-audio.log`) attributes every ring
+byte-store to CURPC `0x0002a4cc` and every write-index commit to `0x0002a4d4`,
+both inside the `0x0002a458-0x0002a574` producer cluster and just below the
+`0x2a4e0` framing entry. Each datum byte goes out through widening
+u16/u24/u32 stores to the same slot with one index bump per store, and
+read-index advances trail in the same frame from PC `0x00001720`, next to the
+`0x16dc` consumer branch. The tap also confirms the documented init idiom
+(index clears plus `0x99` fill from `0x2a8b8-0x2a8c4`) and the `0x2a870`
+`0xa0, 0, low_byte` shape, seen live as `[a0,00,01]` at frame 2340. Command
+vocabulary and bout correlation (FIGHT calls, stage-intro/BGM family) are
+recorded in [audio.md](../docs/audio.md) rather than repeated here.
+
 ### Reused Geometry Service Boundary: `0x0002a990`
 
 The attract worklist's next high-frequency host target is a fixed SHARC
