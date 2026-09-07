@@ -6208,6 +6208,37 @@ first ROM banner (`AIRPORT @0x21065`) by positional indexing
 Per-stage u16-pair params at `0x195e0`
 (`[0x100a,0x1351],[0x1006,0x1358],...`).
 
+### Live five-stage selector table (`KNOWN`, stage-5 bout)
+
+Fresh-NVRAM replay of `von/captures/vonj-20260907T211227Z/inp/stage3-fleet`
+(`von/build/stage5-fleet/stage-trace.log`, FIGHT frames
+4430/8073/10572/13983/16305/18879/21713/24277) gives steady-state
+cells per stage (S3 continues re-roll `0x504dbc` `0x20` -> `0x1c`):
+
+```text
+stage  0x503a80  0x509b80  0x504de0  0x504dbc  FIGHT  BGM
+S1     00        00        03        03        50     4b
+S2     01        01        02        0c        51     4c
+S3     02        02        02        20/1c     52     4d
+S4     03        03        03        80        53     4e
+S5     04        04        03        100       54     4f
+```
+
+`0x503a80`/`0x509b80` are the 0-based stage ordinal: forcing them (not
+the downstream `0x504de0` cell, a proven no-op) is the stage-force
+cheat. `0x504dbc` matches the `0x75D90` jump-table outputs
+(3/12/32/128/256 = S1/S2/S3a1/S4/S5). The arena z-bounds above
+(-60/+60) are exactly the round-start posts (player `(0,0,-60)`,
+CPU `(0,0,+60)`), snapped 3 frames after each FIGHT call.
+
+Replay-methodology notes: a write tap installed once from `setup()`
+at frame 1 never fires; installing it from the every-frame poll
+(same range, same API) yields all 26988 audio-ring writes
+(`von/build/stage_trace.lua`). Replaying with a stale (previously
+used) NVRAM directory desyncs the whole bout (spawn frames
+8200/18654/24661 vs faithful 10573/16306/18880/21714) — replays
+that must match the live session need a fresh NVRAM dir.
+
 ### Variant-B stage store: bus `0x02bed700` (`KNOWN` contents/role)
 
 `[tpa, oba, X]` records, tpa-range `0x004axxxx`. The submitted

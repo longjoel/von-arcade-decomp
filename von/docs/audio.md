@@ -103,16 +103,27 @@ Protocol (new producer-side facts):
 Stage structure of this run (teleports to spawn): S1 f=3178,
 S2 f=8009, S3 f=12841 (~4830 frames each, inputs live throughout).
 
-Findings:
+Findings (corrected and extended by the stage-5 bout,
+`von/build/stage5-fleet/stage-trace.log`, FIGHT frames
+4430/8073/10572/13983/16305/18879/21713/24277):
 
-- FIGHT call, 3/3 stages, timing-exact one frame before spawn:
-  S1 `[13,50]`@3177, S2 `[AE,13,51]`@8008, S3 `[52]`@12840.
-  Per-stage IDs ascend `50/51/52`; each occurs exactly once.
-- Stage-intro cluster in the ~120 frames before each spawn, same
-  shape every time: `[AE,00,02]`/`[AE,00,03]`+`[00,02]` (probable
-  stop/fade of previous audio), then `[AE,13,XX]` variants
-  (S1 `3f`, S2 `41,4c`, S3 `4d`), then the FIGHT call above.
-  `[AE,13,XX]` is the BGM/sequence-start family with a per-stage ID.
+- FIGHT call, timing-exact one frame before every spawn, IDs ascend
+  per stage: S1 `50`, S2 `51`, S3 `52`, S4 `53`, S5 `54`
+  (`[AE,13,5x]`). Stages are single-round: no mid-attempt `50`
+  round-starts appear in-playback.
+- `[AE,13,3f]` and `[AE,13,41]` fire before EVERY stage (shared
+  VS/intro jingles, ~110/~72 frames before spawn), NOT per-stage
+  BGM as previously read. Only the third ID is per-stage BGM:
+  S1 `4b`, S2 `4c`, S3 `4d`, S4 `4e`, S5 `4f`.
+- Stage entry and death-continue both play the full intro cluster
+  (stop `[AE,00,02]`, `3f`, `41`, per-stage BGM, `[AE,11,11]` radar
+  blips x2, stage FIGHT call). A stage WIN first plays victory
+  jingle `[AE,11,15]` plus stop pair `[AE,00,03]`+`[AE,00,02]`;
+  continues skip the victory jingle.
+- Bout map of the stage-5 run: S1, S2 win, S3 x4 attempts (3 death
+  continues), S3 win, S4 win (2563f), S5 reached, recording ends
+  mid-S5. Round-start posts (0,0,-60)/(0,0,+60) snap 3 frames
+  after the FIGHT call with a ~130-frame control lock.
 - Hit SFX are NOT isolated: no vocabulary item clusters within ±8
   frames of the 51 damage events above chance, and input proximity
   is at chance. Impact sounds likely enqueue at attack launch
