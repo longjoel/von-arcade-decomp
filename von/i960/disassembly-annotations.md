@@ -5138,11 +5138,16 @@ word `0x00012790` appears at table entry `0x132ec` beside count `1`, but every
 sibling entry addresses a `0x12xxxx` data record, so invocation through the
 table is unproven and the caller stays SPECULATIVE with the reader
 unidentified. `0x27b0`/`0x27d0` have no static
-branch, call, or address-taken reference and no attract-PC visits. The cluster
+branch, call, or address-taken reference and no attract-PC visits. The top
+entries discard the caller link and tail to their private continuations, but
+the mid-body entries preserve it through `g0` and are called: the
+flag-dispatch arms `bal` to `0x2798` (from `0x2c9c`) and `0x27b8` (from
+`0x2c7c`), returning to the `bal` site. The cluster
 is tracked as ABI scaffolding in the reconstruction ledger with no C
 translation; the listing contract is checked by
-`von/tools/test_continuation_thunk_cluster_2790.py`, which fails if a static
-caller is ever discovered so the attestation can be updated.
+`von/tools/test_continuation_thunk_cluster_2790.py`, which pins both bals
+and fails if any other static referrer appears so the attestation can be
+updated.
 
 ### Controller Upload Table: `0x00002830`
 
@@ -5157,6 +5162,69 @@ high half and the zeros at `0x2846-0x284f` are never read. The table is
 tracked as a data unit in the reconstruction ledger and checked by
 `von/tools/test_controller_upload_table_2830.py` against the listing words,
 the image bytes, and the consumer loop shape.
+
+### Final Setup Table: `0x00002890`
+
+The 22 bytes at `0x2890-0x28a5` mirror the upload table above for the
+`0x28b0` final-setup loop, its sole static consumer (`lda 0x2890,r5`): the
+same `r4`-from-`21` loop stores 22 bytes to `0x1c00000` with a per-byte
+`bal 0x27d8` wait, so the `0x28b0` unit notes now say 22, not 21. Unlike its
+sibling, the first 21 bytes here match the `io_setup_final` model array
+exactly; only the 22nd byte (`0xd1`) is ROM-only. Both uploader ranges now
+extend through their terminal `ret` (`0x2850` ends `0x2888`, `0x28b0` ends
+`0x28e8`). The table is a ledger data unit checked by
+`von/tools/test_final_setup_table_2890.py`, which also cross-checks the 21
+model bytes against `recovered_io.c`.
+
+### Sampler-Entry Thunks: `0x00002cd0`
+
+The `0x2cd0` block is a dual-entry link trampoline. Entered at the top, it
+loads `0x2ce4` into `g14`, discarding the caller link, and tails to the
+`ret` at `0x2ce4`; entered mid-body at `0x2cd8`, it preserves the caller
+link through `g0` and returns to the caller. The flag-dispatch `0x2cb0` arm
+uses the mid entry (`bal 0x2cd8` at `0x2cbc`, returning to `0x2cc0`) and the
+top entry has no static caller. The same arm structure appears in the
+`0x2790` cluster, whose bodies are likewise entered mid-way (`bal 0x2798`,
+`bal 0x27b8`). The setup at `0x2cf0` loads `0x2d5c` into `g14` and falls
+through into the sampler head at `0x2cf8`, whose first instruction moves the
+staged link into `g2` for the sampler's `bx (g2)` return — the sampler is a
+`g2`-link subroutine, entered either staged via `0x2cf0` (no observed
+caller) or directly by the flag-dispatch `bal 0x2cf8` at `0x2cc4`
+(attract-visited once). The pair is a ledger scaffolding unit with no C
+translation, checked by
+`von/tools/test_sampler_entry_thunks_2cd0.py`.
+
+### Dual-Entry Thunk: `0x00002d80`
+
+The `0x2d80` block is the third instance of the discard-top/preserve-mid
+link pattern: the top entry loads `0x2d94` and tails to its `ret` with no
+static caller, while the mid entry at `0x2d88` preserves the caller link
+through `g0`. The flag-dispatch `0x2d60` arm uses the mid entry
+(`bal 0x2d88` at `0x2d6c`, returning to `0x2d70`) and otherwise calls the
+`0x2da0` average routine. A ledger scaffolding unit with no C translation,
+checked by `von/tools/test_dual_entry_thunk_2d80.py`.
+
+### Port-Wait Branch Thunk: `0x000027f0`
+
+The `0x27f0` block is the fourth discard-top/preserve-mid instance with a
+wait loop: the top entry stages continuation `0x2824`, while the mid entry
+at `0x27f8` preserves the caller link through `g0`; both spin on bit `0x20`
+of port `0x1c00002` clearing (`and` with `0x20`, `cmpibe` back to `0x280c`)
+and tail-branch through `g0`. The mid entry is called twice: by the `0x2990`
+indexed upload after its copy loop (`bal` at `0x2968`) and by the `0x2ab0`
+command builder as its tail call (`bal` at `0x2b9c`, whose `ret` at `0x2ba0`
+is now inside the builder range). The top entry has no static caller. A
+ledger scaffolding unit with no C translation, checked by
+`von/tools/test_wait_branch_thunk_27f0.py`.
+
+### Packed-Struct Init Bridge: `0x00002de4`
+
+Three fall-through stores between the average loop tail (now inside the
+average range through `0x2de4`) and the packed head: constant `0x4f` to
+struct `+0x10` and the caller link `g14` into the struct. No branch enters
+the bridge; it only runs by falling through from `0x2de0`. A ledger
+scaffolding unit with no C translation, checked by
+`von/tools/test_packed_struct_init_2de4.py`.
 
 ### Geometry Projection Packet Core: `0x0006f6f0`
 

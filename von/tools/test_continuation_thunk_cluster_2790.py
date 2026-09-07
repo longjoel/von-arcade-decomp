@@ -31,6 +31,14 @@ PRIVATE_THUNKS = {
 SHARED_THUNK_SETUP = {0x27D0: "lda\t0x27e4,g14"}
 SHARED_THUNK_ENTRY = {0x27D8: "mov\tg14,g0"}
 
+# Attested mid-body entries: flag-dispatch bals enter past the lda, so the
+# bal link in g14 is preserved through g0 and returns to the bal site.
+# (Top entries discard the link and tail to private continuations instead.)
+KNOWN_BALS = {
+    0x2C9C: "bal\t0x2798",
+    0x2C7C: "bal\t0x27b8",
+}
+
 # Any static branch to a thunk entry/continuation, or any address-taken load
 # of a thunk entry, would attest a caller for the unattested thunks.
 CALLER_RES = [
@@ -55,7 +63,8 @@ def main() -> int:
     program = parse_listing(text)
     missing = [
         f"{address:#x}: {expected}"
-        for address, expected in {**PRIVATE_THUNKS, **SHARED_THUNK_SETUP, **SHARED_THUNK_ENTRY}.items()
+        for address, expected in {**PRIVATE_THUNKS, **SHARED_THUNK_SETUP,
+                                  **SHARED_THUNK_ENTRY, **KNOWN_BALS}.items()
         if program.get(address) != expected
     ]
     if missing:

@@ -1152,8 +1152,9 @@ range. Immediately past it, the continuation-thunk cluster at
 `0x2790`/`0x27b0`/`0x27d0` repeats the link-laundering shape with
 continuations `0x27a4`/`0x27c4`/`0x27e4`; the word `0x00012790` appears
 at table entry `0x132ec`, but sibling entries address data records so even
-that role is unproven — the cluster is modeled as ABI scaffolding with all
-three callers unattested, not translated.
+that role is unproven — while the mid-body entries at `0x2798`/`0x27b8` are
+called by flag-dispatch arms with the link preserved. The cluster is modeled
+as ABI scaffolding, not translated.
 `recovered_io_failure_reset()` is the pure five-field translation of the
 deterministic stores. The input initializer's 60 index values and 1,170-byte
 port-write plan are checked by `von/tools/test_recovered_io.py`; its mapped

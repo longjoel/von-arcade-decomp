@@ -2045,9 +2045,9 @@
           "modeling": {
             "boundary": "three i960 continuation thunks: 0x2790 loads 0x27a4 into g14, moves it through g0, clears g14, and branches indirect to the ret at 0x27a4; 0x27b0 repeats the shape for the ret at 0x27c4; 0x27d0 loads 0x27e4 into g14 and falls through into the shared 0x27d8 trampoline body",
             "test": "von/tools/test_continuation_thunk_cluster_2790.py",
-            "unresolved_behavior": "the address 0x2790 appears as a word at table entry 0x132ec, but every sibling entry addresses a 0x12xxxx data record, so invocation through the table is unproven (SPECULATIVE caller, reader unidentified); 0x27b0 and 0x27d0 have no static referrer and no attract-PC visits, and caller-side register/stack ownership stays out of this scaffolding contract"
+            "unresolved_behavior": "top-entry callers (0x2790/0x27b0/0x27d0), the 0x132ec table reader, and caller-side register/stack ownership stay out of this scaffolding contract"
           },
-          "notes": "Adjacent single-shot continuation thunks reusing the 0x26e8/0x27d8 link-laundering shape. The word 0x00012790 appears at table entry 0x132ec, but all sibling entries address 0x12xxxx data records, so a call-target role is unproven (SPECULATIVE). 0x27b0/0x27d0 are unattested (no bal/call/branch target, no address-taken load, no attract visits) and stay modeled as scaffolding until a caller is identified. No C translation: control-flow scaffolding like the shared trampoline."
+          "notes": "Adjacent single-shot continuation thunks reusing the 0x26e8/0x27d8 link-laundering shape. The word 0x00012790 appears at table entry 0x132ec, but all sibling entries address 0x12xxxx data records, so a call-target role is unproven (SPECULATIVE). Top entries (0x2790/0x27b0/0x27d0) have no static caller: they discard the caller link and tail to private continuations. Mid-body entries preserve the link through g0 and are called: flag-dispatch bals to 0x2798 (0x2c90 arm) and 0x27b8 (0x2c70 arm), returning to the bal site. No C translation: control-flow scaffolding like the shared trampoline."
         },
         {
           "id": "maincpu.io-input-initializer",
@@ -2106,7 +2106,7 @@
             "test": "von/tools/test_recovered_io.py",
             "unresolved_behavior": "higher-level input meaning and mapped bus timing remain outside this deterministic state-transform slice"
           },
-          "notes": "Models the deterministic state transform after the 0x1c00010 control write: status_3f0=input_byte & port_low, status_480=port_low, status_481=input_byte, status_482=~port_low, and the sampled halfword is latched to 0x1c0000a. Higher-level input meaning and bus timing remain outside the slice.",
+          "notes": "Models the deterministic state transform after the 0x1c00010 control write: status_3f0=input_byte & port_low, status_480=port_low, status_481=input_byte, status_482=~port_low, and the sampled halfword is latched to 0x1c0000a. Dual entry: the 0x2cf0 staged entry presets g2=0x2d5c while the flag-dispatch bal at 0x2cc4 enters directly (attract-visited); both share the g2-link body returning through bx (g2). Higher-level input meaning and bus timing remain outside the slice.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -2130,7 +2130,7 @@
           "ranges": [
             {
               "start": "0x00002ab0",
-              "end": "0x00002ba0"
+              "end": "0x00002ba4"
             }
           ],
           "symbol": "recovered_io_command_plan",
@@ -2156,7 +2156,7 @@
           "ranges": [
             {
               "start": "0x00002da0",
-              "end": "0x00002ddc"
+              "end": "0x00002de4"
             }
           ],
           "symbol": "recovered_io_average_controller_bytes",
@@ -2173,6 +2173,32 @@
               ]
             }
           }
+        },
+        {
+          "id": "maincpu.packed-struct-init-2de4",
+          "name": "packed_struct_init_2de4",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/disassembly-annotations.md"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_packed_struct_init_2de4.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00002de4",
+              "end": "0x00002df0"
+            }
+          ],
+          "modeling": {
+            "boundary": "fall-through struct init between the average loop tail and the packed head: stores constant 0x4f at struct+0x10 and saves the caller link g14 into the struct",
+            "test": "von/tools/test_packed_struct_init_2de4.py",
+            "unresolved_behavior": "consumer of the saved link and higher-level struct meaning stay outside this glue contract"
+          },
+          "notes": "Reached only by falling through from the average loop tail; no branch entry exists. Initializes the packed routine's struct fields before its head at 0x2df0. No C translation: straight-line glue between two translated units."
         },
         {
           "id": "maincpu.io-packed-controller-state",
@@ -2207,7 +2233,7 @@
           "stage": "modeled",
           "sources": ["von/i960/recovered_io.c"],
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_io.py"],
-          "ranges": [{"start": "0x00002850", "end": "0x00002884"}],
+          "ranges": [{"start": "0x00002850", "end": "0x00002888"}],
           "symbol": "recovered_io_setup_plan",
           "modeling": {
             "boundary": "i960 0x2830 controller upload schedule and per-byte status-wait sequencing",
@@ -2316,7 +2342,7 @@
           "ranges": [
             {
               "start": "0x000028b0",
-              "end": "0x000028e4"
+              "end": "0x000028e8"
             }
           ],
           "symbol": "recovered_io_normal_input_plan",
@@ -2325,7 +2351,7 @@
             "test": "von/tools/test_recovered_io.py",
             "unresolved_behavior": "per-byte mapped bus wait and controller timing remain outside the pure fixed-sequence plan"
           },
-          "notes": "Emits the fixed 21-byte sequence stored at 0x2890 to the 0x01c00000 controller port after the normal 0x2c10 two-bank schedule. The per-byte bus wait is outside the pure plan.",
+          "notes": "Emits the fixed 22-byte sequence stored at 0x2890 (r4 runs 21 down to -1) to the 0x01c00000 controller port after the normal 0x2c10 two-bank schedule. The per-byte bus wait is outside the pure plan.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -2333,6 +2359,34 @@
               ]
             }
           }
+        },
+        {
+          "id": "maincpu.final-setup-table-2890",
+          "name": "final_setup_table_2890",
+          "classification": "data",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/disassembly-annotations.md"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/build/disasm/vonj-maincpu.bin",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/recovered_io.c",
+            "von/tools/test_final_setup_table_2890.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00002890",
+              "end": "0x000028a6"
+            }
+          ],
+          "modeling": {
+            "boundary": "22-byte final setup table consumed by the 0x28b0 loop: 11 11 51 d1 71 f1 51 d1 51 d1 51 d1 51 d1 51 d1 51 d1 51 d1 51 d1, with the loop index r4 running 21 down to -1 and a per-byte 0x27d8 status wait; the first 21 bytes match the io_setup_final model array",
+            "test": "von/tools/test_final_setup_table_2890.py",
+            "unresolved_behavior": "MMIO execution and controller timing of the consuming loop stay outside this data model, as do the unread zero bytes at 0x28a6-0x28af; the ROM-only 22nd byte has no model counterpart"
+          },
+          "notes": "Fixed source table for the modeled 0x28b0 final-setup loop (sole static consumer: lda 0x2890,r5), mirroring the 0x2830/0x2850 pair. Range covers exactly the 22 consumed bytes; the 0x28a4 word's high half and following zeros are never read."
         },
         {
       "id": "maincpu.host-byte-queue-initialize",
@@ -8409,6 +8463,32 @@
           }
         },
         {
+          "id": "maincpu.wait-branch-thunk-27f0",
+          "name": "wait_branch_thunk_27f0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/disassembly-annotations.md"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_wait_branch_thunk_27f0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000027f0",
+              "end": "0x00002828"
+            }
+          ],
+          "modeling": {
+            "boundary": "dual-entry port-wait branch at 0x27f0 (top entry stages continuation 0x2824 and discards the caller link; mid entry at 0x27f8 preserves the caller link through g0); both spin on bit 0x20 of port 0x1c00002 clearing, then tail-branch through g0",
+            "test": "von/tools/test_wait_branch_thunk_27f0.py",
+            "unresolved_behavior": "top-entry (0x27f0) caller, port timing, and caller-side register/stack ownership stay out of this scaffolding contract"
+          },
+          "notes": "Mid-body entry at 0x27f8 is called twice: by the 0x2990 indexed upload after its copy loop and by the 0x2ab0 command builder as its tail call (both return to the bal site once the port bit clears); the top 0x27f0 entry has no static caller. Fourth instance of the discard-top/preserve-mid link pattern. No C translation: control-flow scaffolding."
+        },
+        {
           "id": "maincpu.geometry-projection-packet-core",
           "name": "geometry_projection_packet_core",
           "classification": "code",
@@ -9826,11 +9906,11 @@
             },
             {
               "start": "0x00002cb0",
-              "end": "0x00002cc8"
+              "end": "0x00002ccc"
             },
             {
               "start": "0x00002d60",
-              "end": "0x00002d78"
+              "end": "0x00002d7c"
             }
           ],
           "symbol": "recovered_flag_dispatch_target",
@@ -9839,7 +9919,64 @@
             "test": "von/tools/test_recovered_flag_dispatch_2c70.py",
             "unresolved_behavior": "The eight forwarding targets and their input effects remain outside this pure dispatch table"
           },
-          "notes": "Pure route table for the 0x2c70/0x2c90/0x2cb0/0x2d60 dispatcher family over the shared input flag. 0x2cd8/0x2d88 targets remain unmodeled."
+          "notes": "Pure route table for the 0x2c70/0x2c90/0x2cb0/0x2d60 dispatcher family over the shared input flag. Mid-body link entries 0x2798/0x27b8/0x2cd8/0x2d88 are modeled as scaffolding clusters."
+        },
+        {
+          "id": "maincpu.sampler-entry-thunks-2cd0",
+          "name": "sampler_entry_thunks_2cd0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/disassembly-annotations.md"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/build/attract-coverage/vonj-attract-60s.worklist.json",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_sampler_entry_thunks_2cd0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00002cd0",
+              "end": "0x00002ce8"
+            },
+            {
+              "start": "0x00002cf0",
+              "end": "0x00002cf8"
+            }
+          ],
+          "modeling": {
+            "boundary": "dual-entry link trampoline at 0x2cd0 (top entry discards the caller link and tails to the ret at 0x2ce4; mid entry at 0x2cd8 preserves the flag-dispatch bal link through g0) plus the staged sampler entry at 0x2cf0, which loads 0x2d5c into g14 and shares the sampler body whose head moves the staged link into g2 for the bx (g2) return",
+            "test": "von/tools/test_sampler_entry_thunks_2cd0.py",
+            "unresolved_behavior": "top-entry (0x2cd0) and staged-entry (0x2cf0) callers, and caller-side register/stack ownership, stay out of this scaffolding contract"
+          },
+          "notes": "Flag-dispatch 0x2cb0 arm bals to mid-entry 0x2cd8 (link preserved through g0, returns to 0x2cc0) or directly to the sampler head at 0x2cf8 (bal, attract-visited once); the staged 0x2cf0 entry runs the same sampler body with a preset g2 continuation to 0x2d5c. No C translation: control-flow scaffolding."
+        },
+        {
+          "id": "maincpu.dual-entry-thunk-2d80",
+          "name": "dual_entry_thunk_2d80",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/disassembly-annotations.md"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_dual_entry_thunk_2d80.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00002d80",
+              "end": "0x00002d98"
+            }
+          ],
+          "modeling": {
+            "boundary": "dual-entry link trampoline at 0x2d80 (top entry discards the caller link and tails to the ret at 0x2d94; mid entry at 0x2d88 preserves the flag-dispatch bal link through g0, returning to 0x2d70)",
+            "test": "von/tools/test_dual_entry_thunk_2d80.py",
+            "unresolved_behavior": "top-entry (0x2d80) caller and caller-side register/stack ownership stay out of this scaffolding contract"
+          },
+          "notes": "Flag-dispatch 0x2d60 arm bals to mid-entry 0x2d88 (link preserved through g0, returns to 0x2d70) or calls the 0x2da0 average routine; the top 0x2d80 entry has no static caller. Third instance of the discard-top/preserve-mid link pattern after 0x2790 and 0x2cd0. No C translation: control-flow scaffolding."
         },
         {
           "id": "maincpu.pair-match-18438",
