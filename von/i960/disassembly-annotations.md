@@ -138,9 +138,12 @@ state and region descriptors are checked by
 available for the future caller integration pass.
 
 The shared video helper at `0x0001bc90-0x0001bcd0` performs one forward copy
-for each requested row. Each call advances its source pointer by `0x80` bytes
-and its destination pointer by `halfwords * 2` bytes while copying that byte
-count. `recovered_text_video_copy_rows()` preserves this schedule.
+for each requested row. Each call advances its destination pointer by the
+fixed `0x80` bytes and its source pointer by `halfwords * 2` bytes while
+copying that byte count: the per-row call to the `0xf5d40` memcpy passes the
+destination in `g0` and the source in `g1`, and every width phase (quad,
+long, word, byte) reads the `g1` side and writes the `g0` side.
+`recovered_text_video_copy_rows()` preserves this schedule.
 
 The preceding `0x0001bb90-0x0001bc20` converter consumes `blocks * 16`
 halfwords. It expands source bits `0..3`, `4..7`, `8..11`, and bits `12..14`
@@ -183,10 +186,12 @@ nibble output bits `16..31`. The helper processes eight bytes/words per block.
 `recovered_text_expand_video_blocks()` preserve that conversion and are tested
 over every source byte and mode value; mapped-RAM execution remains separate.
 
-The `0x00020180` caller supplies a fixed upload request: source `0x01004000`,
-destination pointer slot `0x02fd61d0`, `0x40` halfwords per row, and `0x40`
-rows. `recovered_text_video_upload()` now executes that exact handoff through
-the shared row-copy loop.
+The `0x00020180` caller supplies a fixed upload request: source `0x02fd61d0`
+in work RAM, destination `0x01004000` in the video plane, `0x40` halfwords
+per row, and `0x40` rows, with no pointer indirection. `recovered_text_video_upload()`
+now executes that exact handoff through the shared row-copy loop. The upload
+runs in the bit-9 voltage-warning interrupt path, so it never fires during
+normal boot, attract, or gameplay captures.
 
 The adjacent `0x20160` block is a clear-`g14` indirect-return thunk targeting
 the single `ret` at `0x20174`; its contract is captured in
@@ -5225,6 +5230,19 @@ struct `+0x10` and the caller link `g14` into the struct. No branch enters
 the bridge; it only runs by falling through from `0x2de0`. A ledger
 scaffolding unit with no C translation, checked by
 `von/tools/test_packed_struct_init_2de4.py`.
+
+### Indexed-Emit Dispatch: `0x000034f10`
+
+First code reached only by match play (from the manual-01 replay): past the
+shared prefix at `0x34f0e`, the match alone derives a record index from
+`0x19a(r8)`, clamps it against `4` (default target `0x355d8`), and
+indirect-branches through the five-entry table at `0x34f78`
+(`0x35510`/`0x355d8`/`0x34f8c`/`0x3503c`/`0x3528c`, all match-visited).
+Early bounds failures in both traces exit to the shared `0x358ac`. The head
+has no static caller (fall-through entry) and the five arms are unmodeled.
+A ledger dispatch unit with no C translation yet, checked by
+`von/tools/test_indexed_emit_dispatch_34f10.py`; execution attestation rests
+on the non-canonical scratch replay trace until registered evidence exists.
 
 ### Geometry Projection Packet Core: `0x0006f6f0`
 

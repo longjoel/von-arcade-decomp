@@ -209,7 +209,10 @@ void recovered_text_write_glyph_string(volatile const u8 *text)
         recovered_text_emit_glyph(character, font_mode, 0U);
 }
 
-/* Describe one 0x1bc90 row transfer. */
+/* Describe one 0x1bc90 row transfer. The loop keeps the destination stride
+ * fixed at 0x80 bytes (lda 0x80(r7),r7) while the source advances by the row
+ * byte count (addo r6,r5,r6); the per-row memcpy at 0xf5d40 takes its
+ * destination from g0 and its source from g1 in every width phase. */
 u32 recovered_text_video_row_transfer_plan(
     u32 row,
     u32 source,
@@ -225,8 +228,8 @@ u32 recovered_text_video_row_transfer_plan(
     if (row >= rows)
         return 0U;
     row_bytes = halfwords << 1;
-    *call_source = source + (row << 7);
-    *call_destination = destination + row * row_bytes;
+    *call_source = source + row * row_bytes;
+    *call_destination = destination + (row << 7);
     *call_bytes = row_bytes;
     return 1U;
 }
@@ -242,19 +245,21 @@ void recovered_text_video_copy_rows(volatile u8 *source,
 
     for (row = 0U; row < rows; ++row) {
         recovered_memory_copy_forward(destination, source, row_bytes);
-        source += 0x80U;
-        destination += row_bytes;
+        source += row_bytes;
+        destination += 0x80U;
     }
 }
 
-/* Describe the 0x20180 upload request before it enters the row blitter. */
+/* Describe the 0x20180 upload request before it enters the row blitter. The
+ * caller passes the work-RAM address as the source and the video plane as
+ * the destination; no indirection is involved. */
 u32 recovered_text_video_upload_plan(u32 *source,
-                                    u32 *destination_pointer,
+                                    u32 *destination,
                                     u32 *halfwords,
                                     u32 *rows)
 {
-    *source = 0x01004000U;
-    *destination_pointer = 0x02fd61d0U;
+    *source = 0x02fd61d0U;
+    *destination = 0x01004000U;
     *halfwords = 0x40U;
     *rows = 0x40U;
     return 1U;
@@ -603,14 +608,12 @@ void recovered_text_ascii_font_initialize(void)
 void recovered_text_video_upload(void)
 {
     u32 source;
-    u32 destination_pointer;
+    u32 destination;
     u32 halfwords;
     u32 rows;
-    u32 destination;
 
-    recovered_text_video_upload_plan(&source, &destination_pointer,
+    recovered_text_video_upload_plan(&source, &destination,
                                      &halfwords, &rows);
-    destination = *(volatile const u32 *)(unsigned long)destination_pointer;
     recovered_text_video_copy_rows((volatile u8 *)(unsigned long)source,
                                    (volatile u8 *)(unsigned long)destination,
                                    halfwords, rows);

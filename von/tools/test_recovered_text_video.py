@@ -188,29 +188,29 @@ def main() -> int:
                 raise SystemExit(f"invalid {function_name} index accepted")
 
         source = ctypes.c_uint32()
-        destination_pointer = ctypes.c_uint32()
+        destination = ctypes.c_uint32()
         halfwords = ctypes.c_uint32()
         rows = ctypes.c_uint32()
         valid = recovered.recovered_text_video_upload_plan(
             ctypes.byref(source),
-            ctypes.byref(destination_pointer),
+            ctypes.byref(destination),
             ctypes.byref(halfwords),
             ctypes.byref(rows),
         )
         if valid != 1 or (
             source.value,
-            destination_pointer.value,
+            destination.value,
             halfwords.value,
             rows.value,
-        ) != (0x01004000, 0x02FD61D0, 0x40, 0x40):
+        ) != (0x02FD61D0, 0x01004000, 0x40, 0x40):
             raise SystemExit("video upload plan mismatch")
 
         copy_vectors = 0
         for halfwords in (1, 2, 0x40):
             for rows in (0, 1, 2, 64):
                 row_bytes = halfwords * 2
-                source = (ctypes.c_ubyte * max(1, rows * 0x80))()
-                destination = (ctypes.c_ubyte * max(1, rows * row_bytes))()
+                source = (ctypes.c_ubyte * max(1, rows * row_bytes))()
+                destination = (ctypes.c_ubyte * max(1, rows * 0x80))()
                 for index in range(len(source)):
                     source[index] = (index * 13 + 7) & 0xFF
                 for index in range(len(destination)):
@@ -220,9 +220,8 @@ def main() -> int:
                 )
                 expected = bytearray(b"\xA5" * len(destination))
                 for row in range(rows):
-                    expected[row * row_bytes:(row + 1) * row_bytes] = (
-                        bytes(source[row * 0x80:row * 0x80 + row_bytes])
-                    )
+                    chunk = bytes(source[row * row_bytes:(row + 1) * row_bytes])
+                    expected[row * 0x80:row * 0x80 + row_bytes] = chunk
                 if bytes(destination) != bytes(expected):
                     raise SystemExit(
                         f"video row copy mismatch halfwords={halfwords} rows={rows}"
@@ -493,8 +492,8 @@ def main() -> int:
                 if expected_valid:
                     expected_bytes = halfwords * 2
                     expected = (
-                        source + row * 0x80,
-                        destination + row * expected_bytes,
+                        source + row * expected_bytes,
+                        destination + row * 0x80,
                         expected_bytes,
                     )
                     actual = (call_source.value, call_destination.value, call_bytes.value)

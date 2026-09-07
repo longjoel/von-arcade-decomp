@@ -2047,7 +2047,7 @@
             "test": "von/tools/test_continuation_thunk_cluster_2790.py",
             "unresolved_behavior": "top-entry callers (0x2790/0x27b0/0x27d0), the 0x132ec table reader, and caller-side register/stack ownership stay out of this scaffolding contract"
           },
-          "notes": "Adjacent single-shot continuation thunks reusing the 0x26e8/0x27d8 link-laundering shape. The word 0x00012790 appears at table entry 0x132ec, but all sibling entries address 0x12xxxx data records, so a call-target role is unproven (SPECULATIVE). Top entries (0x2790/0x27b0/0x27d0) have no static caller: they discard the caller link and tail to private continuations. Mid-body entries preserve the link through g0 and are called: flag-dispatch bals to 0x2798 (0x2c90 arm) and 0x27b8 (0x2c70 arm), returning to the bal site. No C translation: control-flow scaffolding like the shared trampoline."
+          "notes": "Adjacent single-shot continuation thunks reusing the 0x26e8/0x27d8 link-laundering shape. The word 0x00012790 appears at table entry 0x132ec, but all sibling entries address 0x12xxxx data records (four-word ptr/ptr/value/value tuples with no static reader anywhere in maincpu code), so a call-target role is unproven (SPECULATIVE). Top entries (0x2790/0x27b0/0x27d0) have no static caller: they discard the caller link and tail to private continuations. Mid-body entries preserve the link through g0 and are called: flag-dispatch bals to 0x2798 (0x2c90 arm) and 0x27b8 (0x2c70 arm), returning to the bal site. No C translation: control-flow scaffolding like the shared trampoline."
         },
         {
           "id": "maincpu.io-input-initializer",
@@ -3389,14 +3389,16 @@
           "id": "maincpu.text-tile-control-write",
           "name": "text_tile_control_write",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "trace-validated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/attract-coverage/vonj-attract-60s.pcs",
             "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_control.py"
+            "von/tools/test_recovered_text_control.py",
+            "von/build/disasm/vonj-boot.trace",
+            "von/tools/test_text_tile_control_trace.py"
           ],
           "ranges": [
             {
@@ -3405,7 +3407,7 @@
             }
           ],
           "symbol": "recovered_text_write_tile_control",
-          "notes": "Preserves the helper's single 32-bit write of its input to tile/control MMIO address 0x01800000. Trace validation blocked on instrumentation: no current trace patch observes MMIO writes (0x01800000 appears in no capture); needs a MAME MMIO-write trace plus rebuild.",
+          "notes": "Preserves the helper's single 32-bit write of its input to tile/control MMIO address 0x01800000. Trace-validated on the 45-second boot capture (102 MMIO writes via patch 0039): five come from the wrapper store at pc=0x1cd00 with data 0000, 8000, 7fff, 0000, 5940, replayed verbatim through recovered_text_tile_control_bus. The remaining 97 (96 from 0x2b8bc, one from 0x0f5e04) are unattributed context: the register is shared, but only the wrapper path pins this unit.",
           "modeling": {
             "boundary": "Purely models the tile-control bus contract: pass the 32-bit input through unchanged and target MMIO address 0x01800000.",
             "test": "von/tools/test_recovered_text_control.py",
@@ -5329,14 +5331,16 @@
           "id": "maincpu.text-video-row-transfer-plan",
           "name": "text_video_row_transfer_plan",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "trace-validated",
           "sources": [
             "von/i960/recovered_text.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
             "von/i960/disassembly-annotations.md",
-            "von/tools/test_recovered_text_video.py"
+            "von/tools/test_recovered_text_video.py",
+            "von/i960/text_row_transfer_1f060_fixture.json",
+            "von/tools/test_text_row_transfer_trace.py"
           ],
           "ranges": [
             {
@@ -5345,11 +5349,11 @@
             }
           ],
         "symbol": "recovered_text_video_copy_rows",
-        "notes": "Recovers the shared video helper's row loop: forward-copy halfwords*2 bytes once per row, advance source by 0x80 bytes, and advance destination by halfwords*2 bytes. Trace validation blocked on instrumentation: no tile-plane stores from 0x1bc90-0x1bcd0 appear in attract (its traffic is RAM-to-RAM, invisible to current patches); needs a work-RAM write trace plus rebuild.",
+        "notes": "Recovers the shared video helper's row loop: forward-copy halfwords*2 bytes once per row, advance source by halfwords*2 bytes, and advance destination by the fixed 0x80 stride (the listing's per-row memcpy at 0xf5d40 takes its destination from g0 and source from g1 in every width phase). Trace-validated on a live 48-row work-RAM to video-plane upload (src 0x02FD2520, dst 0x01004000, 0x40 halfwords) observed via Lua program-space dumps across boot frames 901-961: all 48 rows byte-exact, rows 17-31 unique in a 32KB work-RAM window at +0x80 spacing. The 0x20180 fixed upload runs only in the voltage-warning interrupt path and never fires in normal play.",
         "modeling": {
-          "boundary": "i960 0x1bc90 text video row-transfer plan covering per-row forward copy length, fixed source stride, and destination stride",
+          "boundary": "i960 0x1bc90 text video row-transfer plan covering per-row forward copy length, fixed destination stride, and source stride",
           "test": "von/tools/test_recovered_text_video.py",
-          "unresolved_behavior": "actual source/destination mapped-memory ownership, caller upload setup, and hardware-visible video effects remain outside the pure row-transfer helper"
+          "unresolved_behavior": "caller upload setup identity for the observed instance, and hardware-visible video effects remain outside the pure row-transfer helper"
         },
         "milestones": {
             "c-only-i960-attract-60s": {
@@ -8851,6 +8855,33 @@
           "notes": "All three host-side object packet builders share a ten-word prefix: 0x2f plus three base words and tagged 0x16/0x15/0x14 parameter pairs. The 0x3403c and 0x346f0 paths append a second 0x15/0x14 pair and 0x3a copy-target word; 0x34de8 instead takes a 0x20 continuation. The live 0x3403c stream then shows 0x06, optional 0x05, a six-payload 0x1f endpoint request, a board response forwarded as the first 0x0a operand, and a later response forwarded as a tagged 0x15 value; 0x346f0 enters 0x10/0x12 setup, then its 0x34b00 continuation emits 0x05, a second tagged 0x2f group, 0x20, and stores the three responses at object +0x158/+0x15c/+0x160 before 0x06. It immediately repeats the tagged-field-plus-0x20 sequence and stores a second triplet at +0x164/+0x168/+0x16c before another 0x06; the rebuilt cross-cabinet runtime tracer observes response triplets 0x4124ffff/0x40aa9fff/0xc23db800 and 0xc0777ffe/0x41427ffe/0xc25b8000. The downstream consumer at 0xdf0cc selects the local +0x14/+0x18/+0x1c vector for selector 0, the first late triplet for selector 1, and the follow-up triplet for selector 2; other selectors produce zeros before common threshold/residual checks. This selector contract is implemented in recovered_geometry_object_response_vector_selector.c and exhaustively tested by test_recovered_geometry_object_response_vector_selector.py. The 0x34de8 response burst is stored into the object record after a standalone 0x20 state-tail readback following the 0x2f transform. SHARC opcode 0x2f writes transformed state-tail components at 0x09..0x0b, and opcode 0x20 returns them in order; the host placement remains path-specific. Runtime capture confirms the apparent 0x17 is the 0x15 payload, not a SHARC dispatcher command. The 0x3403c six-word payload is resolved as [0,x,0,0,0,z] from the profile direction triple at 0x142fd4 + profile*12; the y component at 0x577104 feeds the following opcode-0x0a request. This XZ-projection specialization is implemented and tested by recovered_geometry_object_profile_length_request() and test_recovered_geometry_object_packet.py. A 35-second original capture contains 4096 bounded FIFO events and the analyzer finds the exact ten-word prefix at PCs 0x34048..0x340e4; this validates framing and the first sample, but not the bulk display-list consumer or reconstructed hardware FIFO timing."
         },
         {
+          "id": "maincpu.indexed-emit-dispatch-34f10",
+          "name": "indexed_emit_dispatch_34f10",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/disassembly-annotations.md"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/build/attract-coverage/manual-01.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_indexed_emit_dispatch_34f10.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000034f10",
+              "end": "0x000034f8c"
+            }
+          ],
+          "modeling": {
+            "boundary": "match-only jump-table dispatch: derives a record index from 0x19a(r8), clamps it against 4 with default target 0x355d8, and indirect-branches through the five-entry table at 0x34f78 (0x35510/0x355d8/0x34f8c/0x3503c/0x3528c); entered by fall-through from the shared prefix",
+            "test": "von/tools/test_indexed_emit_dispatch_34f10.py",
+            "unresolved_behavior": "arm bodies, table-target selection semantics, and caller-side frame/register ownership stay out of this dispatch contract; execution attested only by the manual-01 match replay (non-canonical scratch trace)"
+          },
+          "notes": "Match-only divergence: both traces share the prefix through 0x34f0e (early exits to 0x358ac on the bounds tests); the match alone proceeds into the indexed dispatch. No static caller; entered by fall-through. All five table targets are manual-visited; arms unmodeled. No C translation yet: control-flow dispatch contract."
+        },
+        {
           "id": "maincpu.geometry-result-builder",
           "name": "geometry_result_builder",
           "modeling": {
@@ -9943,10 +9974,14 @@
             {
               "start": "0x00002cf0",
               "end": "0x00002cf8"
+            },
+            {
+              "start": "0x00002d5c",
+              "end": "0x00002d60"
             }
           ],
           "modeling": {
-            "boundary": "dual-entry link trampoline at 0x2cd0 (top entry discards the caller link and tails to the ret at 0x2ce4; mid entry at 0x2cd8 preserves the flag-dispatch bal link through g0) plus the staged sampler entry at 0x2cf0, which loads 0x2d5c into g14 and shares the sampler body whose head moves the staged link into g2 for the bx (g2) return",
+            "boundary": "dual-entry link trampoline at 0x2cd0 (top entry discards the caller link and tails to the ret at 0x2ce4; mid entry at 0x2cd8 preserves the flag-dispatch bal link through g0) plus the staged sampler entry at 0x2cf0, which loads 0x2d5c into g14 and shares the sampler body whose head moves the staged link into g2 for the bx (g2) return to the ret at 0x2d5c",
             "test": "von/tools/test_sampler_entry_thunks_2cd0.py",
             "unresolved_behavior": "top-entry (0x2cd0) and staged-entry (0x2cf0) callers, and caller-side register/stack ownership, stay out of this scaffolding contract"
           },
