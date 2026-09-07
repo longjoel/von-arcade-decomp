@@ -1,0 +1,149 @@
+-- Passive replay probe: log live input-port changes plus fighter health.
+--
+-- Replays a recorded .inp (via MAME -playback) and records, per emulated
+-- frame, any change in the raw :IN0/:IN1/:IN2 port values alongside the
+-- player/CPU health halfwords and the session/round ticks. Used to
+-- correlate button presses with damage events when reconstructing gameplay
+-- routines. Never injects input; safe under -playback.
+--
+-- Environment: VON_IH_LOG     (log file path)
+--              VON_IH_SECONDS  (default 260 emulated seconds)
+
+local SECONDS = tonumber(os.getenv("VON_IH_SECONDS") or "260")
+local TARGET_FRAMES = SECONDS * 60
+local LOG_PATH = os.getenv("VON_IH_LOG") or "vonj-input-health.log"
+
+local log_file = assert(io.open(LOG_PATH, "w"))
+
+local function log(msg)
+    log_file:write(msg .. "\n")
+    log_file:flush()
+end
+
+local frame = 0
+local space = nil
+local ports = nil
+local last_ports = nil
+local last_php = nil
+local last_chp = nil
+
+-- Optional write tap: VON_IH_WTAP_ADDR (hex), VON_IH_WTAP_COUNT (default
+-- 20000), VON_IH_WTAP_START (install at frame, default 0). Logs the
+-- CURPC behind each write so the damage applier's store instructions can
+-- be identified in the disassembly.
+local wtap_addr = tonumber(os.getenv("VON_IH_WTAP_ADDR") or "0")
+local wtap_count = tonumber(os.getenv("VON_IH_WTAP_COUNT") or "20000")
+local wtap_start = tonumber(os.getenv("VON_IH_WTAP_START") or "0")
+local wtap = nil
+local wtap_hits = 0
+
+local function wtap_poll()
+    if wtap or wtap_addr <= 0 or frame < wtap_start then
+        return
+    end
+    local ok, tap = pcall(function()
+        return space:install_write_tap(wtap_addr, wtap_addr + 3, "ihwtap",
+            function(addr, data)
+                wtap_hits = wtap_hits + 1
+                local pc = "?"
+                local pok, st = pcall(function()
+                    return manager.machine.devices[":maincpu"].state["CURPC"].value
+                end)
+                if pok and type(st) == "number" then
+                    pc = string.format("0x%x", st)
+                end
+                log(string.format("w f %d addr=0x%x data=0x%x pc=%s",
+                    frame, addr, data, pc))
+                if wtap_hits >= wtap_count and wtap then
+                    space:uninstall_write_tap(wtap)
+                    log("ih: write tap removed")
+                end
+            end)
+    end)
+    if ok then
+        wtap = tap
+        log(string.format("ih: write tap installed at 0x%x", wtap_addr))
+    end
+end
+
+local PHP_ADDR = 0x00503ca2
+local CHP_ADDR = 0x0050380a
+local FC_ADDR = 0x005039fc
+
+local function setup()
+    local cpu = manager.machine.devices[":maincpu"]
+    if not cpu then
+        return false
+    end
+    space = cpu.spaces[":program"] or cpu.spaces["program"]
+    if not space then
+        return false
+    end
+    local in0 = manager.machine.ioport.ports[":IN0"]
+    local in1 = manager.machine.ioport.ports[":IN1"]
+    local in2 = manager.machine.ioport.ports[":IN2"]
+    if not in0 or not in1 or not in2 then
+        return false
+    end
+    ports = { in0, in1, in2 }
+    log("ih: ports resolved")
+    return true
+end
+
+local function read_u16(addr)
+    local ok, v = pcall(function() return space:read_u16(addr) end)
+    if ok and type(v) == "number" then
+        return v
+    end
+    return nil
+end
+
+local function read_u32(addr)
+    local ok, v = pcall(function() return space:read_u32(addr) end)
+    if ok and type(v) == "number" then
+        return v
+    end
+    return nil
+end
+
+emu.register_periodic(function()
+    frame = frame + 1
+    if not space and frame % 60 == 1 then
+        if not setup() then
+            return
+        end
+    end
+    if not space then
+        return
+    end
+
+    wtap_poll()
+
+    local p0, p1, p2 = nil, nil, nil
+    local ok = pcall(function()
+        p0 = ports[1]:read()
+        p1 = ports[2]:read()
+        p2 = ports[3]:read()
+    end)
+    if not ok then
+        return
+    end
+
+    local php = read_u16(PHP_ADDR)
+    local chp = read_u16(CHP_ADDR)
+
+    local ports_key = string.format("%x/%x/%x", p0, p1, p2)
+    if ports_key ~= last_ports or php ~= last_php or chp ~= last_chp then
+        local fc = read_u32(FC_ADDR)
+        log(string.format("f %d in0 %x in1 %x in2 %x php %s chp %s fc %s",
+            frame, p0, p1, p2, tostring(php), tostring(chp), tostring(fc)))
+        last_ports = ports_key
+        last_php = php
+        last_chp = chp
+    end
+
+    if frame >= TARGET_FRAMES then
+        log("ih: session complete at frame " .. frame)
+        manager.machine:exit()
+    end
+end)
