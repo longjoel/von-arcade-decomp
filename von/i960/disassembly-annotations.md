@@ -6231,6 +6231,15 @@ cheat. `0x504dbc` matches the `0x75D90` jump-table outputs
 (-60/+60) are exactly the round-start posts (player `(0,0,-60)`,
 CPU `(0,0,+60)`), snapped 3 frames after each FIGHT call.
 
+Warp verified live (`von/build/force_stage.lua`, dual-cell hold plus
+synchronous rewrite taps): ord=3 loads S4 content into slot 1 (VS
+card `SAV-07-D VR.BELGDOR`, `GREEN HILLS`, `4th. MISSION`, BGM `4e`,
+FIGHT `53` at f=4430); ord=4 loads S5 (`XBV-13-t11 VR.BAL-BAS-BOW`,
+`RUINS`, `5th. MISSION`, BGM `4f`, FIGHT `54` at f=4429, re-entry
+`54` at f=7702 after the death). Prior single-cell holds failed
+because the transition reads both cells mid-frame. Clips:
+`von/build/warp-s4/warp-s4.mp4`, `von/build/warp-s5/warp-s5.mp4`.
+
 Replay-methodology notes: a write tap installed once from `setup()`
 at frame 1 never fires; installing it from the every-frame poll
 (same range, same API) yields all 26988 audio-ring writes
