@@ -42,6 +42,50 @@ local wtap_start = tonumber(os.getenv("VON_IH_WTAP_START") or "0")
 local wtap = nil
 local wtap_hits = 0
 
+-- Optional read tap: VON_IH_RTAP_ADDR/END/COUNT/START. Logs CURPC behind
+-- each read to find consumers of fields like the beam budget (+0x1d6).
+local rtap_addr = tonumber(os.getenv("VON_IH_RTAP_ADDR") or "0")
+local rtap_end = tonumber(os.getenv("VON_IH_RTAP_END") or "0")
+local rtap_count = tonumber(os.getenv("VON_IH_RTAP_COUNT") or "20000")
+local rtap_start = tonumber(os.getenv("VON_IH_RTAP_START") or "0")
+local rtap = nil
+local rtap_hits = 0
+
+local function rtap_poll()
+    if rtap or rtap_addr <= 0 or frame < rtap_start then
+        return
+    end
+    if rtap_end <= rtap_addr then
+        rtap_end = rtap_addr + 3
+    end
+    local ok, tap = pcall(function()
+        return space:install_read_tap(rtap_addr, rtap_end, "ihrtap",
+            function(addr)
+                rtap_hits = rtap_hits + 1
+                local pc = "?"
+                local pok, st = pcall(function()
+                    return manager.machine.devices[":maincpu"].state["CURPC"].value
+                end)
+                if pok and type(st) == "number" then
+                    pc = string.format("0x%x", st)
+                end
+                log(string.format("r f %d addr=0x%x pc=%s",
+                    frame, addr, pc))
+                if rtap_hits >= rtap_count and rtap then
+                    space:uninstall_read_tap(rtap)
+                    log("ih: read tap removed")
+                end
+            end)
+    end)
+    if ok and tap then
+        rtap = tap
+        log(string.format("ih: read tap installed at 0x%x-0x%x", rtap_addr, rtap_end))
+    else
+        log(string.format("ih: read tap FAILED at 0x%x-0x%x", rtap_addr, rtap_end))
+        rtap_addr = 0
+    end
+end
+
 local function wtap_poll()
     if wtap or wtap_addr <= 0 or frame < wtap_start then
         return
@@ -129,6 +173,7 @@ emu.register_periodic(function()
     end
 
     wtap_poll()
+    rtap_poll()
 
     local p0, p1, p2 = nil, nil, nil
     local ok = pcall(function()
