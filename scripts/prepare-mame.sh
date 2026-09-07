@@ -100,6 +100,18 @@ if [[ "$(git -C "$MAME_DIR" rev-parse HEAD)" != "$MAME_REF" ]]; then
     git -C "$MAME_DIR" checkout "$MAME_REF"
 fi
 
+# Reset to pristine MAME_REF content before applying the profile. Same-anchor
+# stacked patches (e.g. 0003/0039, 0006/0013, 0039/0040) apply cleanly in
+# order onto pristine files but can neither reverse-check nor re-apply once
+# stacked, so incremental patch-skipping cannot work: every build applies the
+# full profile from clean. Untracked build objects are left alone, so the
+# expensive compilation stays incremental.
+git -C "$MAME_DIR" checkout -- .
+# Remove files created by patches (currently only 0031 creates
+# src/devices/cpu/sharc/sharcfloat40.h) so stale copies never block the
+# forward application that recreates them.
+rm -f "$MAME_DIR/src/devices/cpu/sharc/sharcfloat40.h"
+
 mapfile -t PATCHES < <(python3 "$ROOT_DIR/von/tools/patchset_manifest.py" \
     "$PATCH_SET" --manifest "$PATCHSET_MANIFEST" --paths)
 [[ "${#PATCHES[@]}" -gt 0 ]] || {

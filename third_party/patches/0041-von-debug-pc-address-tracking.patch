@@ -1,0 +1,50 @@
+diff --git a/src/emu/debug/debugcpu.cpp b/src/emu/debug/debugcpu.cpp
+index 7c742fe..dc601fc 100644
+--- a/src/emu/debug/debugcpu.cpp
++++ b/src/emu/debug/debugcpu.cpp
+@@ -512,6 +512,7 @@ device_debug::device_debug(device_t &device)
+ 	, m_triggered_watchpoint(nullptr)
+ 	, m_trace(nullptr)
+ 	, m_track_pc_set()
++	, m_track_pc_addresses()
+ 	, m_track_pc(false)
+ 	, m_comment_set()
+ 	, m_comment_change(0)
+@@ -882,7 +883,7 @@ void device_debug::instruction_hook(offs_t curpc)
+ 	}
+ 
+ 	// are we tracking our recent pc visits?
+-	if (m_track_pc)
++	if (m_track_pc && m_track_pc_addresses.insert(curpc).second)
+ 	{
+ 		const u32 crc = compute_opcode_crc32(curpc);
+ 		m_track_pc_set.insert(dasm_pc_tag(curpc, crc));
+diff --git a/src/emu/debug/debugcpu.h b/src/emu/debug/debugcpu.h
+index 631d4c7..017fbcc 100644
+--- a/src/emu/debug/debugcpu.h
++++ b/src/emu/debug/debugcpu.h
+@@ -14,6 +14,7 @@
+ #pragma once
+ 
+ #include <set>
++#include <unordered_set>
+ #include <utility>
+ 
+ 
+@@ -140,7 +141,7 @@ public:
+ 	void set_track_pc(bool value);
+ 	bool track_pc_visited(offs_t pc) const;
+ 	void set_track_pc_visited(offs_t pc);
+-	void track_pc_data_clear() { m_track_pc_set.clear(); }
++	void track_pc_data_clear() { m_track_pc_set.clear(); m_track_pc_addresses.clear(); }
+ 
+ 	// memory tracking
+ 	void set_track_mem(bool value);
+@@ -274,6 +275,7 @@ private:
+ 		u32    m_crc;
+ 	};
+ 	std::set<dasm_pc_tag> m_track_pc_set;
++	std::unordered_set<offs_t> m_track_pc_addresses;
+ 	bool m_track_pc;
+ 
+ 	// comments

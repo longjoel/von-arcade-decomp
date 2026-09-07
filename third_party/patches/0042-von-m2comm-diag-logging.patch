@@ -1,0 +1,34 @@
+--- a/src/mame/sega/m2comm.cpp
++++ b/src/mame/sega/m2comm.cpp
+@@ -380,7 +380,9 @@
+ 			{
+ 				osd_printf_verbose("M2COMM: listen on %s\n", m_localhost);
+ 				uint64_t filesize; // unused
+-				osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
++				std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
++				if (filerr && m_diagnostics)
++					osd_printf_verbose("M2COMM: diag listen failure error=%s\n", filerr.message());
+ 			}
+ 
+ 			// check tx socket
+@@ -388,12 +390,19 @@
+ 			{
+ 				osd_printf_verbose("M2COMM: connect to %s\n", m_remotehost);
+ 				uint64_t filesize; // unused
+-				osd_file::open(m_remotehost, 0, m_line_tx, filesize);
++				std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
++				if (filerr && m_diagnostics)
++					osd_printf_verbose("M2COMM: diag connect failure error=%s\n", filerr.message());
+ 			}
+ 
+ 			// if both sockets are there check ring
+ 			if (m_line_rx && m_line_tx)
+ 			{
++				if (m_diagnostics && m_linktimer == 0x00e8)
++					osd_printf_verbose("M2COMM: diag sockets ready\n");
++				if (m_diagnostics && (m_linktimer == 0x0001 || m_linktimer == 0x0000))
++					osd_printf_verbose("M2COMM: diag handshake timer=%04x role=%s\n",
++						m_linktimer, isMaster ? "master" : isSlave ? "slave" : "relay");
+ 				m_zfg ^= 0x01;
+ 
+ 				// try to read one message

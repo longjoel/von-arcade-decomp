@@ -55,26 +55,13 @@ rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/scripts/" "$REMOTE_HOST:$REMOTE_CHECKOUT/scr
 rsync -a --delete -e "$RSYNC_SSH" "$ROOT_DIR/third_party/patches/" "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/patches/" || {
     printf 'error: failed to synchronize patch inputs\n' >&2; exit 1
 }
-rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/mame/sega/m2comm.cpp" \
-    "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/mame/sega/m2comm.cpp" || {
-    printf 'error: failed to synchronize communication diagnostics source\n' >&2; exit 1
-}
-rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/mame/sega/model2.cpp" \
-    "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/mame/sega/model2.cpp" || {
-    printf 'error: failed to synchronize Model 2 source\n' >&2; exit 1
-}
-rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/mame/sega/model2_v.cpp" \
-    "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/mame/sega/model2_v.cpp" || {
-    printf 'error: failed to synchronize geometry tracing source\n' >&2; exit 1
-}
-rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/emu/debug/debugcpu.h" \
-    "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/emu/debug/debugcpu.h" || {
-    printf 'error: failed to synchronize debugger header\n' >&2; exit 1
-}
-rsync -a -e "$RSYNC_SSH" "$ROOT_DIR/third_party/mame-master/src/emu/debug/debugcpu.cpp" \
-    "$REMOTE_HOST:$REMOTE_CHECKOUT/third_party/mame-master/src/emu/debug/debugcpu.cpp" || {
-    printf 'error: failed to synchronize debugger implementation\n' >&2; exit 1
-}
+# NOTE: MAME sources are intentionally NOT synchronized. The remote tree is
+# reset to pristine MAME_REF by prepare-mame.sh and the selected patch profile
+# is applied fresh, so builds are a pure function of (ref, profile). Working
+# copies of MAME sources under third_party/mame-master are build scratch only;
+# any change meant for the binary must be captured as a patch in
+# third_party/patches/ first (see 0041/0042 for the captured debugger and
+# M2COMM diagnostics that used to ride along as raw file syncs).
 
 printf 'Building MAME remotely in Docker...\n'
 ssh "${SSH_ARGS[@]}" "$REMOTE_HOST" "cd '$REMOTE_CHECKOUT' && VON_MAME_BUILD_IMAGE='$BUILD_IMAGE' JOBS='$REMOTE_JOBS' VON_MAME_PATCH_SET='${VON_MAME_PATCH_SET:-core}' ./scripts/build-mame-docker.sh" || {

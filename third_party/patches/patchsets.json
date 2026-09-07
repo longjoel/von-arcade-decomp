@@ -40,10 +40,12 @@
     "0032-von-sharc-40bit-register-seam.patch",
     "0033-von-sharc-drc-compound-abs-special-cases.patch",
     "0039-von-text-tile-control-tracing.patch",
-    "0040-von-text-row-transfer-tracing.patch"
+    "0040-von-text-row-transfer-tracing.patch",
+    "0041-von-debug-pc-address-tracking.patch",
+    "0042-von-m2comm-diag-logging.patch"
   ],
   "profiles": {
-    "core": ["0001-von-mame-support.patch", "0010-von-communication-diagnostics.patch", "0011-mame-lua-pc-coverage.patch"],
+    "core": ["0001-von-mame-support.patch", "0010-von-communication-diagnostics.patch", "0011-mame-lua-pc-coverage.patch", "0041-von-debug-pc-address-tracking.patch", "0042-von-m2comm-diag-logging.patch"],
     "link": ["core", "0034-von-sharc-runtime-diagnostics.patch"],
     "geometry": ["core", "0002-von-sharc-tracing.patch", "0007-von-geometry-object-tracing.patch", "0008-von-geometry-matrix-tracing.patch", "0009-von-geometry-polygon-tracing.patch", "0012-von-renderer-boundary-tracing.patch", "0014-von-geometry-response-tracing.patch", "0035-von-geometry-object-packet-tracing.patch", "0036-von-reconstructed-geometry-tracing.patch", "0037-von-reconstructed-geometry-parser-tracing.patch", "0038-von-reconstructed-geometry-opcode-tracing.patch"],
     "texture": ["core", "0003-von-texture-write-tracing.patch", "0004-von-texture-source-tracing.patch", "0005-von-palette-tracing.patch", "0006-von-texture-command-tracing.patch", "0013-von-first-match-texture-command-tracing.patch", "0039-von-text-tile-control-tracing.patch", "0040-von-text-row-transfer-tracing.patch"],
