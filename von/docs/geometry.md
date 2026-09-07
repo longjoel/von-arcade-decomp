@@ -65,3 +65,57 @@ fighter assembly.
 
 See [Evidence and assets plan](evidence-and-assets-plan.md) for the pack schema
 and `von-viewer` acceptance criteria.
+
+## Stage-2 arena obstacle inventory (manual-02 trace)
+
+Source: `von/build/attract-coverage/manual-02/stage2-geo.log`
+(135168 object packets, 196291 matrices, t=139.2-161.3s) and the
+`t=150.01` export `stage2-arena.glb` (110 slots, 100 meshes). Local
+coordinates equal world coordinates: placing any persistent static
+through V^-1 * P against the west-wall matrix returns its local origin
+(floor `00800bcb` -> (0,0,0), block `0080078e` -> (0,0,0)).
+
+Persistent arena statics (OBA, local box, submissions in window):
+
+- floor `00800bcb`: x/z +/-320, y -72..0, n=1267 (every frame).
+  Matches the movement walls at +/-320 exactly.
+- distant ground `0080114a`: +/-2227, n=1267.
+- backdrop `0080341b`: +/-2775, y 95..2561, n=1267.
+- wall bands N `008020b2` (z -561..-320, y 0..82),
+  S `00802937` (z 320..480), E `008022e9` (x 320..480, y 0..104),
+  W `00802ed1` (x -543..-320, y 0..136, n=687, every 2nd frame).
+- obstacle blocks, 20 tall, 34-58 render tris each:
+  `0080078e` x[-156,-124] z[164,236] n=1099;
+  `008003dd` x[-156,-124] z[-236,-164] n=993;
+  `00800972` x[124,156] z[164,236] n=1219;
+  `0080055d` x[124,156] z[-236,-164] n=993;
+  `00800126` x[-36,36] z[44,76] and `0080009d` x[-36,36] z[-76,-44]
+  (spawn pads: player spawns (0,0,-60), CPU (0,0,60));
+  `0080060e` x[204,236] z[-36,36] n=1500 (two instances: arena copy
+  plus a far-west duplicate at world (-441,128,-20)).
+- far-west set near x=-432: `008006dd` (n=1034, world y -80) plus the
+  `0080060e` duplicate. Purpose unknown.
+
+Movement overlay (`pos-track.log`, stage 2 = game frames >= 3180,
+positions are float bit patterns at 0x00503ad8 / 0x005040d8): the west
+and north-east blocks are never entered, not even with a 16-unit
+margin, so their collision footprint is the full render box plus
+fighter radius -- not a simplified shape. The east-south block
+`0080055d` and the `0080060e` arena copy are walked straight through
+at ground level by the CPU (f=3575-3616 and f=4333-4360, no health
+change either side), so they are either destructible or CPU-uncollided.
+Spawn pads are entered from match start as expected.
+
+Tall transient family `00943088`-`00945ed1` (~24 OBAs, 276 verts /
+120 tris each, local y-span shrinking 157.8 -> ~131 across the
+sequence): one OBA per video frame for ~20 frames, played twice
+(t=144.86-145.16 at world (61.5,23.5,137.0), t=156.33-156.63 at
+world (76.6,54.0,171.2); placement stable within each burst). TPA
+stride is 0x218 (contiguous descriptor array). Not persistent level
+geometry; behaves as a transient large effect or collapse sequence.
+Identity and trigger are open -- world placements do not coincide
+with the walked-through blocks, so it is not their break animation.
+
+Open: collision-code site in i960 still unfound; family trigger needs
+input-to-trace time mapping across runs; B1/B2 blocks are unvisited
+(solid vs destroyed-unvisited undecided).
