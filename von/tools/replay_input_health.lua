@@ -175,6 +175,20 @@ emu.register_periodic(function()
     wtap_poll()
     rtap_poll()
 
+    -- Optional uniform position sampling: VON_IH_POS=1 logs both shadows'
+    -- float xyz (+0x8/+0xc/+0x10) every frame for velocity profiling.
+    if os.getenv("VON_IH_POS") == "1" then
+        local px = read_u32(0x00503ad8)
+        local py = read_u32(0x00503adc)
+        local pz = read_u32(0x00503ae0)
+        local cx = read_u32(0x005040d8)
+        local cy = read_u32(0x005040dc)
+        local cz = read_u32(0x005040e0)
+        log(string.format("p f %d px %s py %s pz %s cx %s cy %s cz %s",
+            frame, tostring(px), tostring(py), tostring(pz),
+            tostring(cx), tostring(cy), tostring(cz)))
+    end
+
     local p0, p1, p2 = nil, nil, nil
     local ok = pcall(function()
         p0 = ports[1]:read()
