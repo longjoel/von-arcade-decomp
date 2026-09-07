@@ -4402,7 +4402,9 @@ The entry contract is now more precise than the earlier caller note implied:
 the routine receives the object pointer in `g0`, copies it to `r5`, then loads
 `0x74(r5)` into `r4` and calls `0xf5058`; that helper advances the PRNG at
 `0x5785d0` and returns the new value in `g0`, while `r4` remains the
-related-object pointer. The dispatcher reads the object state from `0x64(r5)`,
+related-object pointer. The `0x74` field is one 32-bit i960 pointer word; the
+host adapter now widens that word explicitly instead of using host pointer-size
+dereference semantics. The dispatcher reads the object state from `0x64(r5)`,
 while the common tail reads the related tag/state at `0x172(r4)`/`0x64(r4)`
 and the current object state at `0x64(r5)` before applying the `0x504d98`
 remap; the PRNG result in `g0` is consumed by the state arms as caller_state.
@@ -6255,9 +6257,63 @@ the stage globals produced by the selector (`0x503a80`, `0x504dbc`,
 `0x503a74`, `0x503a6c`, and `0x503a70`), normalizes the four-word and two-word
 threshold groups at `0x509b20`/`0x509b30`, maintains active/previous snapshots
 at `0x509b40`/`0x509b60`, and then initializes indexed stage tables. The
-threshold clamp and snapshot prefix are documented in `boot-path.md`; no C
-translation is promoted yet because the live register-to-field mapping and the
-mode-specific table payload remain unresolved.
+threshold clamp and snapshot prefix are documented in `boot-path.md` and are
+modeled by `recovered_stage_post_setup_86240.c`, including the strict equality
+boundaries and the zero-transition/epoch snapshot restores. That model also
+captures the gated mode-1/2/3/default preset values at `0x86534`; only the
+intervening working-table clears and their exact global-field ownership remain
+outside the C model.
+
+The clear interval is now independently labeled as `stage_working_table_clear`
+at `0x86438`, and the four mode arms are labeled `stage_mode_seed_1` through
+`stage_mode_seed_default` at `0x86570`, `0x8658c`, `0x865a8`, and `0x865c8`.
+These labels preserve the distinction between proven packed writes and the
+still-unresolved semantic ownership of the destination tables.
+
+The adjacent helper at `0x86630–0x866ac` is now modeled as
+`recovered_stage_bucket_86630.c`. It preserves the indirect-return control
+flow’s observable result: `(value - 1) mod 6` residues `1..3` return `4`,
+residue `4` returns `3`, and residues `0/5` index the `0x842a0` byte table by
+the corresponding ceiling bucket. The extracted 48-byte ROM table is now
+embedded by the wrapper and checked against `von/build/disasm/vonj-maincpu.bin`;
+negative-counter behavior and indirect caller/return scheduling remain open.
+
+The neighboring initializer at `0x866c0–0x86954` is now connected to its boot
+caller at `0x189f8` as `stage_record_tables_initialize`. The listing proves
+that it builds packed records at `0x5050a0` and `0x5074a0`, then clears the
+same stage working tables and threshold/snapshot globals used by `0x86240`.
+The analogous fixed clear/reset pattern is compared against the existing
+`0x86240` contract. The first table-builder phase through `0x8680c` is now
+represented by `recovered_stage_record_tables_866c0.c`, preserving eight
+`0x90`-byte and eight `0x88`-byte sparse records with untouched holes; the
+packed record field meanings remain an open target.
+The reset tail is now split out as `stage_record_tables_reset_tail` at
+`0x86810`, with the repeated clear loop at `0x86828` and snapshot-zero block at
+`0x868f0`; these labels provide the next bounded target without assigning
+semantics to the packed record fields.
+The clear/reset stores are now promoted as
+`recovered_stage_record_reset_86810.c`; only the gate at `0x86810` and the
+caller-dependent continuation remain outside that contract.
+
+The post-setup tail at `0x76030–0x761a8` is now modeled by
+`recovered_stage_profile_setup_76030.c`. It publishes the fixed completion
+and latch stores, reads a packed 14-byte record from the related object's
+state-selected row in `0x72370`, and—when `0x5039f4 != 4`—selects a second
+`0x72370` row using one of the global selectors `0x503a98`/`0x503a9c`,
+chosen by the current object's `+0x68` flag.
+The second load overwrites the first result in `0x504e34/0x504e3c/0x504e40`,
+as the listing does; the packed field meanings and table ownership remain
+unresolved. The pure byte-packed contract is tested by
+`von/tools/test_recovered_stage_profile_setup_76030.py`.
+
+The next routine, `0x761b0`, is now labeled `geometry_object_threshold_query`.
+Its bounded prefix consumes the selector clamp published by `0x75d90`
+(`0x504dc0`), maps the inclusive ranges through the four observed float
+constants, and emits command selector `29`. The later object/FIFO query and
+residual comparison remain outside `recovered_object_threshold_constant_761b0.c`;
+that C file intentionally preserves only the proven constant-selection
+contract. Its two live call sites at `0x7669c` and `0x766dc` are labeled to
+show the first/second object flow and the resulting store at `0x504dcc`.
 
 Warp verified live (`von/build/force_stage.lua`, dual-cell hold plus
 synchronous rewrite taps): ord=3 loads S4 content into slot 1 (VS
@@ -6301,8 +6357,10 @@ content (the warp played S4 ballistics off row 0). Row word `+0x0c`
 behind `word[0x64(g0)]` stays open. Modeled in
 `von/i960/recovered_stage_row_copy_75fe4.c` with the eight-row
 table, tested by
-`von/tools/test_recovered_stage_row_copy_75fe4.py`. Open: the
-nested call at `0x76030` and everything after it.
+`von/tools/test_recovered_stage_row_copy_75fe4.py`. The nested call and
+packed profile publication after `0x76030` are modeled separately in
+`recovered_stage_profile_setup_76030.c`; the profile record's natural field
+meanings remain open.
 
 Replay-methodology notes: a write tap installed once from `setup()`
 at frame 1 never fires; installing it from the every-frame poll
@@ -6311,6 +6369,24 @@ at frame 1 never fires; installing it from the every-frame poll
 used) NVRAM directory desyncs the whole bout (spawn frames
 8200/18654/24661 vs faithful 10573/16306/18880/21714) — replays
 that must match the live session need a fresh NVRAM dir.
+
+### Damage applier hunt (static, `0xe4c54` DEMOTED)
+
+`0xe4c54: stos g4,0x503ca2` is not the applier: `g4` is loaded
+verbatim from `0x503ca8` five instructions up (`e4c3c`), so the
+block copies working health to the display cell (with `0x5042a8`
+to `0x5042a2` and mirrors to `0x503ca0`/`0x5042a0`), inside a
+round-transition routine (calls `0x2a4e0`, `0x1e980`). No
+absolute-address computed stores to `0x503ca8`/`0x5042a8` exist
+anywhere, and the `0x27410`/`0x274e0` blocks promote bout-struct
+fields (`0x108`/`0x1d0`/`0x1d2`/`0x1d8` of `r4`) to `0x503804`–
+`0x50381c`: the true applier writes struct-indirect and needs a
+Ghidra backward slice or a debugger-PC capture, not a census.
+Method note: Lua write taps do not fire on work RAM (only MMIO);
+debugger watchpoints do (`Stopped ... PC=00027748` for the init
+write) but action context has no device symbols, so PC logging
+needs another route. BGFX assets live in `/usr/lib/mame/bgfx`
+(`~/.mame/bgfx` is an empty stub).
 
 ### Variant-B stage store: bus `0x02bed700` (`KNOWN` contents/role)
 
