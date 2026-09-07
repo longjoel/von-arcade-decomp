@@ -1138,6 +1138,22 @@ the low-byte check succeeds. On failure it calls `0x00002700`, which clears
 byte fields at `0x00502480`, `0x005023f0`, `0x00502481`, and `0x00502482`,
 clears the halfword at `0x00502484`, invokes the input initializer at
 `0x00002bb0`, and then initializes the 16-byte host queue at `0x00018488`.
+The success arm (`bal 0x000026e8`) is a single-use link-laundering thunk —
+same shape as the shared `0x27d8` trampoline but with this dispatch as its
+only caller — rejoining the `[0x5023e0]` reload with no observable effect.
+The routing plan is modeled in `recovered_io.c` as the pure
+`recovered_io_self_test_dispatch_plan` (the integrated image already
+performs the exact service-call sequence), checked by
+`von/tools/test_recovered_io_self_test_dispatch.py`. The 60-second
+attract PC log visits `0x2768`, `0x2774`, and `0x277c`, attesting the
+failure arm on that path. Both arms share the exit tail at `0x277c`
+(`ld [0x5023e0],g0`, `ret` at `0x2784`), now inside the dispatch ledger
+range. Immediately past it, the continuation-thunk cluster at
+`0x2790`/`0x27b0`/`0x27d0` repeats the link-laundering shape with
+continuations `0x27a4`/`0x27c4`/`0x27e4`; the word `0x00012790` appears
+at table entry `0x132ec`, but sibling entries address data records so even
+that role is unproven — the cluster is modeled as ABI scaffolding with all
+three callers unattested, not translated.
 `recovered_io_failure_reset()` is the pure five-field translation of the
 deterministic stores. The input initializer's 60 index values and 1,170-byte
 port-write plan are checked by `von/tools/test_recovered_io.py`; its mapped

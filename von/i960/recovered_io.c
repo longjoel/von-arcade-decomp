@@ -303,3 +303,26 @@ u32 recovered_io_self_test(void)
     *IO_FAILURE_STATE = failed;
     return failed;
 }
+
+/* Routing plan for the failure dispatch at 0x00002768-0x0000277c. The
+ * nonzero arm calls the 0x2700 failure service (reset stores plus the
+ * 0x2bb0 input initialization) and then the 0x18488 queue
+ * initialization; the zero arm takes the single-use 0x26e8 link tail,
+ * which launders the bal return through g0, clears g14, and rejoins
+ * the reload with no observable effect. Both arms reload the latched
+ * failure state before returning it. The plan stays pure (no fixed
+ * service calls) so the host test can vector it; the integrated image
+ * already performs this exact call sequence. */
+struct recovered_io_dispatch_plan {
+    u32 calls_failure_service;
+    u32 calls_queue_initialize;
+    u32 result;
+};
+
+void recovered_io_self_test_dispatch_plan(u32 failed, u32 latched,
+                                          struct recovered_io_dispatch_plan *plan)
+{
+    plan->calls_failure_service = failed != 0U ? 1U : 0U;
+    plan->calls_queue_initialize = failed != 0U ? 1U : 0U;
+    plan->result = latched;
+}

@@ -1992,22 +1992,62 @@
           "id": "maincpu.io-self-test-failure-dispatch",
           "name": "io_self_test_failure_dispatch",
           "classification": "code",
-          "stage": "planned",
+          "stage": "modeled",
           "sources": [
+            "von/i960/recovered_io.c",
             "von/i960/reconstructed_main.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
-            "von/i960/boot-path.md"
+            "von/i960/boot-path.md",
+            "von/tools/test_recovered_io_self_test_dispatch.py"
           ],
           "ranges": [
             {
               "start": "0x00002768",
-              "end": "0x0000277c"
+              "end": "0x00002788"
             }
           ],
-          "symbol": "i960_reconstructed_main",
-          "notes": "Failure selects the state-reset, recovered input-initialization, and queue-initialization path; success returns through the 0x26e8 tail."
+          "symbol": "recovered_io_self_test_dispatch_plan",
+          "modeling": {
+            "boundary": "i960 I/O self-test failure dispatch: nonzero latched result runs the 0x2700 failure service and the 0x18488 queue initialization, then both arms reload the latched failure state into g0 and return",
+            "test": "von/tools/test_recovered_io_self_test_dispatch.py",
+            "unresolved_behavior": "on-target sequencing against the integrated image and the 0x26e8 link-tail timing remain for the integration stage"
+          },
+          "notes": "bne on the latched result selects the failure arm (call 0x2700, bal 0x18488); the success arm takes bal 0x26e8, a single-use link-laundering thunk (one caller only, unlike the shared 0x27d8 trampoline) that rejoins the reload with no observable effect. The shared exit tail at 0x277c reloads [0x5023e0] into g0 and returns at 0x2784, now inside this range. The 60-second attract PC log visits 0x2768, 0x2774, and 0x277c, attesting the failure arm.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00002768"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.continuation-thunk-cluster-2790",
+          "name": "continuation_thunk_cluster_2790",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/disassembly-annotations.md"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_continuation_thunk_cluster_2790.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00002790",
+              "end": "0x000027d8"
+            }
+          ],
+          "modeling": {
+            "boundary": "three i960 continuation thunks: 0x2790 loads 0x27a4 into g14, moves it through g0, clears g14, and branches indirect to the ret at 0x27a4; 0x27b0 repeats the shape for the ret at 0x27c4; 0x27d0 loads 0x27e4 into g14 and falls through into the shared 0x27d8 trampoline body",
+            "test": "von/tools/test_continuation_thunk_cluster_2790.py",
+            "unresolved_behavior": "the address 0x2790 appears as a word at table entry 0x132ec, but every sibling entry addresses a 0x12xxxx data record, so invocation through the table is unproven (SPECULATIVE caller, reader unidentified); 0x27b0 and 0x27d0 have no static referrer and no attract-PC visits, and caller-side register/stack ownership stays out of this scaffolding contract"
+          },
+          "notes": "Adjacent single-shot continuation thunks reusing the 0x26e8/0x27d8 link-laundering shape. The word 0x00012790 appears at table entry 0x132ec, but all sibling entries address 0x12xxxx data records, so a call-target role is unproven (SPECULATIVE). 0x27b0/0x27d0 are unattested (no bal/call/branch target, no address-taken load, no attract visits) and stay modeled as scaffolding until a caller is identified. No C translation: control-flow scaffolding like the shared trampoline."
         },
         {
           "id": "maincpu.io-input-initializer",
@@ -2174,7 +2214,34 @@
             "test": "von/tools/test_recovered_io.py",
             "unresolved_behavior": "MMIO execution and controller timing remain outside the pure upload-plan model"
           },
-          "notes": "Pure 0x2830 controller upload schedule: copies 21 fixed bytes to the controller port and invokes the status wait per byte. MMIO execution/timing remains outside the model."
+          "notes": "Pure 0x2830 controller upload schedule: copies 22 fixed bytes (r4 runs 21 down to -1) to the controller port and invokes the status wait per byte. MMIO execution/timing remains outside the model."
+        },
+        {
+          "id": "maincpu.controller-upload-table-2830",
+          "name": "controller_upload_table_2830",
+          "classification": "data",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/disassembly-annotations.md"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/build/disasm/vonj-maincpu.bin",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_controller_upload_table_2830.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00002830",
+              "end": "0x00002846"
+            }
+          ],
+          "modeling": {
+            "boundary": "22-byte controller upload table consumed by the 0x2850 loop: 11 11 51 d1 71 f1 51 d1 51 d1 71 f1 71 f1 51 d1 51 d1 51 d1 51 d1, with the loop index r4 running 21 down to -1 and a per-byte 0x27d8 status wait",
+            "test": "von/tools/test_controller_upload_table_2830.py",
+            "unresolved_behavior": "MMIO execution and controller timing of the consuming loop stay outside this data model, as do the unread zero bytes at 0x2846-0x284f"
+          },
+          "notes": "Fixed source table for the modeled 0x2850 uploader (sole static consumer: lda 0x2830,r5). Distinct from the 21-byte io_setup_first sequence, which diverges at byte 13. Range covers exactly the 22 consumed bytes; the 0x2844 word's high half and following zeros are never read."
         },
         {
           "id": "maincpu.io-controller-indexed-upload-2990",

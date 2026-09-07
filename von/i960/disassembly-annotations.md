@@ -5127,6 +5127,37 @@ uses this trampoline throughout the text/texture setup loops, which accounts
 for its 13 observed attract-mode call edges. It is tracked as ABI scaffolding
 in the reconstruction ledger rather than translated into misleading C logic.
 
+### Continuation-Thunk Cluster: `0x00002790`
+
+The three entries at `0x2790`, `0x27b0`, and `0x27d0` repeat the single-use
+link-laundering shape: load the continuation address into `g14`, move it
+through `g0`, clear `g14`, and branch indirect. The first two carry private
+bodies returning at `0x27a4` and `0x27c4`; the third only stages `0x27e4` in
+`g14` and falls through into the shared `0x27d8` trampoline body above. The
+word `0x00012790` appears at table entry `0x132ec` beside count `1`, but every
+sibling entry addresses a `0x12xxxx` data record, so invocation through the
+table is unproven and the caller stays SPECULATIVE with the reader
+unidentified. `0x27b0`/`0x27d0` have no static
+branch, call, or address-taken reference and no attract-PC visits. The cluster
+is tracked as ABI scaffolding in the reconstruction ledger with no C
+translation; the listing contract is checked by
+`von/tools/test_continuation_thunk_cluster_2790.py`, which fails if a static
+caller is ever discovered so the attestation can be updated.
+
+### Controller Upload Table: `0x00002830`
+
+The 22 bytes at `0x2830-0x2845` are the fixed source table for the modeled
+`0x2850` uploader, its sole static consumer (`lda 0x2830,r5`): the loop
+counts `r4` from `21` down to `-1`, storing one byte per iteration to the
+controller port at `0x1c00000` with a `bal 0x27d8` status wait each time, so
+22 bytes are copied, not 21. The byte vector is `11 11 51 d1 71 f1 51 d1 51
+d1 71 f1 71 f1 51 d1 51 d1 51 d1 51 d1` — distinct from the 21-byte
+`io_setup_first` sequence, which diverges at byte 13. The `0x2844` word's
+high half and the zeros at `0x2846-0x284f` are never read. The table is
+tracked as a data unit in the reconstruction ledger and checked by
+`von/tools/test_controller_upload_table_2830.py` against the listing words,
+the image bytes, and the consumer loop shape.
+
 ### Geometry Projection Packet Core: `0x0006f6f0`
 
 The sibling geometry helper at `0x6f6f0` repeats the 0..1023 float-coordinate
