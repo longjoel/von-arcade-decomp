@@ -33,11 +33,15 @@
  *   12 frames, same as liftoff). Tap hops last 28 frames peaking 6.0.
  * - Round-start posts are (0,0,-60) player / (0,0,+60) CPU; arena
  *   floor sits at y ~= 0.0 on every stage; stages are single-round.
- * - The jump button is still open: the input map exposes no jump
- *   field, and single-stick flicks (L-only 4%, R-only 7%, R+L 12%)
- *   do not reliably lift. Every ascent follows an L-stick flick
- *   (15 of 16, mostly IN1 0x80) plus an R-stick flick 2-9 frames
- *   before liftoff, but the causal edge is unconfirmed.
+ * - Jump trigger (live-controller confirmed): the input map exposes
+ *   no jump field; jump is the outward twin-stick flick, left stick
+ *   X- (IN1 0x80) plus right stick X+ (IN2 0x40) together. Replay
+ *   corroboration: 15 of 16 ascents follow that chord within 25
+ *   frames, while single-side flicks almost never lift (L-only 4%,
+ *   R-only 7%, any-pair 12%). In live combat only 17 of 36 grounded
+ *   chords (47%) lift within 30 frames, so the chord is further
+ *   gated by combat state (attack recovery and cooldowns); isolated
+ *   testing lifts every time.
  */
 
 typedef unsigned int u32;
