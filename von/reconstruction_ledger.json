@@ -13975,6 +13975,22 @@
           "notes": "ROM rows read live (probe_rom_rows.lua); whole-row matches against spawn dumps pin S3 to row 4 (both attempts), S4 to row 2, warped S4 to row 0. Continues reuse the row, so the S3 0x20/0x1c split lives outside this copy. Word +0x0c varies per row and is not the plain stage ordinal."
         },
         {
+          "id": "maincpu.stage-postcall-76030",
+          "name": "stage_postcall_76030",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_stage_postcall_76030.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_stage_postcall_76030.py", "von/build/romrows/t.log"],
+          "ranges": [{"start": "0x00076030", "end": "0x000761a8"}],
+          "symbol": "stage_postcall_tail",
+          "modeling": {
+            "boundary": "Models the 0x76030 post-call setup tail: 0x504e1c = 1, g14/r4 fan-out to 0x504e42/44/20/24/28/2c/4c/50/9b8c/90/94/98, 0x504e48 = 6, the 0x72400 50-byte row copy (12 words + half) to 0x505060/70/80/90 keyed by [0x5770f0], and the 0x72370 14-byte entry reads to 0x504e34/38/3c/40 with the [0x5039f4] != 4 second-read overwrite.",
+            "test": "von/tools/test_recovered_stage_postcall_76030.py",
+            "unresolved_behavior": "The nested call at 0x76030 (g14/r4 provenance), the 0x72400 index-to-stage mapping behind [0x5770f0], the r5-chain keys for both 0x72370 reads, per-word row/entry semantics, and everything after the 0x761a8 ret remain outside this tail contract."
+          },
+          "notes": "ROM goldens read live (probe_rom_rows.lua): S3 (both attempts) pins 0x72400 row 2, S4 pins row 3; 0x72370 entries pin S3 attempt 1 to entry 4, S3 attempt 3 to entry 6, S4 to entry 3. Continues re-pick the 0x72370 entry while reusing the 0x72400 row."
+        },
+        {
           "id": "maincpu.status-record-init-3ecd0",
           "name": "status_record_init_3ecd0",
           "classification": "code",
