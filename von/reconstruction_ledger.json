@@ -6452,9 +6452,9 @@
           "modeling": {
             "boundary": "Models the static shared dispatcher boundary: the object state at 0x64 selects one of ten state arms within 0x79050–0x795c4, with the independently tested arm models providing the direct transition decisions before the common tail remap; observed PC coverage is reported separately.",
             "test": "von/tools/test_analyze_object_state_coverage.py",
-            "unresolved_behavior": "The live object and related-pointer loads, 0xf5058 helper behavior, global/MMIO reads and writes, indirect dispatch execution, common-tail remap integration, and input-driven runtime correlation are not modeled by this static boundary."
+            "unresolved_behavior": "The pointer-accurate C adapter now models the object+0x74 related-pointer load and 0xf5058 PRNG result; the capture-derived wrapper still uses a fixed attract object, while live global/MMIO effects, indirect dispatch execution, common-tail remap integration, and input-driven runtime correlation remain runtime-validation targets."
           },
-          "notes": "Static boundary for the ten-state dispatch and state arms before the common return tail. It is called by 11 observed attract callers with 15 direct-call edges and updates global transition state at 0x504d98. The input-free 60-second PC log reaches state-table arms 0, 5, 8, and 9; the other arms remain unvisited in that scenario, but all ten arms now have separate tested pure models. Static writes are limited to direct transitions 1, 2, 7, 8, and 9; only the common tail can remap these to 10, 11, or 12 for object tag/state/caller (31, 3, 6). The entry receives the object pointer in g0, preserves it in r5, and obtains the related pointer in r4 from 0xf5058 using object+0x74. A bounded i960 diagnostic now samples this pointer handoff, object state, related tag, and emitted transition; input-driven runtime correlation remains separate.",
+          "notes": "Static boundary for the ten-state dispatch and state arms before the common return tail. It is called by 11 observed attract callers with 15 direct-call edges and updates global transition state at 0x504d98. The input-free 60-second PC log reaches state-table arms 0, 5, 8, and 9; the other arms remain unvisited in that scenario, but all ten arms now have separate tested pure models. Static writes are limited to direct transitions 1, 2, 7, 8, and 9; only the common tail can remap these to 10, 11, or 12 for object tag/state/caller (31, 3, 6). The entry receives the object pointer in g0, preserves it in r5, loads object+0x74 into r4, and calls 0xf5058; that helper advances 0x5785d0 and returns caller_state in g0. A bounded i960 diagnostic now samples the object pointer, PRNG-derived caller state, object state, related tag, and emitted transition; input-driven runtime correlation remains separate.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -6488,7 +6488,7 @@
             "test": "von/tools/test_secondary_object_state_dispatch.py",
             "unresolved_behavior": "The object/related-pointer handoff, floating comparison polarity, live timing and mode inputs, global transition publication, indirect arm execution, and input-driven pointer correlation remain runtime-validation targets."
           },
-          "notes": "Separate ten-entry object-state dispatcher. It preserves the object in r4, derives the related pointer through 0x74 and 0xf5058 into r5, dispatches on object state through 0x79d8c, and emits transitions 13, 14, or 15 from timing/mode/tag predicates. States 1-7 are instruction-locked by the static oracle: state 1 uses 0x40590000/0x4062c000 timing bands and tag/caller exits; state 2 uses 0x4062c000/0x40790000 timing bands and mode exits; state 3 gates caller 2/3 and related states 6/3; state 4 uses 0x40590000/0x40690000 and absolute caller-state selection; state 5 writes 13/14/15 to 0x504d98; state 6 uses related-state/0x504e4c gates and the 0x40568000..0x405b8000 window; state 7 uses related-tag/state/0x504d9c gates. Terminal state 8 writes 13, state 9 returns, and shared exits write 15 or 13. Its floating comparison polarity and pointer plumbing remain runtime-validation targets.",
+          "notes": "Separate ten-entry object-state dispatcher. It preserves the object in r4, derives the related pointer through 0x74 into r5, dispatches on object state through 0x79d8c, and emits transitions 13, 14, or 15 from timing/mode/tag predicates. States 1-7 are instruction-locked by the static oracle: state 1 uses 0x40590000/0x4062c000 timing bands and tag/caller exits; state 2 uses 0x4062c000/0x40790000 timing bands and mode exits; state 3 gates caller 2/3 and related states 6/3; state 4 uses 0x40590000/0x40690000 and absolute caller-state selection; state 5 writes 13/14/15 to 0x504d98; state 6 uses related-state/0x504e4c gates and the 0x40568000..0x405b8000 window; state 7 uses related-tag/state/0x504d9c gates. Terminal state 8 writes 13, state 9 returns, and shared exits write 15 or 13. Its floating comparison polarity and live pointer/global provenance remain runtime-validation targets.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -13920,6 +13920,22 @@
             "unresolved_behavior": "The caller’s table lookup, callback invocation, progress storage, MMIO effects, and service-side behavior remain outside this dispatch decision model."
           },
           "notes": "After caller-side progress&31 table lookup, original code resets progress to 1 when callback is null, or when service mode is 2 and callback is 0xe3ab0; otherwise it invokes the callback. Callback/MMIO effects are excluded."
+        },
+        {
+          "id": "maincpu.stage-selector-75d90",
+          "name": "stage_selector_75d90",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_stage_selector_75d90.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_stage_selector_75d90.py", "von/build/stage5-fleet/stage-trace.log"],
+          "ranges": [{"start": "0x00075d90", "end": "0x00075fe4"}],
+          "symbol": "stage_selector_stamp",
+          "modeling": {
+            "boundary": "Models the 0x75d90 selector core: mode byte to g7 (1/2/3 to 8/30/2 else 4), g5-plus-ordinal index with the 0x5039f4 gate and 0x503a6c increment, seven-arm jump table to g6 (1, 2/3, 8, 32, 64, 64, 99), takeover-vs-divisor stamp to 0x504dbc with min(dbc+0x50,300) to 0x504dc0, g14/r4 passthrough stores, and the 160.0f/1/5 constant stores.",
+            "test": "von/tools/test_recovered_stage_selector_75d90.py",
+            "unresolved_behavior": "The row-copy tail from 0x75fe4 (72-byte rows at 0x72050), the nested call at 0x76030, divisor-word provenance at 9*g6*g7, the g0 bout-struct sub-checks, and MMIO mode-byte ownership remain outside this selector-core contract."
+          },
+          "notes": "Operand order pinned by two anchors: the r4 = 0 - 1 sentinel fixates arithmetic, and the 0x504dc0 clamp (112/108/208 in spawn dumps, never 300 except S5) fixates compare-flags-plus-bge; together they prove the jump table is live (g6 1/2/3/8/32/64/64/99) rather than the always-99 misreading. Takeover (signed a80 > b80 or nonzero 0x503a74) explains why single-cell ordinal forces failed."
         },
         {
           "id": "maincpu.status-record-init-3ecd0",

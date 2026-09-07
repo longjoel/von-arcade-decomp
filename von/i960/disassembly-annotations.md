@@ -1325,9 +1325,11 @@ from the MMIO-addressed state wrapper so deterministic vectors can be tested.
 The leaf at `0x00073508` sign-extends its low 16-bit argument and returns one
 of ten bands. Nonnegative boundaries are `0x038d`, `0x1554`, `0x3fff`, and
 `0x5fff`; negative boundaries are `-0x6000`, `-0x4000`, `-0x1555`, and
-`-0x038e`. Observed callers immediately use the result in halfword or word
-lookup tables, supporting the classifier interpretation without assigning a
-more specific gameplay name yet.
+`-0x038e`. The result is immediately used as a table index by the callers at
+`0x73e48`, `0x74550`, `0x7521c`, `0x75348`, `0x75360`, `0x76634`, `0x76688`,
+`0x76c9c`, `0x76d40`, and `0x76f9c`, tying the leaf to both match-profile and
+status-update paths. The C wrapper preserves the original low-halfword ABI;
+the full-width subtraction is intentionally not classified as a 32-bit value.
 
 The cluster at `0x0002a458-0x0002a574` is the producer side of a 64-byte
 host-to-SCSP command ring. Read and write indices live at `0x0051aa70/74`,
@@ -4392,15 +4394,19 @@ following state helper at `0x796f0`. The 60-second attract worklist records 11
 distinct callers and 15 direct-call edges. This establishes it as a central
 candidate for scheduler/object-state closure. The arm semantics are now
 isolated and tested; the remaining work is caller-side integration: correlate
-the `g0` object pointer and the `0x74`-derived related pointer with
-input-driven progress traces before enabling the dispatcher in startup.
+the `g0` object pointer and the `0x74`-loaded related pointer with
+input-driven progress traces while preserving the PRNG-derived `g0` result
+used as caller_state.
 
 The entry contract is now more precise than the earlier caller note implied:
 the routine receives the object pointer in `g0`, copies it to `r5`, then loads
-`0x74(r5)` and calls `0xf5058`; that helper returns the related pointer in
-`r4`. The dispatcher reads the object state from `0x64(r5)`, while the common
-tail reads the related tag at `0x172(r4)` and the caller state at `0x64(r5)`
-before applying the `0x504d98` remap. A bounded i960 diagnostic now samples
+`0x74(r5)` into `r4` and calls `0xf5058`; that helper advances the PRNG at
+`0x5785d0` and returns the new value in `g0`, while `r4` remains the
+related-object pointer. The dispatcher reads the object state from `0x64(r5)`,
+while the common tail reads the related tag/state at `0x172(r4)`/`0x64(r4)`
+and the current object state at `0x64(r5)` before applying the `0x504d98`
+remap; the PRNG result in `g0` is consumed by the state arms as caller_state.
+A bounded i960 diagnostic now samples
 these exact points, including the input pointer, both derived pointers,
 object state, related tag, and emitted transition, so the next input-driven
 capture can test the integration without guessing from the indirect jump
@@ -6239,6 +6245,28 @@ FIGHT `53` at f=4430); ord=4 loads S5 (`XBV-13-t11 VR.BAL-BAS-BOW`,
 `54` at f=7702 after the death). Prior single-cell holds failed
 because the transition reads both cells mid-frame. Clips:
 `von/build/warp-s4/warp-s4.mp4`, `von/build/warp-s5/warp-s5.mp4`.
+
+### Stage selector routine: `0x00075d90` (`KNOWN`, modeled to `0x75fe4`)
+
+Caller `0x27664` (`mov r4,g0; call 0x75d90`, g0 = bout struct).
+Operand order is pinned by two anchors: the `subo 1,0,r4` sentinel
+lands `0xffffffff` in `0x504d8c/90` (arithmetic is src2-src1), and
+`0x504dc0` holds 112/108/208 in the spawn dumps (compare flags are
+src1-src2, `bge` skips the 300 overwrite), so `dc0 = min(dbc+0x50,
+300)` with S5 the only clamping stage. Together they prove the
+`0x75e18` jump table is live (`g6` 1/2/3/8/32/64/64/99), not the
+always-99 misreading the `cmpobl` first suggested. `g7` follows the
+mode byte `@0x1d00021` (1/2/3 to 8/30/2 else 4; live golden 2,
+sampled by `von/build/probe_75d90.lua`). Takeover (signed
+`[0x503a80] > [0x509b80]`, or nonzero `[0x503a74]`) stamps the raw
+`g6*g7` product (never observed live); otherwise the
+divisor word at absolute `9*g6*g7` is doubled and divided signed by
+20 (S3 continues re-roll it 320 to 280, hence `0x20` vs `0x1c`).
+Entry registers read back as `g14` = 0 / `r4` = 0 in every dump.
+Modeled in `von/i960/recovered_stage_selector_75d90.c`, tested by
+`von/tools/test_recovered_stage_selector_75d90.py`. Open tail from
+`0x75fe4`: 72-byte rows at `0x72050` indexed by `word[0x64(g0)]`
+copied to `0x504dd4+`, plus the nested call at `0x76030`.
 
 Replay-methodology notes: a write tap installed once from `setup()`
 at frame 1 never fires; installing it from the every-frame poll
