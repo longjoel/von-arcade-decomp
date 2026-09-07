@@ -26,12 +26,17 @@ local ports = nil
 local last_ports = nil
 local last_php = nil
 local last_chp = nil
+local last_pb = nil
+local last_cb = nil
+local last_sa = nil
+local last_sh = nil
 
 -- Optional write tap: VON_IH_WTAP_ADDR (hex), VON_IH_WTAP_COUNT (default
 -- 20000), VON_IH_WTAP_START (install at frame, default 0). Logs the
 -- CURPC behind each write so the damage applier's store instructions can
 -- be identified in the disassembly.
 local wtap_addr = tonumber(os.getenv("VON_IH_WTAP_ADDR") or "0")
+local wtap_end = tonumber(os.getenv("VON_IH_WTAP_END") or "0")
 local wtap_count = tonumber(os.getenv("VON_IH_WTAP_COUNT") or "20000")
 local wtap_start = tonumber(os.getenv("VON_IH_WTAP_START") or "0")
 local wtap = nil
@@ -41,8 +46,11 @@ local function wtap_poll()
     if wtap or wtap_addr <= 0 or frame < wtap_start then
         return
     end
+    if wtap_end <= wtap_addr then
+        wtap_end = wtap_addr + 3
+    end
     local ok, tap = pcall(function()
-        return space:install_write_tap(wtap_addr, wtap_addr + 3, "ihwtap",
+        return space:install_write_tap(wtap_addr, wtap_end, "ihwtap",
             function(addr, data)
                 wtap_hits = wtap_hits + 1
                 local pc = "?"
@@ -60,9 +68,12 @@ local function wtap_poll()
                 end
             end)
     end)
-    if ok then
+    if ok and tap then
         wtap = tap
-        log(string.format("ih: write tap installed at 0x%x", wtap_addr))
+        log(string.format("ih: write tap installed at 0x%x-0x%x", wtap_addr, wtap_end))
+    else
+        log(string.format("ih: write tap FAILED at 0x%x-0x%x", wtap_addr, wtap_end))
+        wtap_addr = 0
     end
 end
 
@@ -131,15 +142,29 @@ emu.register_periodic(function()
 
     local php = read_u16(PHP_ADDR)
     local chp = read_u16(CHP_ADDR)
+    local php = read_u16(PHP_ADDR)
+    local chp = read_u16(CHP_ADDR)
+    local pb = read_u16(0x00503ca4)
+    local cb = read_u16(0x005042a4)
+    local sa = read_u16(0x005042a0)
+    local sh = read_u16(0x005042a2)
 
     local ports_key = string.format("%x/%x/%x", p0, p1, p2)
-    if ports_key ~= last_ports or php ~= last_php or chp ~= last_chp then
+    if ports_key ~= last_ports or php ~= last_php or chp ~= last_chp
+            or pb ~= last_pb or cb ~= last_cb
+            or sa ~= last_sa or sh ~= last_sh then
         local fc = read_u32(FC_ADDR)
-        log(string.format("f %d in0 %x in1 %x in2 %x php %s chp %s fc %s",
-            frame, p0, p1, p2, tostring(php), tostring(chp), tostring(fc)))
+        log(string.format("f %d in0 %x in1 %x in2 %x php %s chp %s pb %s cb %s sa %s sh %s fc %s",
+            frame, p0, p1, p2, tostring(php), tostring(chp),
+            tostring(pb), tostring(cb), tostring(sa), tostring(sh),
+            tostring(fc)))
         last_ports = ports_key
         last_php = php
         last_chp = chp
+        last_pb = pb
+        last_cb = cb
+        last_sa = sa
+        last_sh = sh
     end
 
     if frame >= TARGET_FRAMES then
