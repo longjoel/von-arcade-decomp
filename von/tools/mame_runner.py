@@ -35,6 +35,10 @@ def main() -> int:
     parser.add_argument("--rom-dir", type=Path, default=Path(__file__).parents[1] / "artifacts")
     parser.add_argument("--capture-dir", type=Path, default=Path(__file__).parents[1] / "captures")
     parser.add_argument("--record-input", type=Path, help="MAME input recording file")
+    parser.add_argument("--ctrlr", default=os.environ.get("VON_CTRLR", ""),
+                        help="controller profile from the ctrlr path (empty disables)")
+    parser.add_argument("--ctrlr-path", type=Path, default=None,
+                        help="controller profile directory (default: repo ctrlr/)")
     parser.add_argument("--root", type=Path, default=Path.cwd(),
                         help="root that ROM, capture, and input paths must remain within")
     parser.add_argument("extra", nargs=argparse.REMAINDER, help="Arguments after -- are passed to MAME")
@@ -50,6 +54,17 @@ def main() -> int:
             parser.error(error)
     if args.record_input:
         error = path_error("record input", args.record_input, root)
+        if error:
+            parser.error(error)
+    ctrlr_path = args.ctrlr_path
+    if args.ctrlr and ctrlr_path is None:
+        if os.environ.get("VON_CTRLRPATH"):
+            ctrlr_path = Path(os.environ["VON_CTRLRPATH"])
+        else:
+            ctrlr_path = Path(__file__).parents[2] / "ctrlr"
+    if args.ctrlr:
+        error = path_error("controller profile", ctrlr_path, root, directory=True,
+                           allow_missing=True)
         if error:
             parser.error(error)
 
@@ -71,6 +86,8 @@ def main() -> int:
     ]
     if args.record_input:
         command += ["-record", str(args.record_input)]
+    if args.ctrlr and ctrlr_path.is_dir():
+        command += ["-ctrlr", args.ctrlr, "-ctrlrpath", str(ctrlr_path)]
     command += [arg for arg in args.extra if arg != "--"]
     print("Launching:", " ".join(subprocess.list2cmdline([arg]) for arg in command))
     print(f"Capture directory: {output_dir}")

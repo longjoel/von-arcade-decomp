@@ -12,6 +12,13 @@ die() {
     exit 1
 }
 
+# Controller profile (e.g. x360 twin-stick) applied to MAME runs.
+# VON_CTRLR names a file in VON_CTRLRPATH (default: repo ctrlr/x360twin);
+# empty VON_CTRLR disables the profile. Profiles only supply defaults,
+# so Tab-menu edits and -playback still behave as before.
+VON_CTRLR="${VON_CTRLR-x360twin}"
+VON_CTRLRPATH="${VON_CTRLRPATH-$ROOT_DIR/ctrlr}"
+
 require_command() {
     command -v "$1" >/dev/null 2>&1 || die "required command not found: $1"
 }

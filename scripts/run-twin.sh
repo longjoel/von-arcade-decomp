@@ -30,6 +30,9 @@ mkdir -p "$TWIN_DIR/p1/cfg" "$TWIN_DIR/p1/nvram" "$TWIN_DIR/p1/inp" "$TWIN_DIR/p
     "$TWIN_DIR/p2/cfg" "$TWIN_DIR/p2/nvram" "$TWIN_DIR/p2/inp" "$TWIN_DIR/p2/snap"
 
 MAME_ARGS=(-window -skip_gameinfo -verbose "$@")
+if [[ -n "$VON_CTRLR" && -d "$VON_CTRLRPATH" ]]; then
+    MAME_ARGS+=(-ctrlr "$VON_CTRLR" -ctrlrpath "$VON_CTRLRPATH")
+fi
 if [[ "${VON_TWIN_SECONDS:-0}" != 0 ]]; then
     MAME_ARGS+=(-seconds_to_run "$VON_TWIN_SECONDS")
 fi
