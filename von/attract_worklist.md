@@ -1,8 +1,8 @@
 # Attract Reconstruction Worklist
 
 - Observed direct-call units: 262
-- Modeled integration queue: 75
-- Integrated or validated: 27
+- Modeled integration queue: 72
+- Integrated or validated: 30
 - Untriaged: 160
 
 | Entry | Edges | Triage | Work unit |
@@ -21,11 +21,8 @@
 | `0x00002da0` | 1 | modeled-integration-queue | maincpu.io-controller-byte-average |
 | `0x00003120` | 4 | modeled-integration-queue | maincpu.runtime-crc16-table-checksum |
 | `0x00018ab0` | 4 | modeled-integration-queue | maincpu.timing-sample-extrema-update |
-| `0x0001bc90` | 1 | modeled-integration-queue | maincpu.text-video-row-transfer-plan |
-| `0x0001ccf8` | 7 | modeled-integration-queue | maincpu.text-tile-control-write |
 | `0x0001ce00` | 1 | modeled-integration-queue | maincpu.text-alternate-two-row-glyph-plan |
 | `0x0001cea0` | 1 | modeled-integration-queue | maincpu.text-alternate-two-row-glyph-plan |
-| `0x0001d1b0` | 4 | modeled-integration-queue | maincpu.text-string-byte-dispatch |
 | `0x0001d9e0` | 4 | modeled-integration-queue | maincpu.text-alternate-string-font-mode |
 | `0x0001de80` | 4 | modeled-integration-queue | maincpu.text-tile-block-writer |
 | `0x00028840` | 1 | modeled-integration-queue | maincpu.geometry-profile-dispatch |
@@ -86,12 +83,15 @@
 | `0x00018488` | 1 | integrated-validation-queue | maincpu.host-byte-queue-initialize |
 | `0x0001bb90` | 6 | integrated-validation-queue | maincpu.word-expand-blocks |
 | `0x0001bc20` | 3 | integrated-validation-queue | maincpu.halfword-byte-swap-copy |
+| `0x0001bc90` | 1 | integrated-validation-queue | maincpu.text-video-row-transfer-plan |
 | `0x0001bda0` | 2 | integrated-validation-queue | maincpu.startup-asset-transfer-plan |
 | `0x0001c220` | 2 | integrated-validation-queue | maincpu.video-control-bootstrap-plan |
 | `0x0001c618` | 8 | integrated-validation-queue | maincpu.text-video-initialize |
 | `0x0001c730` | 1 | integrated-validation-queue | maincpu.video-byte-lane-expand |
 | `0x0001cac8` | 23 | integrated-validation-queue | maincpu.text-position-state |
 | `0x0001cc40` | 2 | integrated-validation-queue | maincpu.text-character-output |
+| `0x0001ccf8` | 7 | integrated-validation-queue | maincpu.text-tile-control-write |
+| `0x0001d1b0` | 4 | integrated-validation-queue | maincpu.text-string-byte-dispatch |
 | `0x0001d310` | 5 | integrated-validation-queue | maincpu.text-glyph-address-plan |
 | `0x0001da90` | 4 | integrated-validation-queue | maincpu.text-string-font-mode |
 | `0x00027e50` | 3 | integrated-validation-queue | maincpu.texture-decompressor |

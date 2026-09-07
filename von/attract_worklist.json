@@ -3,8 +3,8 @@
   "coverage_source": "von/build/attract-coverage/vonj-attract-60s.json",
   "discovered_units": 262,
   "represented_units": 102,
-  "modeled_units": 75,
-  "integrated_units": 27,
+  "modeled_units": 72,
+  "integrated_units": 30,
   "untriaged_units": 160,
   "ordering": "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality",
   "units": [
@@ -179,8 +179,8 @@
     {
       "entry": "0x0001bc90",
       "observed_call_edges": 1,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
+      "triage": "integrated-validation-queue",
+      "stage": "trace-validated",
       "priority": 0,
       "weight": null,
       "work_unit": "maincpu.text-video-row-transfer-plan",
@@ -191,8 +191,8 @@
     {
       "entry": "0x0001ccf8",
       "observed_call_edges": 7,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
+      "triage": "integrated-validation-queue",
+      "stage": "trace-validated",
       "priority": 0,
       "weight": null,
       "work_unit": "maincpu.text-tile-control-write",
@@ -227,8 +227,8 @@
     {
       "entry": "0x0001d1b0",
       "observed_call_edges": 4,
-      "triage": "modeled-integration-queue",
-      "stage": "modeled",
+      "triage": "integrated-validation-queue",
+      "stage": "trace-validated",
       "priority": 0,
       "weight": null,
       "work_unit": "maincpu.text-string-byte-dispatch",
