@@ -1177,7 +1177,10 @@
             "von/build/disasm/vonj-maincpu.lst",
             "von/tools/test_sharc_matrix_state_service.py",
             "von/tools/test_recovered_sharc_opcode_09_caller.py",
-            "third_party/patches/0022-von-opcode-09-caller-tracing.patch"
+            "third_party/patches/0022-von-opcode-09-caller-tracing.patch",
+            "von/i960/recovered_sharc_opcode_09.c",
+            "von/tools/test_recovered_sharc_opcode_09.py",
+            "von/tools/test_recovered_sharc_matrix_compose.py"
           ],
           "ranges": [
             {
@@ -1191,7 +1194,7 @@
             "test": "von/tools/test_recovered_sharc_opcode_09_caller.py",
             "unresolved_behavior": "SHARC FIFO production and floating-point rounding, persistent matrix/state ownership and address semantics, exact delayed-store timing, lane semantic names, and downstream geometry interpretation remain outside this bounded transform/caller model."
           },
-          "notes": "Static listing and the reusable model recover twelve FIFO inputs in four groups of three, nine coefficient words through the DM 0x30101 state pointer, and twelve derived stores at offsets 0x00..0x0b. Each input triplet (x,y,z) maps to (x*s0+y*s3+z*s6, x*s1+y*s4+z*s7, x*s2+y*s5+z*s8), matching the established column-dot ordering and excluding the translation tail. The final two stores are delayed-return slots. Main-CPU listing 0x41fbc..0x41ff4 identifies a direct caller: opcode 0x05 selects/advances the state window, opcode 0x09 follows, and three quadwords from host offsets +0x08/+0x18/+0x28 provide the twelve inputs. Their lane-major order is [x0..x3,y0..y3,z0..z3], so the SHARC groups them as four vectors (x0,y0,z0)..(x3,y3,z3). This establishes a twelve-word derived state block associated with one host record; lane semantic names remain open."
+          "notes": "Static listing and the reusable model recover twelve FIFO inputs in four groups of three, nine coefficient words through the DM 0x30101 state pointer, and twelve derived stores at offsets 0x00..0x0b. Each input triplet (x,y,z) maps to (x*s0+y*s3+z*s6, x*s1+y*s4+z*s7, x*s2+y*s5+z*s8), matching the established column-dot ordering and excluding the translation tail. The final two stores are delayed-return slots. Main-CPU listing 0x41fbc..0x41ff4 identifies a direct caller: opcode 0x05 selects/advances the state window, opcode 0x09 follows, and three quadwords from host offsets +0x08/+0x18/+0x28 provide the twelve inputs. Their lane-major order is [x0..x3,y0..y3,z0..z3]. Grouping correction: live 07->09->1a->11 compose execution proves the SHARC dots four consecutive triplets (words 3k..3k+2 form vector k) with the record matrix columns, not lane regroups -- a cyclic-shift matrix shifts each input triplet in place, which lane regrouping would have scattered, and the fourth vector excludes the translation tail. The earlier lane-regroup software model and its test encoded the wrong grouping and are corrected. How the caller lanes map to geometric vectors is now open; lane semantic names remain open. This establishes a twelve-word derived state block associated with one host record."
         },
         {
           "id": "maincpu.opcode-0a-two-input-angle-service",
@@ -1648,7 +1651,8 @@
             "von/i960/recovered_sharc_opcode_1a.c",
             "von/tools/test_recovered_sharc_opcode_1a.py",
             "von/i960/recovered_sharc_opcode_1a_trunc.c",
-            "von/tools/test_recovered_sharc_opcode_1a_trunc.py"
+            "von/tools/test_recovered_sharc_opcode_1a_trunc.py",
+            "von/tools/test_recovered_sharc_matrix_compose.py"
           ],
           "ranges": [
             {
@@ -1662,7 +1666,7 @@
             "test": "von/tools/test_recovered_sharc_opcode_1a.py",
             "unresolved_behavior": "exceptional-value and 40-bit floating-point behavior remain open beyond the finite affine vectors"
           },
-          "notes": "Static listing recovers three FIFO inputs, persistent state-tail seeds at offsets 0x09..0x0b, and nine products over the coefficient order 0,3,6,1,4,7,2,5,8 added into three accumulators. The resulting stored row-major transform is output[j] = tail[j] + x*state[j] + y*state[3+j] + z*state[6+j]. Focused runtime probes confirm the 0x2039b boundary, identity output (1,2,3), diagonal output (2,6,12), and a split-packet opcode-0x07 load with tail (10,20,30) producing exact (11,22,33). The reusable affine model is in recovered_sharc_opcode_1a.c and covered by test_recovered_sharc_opcode_1a.py. Only exceptional-value/40-bit floating behavior remains open. Finite-word engine divergence is now resolved the same way as 03/04: a forced-FIFO 07-load/1a compose of a discriminating matrix drains 42e09999/4354eeee/43b67333 under default DRC but 42e0999a/4354eeef/43b67333 under the -nodrc interpreter, pinning bootstrap MODE1=0x18000 TRUNCATE as the hardware-faithful rounding; the truncating integer-arithmetic model is recovered_sharc_opcode_1a_trunc.c with test_recovered_sharc_opcode_1a_trunc.py (live DRC drain goldens, identity compose, and directed huge-gap-subtract cases). Fuzzing the chop adder against an exact-range double oracle plus an analytic large-gap rule exposed a one-ulp boundary bug shared with the 03/04 chop_sub: subtracting a subtrahend smaller than one ulp (exponent gap >= 63) must drop exactly one ulp toward zero, not return the larger operand; both models now borrow that ulp with exponent renormalization, verified bit-exact over 1.8M adds."
+          "notes": "Static listing recovers three FIFO inputs, persistent state-tail seeds at offsets 0x09..0x0b, and nine products over the coefficient order 0,3,6,1,4,7,2,5,8 added into three accumulators. The resulting stored row-major transform is output[j] = tail[j] + x*state[j] + y*state[3+j] + z*state[6+j]. Focused runtime probes confirm the 0x2039b boundary, identity output (1,2,3), diagonal output (2,6,12), and a split-packet opcode-0x07 load with tail (10,20,30) producing exact (11,22,33). The reusable affine model is in recovered_sharc_opcode_1a.c and covered by test_recovered_sharc_opcode_1a.py. Only exceptional-value/40-bit floating behavior remains open. Finite-word engine divergence is now resolved the same way as 03/04: a forced-FIFO 07-load/1a compose of a discriminating matrix drains 42e09999/4354eeee/43b67333 under default DRC but 42e0999a/4354eeef/43b67333 under the -nodrc interpreter, pinning bootstrap MODE1=0x18000 TRUNCATE as the hardware-faithful rounding; the truncating integer-arithmetic model is recovered_sharc_opcode_1a_trunc.c with test_recovered_sharc_opcode_1a_trunc.py (live DRC drain goldens, identity compose, and directed huge-gap-subtract cases). Fuzzing the chop adder against an exact-range double oracle plus an analytic large-gap rule exposed a one-ulp boundary bug shared with the 03/04 chop_sub: subtracting a subtrahend smaller than one ulp (exponent gap >= 63) must drop exactly one ulp toward zero, not return the larger operand; both models now borrow that ulp with exponent renormalization, verified bit-exact over 1.8M adds. Matrix-compose verification: one forced-FIFO spec (08 reset, 07 matrix load, 09 four-vector transform, 1a affine, 11 readback) proves the full chain live -- the 09 derived stores land in the 1a coefficient window and 11 streams them back. Identity matrix reproduces inputs with 1a drains 43fcd110/44b0a333/439ccccc (stable across two boots); cyclic-shift out=(y,z,x) shifts each triplet in place with drains 44b0a333/439ccccc/43fcd110, proving the 09 transform, consecutive-triplet grouping, and column order in one shot. The -nodrc interpreter agrees on the exact-regime 09/11 stages and rounds the 1a drains up one ulp (44b0a333/439ccccd/43fcd111). test_recovered_sharc_matrix_compose.py chains all four C models against these DRC goldens."
         },
         {
           "id": "maincpu.helper-20d5d-table-state-base-derivation",
@@ -14856,6 +14860,118 @@
           }
         },
         {
+          "id": "maincpu.transition-state4-threshold-prefix-7f70c",
+          "name": "transition_state4_threshold_prefix_7f70c",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_state4_threshold_prefix_7f70c.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/recovered_transition_state4_threshold_prefix_7f70c.c",
+            "von/tools/test_recovered_transition_state4_threshold_prefix_7f70c.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007f70c",
+              "end": "0x0007f774"
+            }
+          ],
+          "symbol": "recovered_transition_state4_threshold_prefix_7f70c",
+          "modeling": {
+            "boundary": "Models the state-4 gate, both timing ceilings, selector/control publication, and direct-versus-difference continuation.",
+            "test": "von/tools/test_recovered_transition_state4_threshold_prefix_7f70c.py",
+            "unresolved_behavior": "The 0x80710 side effects, 0x7f774 difference classifier, and 0x7f800 alternate route remain outside this prefix."
+          },
+          "notes": "Timing comparisons are represented as explicit relations to preserve the i960 floating-point boundary semantics."
+        },
+        {
+          "id": "maincpu.transition-followup-admission-7f6b0",
+          "name": "transition_followup_admission_7f6b0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_followup_admission_7f6b0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/recovered_transition_followup_admission_7f6b0.c",
+            "von/tools/test_recovered_transition_followup_admission_7f6b0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007f6b0",
+              "end": "0x0007f70c"
+            }
+          ],
+          "symbol": "recovered_transition_followup_admission_7f6b0",
+          "modeling": {
+            "boundary": "Models the state-4 exclusion, +0x170 admission, r6 equality, unsigned status/global gates, and 0x80710 continuation.",
+            "test": "von/tools/test_recovered_transition_followup_admission_7f6b0.py",
+            "unresolved_behavior": "The 0x80710 route and 0x7f808 fallback consumer remain outside this admission boundary."
+          },
+          "notes": "The +0x172 check is retained as an observed state-4-side input but does not admit the 0x7f6d0 path."
+        },
+        {
+          "id": "maincpu.transition-timing-threshold-route-7f634",
+          "name": "transition_timing_threshold_route_7f634",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_timing_threshold_route_7f634.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/recovered_transition_timing_threshold_route_7f634.c",
+            "von/tools/test_recovered_transition_timing_threshold_route_7f634.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007f634",
+              "end": "0x0007f6b0"
+            }
+          ],
+          "symbol": "recovered_transition_timing_threshold_route_7f634",
+          "modeling": {
+            "boundary": "Models both converted timing threshold arms, lower-arm callback/publication, upper-arm global gates, state publication, and mode-10 continuation.",
+            "test": "von/tools/test_recovered_transition_timing_threshold_route_7f634.py",
+            "unresolved_behavior": "The exact conversion/comparison implementation, callback side effects, and 0x7f6b0 fallback consumer remain outside this route model."
+          },
+          "notes": "Threshold relations are explicit inputs because the original uses i960 floating compares over converted words."
+        },
+        {
+          "id": "maincpu.transition-post-scan-admission-7f5ec",
+          "name": "transition_post_scan_admission_7f5ec",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_post_scan_admission_7f5ec.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/recovered_transition_post_scan_admission_7f5ec.c",
+            "von/tools/test_recovered_transition_post_scan_admission_7f5ec.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007f5ec",
+              "end": "0x0007f634"
+            }
+          ],
+          "symbol": "recovered_transition_post_scan_admission_7f5ec",
+          "modeling": {
+            "boundary": "Models the post-scan halfword, related-state, unsigned status-index, and floating-zero admission gates.",
+            "test": "von/tools/test_recovered_transition_post_scan_admission_7f5ec.py",
+            "unresolved_behavior": "The 0x504dec/current-timing route beginning at 0x7f634 remains outside this admission prefix."
+          },
+          "notes": "Status subtraction is intentionally unsigned to preserve the observed underflow behavior for published statuses 0 and 1."
+        },
+        {
           "id": "maincpu.transition-scan-7f4d0",
           "name": "transition_scan_7f4d0",
           "classification": "code",
@@ -14890,6 +15006,34 @@
               ]
             }
           }
+        },
+        {
+          "id": "maincpu.state31-special-status-publication-7f44c",
+          "name": "state31_special_status_publication_7f44c",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state31_special_status_publication_7f44c.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/recovered_state31_special_status_publication_7f44c.c",
+            "von/tools/test_recovered_state31_special_status_publication_7f44c.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007f44c",
+              "end": "0x0007f4c4"
+            }
+          ],
+          "symbol": "recovered_state31_special_status_publication_7f44c",
+          "modeling": {
+            "boundary": "Models the four status/related-state admissions, selector/status/control publication, 0x79d60 callback, action-30 write, and return.",
+            "test": "von/tools/test_recovered_state31_special_status_publication_7f44c.py",
+            "unresolved_behavior": "The preceding non-classifier result setup and callback side effects remain outside this publication route."
+          },
+          "notes": "Status 0x44 is accepted before the related-state checks; 0x92, 0x56, and 0x57 retain their observed paired-state predicates."
         },
         {
           "id": "maincpu.state31-threshold-status-dispatch-7f364",

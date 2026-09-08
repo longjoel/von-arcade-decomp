@@ -1,22 +1,31 @@
-/* Recovered four-vector matrix transform for SHARC opcode 0x09. */
+/* Recovered four-vector matrix transform for SHARC opcode 0x09.
+ *
+ * Grouping correction: the handler reads four CONSECUTIVE FIFO triplets
+ * (words 3k..3k+2 form vector k), not lane-major regroups. Proven live by
+ * the 07->09->1a->11 matrix compose: a cyclic-shift matrix maps the input
+ * triplets to shifted triplets in place, which a lane regroup would have
+ * scattered. The identified host caller still packs three lane quadwords,
+ * so how those lanes map to geometric vectors is open; the SHARC-side
+ * contract below is what the hardware executes. */
 #include <stdint.h>
 
-/* Interpret one of the four vectors encoded by the state-readback layout.
- * The state window is stored lane-major: [x0..x3,y0..y3,z0..z3].  When the
- * window is the usual row-major matrix plus tail, these are not necessarily
- * geometric vertices; they are the four triples induced by that wire layout. */
+/* Interpret one of the four vectors consumed by the handler: three
+ * consecutive input words starting at 3*vector. */
 void recovered_sharc_opcode_09_state_vector(
     const float state[12], unsigned vector, float output[3])
 {
-    output[0] = state[vector];
-    output[1] = state[4 + vector];
-    output[2] = state[8 + vector];
+    output[0] = state[vector * 3 + 0];
+    output[1] = state[vector * 3 + 1];
+    output[2] = state[vector * 3 + 2];
 }
 
-/* The handler consumes four (x,y,z) triplets and writes four transformed
- * triplets to state words 0..11 using the established column-dot order.
- * The FIFO input is lane-major when supplied by the identified host caller:
- * [x0,x1,x2,x3,y0,y1,y2,y3,z0,z1,z2,z3]. */
+/* The handler consumes four consecutive (x,y,z) triplets and writes four
+ * transformed triplets to state words 0..11 using the established
+ * column-dot order (listing PM 0x201c4-0x20210; stores at 0x203-0x210 land
+ * F5/F6/F7, F9/F10/F11, F13/F14/F15, F0/F1/F2 via the R5-R15/R0-R2
+ * aliases). No translation tail enters any vector. Float rounding of the
+ * multiply-add lattice is unpinned; exact-regime inputs (0/1 scalings and
+ * permutations) reproduce live words bit-exactly under both engines. */
 void recovered_sharc_opcode_09_transform(
     const float input[12], const float matrix[9], float output[12])
 {
