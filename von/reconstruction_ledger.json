@@ -13839,6 +13839,22 @@
           "notes": "Three callers per site, always invoked as a 0x90c10/50/80 triple. Bodies differ only in the site word (0xb800, 3<<14, 0xc800) at the same position. ROM table read live; entry 0 is null so index 0 always skips the register block."
         },
         {
+          "id": "maincpu.geometry-fifo-sequencer-93560",
+          "name": "geometry_fifo_sequencer_93560",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_fifo_sequencer_93560.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_fifo_sequencer_93560.py"],
+          "ranges": [{"start": "0x00093560", "end": "0x000936f0"}],
+          "symbol": "fifo_seq_step",
+          "modeling": {
+            "boundary": "Models the 0x93560 sequencer: 12-word prefix packet, the CC-zero-gated C8 = g0 & 3 store, the mod-120 selector path (bases 0x02b5c3a6/0x02b60728), and the mod-168 sequencer with the 59/23/59 g2 way selection.",
+            "test": "von/tools/test_recovered_geometry_fifo_sequencer_93560.py",
+            "unresolved_behavior": "Live FIFO/MMIO transports, the 0xf5058 subroutine and its g0 effects (modeled as an input), RAM provenance of C8/CC, ordinal-vs-ordered compare semantics, and the 0x8e310 tail-call effects remain outside this contract."
+          },
+          "notes": "Six cross-references. Richest family member yet: g1 re-derives the familiar 0x02be2b64 as base + 0x8ab40 on the sequencer legs. Boundary edges 59/60, 82/83, 142/143/144 pinned in the test."
+        },
+        {
           "id": "maincpu.geometry-indexed-packet-8d5d0",
           "name": "geometry_indexed_packet_8d5d0",
           "classification": "code",
