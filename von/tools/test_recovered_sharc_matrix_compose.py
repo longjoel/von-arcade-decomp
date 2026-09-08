@@ -86,7 +86,6 @@ def main() -> int:
         readback11.restype = None
 
         words12 = ctypes.c_uint32 * 12
-        words13 = ctypes.c_uint32 * 13
         words3 = ctypes.c_uint32 * 3
         floats12 = ctypes.c_float * 12
         floats9 = ctypes.c_float * 9
@@ -108,11 +107,11 @@ def main() -> int:
             assert tuple(out) == want_drain, \
                 (name, [hex(v) for v in out])
 
-            # 11 streams the derived block plus the delay-slot word
-            # (live harness poked 0x3020c to zero for determinism).
-            stream = words13()
-            readback11(words13(*floats_to_words(derived), 0x0), stream)
-            assert tuple(stream) == want_block + (0x0,), name
+            # 11 streams exactly the 12 derived words (no thirteenth;
+            # live drains past twelve read empty-FIFO zero).
+            stream = words12()
+            readback11(words12(*floats_to_words(derived)), stream)
+            assert tuple(stream) == want_block, name
         print("PASS: SHARC 07->09->1a->11 matrix compose "
               "(live DRC goldens)")
     return 0

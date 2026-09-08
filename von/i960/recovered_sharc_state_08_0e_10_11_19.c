@@ -18,9 +18,10 @@
  *   0, 4, 8, else 0.0) through the record pointer DM(0x30101).
  *   Pinned live over garbage pokes by the harness golden.
  * - 11 (0x29e): streams the 12 pointed words to the output FIFO with
- *   FLAG1 flow control, plus the RTS delay-slot word (a 13th
- *   DM(I7,M1) read of the word following the record; observed 0x0
- *   after identity init). No DM writes of its own.
+ *   FLAG1 flow control; the twelfth emit occupies the RTS delay slot
+ *   (0x2c3), so no thirteenth word exists (a thirteenth drained word
+ *   reads empty-FIFO zero; observed 0x0 after identity init). No DM
+ *   writes of its own.
  * - 19 (0x397): emits DM(0x30100) to the output FIFO first (RTS delay
  *   slots), with no FIFO payload. Proved live by poking the counter
  *   to 5 and draining 00000005 back.
@@ -65,14 +66,17 @@ void sharc_state_init_10(u32 *record)
         record[i] = (i == 0 || i == 4 || i == 8) ? SHARC_FLOAT_ONE_BITS : 0U;
 }
 
-/* Opcode 0x11: stream the 12 record words plus the delay-slot word
- * (rec[12], the word following the record). */
+/* Opcode 0x11: stream the 12 record words. The listing shows 12 reads
+ * (0x29f-0x2c0) and 12 FIFO emits (0x2a1-0x2bf plus the RTS delay slot at
+ * 0x2c3, which carries the twelfth emit, not a thirteenth read). An
+ * earlier revision read a thirteenth word; live fd drains show the word
+ * after the twelve is empty-FIFO zero, and the disassembly admits no
+ * thirteenth read. */
 void sharc_state_readback_11(const u32 *record, u32 *out)
 {
     int i;
     for (i = 0; i < 12; ++i)
         out[i] = record[i];
-    out[12] = record[12];
 }
 
 /* Opcode 0x19: emit the upload counter word. */

@@ -5,8 +5,9 @@ Goldens mirror the live harness evidence, not the emulator:
 - 0e stores mirror von/tools/sharc_harness_goldens.json effects_exact
   for words 11111111/22222222/33333333/44444444 at DM 0x30105-08.
 - 10 init mirrors the golden over deadbeef garbage pokes at 0x30200.
-- 11 readback mirrors the live identity stream (12 words plus the
-  delay-slot word, observed 0x0 after identity init).
+- 11 readback mirrors the live identity stream (12 words; the word
+  after the twelve drains empty-FIFO zero, observed 0x0 after
+  identity init).
 - 19 counter mirrors the live poke proof (counter poked to 5 drains
   back 00000005) and the 08-init zero point.
 - The push composition ties the committed
@@ -72,13 +73,16 @@ def main() -> int:
         readback.argtypes = [ctypes.POINTER(ctypes.c_uint32),
                              ctypes.POINTER(ctypes.c_uint32)]
         readback.restype = None
-        src = (ctypes.c_uint32 * 13)(*IDENTITY, 0x0)
-        out = (ctypes.c_uint32 * 13)()
+        # Twelve words only: the listing shows 12 reads and 12 emits
+        # (twelfth emit in the RTS delay slot); a thirteenth drained
+        # word is empty-FIFO zero, proven live.
+        src = (ctypes.c_uint32 * 12)(*IDENTITY)
+        out = (ctypes.c_uint32 * 12)()
         readback(src, out)
-        assert list(out) == IDENTITY + [0x0]
-        pattern = (ctypes.c_uint32 * 13)(*range(1, 13), 0xAA)
+        assert list(out) == IDENTITY
+        pattern = (ctypes.c_uint32 * 12)(*range(1, 13))
         readback(pattern, out)
-        assert list(out) == list(range(1, 13)) + [0xAA]
+        assert list(out) == list(range(1, 13))
 
         counter = lib.sharc_state_counter_19
         counter.argtypes = [ctypes.c_uint32]
