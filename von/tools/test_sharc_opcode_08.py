@@ -23,6 +23,9 @@ def main() -> int:
         "1bf": "R0 = 0x00000000",
         "1c0": "DM(0x00030100) = R0",
         "1c1": "RTS (DB)",
+        # RTS delay slots: record-pointer reset rides along.
+        "1c2": "R0 = 0x00030200",
+        "1c3": "DM(0x00030101) = R0",
     }
     for slot, fragment in checks.items():
         if fragment not in lines.get(slot, ""):

@@ -1308,7 +1308,10 @@
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_0e.py"
+            "von/tools/test_sharc_opcode_0e.py",
+            "von/tools/sharc_harness_goldens.json",
+            "von/i960/recovered_sharc_state_08_0e_10_11_19.c",
+            "von/tools/test_recovered_sharc_state_services.py"
           ],
           "ranges": [
             {
@@ -1322,7 +1325,7 @@
             "test": "von/tools/test_sharc_opcode_0e.py",
             "unresolved_behavior": "FIFO production and wait timing, persistent DM ownership/address units, delayed-store timing, field semantics, and opcode-0f consumers remain outside this static upload model."
           },
-          "notes": "Static listing recovers four FIFO reads into R0,R1,R2,R3 and stores at DM 0x30105..0x30108; the final two stores occupy delayed-return slots."
+          "notes": "Static listing recovers four FIFO reads into R0,R1,R2,R3 and stores at DM 0x30105..0x30108; the final two stores occupy delayed-return slots. Live harness DM snapshots pin the exact store set for words 11111111/22222222/33333333/44444444; the stores are absolute and never appear in the pointer-based 11 readback (record pointer aims at 0x30200)."
         },
         {
           "id": "maincpu.opcode-0f-difference-service",
@@ -1369,7 +1372,10 @@
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_10.py"
+            "von/tools/test_sharc_opcode_10.py",
+            "von/tools/sharc_harness_goldens.json",
+            "von/i960/recovered_sharc_state_08_0e_10_11_19.c",
+            "von/tools/test_recovered_sharc_state_services.py"
           ],
           "ranges": [
             {
@@ -1383,7 +1389,7 @@
             "test": "von/tools/test_sharc_opcode_10.py",
             "unresolved_behavior": "Persistent state ownership/address semantics, delayed-return timing, caller/reset frequency, FIFO/dispatch scheduling, and downstream interpretation of the identity-plus-tail block remain outside this static initializer model."
           },
-          "notes": "Static listing recovers a 12-word identity block at the DM 0x30101 state pointer: 1.0 at offsets 0,4,8 and zero elsewhere. The last two writes are delayed-return slots; caller/reset frequency remains provisional."
+          "notes": "Static listing recovers a 12-word identity block at the DM 0x30101 state pointer: 1.0 at offsets 0,4,8 and zero elsewhere. The last two writes are delayed-return slots; caller/reset frequency remains provisional. Live harness DM snapshots pin the exact 12-word effect over garbage pokes, and forced-FIFO 10-then-11 probes stream the identity back."
         },
         {
           "id": "maincpu.opcode-11-state-readback-service",
@@ -1395,7 +1401,10 @@
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_11.py"
+            "von/tools/test_sharc_opcode_11.py",
+            "von/tools/sharc_harness_goldens.json",
+            "von/i960/recovered_sharc_state_08_0e_10_11_19.c",
+            "von/tools/test_recovered_sharc_state_services.py"
           ],
           "ranges": [
             {
@@ -1409,7 +1418,7 @@
             "test": "von/tools/test_sharc_opcode_11.py",
             "unresolved_behavior": "Persistent state ownership/address units, FIFO backpressure and dispatch scheduling, delayed-return timing, and semantic interpretation of the twelve returned fields remain outside this static readback model."
           },
-          "notes": "Static listing recovers a no-payload sequential readback of twelve words from the DM 0x30101 state pointer to the output FIFO. The twelfth output is after RTS (DB); state field meaning remains provisional."
+          "notes": "Static listing recovers a no-payload sequential readback of twelve words from the DM 0x30101 state pointer to the output FIFO. The twelfth output is after RTS (DB); state field meaning remains provisional. Live forced-FIFO probes stream the identity record back word-for-word (plus the delay-slot word); output-FIFO drains under attract also catch game-emitted streams, so DM snapshots are the authoritative channel."
         },
         {
           "id": "maincpu.opcode-12-state-tail-update-service",
@@ -11192,7 +11201,10 @@
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
-            "von/tools/test_sharc_opcode_08.py"
+            "von/tools/test_sharc_opcode_08.py",
+            "von/tools/sharc_harness_goldens.json",
+            "von/i960/recovered_sharc_state_08_0e_10_11_19.c",
+            "von/tools/test_recovered_sharc_state_services.py"
           ],
           "ranges": [
             {
@@ -11202,11 +11214,39 @@
           ],
           "symbol": "sharc_opcode_08_service_state_reset",
           "modeling": {
-            "boundary": "Models the exact opcode-0x08 reset boundary: write the 32-bit zero value to DM 0x30100 and return, with no payload consumption, response emission, or clearing of the later coefficient/state windows.",
+            "boundary": "Models the exact opcode-0x08 reset boundary: write the 32-bit zero value to DM 0x30100 and return, with no payload consumption, response emission, or clearing of the later coefficient/state windows. The RTS delay slots additionally reset the upload-record pointer DM 0x30101 to 0x30200 (listing 1c2-1c3), covered by the same audit.",
             "test": "von/tools/test_sharc_opcode_08.py",
             "unresolved_behavior": "SHARC FIFO/dispatcher scheduling, delayed-return timing, DM bus/address semantics, and all consumers of the reset word remain outside this static store-only model."
           },
-          "notes": "Static listing recovers a single zero store to DM 0x30100 followed by delayed return; no payload, output, or broad state clear is present."
+          "notes": "Static listing recovers a single zero store to DM 0x30100 followed by delayed return; no payload, output, or broad state clear is present. The delay slots reset DM 0x30101 to 0x30200. Live: 08 then 19 drains 0; the attract-mode game streams 08 constantly, which resets the upload counter between spaced FIFO probes (prefix-free back-to-back trials required)."
+        },
+        {
+          "id": "sharc.opcode-19-counter-readback",
+          "name": "opcode_19_counter_readback",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/disassembly-annotations.md"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-sharc-bootstrap.lst",
+            "von/tools/sharc_harness_goldens.json",
+            "von/i960/recovered_sharc_state_08_0e_10_11_19.c",
+            "von/tools/test_recovered_sharc_state_services.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00020397",
+              "end": "0x0002039b"
+            }
+          ],
+          "symbol": "sharc_opcode_19_counter_readback",
+          "modeling": {
+            "boundary": "Opcode 0x19 emits DM(0x30100) to the output FIFO in its RTS delay slots, with no FIFO payload and no DM writes. The emitter is the identity function on the counter word.",
+            "test": "von/tools/test_recovered_sharc_state_services.py",
+            "unresolved_behavior": "Live end-to-end 05-push to 19-drain counting is not directly observable under attract (the game 08-stream resets the counter between spaced probes); verified by parts: 08-then-19 zero point and poke-to-5 drain-back live, bump gate static at PM 0x2016d, composition at model level."
+          },
+          "notes": "Static listing recovers the counter read plus delayed emit at PM 0x20397 (dispatch table DM 0x30000+0x19 snapshot). Live: poking DM 0x30100 to 5 drains back 00000005; 08-init then 19 drains 0. Depends on the 05/06 depth discipline for counting."
         },
         {
           "id": "sharc.scalar-alu-00-02",
