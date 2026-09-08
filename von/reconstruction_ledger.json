@@ -1058,7 +1058,8 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md"
+            "von/i960/disassembly-annotations.md",
+            "von/i960/recovered_secondary_dispatch_79d60.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1116,7 +1117,7 @@
             "test": "von/tools/test_sharc_reciprocal_services.py",
             "unresolved_behavior": "non-finite exception semantics remain emulator-boundary evidence rather than hardware fidelity"
           },
-          "notes": "Static listing recovers two two-input/output handlers with RECIPS and three correction stages. Opcode 0x03 returns the numerator/denominator quotient through the ROM seed and three 32-bit correction boundaries; live responses are 2.0, 0.5, and -2.0 for (2.0,1.0), (1.0,2.0), and (-2.0,1.0). Opcode 0x04 stages the denominator in F2/R2 and computes numerator - quotient*denominator, normally zero but retaining a small reciprocal residual; the live (1.7, 1/3) case returns 0xb4000000 under the interpreter but 0x34000000 under DRC/hardware truncation (engine divergence resolved below). The finite recovered models share the RECIPS seed table with opcode 0x35. Bootstrap MODE1=0x18000 selects truncating 32-bit results. A direct MAME edge capture records 0xffffffff for 0x03 inputs 1/0, 1/+inf, NaN/1, and 1/NaN; 0/1 returns 0, +inf/1 preserves +inf, and the smallest positive denormal over 1 returns 0x00000001. Tested 0x04 inputs 1/0, 1/+inf, and NaN/1 likewise return 0xffffffff. The complete ten-vector result list is verified by von/tools/verify_sharc_reciprocal_edges.py. Repeating the probe with default DRC and -nodrc interpreter produced identical FIFO words, so there is no engine-specific discrepancy in this boundary set (that parity claim covers only the non-finite edges; finite words diverge by engine as resolved below). These exception results are emulator-boundary evidence and remain provisional for hardware fidelity; the recovered C contracts intentionally cover finite operands only. Finite-word engine divergence is now resolved: the listing sequence (RECIPS seed plus three d=x*d, n=x*n, e=2-d correction rounds, q=e*n; residual N-q*D via stashed F1/F2) was simulated bit-exactly against the true 2-operand handlers at PM 0x2014b/0x2015b (dispatch table DM 0x30000+opcode snapshot: 03->0x2014b, 04->0x2015b; the same schedule also appears with chained passes in the 3-operand normalize path at a22-a41). The -nodrc interpreter matches round-to-nearest evaluation of that pass on all 55 healthy finite trials (20 divide, 35 residual), while default DRC matches truncating (MODE1=0x18000 TRUNCATE|RND32) evaluation on all 33 finite trials (13 divide, 20 residual). The DRC/truncate behavior is the hardware-faithful one: compute.hxx FADD/FMUL use host round-to-nearest floats and honor MODE1_TRUNCATE only for infinity saturation, whereas sharcdrc.cpp reimplements float mul/add with truncating integer UML ops. Exact integer-arithmetic models are recovered_sharc_divide_03_04.c with von/tools/test_recovered_sharc_divide_03_04.py (13 divide + 15 residual DRC goldens, plus 6000-sample differential vs an independent chop oracle); the older recovered_sharc_reciprocal_services.c and its test pin the interpreter rounding instead and are now labeled as such. Both engines are stateless across calls (repeat probes agree); single-read +10-frame probes flake under the interpreter, and long sweeps suffer FIFO response theft once attract traffic starts (~30 s in), so validation sweeps use +60-frame reads with interleaved nonzero divide sentinels."
+          "notes": "Static listing recovers two two-input/output handlers with RECIPS and three correction stages. Opcode 0x03 returns the numerator/denominator quotient through the ROM seed and three 32-bit correction boundaries; live responses are 2.0, 0.5, and -2.0 for (2.0,1.0), (1.0,2.0), and (-2.0,1.0). Opcode 0x04 stages the denominator in F2/R2 and computes numerator - quotient*denominator, normally zero but retaining a small reciprocal residual; the live (1.7, 1/3) case returns 0xb4000000 under the interpreter but 0x34000000 under DRC/hardware truncation (engine divergence resolved below). The finite recovered models share the RECIPS seed table with opcode 0x35. Bootstrap MODE1=0x18000 selects truncating 32-bit results. A direct MAME edge capture records 0xffffffff for 0x03 inputs 1/0, 1/+inf, NaN/1, and 1/NaN; 0/1 returns 0, +inf/1 preserves +inf, and the smallest positive denormal over 1 returns 0x00000001. Tested 0x04 inputs 1/0, 1/+inf, and NaN/1 likewise return 0xffffffff. The complete ten-vector result list is verified by von/tools/verify_sharc_reciprocal_edges.py. Repeating the probe with default DRC and -nodrc interpreter produced identical FIFO words, so there is no engine-specific discrepancy in this boundary set (that parity claim covers only the non-finite edges; finite words diverge by engine as resolved below). These exception results are emulator-boundary evidence and remain provisional for hardware fidelity; the recovered C contracts intentionally cover finite operands only. Finite-word engine divergence is now resolved: the listing sequence (RECIPS seed plus three d=x*d, n=x*n, e=2-d correction rounds, q=e*n; residual N-q*D via stashed F1/F2) was simulated bit-exactly against the true 2-operand handlers at PM 0x2014b/0x2015b (dispatch table DM 0x30000+opcode snapshot: 03->0x2014b, 04->0x2015b; the same schedule also appears with chained passes in the 3-operand normalize path at a22-a41). The -nodrc interpreter matches round-to-nearest evaluation of that pass on all 55 healthy finite trials (20 divide, 35 residual), while default DRC matches truncating (MODE1=0x18000 TRUNCATE|RND32) evaluation on all 33 finite trials (13 divide, 20 residual). The DRC/truncate behavior is the hardware-faithful one: compute.hxx FADD/FMUL use host round-to-nearest floats and honor MODE1_TRUNCATE only for infinity saturation, whereas sharcdrc.cpp reimplements float mul/add with truncating integer UML ops. Exact integer-arithmetic models are recovered_sharc_divide_03_04.c with von/tools/test_recovered_sharc_divide_03_04.py (13 divide + 15 residual DRC goldens, plus 6000-sample differential vs an independent chop oracle); the older recovered_sharc_reciprocal_services.c and its test pin the interpreter rounding instead and are now labeled as such. Both engines are stateless across calls (repeat probes agree); single-read +10-frame probes flake under the interpreter, and long sweeps suffer FIFO response theft once attract traffic starts (~30 s in), so validation sweeps use +60-frame reads with interleaved nonzero divide sentinels. Chop-boundary audit (driven by the opcode-0x1a affine fuzz against an exact-range double oracle plus an analytic large-gap rule): subtracting a subtrahend smaller than one ulp (exponent gap >= 63) drops exactly one ulp toward zero rather than returning the larger operand; chop_sub now borrows that ulp with exponent renormalization, verified bit-exact over 1.8M adds."
         },
         {
           "id": "maincpu.opcode-05-07-state-window-services",
@@ -1124,7 +1125,8 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md"
+            "von/i960/disassembly-annotations.md",
+            "von/i960/recovered_text_formatter_dispatch.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-sharc-bootstrap.lst",
@@ -1626,7 +1628,9 @@
             "von/tools/probe_sharc_service_1a_scaled.lua",
             "von/tools/probe_sharc_opcode_07_affine.lua",
             "von/i960/recovered_sharc_opcode_1a.c",
-            "von/tools/test_recovered_sharc_opcode_1a.py"
+            "von/tools/test_recovered_sharc_opcode_1a.py",
+            "von/i960/recovered_sharc_opcode_1a_trunc.c",
+            "von/tools/test_recovered_sharc_opcode_1a_trunc.py"
           ],
           "ranges": [
             {
@@ -1640,7 +1644,7 @@
             "test": "von/tools/test_recovered_sharc_opcode_1a.py",
             "unresolved_behavior": "exceptional-value and 40-bit floating-point behavior remain open beyond the finite affine vectors"
           },
-          "notes": "Static listing recovers three FIFO inputs, persistent state-tail seeds at offsets 0x09..0x0b, and nine products over the coefficient order 0,3,6,1,4,7,2,5,8 added into three accumulators. The resulting stored row-major transform is output[j] = tail[j] + x*state[j] + y*state[3+j] + z*state[6+j]. Focused runtime probes confirm the 0x2039b boundary, identity output (1,2,3), diagonal output (2,6,12), and a split-packet opcode-0x07 load with tail (10,20,30) producing exact (11,22,33). The reusable affine model is in recovered_sharc_opcode_1a.c and covered by test_recovered_sharc_opcode_1a.py. Only exceptional-value/40-bit floating behavior remains open."
+          "notes": "Static listing recovers three FIFO inputs, persistent state-tail seeds at offsets 0x09..0x0b, and nine products over the coefficient order 0,3,6,1,4,7,2,5,8 added into three accumulators. The resulting stored row-major transform is output[j] = tail[j] + x*state[j] + y*state[3+j] + z*state[6+j]. Focused runtime probes confirm the 0x2039b boundary, identity output (1,2,3), diagonal output (2,6,12), and a split-packet opcode-0x07 load with tail (10,20,30) producing exact (11,22,33). The reusable affine model is in recovered_sharc_opcode_1a.c and covered by test_recovered_sharc_opcode_1a.py. Only exceptional-value/40-bit floating behavior remains open. Finite-word engine divergence is now resolved the same way as 03/04: a forced-FIFO 07-load/1a compose of a discriminating matrix drains 42e09999/4354eeee/43b67333 under default DRC but 42e0999a/4354eeef/43b67333 under the -nodrc interpreter, pinning bootstrap MODE1=0x18000 TRUNCATE as the hardware-faithful rounding; the truncating integer-arithmetic model is recovered_sharc_opcode_1a_trunc.c with test_recovered_sharc_opcode_1a_trunc.py (live DRC drain goldens, identity compose, and directed huge-gap-subtract cases). Fuzzing the chop adder against an exact-range double oracle plus an analytic large-gap rule exposed a one-ulp boundary bug shared with the 03/04 chop_sub: subtracting a subtrahend smaller than one ulp (exponent gap >= 63) must drop exactly one ulp toward zero, not return the larger operand; both models now borrow that ulp with exponent renormalization, verified bit-exact over 1.8M adds."
         },
         {
           "id": "maincpu.helper-20d5d-table-state-base-derivation",
@@ -2563,7 +2567,7 @@
             "test": "von/tools/test_recovered_audio_queue.py",
             "unresolved_behavior": "mapped sound transport timing and host-control interrupt servicing remain outside the deterministic queue/encoding contract"
           },
-          "notes": "Queues special command 0xff as one byte or a normal 16-bit command as 0xae/high/low after reserving space, honors the observed mode/status suppression gate, and raises host control bit 10 to service the queue.",
+          "notes": "Queues special command 0xff as one byte or a normal 16-bit command as 0xae/high/low after reserving space, honors the observed mode/status suppression gate, and raises host control bit 10 to service the queue. The pure enqueue-plan surface now connects framing, capacity rejection, and service-request outcome for the complete 0x2a4e0 branch without performing MMIO writes.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -3116,6 +3120,33 @@
           }
         },
         {
+          "id": "maincpu.runtime-random-seed",
+          "name": "runtime_random_seed",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_runtime_math.c"
+          ],
+          "evidence": [
+            "von/build/attract-coverage/vonj-attract-60s.pcs",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_runtime_math.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000f50a8",
+              "end": "0x000f50bc"
+            }
+          ],
+          "symbol": "recovered_random_seed",
+          "modeling": {
+            "boundary": "Stores the caller-supplied 32-bit seed directly to the persistent random-state location; the host-injectable state form preserves the exact store contract without dereferencing hardware MMIO",
+            "test": "von/tools/test_recovered_runtime_math.py",
+            "unresolved_behavior": "live hardware state mapping and caller-specific seed selection remain outside the pure store contract"
+          },
+          "notes": "Exact leaf-level model for the seed store at 0x000f50a8. The production wrapper targets 0x005785d0; tests exercise recovered_random_seed_state with injected storage."
+        },
+        {
           "id": "maincpu.runtime-random-step",
           "name": "runtime_random_step",
           "classification": "code",
@@ -3436,6 +3467,33 @@
               ]
             }
           }
+        },
+        {
+          "id": "maincpu.memory-copy-overlap",
+          "name": "memory_copy_overlap",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_memory.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_memory.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000f5e80",
+              "end": "0x000f5f10"
+            }
+          ],
+          "symbol": "recovered_memory_copy_overlap",
+          "modeling": {
+            "boundary": "Overlap-aware memory copy: disjoint ranges reuse the forward copy leaf and overlapping ranges copy backward when the destination begins inside the source interval.",
+            "test": "von/tools/test_recovered_memory.py",
+            "unresolved_behavior": "Caller buffer ownership, runtime alignment dispatch, and live mapped-memory effects remain outside this host-buffer contract."
+          },
+          "notes": "Recovers the 0xf5e80 sibling's interval-direction contract and connects its disjoint path to recovered_memory_copy_forward(); host tests cover overlapping and disjoint offsets."
         },
         {
           "id": "maincpu.memory-copy-forward",
@@ -5911,12 +5969,76 @@
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/i960/boot-path.md", "von/tools/test_recovered_object_threshold_constant_761b0.py"],
           "ranges": [{"start": "0x000761b0", "end": "0x00076234"}],
         "symbol": "recovered_object_threshold_constant_761b0",
-        "notes": "Pure fixture-tested threshold mapping: counters through 0x54 map to 0x45000000, 0x55..0x59 to 0x45800000, 0x5a..0x5e to 0x46000000, and 0x5f+ to 0x46800000; selector 29 is emitted. State/FIFO/MMIO effects remain external.",
+        "notes": "Pure fixture-tested prefix of geometry_object_threshold_query: 0x504dc0 through 0x54 maps to 0x45000000, 0x55..0x59 to 0x45800000, 0x5a..0x5e to 0x46000000, and 0x5f+ to 0x46800000; selector 29 is emitted. The object/FIFO query and residual checks continue beyond this bounded C slice.",
         "modeling": {
           "boundary": "i960 0x761b0 object-threshold selector plan covering four counter ranges, IEEE-754 output constants, and fixed selector 29",
           "test": "von/tools/test_recovered_object_threshold_constant_761b0.py",
           "unresolved_behavior": "state updates, FIFO/MMIO effects, caller context, and downstream use of the selected constant remain outside the pure threshold mapping"
         }
+        },
+        {
+          "id": "maincpu.geometry-related-threshold-bias-768f4",
+          "name": "geometry_related_threshold_bias_768f4",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_related_threshold_bias_768f4.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_related_threshold_bias_768f4.py", "von/i960/disassembly-annotations.md"],
+          "ranges": [{"start": "0x000768f4", "end": "0x00076930"}],
+          "symbol": "recovered_geometry_related_threshold_bias_768f4",
+          "modeling": {
+            "boundary": "Models the related-state/stage-ordinal predicate that adds 10 to 0x504dc0 after the projection threshold gates.",
+            "test": "von/tools/test_recovered_geometry_related_threshold_bias_768f4.py",
+            "unresolved_behavior": "Object-state semantic names, global ownership, paired 0x778b0 helper behavior, and downstream geometry consumers remain outside this pure threshold update."
+          },
+          "notes": "The four literal related states and stage ordinal 2 are transcribed from the consecutive cmpibe/cmpibne branches; unsigned 32-bit wrap is tested."
+        },
+        {
+          "id": "maincpu.geometry-projection-mode-threshold-gates-76858",
+          "name": "geometry_projection_mode_threshold_gates_76858",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_projection_mode_threshold_gates_76858.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_projection_mode_threshold_gates_76858.py", "von/i960/disassembly-annotations.md"],
+          "ranges": [{"start": "0x00076858", "end": "0x000768f0"}],
+          "symbol": "recovered_geometry_projection_mode_threshold_gates_76858",
+          "modeling": {
+            "boundary": "Models the mode-dependent threshold-101 branch and final r4-bounded raises to 90 and 100 after the 0x76808 re-clamp.",
+            "test": "von/tools/test_recovered_geometry_projection_mode_threshold_gates_76858.py",
+            "unresolved_behavior": "Semantic names/provenance of object fields and globals, upstream floating-point state, and downstream object-state consumers remain outside this register-oriented gate model."
+          },
+          "notes": "The object halfwords are modeled after the listing's mask-to-16-bit operations; strict branch boundaries are covered by mode-bypass, comparison, and threshold vectors."
+        },
+        {
+          "id": "maincpu.geometry-projection-threshold-reclamp-76808",
+          "name": "geometry_projection_threshold_reclamp_76808",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_projection_threshold_reclamp_76808.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_projection_threshold_reclamp_76808.py", "von/i960/disassembly-annotations.md"],
+          "ranges": [{"start": "0x00076808", "end": "0x00076850"}],
+          "symbol": "recovered_geometry_projection_threshold_reclamp_76808",
+          "modeling": {
+            "boundary": "Models the quantized projection threshold tail: r4 split, 0x50+r4 offset, signed 300 clamp, nonpositive fallback, and 0x504dc0 publication.",
+            "test": "von/tools/test_recovered_geometry_projection_threshold_reclamp_76808.py",
+            "unresolved_behavior": "Upstream floating-point quantization, exact caller meaning of r4, mode-dependent object gates, and downstream geometry consumers remain outside this integer-tail contract."
+          },
+          "notes": "The C model preserves 32-bit i960 arithmetic and uses signed comparisons for the clamp/fallback branches visible in the original listing."
+        },
+        {
+          "id": "maincpu.geometry-object-band-pair-76590",
+          "name": "geometry_object_band_pair_76590",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_object_band_pair_76590.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/i960/recovered_runtime_math.c", "von/tools/test_recovered_geometry_object_band_pair_76590.py", "von/i960/disassembly-annotations.md"],
+          "ranges": [{"start": "0x00076590", "end": "0x00076690"}],
+          "symbol": "recovered_geometry_object_band_pair_76590",
+          "modeling": {
+            "boundary": "Models the reversed cross-object request arithmetic, supplied command-10 response subtraction, low-halfword publication, and ten-band classification for the two object paths.",
+            "test": "von/tools/test_recovered_geometry_object_band_pair_76590.py",
+            "unresolved_behavior": "FIFO request/response production, object-record ownership, downstream threshold-query behavior, and later geometry/FPU consumers remain outside this deterministic prefix."
+          },
+          "notes": "The request operands and response deltas follow the listing's SUBR/SUBO order; the classifier intentionally consumes only each delta's low 16 bits, matching 0x73508 ABI behavior."
         },
         {
           "id": "maincpu.geometry-fifo-argument-plan-76240",
@@ -6491,7 +6613,8 @@
             "von/i960/disassembly-annotations.md",
             "von/build/disasm/vonj-maincpu.lst",
             "von/build/attract-coverage/vonj-attract-60s.worklist.json",
-            "von/tools/test_secondary_object_state_dispatch.py"
+            "von/tools/test_secondary_object_state_dispatch.py",
+            "von/tools/test_recovered_secondary_dispatch_79d60.py"
           ],
           "ranges": [
             {
@@ -6501,10 +6624,11 @@
           ],
           "modeling": {
             "boundary": "Models the static ten-entry secondary dispatcher boundary: object state selects the instruction-locked state arms through the 0x79d8c table, with shared exits assigning transitions 13, 14, or 15 as documented by the listing oracle and dedicated boundary test.",
-            "test": "von/tools/test_secondary_object_state_dispatch.py",
+            "test": "von/tools/test_recovered_secondary_dispatch_79d60.py",
             "unresolved_behavior": "The object/related-pointer handoff, floating comparison polarity, live timing and mode inputs, global transition publication, indirect arm execution, and input-driven pointer correlation remain runtime-validation targets."
           },
-          "notes": "Separate ten-entry object-state dispatcher. It preserves the object in r4, derives the related pointer through 0x74 into r5, dispatches on object state through 0x79d8c, and emits transitions 13, 14, or 15 from timing/mode/tag predicates. States 1-7 are instruction-locked by the static oracle: state 1 uses 0x40590000/0x4062c000 timing bands and tag/caller exits; state 2 uses 0x4062c000/0x40790000 timing bands and mode exits; state 3 gates caller 2/3 and related states 6/3; state 4 uses 0x40590000/0x40690000 and absolute caller-state selection; state 5 writes 13/14/15 to 0x504d98; state 6 uses related-state/0x504e4c gates and the 0x40568000..0x405b8000 window; state 7 uses related-tag/state/0x504d9c gates. Terminal state 8 writes 13, state 9 returns, and shared exits write 15 or 13. Its floating comparison polarity and live pointer/global provenance remain runtime-validation targets.",
+          "symbol": "recovered_secondary_dispatch_target_79d60",
+          "notes": "Separate ten-entry object-state dispatcher. It preserves the object in r4, derives the related pointer through 0x74 into r5, dispatches on object state through 0x79d8c, and emits transitions 13, 14, or 15 from timing/mode/tag predicates. The reusable C seam now locks the ten table targets and maps shared exits 0x7a1e4, 0x7a11c, 0x7a1f4, and direct state-8 exit 0x7a204 to transitions 15, 14, 13, and 13. States 1-7 remain instruction-locked by the static oracle: state 1 uses 0x40590000/0x4062c000 timing bands and tag/caller exits; state 2 uses 0x4062c000/0x40790000 timing bands and mode exits; state 3 gates caller 2/3 and related states 6/3; state 4 uses 0x40590000/0x40690000 and absolute caller-state selection; state 5 writes 13/14/15 to 0x504d98; state 6 uses related-state/0x504e4c gates and the 0x40568000..0x405b8000 window; state 7 uses related-tag/state/0x504d9c gates. Terminal state 8 writes 13, state 9 returns, and shared exits write 15 or 13. Its floating comparison polarity and live pointer/global provenance remain runtime-validation targets.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -7290,11 +7414,11 @@
             }
           ],
           "symbol": "recovered_timing_variant_route",
-          "notes": "Recovers the pure normalized-difference guard and current-vs-threshold split to action 5 or action 10. Calls to 0x784c8, 0x783c8, and 0x78408 and their mapped state effects remain outside the adapter.",
+          "notes": "Recovers the normalized-difference guard and current-vs-threshold split to action 5 or action 10, composed with the preceding 0x784c8 status-write predicate. Calls to 0x783c8 and 0x78408 and their mapped state effects remain outside the adapter.",
           "modeling": {
-            "boundary": "Purely models the 0x786d0 timing decision: decode current_bits and threshold_bits as floats, reject when fabsf(current - threshold) is NaN, otherwise route current >= threshold to action 5 and current < threshold to action 10.",
+            "boundary": "Models the 0x786d0 timing decision and its preceding 0x784c8 status predicate: decode current_bits and threshold_bits as floats, reject when fabsf(current - threshold) is NaN, otherwise route current >= threshold to action 5 and current < threshold to action 10 while returning the status-write decision.",
             "test": "von/tools/test_recovered_timing_variant.py",
-            "unresolved_behavior": "The runtime producers of both float values, calls to 0x784c8/0x783c8/0x78408, mapped object-state writes, and downstream action effects are not modeled."
+            "unresolved_behavior": "The runtime producers of both float values, calls to 0x783c8/0x78408, mapped object-state writes, and downstream action effects are not modeled."
           }
         },
         {
@@ -8542,6 +8666,25 @@
           }
         },
         {
+          "id": "maincpu.geometry-profile-table-loader",
+          "name": "geometry_profile_table_loader",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_profile_table_loader.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_geometry_projection_mode_setup.py", "von/tools/test_recovered_geometry_profile_table_loader.py", "von/i960/disassembly-annotations.md"],
+          "ranges": [
+            {"start": "0x0006f900", "end": "0x0006f968"},
+            {"start": "0x0006f970", "end": "0x0006f9d8"}
+          ],
+          "symbol": "recovered_geometry_profile_table_loader",
+          "modeling": {
+            "boundary": "Models the shared 24-byte profile-record loader core: select record g0, publish words 0/1/3, set bit 6 in the incoming g1 selector, and expose record word 5 as the FIFO payload while leaving each entry's return stub separate.",
+            "test": "von/tools/test_recovered_geometry_profile_table_loader.py",
+            "unresolved_behavior": "Live FIFO transport, profile-record semantic names, and the distinct local return stubs at 0x6f964 and 0x6f9d4 remain outside this pure loader contract."
+          },
+          "notes": "Twin entries have identical field flow and differ only in their local bx return stubs; the existing static mode setup oracle pins both instruction shapes and all 16 callback targets."
+        },
+        {
           "id": "maincpu.geometry-projection-mode-validation-tail",
           "name": "geometry_projection_mode_validation_tail",
           "classification": "code",
@@ -8584,21 +8727,27 @@
           ],
           "ranges": [
             {
+              "start": "0x0006f9e0",
+              "end": "0x0006fa30"
+            },
+            {
               "start": "0x0006fa40",
               "end": "0x0006fb80"
             }
           ],
           "symbol": "recovered_geometry_pool64_acquire",
-          "notes": "Recovers the paired 64-slot and 32-slot cursor primitives: increment-before-read acquisition, decrement-before-store release, and unchanged-count 0xffffffff failure at counts 64 and 32 respectively.",
+          "notes": "Recovers the paired 64-slot and 32-slot cursor primitives: increment-before-read acquisition, decrement-before-store release, unchanged-count 0xffffffff failure at counts 64 and 32 respectively, the 0x6f9e0 reset that clears the 64 release slots plus one field in each 0x54-byte record and zeroes its cursor, and the 0x6fad0 reset that clears all 32 release slots and zeroes its cursor.",
           "modeling": {
-            "boundary": "Purely models both bounded slot pools: acquire increments before reading until counts 64 or 32 are exhausted, returns 0xffffffff without changing an exhausted count, and release decrements before storing the returned value.",
+            "boundary": "Models both bounded slot pools: acquire increments before reading until counts 64 or 32 are exhausted, returns 0xffffffff without changing an exhausted count, release decrements before storing the returned value, 0x6f9e0 clears the 64-entry pool and its strided record field while resetting 0x51c880, and 0x6fad0 clears the 32-entry release pool and cursor.",
             "test": "von/tools/test_recovered_geometry_slot_pool.py",
             "unresolved_behavior": "Does not model pool ownership, concurrent callers, caller-specific slot contents, or the surrounding geometry setup and teardown sequencing."
           },
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
+                "0x0006f9e0",
                 "0x0006fa48",
+                "0x0006fad0",
                 "0x0006fad8",
                 "0x0006fb18"
               ]
@@ -8625,9 +8774,9 @@
             }
           ],
           "symbol": "recovered_geometry_record_init",
-          "notes": "Recovers the deterministic 84-byte record initialization from the 0x6fb90 allocator: eleven template-word placements, cleared status/link fields, and the association-value/999 sentinel branches. The following bookkeeping commit is tracked separately.",
+          "notes": "Recovers the deterministic 84-byte record initialization from the 0x6fb90 allocator: eleven template-word placements including the narrowed unaligned +0x3e halfword, cleared status/link fields, and the association-value/999 sentinel branches. The following bookkeeping commit is tracked separately.",
           "modeling": {
-            "boundary": "Purely models initialization of one 84-byte record: clear all 21 aligned words, copy the eleven template fields into their recovered offsets, set association and 999 sentinel values, and leave status/link fields zeroed.",
+            "boundary": "Purely models initialization of one 84-byte little-endian record image: clear all 84 bytes, copy the eleven template fields into their recovered offsets, narrow source +0x24 to the destination +0x3e halfword store, set association and 999 sentinel values, and leave status/link fields zeroed.",
             "test": "von/tools/test_recovered_geometry_record_init.py",
             "unresolved_behavior": "Does not model allocator/free-list head mutation, mapped record ownership, linked-record bookkeeping, or subsequent geometry pipeline consumption."
           },
@@ -8686,9 +8835,9 @@
             }
           ],
           "symbol": "recovered_geometry_link_release_plan",
-          "notes": "Recovers the symmetric link-repair decisions for record offsets 0x14/0x18, 999-sentinel side-table targets, referenced-record targets, and the source reference-count decrement. Mapped writes and pool bookkeeping remain outside the pure plan.",
+          "notes": "Recovers the symmetric link-repair decisions for record offsets 0x14/0x18, 999-sentinel side-table targets, referenced-record targets, and the source reference-count decrement. The integrated apply wrapper also returns the source slot through the 0x6fb58 release leaf before repairs; mapped record writes remain outside the pure plan.",
           "modeling": {
-            "boundary": "Purely models release link repair: route each 0x14/0x18 link either to the referenced record's opposite field or to the corresponding source side-table offset 0x5c8/0x5c4 when the link is 999, write the opposite link value, and decrement the reference count with 32-bit wraparound.",
+            "boundary": "Models the 0x6fd50 teardown ordering: return the source slot to the 32-entry pool first, then route each 0x14/0x18 link either to the referenced record's opposite field or to the corresponding source side-table offset 0x5c8/0x5c4 when the link is 999, write the opposite link value, and decrement the reference count with 32-bit wraparound.",
             "test": "von/tools/test_recovered_geometry_link_release.py",
             "unresolved_behavior": "Does not perform mapped-memory writes, pool release/head bookkeeping, pointer traversal, concurrent ownership changes, or downstream record consumers."
           }
@@ -8712,11 +8861,11 @@
             }
           ],
           "modeling": {
-            "boundary": "selector-gated geometry helper returns for nonzero selectors and for selector zero writes 0x303 plus the exact 0x80/0x00f80140 control-pulse sequence to the mapped geometry ports",
-            "test": "von/tools/test_geometry_control_selector.py",
+            "boundary": "selector-gated geometry helper returns for nonzero selectors and for selector zero writes 0x303, the paired 0x80/0x01f40204 store, and the exact 0x00f80140 control-pulse words to the mapped geometry ports",
+            "test": "von/tools/test_recovered_geometry_control_selector_6fec0.py",
             "unresolved_behavior": "geometry-board interpretation and MMIO timing remain hardware-specific beyond the host-side write contract"
           },
-          "notes": "Selector-zero guard and exact geometry control writes are recovered: 0x303 to 0x00800030, 0x80 to 0x00804000, and 0x00f80140 to 0x00804008, 0x0080400c, and 0x00804000 twice. Hardware interpretation remains external to the host contract.",
+          "notes": "Selector-zero guard and exact geometry control writes are recovered in C: 0x303 to 0x00800030, the stl pair 0x80/0x01f40204 to 0x00804000/0x00804004, and 0x00f80140 to 0x00804008, 0x0080400c, and 0x00804000 twice. Hardware interpretation remains external to the host contract.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -9110,6 +9259,426 @@
           }
         },
         {
+          "id": "maincpu.transition-action-wrapper-10",
+          "name": "transition_action_wrapper_action10",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_wrapper.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_transition_wrapper.c",
+            "von/tools/test_recovered_transition_wrapper.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00078408",
+              "end": "0x00078438"
+            }
+          ],
+          "symbol": "recovered_transition_wrapper_action10",
+          "modeling": {
+            "boundary": "Models the action-10 sibling: the supplied transition table is indexed by selector, its value is written to transition state, and action 10 is published.",
+            "test": "von/tools/test_recovered_transition_wrapper.py",
+            "unresolved_behavior": "The ROM table contents beyond the fixture, global storage addresses, caller sequencing, and downstream action execution remain outside this pure adapter."
+          },
+          "notes": "The 0x78408 leaf is distinct from 0x783c8: it indexes ROM table 0x72750 and publishes action 10, while preserving the same selector-to-transition write shape."
+        },
+        {
+          "id": "maincpu.transition-conditioned-wrapper-78818",
+          "name": "transition_conditioned_wrapper_78818",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_conditioned_wrapper_78818.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_transition_conditioned_wrapper_78818.c",
+            "von/tools/test_recovered_transition_conditioned_wrapper_78818.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00078818",
+              "end": "0x00078880"
+            }
+          ],
+          "symbol": "recovered_transition_conditioned_wrapper_78818",
+          "modeling": {
+            "boundary": "Models the 0x78818 transition table lookup and the exact conjunction of mode bit 5 and gate value 1 that changes status, selector state, and action.",
+            "test": "von/tools/test_recovered_transition_conditioned_wrapper_78818.py",
+            "unresolved_behavior": "The fixed continuation at 0x78880 is only an ABI return boundary; runtime object meaning and downstream transition execution remain unresolved."
+          },
+          "notes": "Recovers the normal table-0x72690/action-5 path and the gated status-1, selector-6, action-20 override at 0x78818."
+        },
+        {
+          "id": "maincpu.transition-state3-wrapper-78bd8",
+          "name": "transition_state3_wrapper_78bd8",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_state3_wrapper_78bd8.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_transition_state3_wrapper_78bd8.c",
+            "von/tools/test_recovered_transition_state3_wrapper_78bd8.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00078bd8",
+              "end": "0x00078c74"
+            }
+          ],
+          "symbol": "recovered_transition_state3_wrapper_78bd8",
+          "modeling": {
+            "boundary": "Models the table-0x72690 default and priority-ordered state-3/mode-mask and bit-3/gate transition overrides.",
+            "test": "von/tools/test_recovered_transition_state3_wrapper_78bd8.py",
+            "unresolved_behavior": "The fixed continuation at 0x78c74 is an ABI return boundary; runtime object semantics and downstream transition execution remain unresolved."
+          },
+          "notes": "Recovers selector states 18 and 16, status 1, and action 20 under the exact branch ordering at 0x78bd8."
+        },
+        {
+          "id": "maincpu.transition-state3-variant-78c80",
+          "name": "transition_state3_variant_78c80",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_state3_variant_78c80.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_transition_state3_variant_78c80.c",
+            "von/tools/test_recovered_transition_state3_variant_78c80.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00078c80",
+              "end": "0x00078d44"
+            }
+          ],
+          "symbol": "recovered_transition_state3_variant_78c80",
+          "modeling": {
+            "boundary": "Models the table-0x72690 default and priority-ordered selector-18 and selector-17/18 overrides controlled by object state, mode bits, and transition gate.",
+            "test": "von/tools/test_recovered_transition_state3_variant_78c80.py",
+            "unresolved_behavior": "The fixed continuation at 0x78d44 is an ABI return boundary; runtime object semantics and downstream transition execution remain unresolved."
+          },
+          "notes": "Recovers the state-3/mask-0xc selector-18 path, bit-4/gate selector-17 path, and state-3/bit-2 upgrade to selector 18 at 0x78c80."
+        },
+        {
+          "id": "maincpu.transition-conditioned-wrapper-78d50",
+          "name": "transition_conditioned_wrapper_78d50",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_conditioned_wrapper_78818.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_transition_conditioned_wrapper_78818.c",
+            "von/tools/test_recovered_transition_conditioned_wrapper_78818.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00078d50",
+              "end": "0x00078dc0"
+            }
+          ],
+          "symbol": "recovered_transition_conditioned_wrapper_78d50",
+          "modeling": {
+            "boundary": "Models the shared bit-5/gate-1 transition predicate with selector-state-18 override, status 1, and action 20; unmatched calls retain action 5.",
+            "test": "von/tools/test_recovered_transition_conditioned_wrapper_78818.py",
+            "unresolved_behavior": "The fixed continuation at 0x78dc0 is an ABI return boundary; runtime object meaning and downstream transition execution remain unresolved."
+          },
+          "notes": "The 0x78d50 sibling shares the conditioned wrapper predicate but publishes selector state 18, while 0x78818 publishes selector state 6."
+        },
+        {
+          "id": "maincpu.transition-post-threshold-79630",
+          "name": "transition_post_threshold_79630",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_post_threshold_79630.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_transition_post_threshold_79630.c",
+            "von/tools/test_recovered_transition_post_threshold_79630.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00079630",
+              "end": "0x00079714"
+            }
+          ],
+          "symbol": "recovered_transition_post_threshold_79630",
+          "modeling": {
+            "boundary": "Models the eight-entry normalized transition table, out-of-range table bypass, shared-state re-entry, and action-30 tail; normalized input is supplied by the caller.",
+            "test": "von/tools/test_recovered_transition_post_threshold_79630.py",
+            "unresolved_behavior": "Threshold acceptance and the exact 0xf5058 result-normalization arithmetic remain outside this pure selector contract."
+          },
+          "notes": "Captures the static table values 1,1,2,2,3,3,5,6 and the common re-entry/action-30 sequence at 0x79630."
+        },
+        {
+          "id": "maincpu.transition-dispatch-79720",
+          "name": "transition_dispatch_79720",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_dispatch_79720.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_transition_dispatch_79720.c",
+            "von/tools/test_recovered_transition_dispatch_79720.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00079720",
+              "end": "0x00079834"
+            }
+          ],
+          "symbol": "recovered_transition_dispatch_79720",
+          "modeling": {
+            "boundary": "Models the post-threshold ten-entry caller-state dispatch, transition constants, gate-1 shared-state re-entry, and action-30 tail; threshold decision is supplied by the caller.",
+            "test": "von/tools/test_recovered_transition_dispatch_79720.py",
+            "unresolved_behavior": "Entry threshold comparison and downstream object-state effects of 0x79050 remain outside this pure dispatch contract."
+          },
+          "notes": "Recovers the static caller-state mapping 0/1 to 18, 2-4 to 12, 5-7 to 13, and 8/9 to 19, with gate-1 overrides for 0/1/8/9."
+        },
+        {
+          "id": "maincpu.transition-728d0-variant-79840",
+          "name": "transition_728d0_variant_79840",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_728d0_variant_79840.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_transition_728d0_variant_79840.c",
+            "von/tools/test_recovered_transition_728d0_variant_79840.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00079840",
+              "end": "0x0007990c"
+            }
+          ],
+          "symbol": "recovered_transition_728d0_variant_79840",
+          "modeling": {
+            "boundary": "Models the post-threshold low/high caller-state gates around the supplied 0x728d0 table value, including gate-1 shared-state re-entry and action-30 publication.",
+            "test": "von/tools/test_recovered_transition_728d0_variant_79840.py",
+            "unresolved_behavior": "Entry threshold polarity and 0x728d0 ROM contents remain outside this pure schedule."
+          },
+          "notes": "Recovers clear-gate transitions 18 and 19, table preservation for states 2-7, and gate-1 transitions 1/3 with status 1 and action 30."
+        },
+        {
+          "id": "maincpu.geometry-entry-gate-78dd0",
+          "name": "geometry_entry_gate_78dd0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_geometry_entry_gate_78dd0.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_geometry_entry_gate_78dd0.c",
+            "von/tools/test_recovered_geometry_entry_gate_78dd0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00078dd0",
+              "end": "0x00078de8"
+            }
+          ],
+          "symbol": "recovered_geometry_entry_route_78dd0",
+          "modeling": {
+            "boundary": "Models the entry gate: object states 2 and 4 call 0x7cbc0; all other states enter the command-29 packet path.",
+            "test": "von/tools/test_recovered_geometry_entry_gate_78dd0.py",
+            "unresolved_behavior": "The downstream command-29 packet builder, hardware response, and service side effects remain outside this pure route selector."
+          },
+          "notes": "Exact cmpibe/cmpibne state split recovered from 0x78dd0-0x78de8."
+        },
+        {
+          "id": "maincpu.transition-service-7cbc0",
+          "name": "transition_service_7cbc0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_service_7cbc0.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_transition_service_7cbc0.c",
+            "von/tools/test_recovered_transition_service_7cbc0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007cbc0",
+              "end": "0x0007cc44"
+            }
+          ],
+          "symbol": "recovered_transition_service_7cbc0",
+          "modeling": {
+            "boundary": "Models the timing-gated service: clear timing routes to the existing action-5 wrapper, while passed timing selects the 0x72900 action-10 selector and applies the control-1 transition override.",
+            "test": "von/tools/test_recovered_transition_service_7cbc0.py",
+            "unresolved_behavior": "The converted 0x504e0c versus 0x504d60 comparison, 0x72900 table contents, and side effects of the delegated 0x783c8 call remain integration inputs."
+          },
+          "notes": "Exact service writes recover action 10, status 1, transition 2/3, and action 25 for control value 1."
+        },
+        {
+          "id": "maincpu.transition-status-dispatch-784c8",
+          "name": "transition_status_dispatch_784c8",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_status_dispatch_784c8.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_transition_status_dispatch_784c8.c",
+            "von/tools/test_recovered_transition_status_dispatch_784c8.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000784c8",
+              "end": "0x0007863c"
+            }
+          ],
+          "symbol": "recovered_transition_status_should_set_784c8",
+          "modeling": {
+            "boundary": "Models the ten selector arms that conditionally write status 1 to 0x504d84 from mode bits 1 and 2.",
+            "test": "von/tools/test_recovered_transition_status_dispatch_784c8.py",
+            "unresolved_behavior": "The saved continuation ABI and caller-owned persistent status cell remain outside this pure write-decision helper."
+          },
+          "notes": "Exact selector grouping: 0/6 use bit 1, 1/3 use bit 2, and 2/4/5/7/8/9 use mode mask 6."
+        },
+        {
+          "id": "maincpu.timing-status-variant-78740",
+          "name": "timing_status_variant_78740",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_timing_status_variant_78740.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_timing_status_variant_78740.c",
+            "von/tools/test_recovered_timing_status_variant_78740.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00078740",
+              "end": "0x00078780"
+            }
+          ],
+          "symbol": "recovered_timing_status_variant_78740",
+          "modeling": {
+            "boundary": "Models the normalized timing guard and inverted comparable split: current greater than threshold selects action 10, otherwise status 1 is written directly.",
+            "test": "von/tools/test_recovered_timing_status_variant_78740.py",
+            "unresolved_behavior": "The preceding 0x784c8 status call, runtime threshold producer, action-10 mapped writes, and persistent status-cell effects remain outside this pure result plan."
+          },
+          "notes": "Exact 0x504dd8 sibling behavior; no action-5 call occurs in this arm."
+        },
+        {
+          "id": "maincpu.state8-action-route-78790",
+          "name": "state8_action_route_78790",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state8_action_route_78790.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_state8_action_route_78790.c",
+            "von/tools/test_recovered_state8_action_route_78790.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00078790",
+              "end": "0x00078808"
+            }
+          ],
+          "symbol": "recovered_state8_action_route_78790",
+          "modeling": {
+            "boundary": "Models the state-8 normalized timing guard, action-10/action-5 split, control-1 related-band table selection, and invalid-timing status write.",
+            "test": "von/tools/test_recovered_state8_action_route_78790.py",
+            "unresolved_behavior": "The runtime producer of the 0x504dd6 threshold, contents and mapped writes of tables 0x72990/0x729f0, and delegated action-helper effects remain outside this route plan."
+          },
+          "notes": "The related-band comparison is unsigned and uses the 0x504d68 word loaded by the 0x504d60 quad."
+        },
+        {
+          "id": "maincpu.state-geometry-packet-78890",
+          "name": "state_geometry_packet_78890",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_geometry_packet_78890.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_state_geometry_packet_78890.c",
+            "von/tools/test_recovered_state_geometry_packet_78890.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00078890",
+              "end": "0x00078a28"
+            }
+          ],
+          "symbol": "recovered_state_geometry_packet_78890",
+          "modeling": {
+            "boundary": "Models the command-29/30 pair, response-derived command-10 operands, command-31 tail inputs, action-5 default, and mode-bit-5/control-1 status-transition override.",
+            "test": "von/tools/test_recovered_state_geometry_packet_78890.py",
+            "unresolved_behavior": "The 0x504df8 divisor/FPU scale, live FIFO responses, 0x729c0 table contents, command-31 response, and hardware side effects remain outside this packet plan."
+          },
+          "notes": "The packet uses 16-bit wrapping after ldos sign extension and preserves i960 unsigned subtraction wrap in derived operands."
+        },
+        {
+          "id": "maincpu.state-geometry-packet-78a30",
+          "name": "state_geometry_packet_78a30",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_geometry_packet_78890.c"
+          ],
+          "evidence": [
+            "von/i960/disassembly-annotations.md",
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/recovered_state_geometry_packet_78890.c",
+            "von/tools/test_recovered_state_geometry_packet_78890.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00078a30",
+              "end": "0x00078bc8"
+            }
+          ],
+          "symbol": "recovered_state_geometry_packet_78a30",
+          "modeling": {
+            "boundary": "Models the 0x72a20 selector sibling using the shared command-29/30/10/31 packet flow, opposite coordinate bias, and mode-bit-5/control-1 override.",
+            "test": "von/tools/test_recovered_state_geometry_packet_78890.py",
+            "unresolved_behavior": "The 0x504df8 divisor/FPU scale, live FIFO responses, 0x72a20 table contents, command-31 response, and hardware side effects remain outside this packet plan."
+          },
+          "notes": "Shares all packet arithmetic with 0x78890; only the selector table and +0x184 bias direction differ."
+        },
+        {
           "id": "maincpu.timing-sample-extrema-update",
           "name": "timing_sample_extrema_update",
           "classification": "code",
@@ -9352,12 +9921,14 @@
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md"
+            "von/i960/disassembly-annotations.md",
+            "von/i960/recovered_text_formatter_dispatch.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
             "von/i960/boot-path.md",
-            "von/build/disasm/vonj-maincpu.lst"
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_text_formatter_dispatch.py"
           ],
           "ranges": [
             {
@@ -9367,10 +9938,11 @@
           ],
           "modeling": {
             "boundary": "general text formatter creates a saved context, parses bytes through the 0xf5210 dispatch table, emits expanded characters through 0x1cc40, and converges unsupported directives at 0xf5bf4",
-            "test": "von/tools/test_text_formatter_boundary.py",
+            "test": "von/tools/test_recovered_text_formatter_dispatch.py",
             "unresolved_behavior": "full printf-style conversion semantics and live directive coverage remain provisional beyond the recovered control-flow boundary"
           },
-          "notes": "Static boundary for the general formatted-text path: 0xf5100 creates the saved context, 0xf5190 parses the format string and dispatches through the 0xf5210 table, and unsupported/conversion-specific paths converge at 0xf5bf4. Plain strings and the observed two-digit diagnostic are separately reconstructed; full conversion replacement remains deferred until runtime vectors cover the live directives.",
+          "symbol": "recovered_text_formatter_dispatch_target",
+          "notes": "Static boundary for the general formatted-text path: 0xf5100 creates the saved context, 0xf5190 parses the format string and dispatches through the exact 121-entry 0xf5210 table, and unsupported/conversion-specific paths converge at 0xf5bf4. Plain strings and the observed two-digit diagnostic are separately reconstructed; full conversion replacement remains deferred until runtime vectors cover the live directives.",
           "milestones": {
             "c-only-i960-attract-60s": {
               "entries": [
@@ -9712,12 +10284,40 @@
           "notes": "Pure emit schedule for the 0xe3a70 fan-out: emits the first three string bytes with sign extension through 0x1d570."
         },
         {
+          "id": "maincpu.record-flag-scan-77c40",
+          "name": "record_flag_scan_77c40",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_record_flag_scan_77c40.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_record_flag_scan_77c40.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00077c40",
+              "end": "0x00077dd0"
+            }
+          ],
+          "symbol": "recovered_record_flag_scan_77c40_plan",
+          "modeling": {
+            "boundary": "Structural two-pass scan contract: 32 records at object +0x200 with 0x20-byte stride, output byte 0x504e50, bit-13 match counter, threshold 20, and literal output-bit positions.",
+            "test": "von/tools/test_recovered_record_flag_scan_77c40.py",
+            "unresolved_behavior": "The register-derived second-pass comparison polarity and higher-level meanings of the output flags remain runtime-validation targets."
+          },
+          "notes": "The listing initializes 0x504e50, scans 32 records in two passes, uses record halfword +0x2 bit 13 for the shared counter, and tests the final count against 20 before setting output bit 0. The plan preserves literal first-pass output bits 3/6/7 and second-pass bits 4/2/5 without assigning semantic names."
+        },
+        {
           "id": "maincpu.state-shift-77e20",
           "name": "state_shift_77e20",
           "classification": "code",
           "stage": "modeled",
           "sources": [
-            "von/i960/disassembly-annotations.md"
+            "von/i960/disassembly-annotations.md",
+            "von/i960/recovered_memory.c"
           ],
           "evidence": [
             "von/i960/disassembly-annotations.md",
@@ -9726,7 +10326,7 @@
           ],
           "ranges": [
             {
-              "start": "0x00077e20",
+              "start": "0x00077de0",
               "end": "0x00077e50"
             }
           ],
@@ -9735,7 +10335,7 @@
             "test": "von/tools/test_recovered_memory.py",
             "unresolved_behavior": "Runtime state contents and exact wrapper instruction encoding remain provisional beyond the fixed address/length contract"
           },
-          "notes": "Fixed wrapper around 0xf5d40 like 0x2330: two chained 0xf4-byte copies shifting state down one slot. All addresses and the length are immediate and reuse the recovered forward-copy contract."
+          "notes": "Fixed wrappers around 0xf5d40 like 0x2330: 0x77de0 copies 0x504f60 -> 0x504d60 -> 0x504e60, while 0x77e20 copies 0x504e60 -> 0x504d60 and 0x504f60 -> 0x504e60. All addresses and the 0xf4 length are immediate and reuse the recovered forward-copy contract; both sequences are host-tested."
         },
         {
           "id": "maincpu.divisor-clamp-78090",
@@ -9847,6 +10447,1239 @@
             "unresolved_behavior": "None; both bodies are a single call plus return"
           },
           "notes": "Tracked as ABI scaffolding like the 0x27d8 trampoline: no translation needed beyond naming the forwarding targets."
+        },
+        {
+          "id": "maincpu.transition-setup-7a318",
+          "name": "transition_setup_7a318",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_setup_7a318.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_transition_setup_7a318.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007a318",
+              "end": "0x0007a3d0"
+            }
+          ],
+          "symbol": "recovered_transition_setup_7a318",
+          "modeling": {
+            "boundary": "Callback-returning action-34 setup: gate 0x504dc8 publishes transition/status ones, selected object states publish the cursor-clamped 0x504db8 value, and remaining states publish 12 or 13 to 0x504d94",
+            "test": "von/tools/test_recovered_transition_setup_7a318.py",
+            "unresolved_behavior": "The callback return-link protocol and live global storage remain outside this pure write schedule"
+          },
+          "notes": "Exact state partition from 0x7a318: states 1,2,4,5,7 use the 0x504dbc+22 versus g28+31/g29+31 bound selection; non-selected states use literal-first unsigned cmpobl on state-1 to choose 12 or 13. Reached by the 0x7802c action dispatcher arm.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x0007a318"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-status-prefix-82650",
+          "name": "state_status_prefix_82650",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_status_prefix_82650.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_status_prefix_82650.c",
+            "von/tools/test_recovered_state_status_prefix_82650.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082650",
+              "end": "0x000826b0"
+            }
+          ],
+          "symbol": "recovered_state_status_prefix_82650",
+          "modeling": {
+            "boundary": "Models the exact early status prefix: (r5,r6)=(0,0) writes status 8; (0,1) writes status 3 when global 0x504d70 <= 4 or status 4 above it; all other pairs continue into the downstream descriptor/state path.",
+            "test": "von/tools/test_recovered_state_status_prefix_82650.py",
+            "unresolved_behavior": "The continuing descriptor lookup, geometry packet construction, timing, transition, and persistent status effects remain outside this prefix model."
+          },
+          "notes": "The signed global comparison preserves the inclusive status-3 boundary at 0x504d70 == 4; the two terminal branches are modeled separately from the unresolved continuation.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082650"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-handler-dispatch-82800",
+          "name": "state_handler_dispatch_82800",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_handler_dispatch_82800.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_handler_dispatch_82800.c",
+            "von/tools/test_recovered_state_handler_dispatch_82800.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082800",
+              "end": "0x00082840"
+            }
+          ],
+          "symbol": "recovered_state_handler_dispatch_82800",
+          "modeling": {
+            "boundary": "Models the unsigned selector <= 9 gate and exact ten-entry handler target table at 0x82818.",
+            "test": "von/tools/test_recovered_state_handler_dispatch_82800.py",
+            "unresolved_behavior": "The ten handler bodies, their random/status effects, and the shared reject/return continuation remain outside this dispatcher boundary."
+          },
+          "notes": "The table preserves the non-monotonic target order in the image, including selector 7 -> 0x8293c and selector 8 -> 0x828e8.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082800"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-action-dispatch-82040",
+          "name": "state_action_dispatch_82040",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_action_dispatch_82040.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_action_dispatch_82040.c",
+            "von/tools/test_recovered_state_action_dispatch_82040.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082040",
+              "end": "0x00082088"
+            }
+          ],
+          "symbol": "recovered_state_action_dispatch_82040",
+          "modeling": {
+            "boundary": "Models the unsigned state <= 9 gate and exact ten-entry action handler table.",
+            "test": "von/tools/test_recovered_state_action_dispatch_82040.py",
+            "unresolved_behavior": "The ten action handlers and their timing, random, FIFO, and transition effects remain outside this dispatcher boundary."
+          },
+          "notes": "The table is directly indexed by object field +0x64 with four-byte entries.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082040"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-scheduler-tail-82d74",
+          "name": "state_scheduler_tail_82d74",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_scheduler_tail_82d74.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_scheduler_tail_82d74.c",
+            "von/tools/test_recovered_state_scheduler_tail_82d74.py",
+            "von/i960/recovered_state_scheduler_dispatch_82b4c.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082d74",
+              "end": "0x00082da4"
+            }
+          ],
+          "symbol": "recovered_state_scheduler_tail_82d74",
+          "modeling": {
+            "boundary": "Models the shared quadword rewrite, second-word clear, and conditional 0x504d90 = 15 publication for statuses <= 6 or 8.",
+            "test": "von/tools/test_recovered_state_scheduler_tail_82d74.py",
+            "unresolved_behavior": "The caller-specific handler stores and later scheduler return ABI remain outside this common tail model."
+          },
+          "notes": "The status partition is derived from subo/cmpobge plus the exact status-8 equality check; statuses 7 and 9+ do not write 0x504d90.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082d74"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-service-high-dispatch-82f90",
+          "name": "state_service_high_dispatch_82f90",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_service_high_dispatch_82f90.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_service_high_dispatch_82f90.c",
+            "von/tools/test_recovered_state_service_high_dispatch_82f90.py",
+            "von/i960/recovered_state_service_dispatch_82db0.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082f90",
+              "end": "0x00082fdc"
+            }
+          ],
+          "symbol": "recovered_state_service_high_dispatch_82f90",
+          "modeling": {
+            "boundary": "Models the signed-negative adjustment, low-two-bit-cleared remainder, and unsigned 0..7 indirect dispatch table.",
+            "test": "von/tools/test_recovered_state_service_high_dispatch_82f90.py",
+            "unresolved_behavior": "The random producer, eight downstream handlers, and shared reject target remain outside this normalization/dispatch model."
+          },
+          "notes": "The exact table preserves all eight targets; negative remainders are rejected by the unsigned selector bound after the observed adjustment sequence.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082f90"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-service-random-mod7-82f84",
+          "name": "state_service_random_mod7_82f84",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_service_random_mod7_82f84.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_service_random_mod7_82f84.c",
+            "von/tools/test_recovered_state_service_random_mod7_82f84.py",
+            "von/i960/recovered_state_service_dispatch_82db0.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082f84",
+              "end": "0x00082f90"
+            }
+          ],
+          "symbol": "recovered_state_service_random_mod7_82f84",
+          "modeling": {
+            "boundary": "Models the remi-7 remainder emitted by the 0x82f84 leaf and its direct handoff to shared 0x82fac dispatch.",
+            "test": "von/tools/test_recovered_state_service_random_mod7_82f84.py",
+            "unresolved_behavior": "The random producer and shared 0x82fac target semantics remain outside this remainder boundary."
+          },
+          "notes": "The signed C remainder preserves the observed i960 remi behavior for negative helper results; a raw-word wrapper exposes the resulting bit pattern.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082f84"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-service-handler-82f6c",
+          "name": "state_service_handler_82f6c",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_service_handler_82f6c.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_service_handler_82f6c.c",
+            "von/tools/test_recovered_state_service_handler_82f6c.py",
+            "von/i960/recovered_state_service_dispatch_82db0.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082f6c",
+              "end": "0x00082f84"
+            }
+          ],
+          "symbol": "recovered_state_service_handler_82f6c",
+          "modeling": {
+            "boundary": "Models the exact modulo-5 remainder and object-state-3 conjunction selecting downstream value 2 before common dispatch.",
+            "test": "von/tools/test_recovered_state_service_handler_82f6c.py",
+            "unresolved_behavior": "The random producer, shared 0x82fac dispatch, and final status/state stores remain outside this handler gate."
+          },
+          "notes": "The handler is reached from object-state table selector 7 at 0x82dec and rejoins the shared service dispatch after selecting value 2.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082f6c"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-service-mod8-handlers-82ed4",
+          "name": "state_service_mod8_handlers_82ed4",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_service_mod8_handlers_82ed4.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_service_mod8_handlers_82ed4.c",
+            "von/tools/test_recovered_state_service_mod8_handlers_82ed4.py",
+            "von/i960/recovered_state_service_dispatch_82db0.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082ed4",
+              "end": "0x00082f10"
+            }
+          ],
+          "symbol": "recovered_state_service_mod8_handler",
+          "modeling": {
+            "boundary": "Models the modulo-8 remainder/state acceptance sets for the 0x82ed4 and 0x82f10 service targets before shared dispatch.",
+            "test": "von/tools/test_recovered_state_service_mod8_handlers_82ed4.py",
+            "unresolved_behavior": "The random normalization producer, shared 0x82fac dispatch, and final status/state stores remain outside these handler gates."
+          },
+          "notes": "The two target handlers are modeled together because both consume the normalized remainder from the same service cluster; all unaccepted combinations retain the shared fallback route.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082ed4"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-service-handler-82ea0",
+          "name": "state_service_handler_82ea0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_service_handler_82ea0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_service_handler_82ea0.c",
+            "von/tools/test_recovered_state_service_handler_82ea0.py",
+            "von/i960/recovered_state_service_dispatch_82db0.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082ea0",
+              "end": "0x00082ed4"
+            }
+          ],
+          "symbol": "recovered_state_service_handler_82ea0",
+          "modeling": {
+            "boundary": "Models the modulo-6 random gate, object-state-3 requirement, and downstream value 3 or 6 selection before shared dispatch.",
+            "test": "von/tools/test_recovered_state_service_handler_82ea0.py",
+            "unresolved_behavior": "The random producer, shared 0x82fac dispatch, and resulting status/state stores remain outside this handler gate."
+          },
+          "notes": "The handler is reached from object-state table selector 4 at 0x82de4; remainder 4 maps to value 3 and remainder 5 maps to value 6 only for object state 3.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082ea0"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-service-handler-82e40",
+          "name": "state_service_handler_82e40",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_service_handler_82e40.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_service_handler_82e40.c",
+            "von/tools/test_recovered_state_service_handler_82e40.py",
+            "von/i960/recovered_state_service_dispatch_82db0.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082e40",
+              "end": "0x00082e64"
+            }
+          ],
+          "symbol": "recovered_state_service_handler_82e40",
+          "modeling": {
+            "boundary": "Models the random modulo-5 gate and object-state-3 split selecting downstream values 2 or 5, with nonmatching remainders taking the shared fallback.",
+            "test": "von/tools/test_recovered_state_service_handler_82e40.py",
+            "unresolved_behavior": "The random producer, shared 0x82fac dispatch, and resulting state/status stores remain outside this handler gate."
+          },
+          "notes": "The handler is reached from object-state table selector 2 at 0x82ddc; the random remainder is supplied after the observed remi 5 instruction.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082e40"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-service-dispatch-82db0",
+          "name": "state_service_dispatch_82db0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_service_dispatch_82db0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_service_dispatch_82db0.c",
+            "von/tools/test_recovered_state_service_dispatch_82db0.py",
+            "von/i960/recovered_state_scheduler_gate_82ae0.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082db0",
+              "end": "0x00082df8"
+            }
+          ],
+          "symbol": "recovered_state_service_dispatch_82db0",
+          "modeling": {
+            "boundary": "Models the unsigned object-state <= 8 gate, exact nine-entry table, and high-state route to 0x82f90.",
+            "test": "von/tools/test_recovered_state_service_dispatch_82db0.py",
+            "unresolved_behavior": "The nine table handlers, high-state path, and common scheduler effects remain outside this dispatcher boundary."
+          },
+          "notes": "This dispatcher is the direct low-state route from the 0x82ae0 scheduler gate; table targets are preserved in image order.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082db0"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-scheduler-handler-82d18",
+          "name": "state_scheduler_handler_82d18",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_scheduler_handler_82d18.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_scheduler_handler_82d18.c",
+            "von/tools/test_recovered_state_scheduler_handler_82d18.py",
+            "von/i960/recovered_state_scheduler_dispatch_82b4c.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082d18",
+              "end": "0x00082d34"
+            }
+          ],
+          "symbol": "recovered_state_scheduler_handler_82d18",
+          "modeling": {
+            "boundary": "Models the object-state-8 predicate, status-3 publication, selector-20 write, and shared status-8 default.",
+            "test": "von/tools/test_recovered_state_scheduler_handler_82d18.py",
+            "unresolved_behavior": "The common scheduler tail and downstream meaning of selector 20 remain outside this handler model."
+          },
+          "notes": "The target is the table entry at selector 32 and joins the common tail after selecting status/selector values.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082d18"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-scheduler-state4-handlers-82ce8",
+          "name": "state_scheduler_state4_handlers_82ce8",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_scheduler_state4_handlers_82ce8.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_scheduler_state4_handlers_82ce8.c",
+            "von/tools/test_recovered_state_scheduler_state4_handlers_82ce8.py",
+            "von/i960/recovered_state_scheduler_dispatch_82b4c.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082ce8",
+              "end": "0x00082d18"
+            }
+          ],
+          "symbol": "recovered_state_scheduler_state4_handler",
+          "modeling": {
+            "boundary": "Models the complementary object-state-4 predicates at table targets 0x82ce8 and 0x82d04, including status and selector-28 writes.",
+            "test": "von/tools/test_recovered_state_scheduler_state4_handlers_82ce8.py",
+            "unresolved_behavior": "The common scheduler tail and consumers of the published cells remain outside these handler variants."
+          },
+          "notes": "The two handlers intentionally invert the state-4 status choice; target 0x82ce8 additionally publishes state 28 only on its state-4 arm.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082ce8"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-scheduler-constant-handlers-82cc0",
+          "name": "state_scheduler_constant_handlers_82cc0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_scheduler_constant_handlers_82cc0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_scheduler_constant_handlers_82cc0.c",
+            "von/tools/test_recovered_state_scheduler_constant_handlers_82cc0.py",
+            "von/i960/recovered_state_scheduler_dispatch_82b4c.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082cc0",
+              "end": "0x00082ce8"
+            }
+          ],
+          "symbol": "recovered_state_scheduler_constant_handler_82cc0",
+          "modeling": {
+            "boundary": "Models the five constant scheduler table targets and their exact 0x504d98 values before the common tail.",
+            "test": "von/tools/test_recovered_state_scheduler_constant_handlers_82cc0.py",
+            "unresolved_behavior": "The common tail and caller-specific selector meaning remain outside this constant-handler family."
+          },
+          "notes": "The target-address keyed model preserves the exact values 3, 1, 13, 14, and 15 at 0x82cc0, 0x82cc8, 0x82cd0, 0x82cd8, and 0x82ce0.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082cc0"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-scheduler-handler-82c6c",
+          "name": "state_scheduler_handler_82c6c",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_scheduler_handler_82c6c.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_scheduler_handler_82c6c.c",
+            "von/tools/test_recovered_state_scheduler_handler_82c6c.py",
+            "von/i960/recovered_state_scheduler_dispatch_82b4c.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082c6c",
+              "end": "0x00082cb0"
+            }
+          ],
+          "symbol": "recovered_state_scheduler_handler_82c6c",
+          "modeling": {
+            "boundary": "Models scheduler table selector 19: the object-state gate, signed 0x504dc0 threshold, status writes, and 0x504e28-dependent state selection.",
+            "test": "von/tools/test_recovered_state_scheduler_handler_82c6c.py",
+            "unresolved_behavior": "The common scheduler tail and any consumers of the published status/state cells remain outside this handler model."
+          },
+          "notes": "The inclusive 0x78000 boundary and selector-19 table reachability are vector-tested; stores are returned as an explicit write plan.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082c6c"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-scheduler-handler-82c08",
+          "name": "state_scheduler_handler_82c08",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_scheduler_handler_82c08.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_scheduler_handler_82c08.c",
+            "von/tools/test_recovered_state_scheduler_handler_82c08.py",
+            "von/i960/recovered_state_scheduler_dispatch_82b4c.c",
+            "von/i960/recovered_state_dispatch_81e60.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082c08",
+              "end": "0x00082c18"
+            }
+          ],
+          "symbol": "recovered_state_scheduler_handler_82c08",
+          "modeling": {
+            "boundary": "Models scheduler table selector 6: the zero-control state-7 write and the nonzero-control call to 0x81e60.",
+            "test": "von/tools/test_recovered_state_scheduler_handler_82c08.py",
+            "unresolved_behavior": "The common scheduler tail and the called 0x81e60 handler effects remain outside this small handler plan."
+          },
+          "notes": "The handler is reached from selector 6 at the exact 0x82b58 table entry and preserves the prior state on the 0x81e60-call arm.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082c08"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-scheduler-dispatch-82b4c",
+          "name": "state_scheduler_dispatch_82b4c",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_scheduler_dispatch_82b4c.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_scheduler_dispatch_82b4c.c",
+            "von/tools/test_recovered_state_scheduler_dispatch_82b4c.py",
+            "von/i960/recovered_state_scheduler_gate_82ae0.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082b38",
+              "end": "0x00082c08"
+            }
+          ],
+          "symbol": "recovered_state_scheduler_dispatch_82b4c",
+          "modeling": {
+            "boundary": "Models the status-1 gate, unsigned selector bound, and exact 44-entry indirect dispatch table beginning at 0x82b58.",
+            "test": "von/tools/test_recovered_state_scheduler_dispatch_82b4c.py",
+            "unresolved_behavior": "The scheduler's handler bodies and shared reject/return continuation remain outside this table boundary."
+          },
+          "notes": "The caller-supplied max_selector represents g28+12; repeated 0x82d68 entries and the non-monotonic handler ordering are retained exactly.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082b38"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-scheduler-gate-82ae0",
+          "name": "state_scheduler_gate_82ae0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_scheduler_gate_82ae0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_scheduler_gate_82ae0.c",
+            "von/tools/test_recovered_state_scheduler_gate_82ae0.py",
+            "von/i960/recovered_timing_selector_81f60.c"
+          ],
+          "ranges": [
+            {
+              "start": "0x00082ae0",
+              "end": "0x00082b38"
+            }
+          ],
+          "symbol": "recovered_state_scheduler_gate_82ae0",
+          "modeling": {
+            "boundary": "Models the mandatory 0x81f60 call and the exact deadline/global/threshold/object-state gate selecting 0x82db0, 0x81e60, or the shared downstream scheduler continuation.",
+            "test": "von/tools/test_recovered_state_scheduler_gate_82ae0.py",
+            "unresolved_behavior": "The 0x81f60 side effects, 0x82db0 service, 0x81e60 dispatch, and later 0x82b38 state table remain outside this gate plan."
+          },
+          "notes": "The scheduler bound is supplied as the caller's g28+31 value; the unsigned threshold/state gates preserve the observed cmpibge/cmpibl behavior.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00082ae0"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.timing-selector-81f60",
+          "name": "timing_selector_81f60",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_timing_selector_81f60.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_timing_selector_81f60.c",
+            "von/tools/test_recovered_timing_selector_81f60.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00081f60",
+              "end": "0x00082038"
+            }
+          ],
+          "symbol": "recovered_timing_selector_81f60",
+          "modeling": {
+            "boundary": "Models the state-6 timing fast path, state-3 and state/value partitions, paired selector-cell writes, final value-3 override, and fallback 0x504d88 clear.",
+            "test": "von/tools/test_recovered_timing_selector_81f60.py",
+            "unresolved_behavior": "The surrounding scheduler, callback/control-flow ABI, and consumers of the selector cells remain outside this pure update plan."
+          },
+          "notes": "Preserves the floating-point comparison of 0x504d60 against zero and unsigned cmpobl delta tests; the nearby 0x404e0000 load is dead at the compare, and 0x504dc0 is supplied as the loaded low word used by fallback state selection.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00081f60"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-dispatch-81e60",
+          "name": "state_dispatch_81e60",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_dispatch_81e60.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_dispatch_81e60.c",
+            "von/tools/test_recovered_state_dispatch_81e60.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00081e60",
+              "end": "0x00081f54"
+            }
+          ],
+          "symbol": "recovered_state_dispatch_81e60",
+          "modeling": {
+            "boundary": "Models the exact startup-call tuple, mode-zero gate, state 0..9 bounds, and ten-entry handler target table.",
+            "test": "von/tools/test_recovered_state_dispatch_81e60.py",
+            "unresolved_behavior": "The ten state handler bodies and 0x84d90 startup-helper side effects remain outside this dispatcher boundary."
+          },
+          "notes": "The dispatcher uses signed mode comparison for the zero gate and unsigned upper bound for object state <= 9.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00081e60"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.transition-status-tail-8168c",
+          "name": "transition_status_tail_8168c",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_status_tail_8168c.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_transition_status_tail_8168c.c",
+            "von/tools/test_recovered_transition_status_tail_8168c.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0008168c",
+              "end": "0x000816cc"
+            }
+          ],
+          "symbol": "recovered_transition_status_tail_8168c",
+          "modeling": {
+            "boundary": "Models the global-state overrides and exact modulo-240 status split at remainder 0x77.",
+            "test": "von/tools/test_recovered_transition_status_tail_8168c.py",
+            "unresolved_behavior": "The preceding 0x81610 offset/classifier path and persistent store ABI remain outside this tail model."
+          },
+          "notes": "The modulo is represented as unsigned because the observed source value is a nonnegative runtime counter.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x0008168c"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.transition-mode-route-810d0",
+          "name": "transition_mode_route_810d0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_mode_route_810d0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_transition_mode_route_810d0.c",
+            "von/tools/test_recovered_transition_mode_route_810d0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000810d0",
+              "end": "0x000811b8"
+            }
+          ],
+          "symbol": "recovered_transition_mode_route_810d0",
+          "modeling": {
+            "boundary": "Models the outer counter/range gate, timing-dependent mode-bit gate, object/related state partition, five-cell write schedule, and secondary-dispatch call boundary.",
+            "test": "von/tools/test_recovered_transition_mode_route_810d0.py",
+            "unresolved_behavior": "The secondary dispatch side effects and alternate selector table bodies after 0x811b8 remain outside this route plan."
+          },
+          "notes": "The same C plan covers the 0x810d0 wrapper and 0x81120 successful route; normalized related halfword uses the observed shift pair.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x000810d0",
+                "0x00081120"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.transition-route-80710",
+          "name": "transition_route_80710",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_route_80710.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_transition_route_80710.c",
+            "von/tools/test_recovered_transition_route_80710.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00080710",
+              "end": "0x000807d0"
+            }
+          ],
+          "symbol": "recovered_transition_route_80710",
+          "modeling": {
+            "boundary": "Models branch-specific halfword offset selection, 0x73508 band classification, base-state-10 publication, and the strict threshold condition for 0x82800.",
+            "test": "von/tools/test_recovered_transition_route_80710.py",
+            "unresolved_behavior": "The 0x72630 table values, actual 0x504d94 store, 0x82800 side effects, and callback ABI remain outside this route plan."
+          },
+          "notes": "The classifier thresholds match the recovered 0x73508 implementation and retain low-16-bit signed truncation.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x00080710"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.transition-precondition-7fca0",
+          "name": "transition_precondition_7fca0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_precondition_7fca0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_transition_precondition_7fca0.c",
+            "von/tools/test_recovered_transition_precondition_7fca0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007fca0",
+              "end": "0x0007fd24"
+            }
+          ],
+          "symbol": "recovered_transition_precondition_7fca0",
+          "modeling": {
+            "boundary": "Models normalized related-halfword range acceptance and the exact state-tuple fallback before the 0x504dec timing branch.",
+            "test": "von/tools/test_recovered_transition_precondition_7fca0.py",
+            "unresolved_behavior": "The timing comparison, persistent writes, command packets, and downstream object-state dispatch remain outside this precondition model."
+          },
+          "notes": "The range arm covers normalized related halfwords 2..13; values 1 and 14 are represented by the separate state-tuple arm.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x0007fca0"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.transition-scan-7f4d0",
+          "name": "transition_scan_7f4d0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_scan_7f4d0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_transition_scan_7f4d0.c",
+            "von/tools/test_recovered_transition_scan_7f4d0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007f4d0",
+              "end": "0x0007f5ec"
+            }
+          ],
+          "symbol": "recovered_transition_scan_7f4d0",
+          "modeling": {
+            "boundary": "Models the signed entry guard and both inclusive five-count status-byte match masks across 32 related-object slots.",
+            "test": "von/tools/test_recovered_transition_scan_7f4d0.py",
+            "unresolved_behavior": "The minimum-candidate floating comparison, subsequent state gates, command packets, and persistent transition writes remain outside this scan boundary."
+          },
+          "notes": "The scan uses two adjacent status bytes and advances both object pointers by 0x20 per slot.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x0007f4d0"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state31-initializer-7ea10",
+          "name": "state31_initializer_7ea10",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state31_initializer_7ea10.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state31_initializer_7ea10.c",
+            "von/tools/test_recovered_state31_initializer_7ea10.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007ea10",
+              "end": "0x0007eab0"
+            }
+          ],
+          "symbol": "recovered_state31_initializer_7ea10",
+          "modeling": {
+            "boundary": "Models the signed counter gate, exact state-31 five-cell write schedule, and eight-entry halfword threshold dispatch.",
+            "test": "von/tools/test_recovered_state31_initializer_7ea10.py",
+            "unresolved_behavior": "The post-dispatch 0x7ebcc 32-slot scan, command packets, and downstream persistent state effects remain outside this initializer seam."
+          },
+          "notes": "The selector table maps handlers to thresholds 0x504e3c/0x504e3e/0x504e40; related halfword comparison is modeled after ldos plus 16-bit normalization.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x0007ea10"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-geometry-descriptor-7e390",
+          "name": "state_geometry_descriptor_7e390",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_geometry_descriptor_7e390.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_geometry_descriptor_7e390.c",
+            "von/tools/test_recovered_state_geometry_descriptor_7e390.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007e390",
+              "end": "0x0007e440"
+            }
+          ],
+          "symbol": "recovered_state_geometry_descriptor_7e390",
+          "modeling": {
+            "boundary": "Models the object-slot byte address, 0x562cb0 descriptor index/stride, signed and unsigned descriptor field reads, state-3 branch, and raw numeric constants.",
+            "test": "von/tools/test_recovered_state_geometry_descriptor_7e390.py",
+            "unresolved_behavior": "The command-29/30 packet writes, descriptor-derived floating-point arithmetic, object-coordinate differences, and downstream state publication remain outside this lookup seam."
+          },
+          "notes": "The lookup structure is exact: slot shift is 5, descriptor index scaling is 48, and field +0xc is loaded with ldis.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x0007e390"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-byte-window-7dcc0",
+          "name": "state_byte_window_7dcc0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_byte_window_7dcc0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_byte_window_7dcc0.c",
+            "von/tools/test_recovered_state_byte_window_7dcc0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007dcc0",
+              "end": "0x0007dd60"
+            }
+          ],
+          "symbol": "recovered_state_byte_window_7dcc0",
+          "modeling": {
+            "boundary": "Models the signed entry threshold and per-slot status/object byte window with the masked-halfword gate.",
+            "test": "von/tools/test_recovered_state_byte_window_7dcc0.py",
+            "unresolved_behavior": "The 32-slot iteration, fixed-point selection, command packet operands, selector branches, and persistent state writes remain outside this local predicate seam."
+          },
+          "notes": "The five-count inclusive window matches the independently recovered 0x7d1f0 byte predicate.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x0007dcc0"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-route-select-7d670",
+          "name": "state_route_select_7d670",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_route_select_7d670.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_route_select_7d670.c",
+            "von/tools/test_recovered_state_route_select_7d670.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007d670",
+              "end": "0x0007d7f4"
+            }
+          ],
+          "symbol": "recovered_state_route_select_7d670",
+          "modeling": {
+            "boundary": "Models the seven-entry six-byte record scan, zero +4 halfword skip, strict minimum +2 metric selection, and no-record status 10/11 fallback.",
+            "test": "von/tools/test_recovered_state_route_select_7d670.py",
+            "unresolved_behavior": "The selected-record 0x884000 command packet, related-object differences, and subsequent 0x504d94 classification remain outside this selector seam."
+          },
+          "notes": "The strict comparison preserves first-entry tie behavior; table halfwords are modeled as signed because the listing uses ldis.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x0007d670"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.state-byte-pair-scan-7d1f0",
+          "name": "state_byte_pair_scan_7d1f0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_state_byte_pair_scan_7d1f0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/boot-path.md",
+            "von/i960/recovered_state_byte_pair_scan_7d1f0.c",
+            "von/tools/test_recovered_state_byte_pair_scan_7d1f0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007d1f0",
+              "end": "0x0007d358"
+            }
+          ],
+          "symbol": "recovered_state_byte_pair_scan_7d1f0",
+          "modeling": {
+            "boundary": "Models the two one-byte inclusive reference..reference+5 match flags, the discarded three-byte scan, and the common pre-dispatch gate through the 0x7d358 selector table.",
+            "test": "von/tools/test_recovered_state_byte_pair_scan_7d1f0.py",
+            "unresolved_behavior": "The ten selector bodies at 0x7d380..0x7d660 and their 0x504d98 writes remain separate; the third scan's discarded comparison is retained only as an execution marker."
+          },
+          "notes": "The first two loops terminate at 0x9b and 0x99 respectively, so they inspect exactly one byte each.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x0007d1f0"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.transition-route-7bf10",
+          "name": "transition_route_7bf10",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_route_7bf10.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_transition_route_7bf10.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007bf10",
+              "end": "0x0007bf58"
+            }
+          ],
+          "symbol": "recovered_transition_route_7bf10",
+          "modeling": {
+            "boundary": "Exact 0x7bf10 sentinel dispatch: the -1 selector routes object states 2 and 7 to 0x78740 and all other states to 0x786d0, then publishes status 1; non-sentinel selectors enter the 0x505060 packet path",
+            "test": "von/tools/test_recovered_transition_route_7bf10.py",
+            "unresolved_behavior": "The non-sentinel packet construction, FIFO effects, and downstream transition publication remain outside this dispatch prefix"
+          },
+          "notes": "Paired with 0x7b430 but retains the additional sentinel-path store of 1 to 0x504d84. Object-state and related-pointer offsets are 0x64 and 0x74; packet table base is 0x505060.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x0007bf10"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.transition-route-7b430",
+          "name": "transition_route_7b430",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_route_7b430.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_transition_route_7b430.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007b430",
+              "end": "0x0007b46c"
+            }
+          ],
+          "symbol": "recovered_transition_route_7b430",
+          "modeling": {
+            "boundary": "Exact 0x7b430 sentinel dispatch: the -1 selector routes object states 2 and 7 to 0x78740 and all other states to 0x786d0; non-sentinel selectors enter the 0x505060 packet path",
+            "test": "von/tools/test_recovered_transition_route_7b430.py",
+            "unresolved_behavior": "The non-sentinel packet construction, FIFO effects, and downstream state publication remain outside this dispatch prefix"
+          },
+          "notes": "Connects the 0x7b430 caller to both existing timing variants. The listing also fixes object-state offset 0x64, related-pointer offset 0x74, and packet table base 0x505060 for the next packet-slice refinement.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x0007b430"
+              ]
+            }
+          }
+        },
+        {
+          "id": "maincpu.transition-route-7a9f0",
+          "name": "transition_route_7a9f0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_route_7a9f0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/tools/test_recovered_transition_route_7a9f0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0007a9f0",
+              "end": "0x0007aa30"
+            }
+          ],
+          "symbol": "recovered_transition_route_7a9f0",
+          "modeling": {
+            "boundary": "Exact 0x7a9f0 entry gate: initialize 0x504db8 to 10, route sentinel or threshold cases to 0x786d0, and admit the non-sentinel above-threshold cases to the 0x505060 packet path",
+            "test": "von/tools/test_recovered_transition_route_7a9f0.py",
+            "unresolved_behavior": "Record decoding, floating-point geometry packet construction, FIFO readback, and final state publication remain outside this prefix model"
+          },
+          "notes": "Connects the 0x7a3e0 peer-state route to the existing timing variant and isolates the exact guards before the larger packet arm. The sentinel is the 0xffffffff result of subo 1,0; cmpibg admits only values strictly above 99.",
+          "milestones": {
+            "c-only-i960-attract-60s": {
+              "entries": [
+                "0x0007a9f0"
+              ]
+            }
+          }
         },
         {
           "id": "maincpu.route-head-7a3e0",
@@ -10901,22 +12734,77 @@
               "entries": ["0x00075d90"]
             }
           }
-        }
-        ,{
+        },
+        {
           "id": "maincpu.stage-post-setup-86240",
           "name": "stage_post_setup_86240",
           "classification": "code",
           "stage": "modeled",
           "sources": ["von/i960/recovered_stage_post_setup_86240.c"],
           "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_stage_post_setup_86240.py", "von/i960/boot-path.md"],
-          "ranges": [{"start": "0x00086240", "end": "0x00086624"}],
+          "ranges": [
+            {"start": "0x00086240", "end": "0x00086438"},
+            {"start": "0x00086438", "end": "0x00086524"},
+            {"start": "0x00086534", "end": "0x00086620"}
+          ],
           "symbol": "recovered_stage_threshold_normalize_86240",
           "modeling": {
-            "boundary": "Models the deterministic threshold normalization at 0x86248-0x86338 and active/previous snapshot protocol at 0x8633c-0x86434.",
+            "boundary": "Models the deterministic threshold normalization at 0x86248-0x86338, active/previous snapshot protocol at 0x8633c-0x86434, fixed zero-write loops at 0x86438-0x86520, and gated mode presets/publication values at 0x86534-0x86620.",
             "test": "von/tools/test_recovered_stage_post_setup_86240.py",
-            "unresolved_behavior": "Stage working-table clears and mode-specific payload writes from 0x86438-0x86620, exact global-field ownership, and caller-visible hardware effects remain outside this bounded prefix."
+            "unresolved_behavior": "Exact global-field ownership and caller-visible hardware effects remain outside this bounded model."
           },
           "notes": "The two literal families and timing/stage gates are transcribed from the original listing; snapshot state is represented explicitly rather than assigning names to the four threshold words."
+        }
+        ,{
+          "id": "maincpu.stage-bucket-86630",
+          "name": "stage_bucket_86630",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_stage_bucket_86630.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/build/disasm/vonj-maincpu.bin", "von/tools/test_recovered_stage_bucket_86630.py", "von/i960/disassembly-annotations.md"],
+          "ranges": [{"start": "0x00086630", "end": "0x000866b0"}],
+          "symbol": "recovered_stage_bucket_86630",
+          "modeling": {
+            "boundary": "Models the nonnegative counter residue dispatch and bounded byte-table lookup at 0x86630-0x866ac.",
+            "test": "von/tools/test_recovered_stage_bucket_86630.py",
+            "unresolved_behavior": "Negative-counter behavior and indirect caller/return scheduling remain outside this pure helper model."
+          },
+          "notes": "Special return values are transcribed from the three jump-table arms; table lookup uses the ceiling bucket derived by the common 0x8668c tail."
+        }
+        ,{
+          "id": "maincpu.stage-record-tables-866c0",
+          "name": "stage_record_tables_866c0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_stage_record_tables_866c0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_stage_record_tables_866c0.py", "von/i960/disassembly-annotations.md"],
+          "ranges": [{"start": "0x000866c0", "end": "0x00086810"}],
+          "symbol": "recovered_stage_record_tables_write_plan_866c0",
+          "modeling": {
+            "boundary": "Models the eight 0x90-byte sparse halfword records written at 0x5050a0 and eight 0x88-byte sparse halfword records written at 0x5074a0 through 0x8680c.",
+            "test": "von/tools/test_recovered_stage_record_tables_866c0.py",
+            "unresolved_behavior": "Record field meanings, caller-dependent continuation into the reset tail, and downstream stage consumers remain outside this write-plan model."
+          },
+          "notes": "Untouched holes are preserved explicitly; only zero stores proven by the nested loops are represented."
+        }
+        ,{
+          "id": "maincpu.stage-record-reset-86810",
+          "name": "stage_record_reset_86810",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_stage_record_reset_86810.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_stage_record_reset_86810.py", "von/i960/disassembly-annotations.md"],
+          "ranges": [
+            {"start": "0x00086828", "end": "0x000868d0"},
+            {"start": "0x000868d0", "end": "0x00086958"}
+          ],
+          "symbol": "recovered_stage_record_reset_86810",
+          "modeling": {
+            "boundary": "Models the reset-tail clear loops and zero publication at 0x86828-0x86954 after the caller/state-dependent gate at 0x86810.",
+            "test": "von/tools/test_recovered_stage_record_reset_86810.py",
+            "unresolved_behavior": "The 0x86810 gate predicate and caller-dependent table-builder continuation remain outside this reset contract."
+          },
+          "notes": "The reset model preserves the same sparse halfword lanes and untouched holes as the observed stores, then zeros current, active, previous, and guard state."
         }
       ]
     },
@@ -13956,6 +15844,36 @@
           "notes": "Three callers per site, always invoked as a 0x90c10/50/80 triple. Bodies differ only in the site word (0xb800, 3<<14, 0xc800) at the same position. ROM table read live; entry 0 is null so index 0 always skips the register block."
         },
         {
+          "id": "maincpu.match-result-state-dispatch-735d0",
+          "name": "match_result_state_dispatch_735d0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_match_result_state_dispatch_735d0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/i960/disassembly-annotations.md", "von/tools/test_recovered_match_result_state_dispatch_735d0.py"],
+          "ranges": [{"start": "0x000735d0", "end": "0x00073618"}],
+          "symbol": "recovered_match_result_state_dispatch_735d0",
+          "modeling": {
+            "boundary": "Models the 0x735d0 nonzero-0x504e42 diversion, the 0x504d94 <= 33 bound, and all 34 exact targets rooted at 0x73618 with default 0x74848 routing.",
+            "test": "von/tools/test_recovered_match_result_state_dispatch_735d0.py",
+            "unresolved_behavior": "The selected handlers, object context setup at g0+0x74/g0+0xec, continuation register g6, and mapped global storage remain outside this routing contract."
+          }
+        },
+        {
+          "id": "maincpu.match-result-counter-73498",
+          "name": "match_result_counter_73498",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_match_result_counter_73498.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/i960/disassembly-annotations.md", "von/tools/test_recovered_match_result_counter_73498.py"],
+          "ranges": [{"start": "0x00073498", "end": "0x00073500"}],
+          "symbol": "recovered_match_result_counter_73498",
+          "modeling": {
+            "boundary": "Models the 0x73498 pair increment through a supplied limit, overflow to 0xffffffff, mandatory 0x504d9c clear, and conditional 0x504da4 clear based on nonzero 0x504d98 and 0x504dc0 <= 99.",
+            "test": "von/tools/test_recovered_match_result_counter_73498.py",
+            "unresolved_behavior": "The surrounding match-state caller, mapped global storage, continuation register g6, and semantic meaning of the counters remain outside this pure transition."
+          }
+        },
+        {
           "id": "maincpu.geometry-fifo-sequencer-93560",
           "name": "geometry_fifo_sequencer_93560",
           "classification": "code",
@@ -13965,11 +15883,11 @@
           "ranges": [{"start": "0x00093560", "end": "0x000936f0"}],
           "symbol": "fifo_seq_step",
           "modeling": {
-            "boundary": "Models the 0x93560 sequencer: 12-word prefix packet, the CC-zero-gated C8 = g0 & 3 store, the mod-120 selector path (bases 0x02b5c3a6/0x02b60728), and the mod-168 sequencer with the 59/23/59 g2 way selection.",
+            "boundary": "Models the 0x93560 sequencer: 11-word FIFO prefix packet, the CC-zero-gated C8 = g0 & 3 store, the mod-120 selector path (bases 0x02b5c3a6/0x02b60728), the mod-168 sequencer with the 59/23/59 g2 way selection, and the post-tail completion selector 6.",
             "test": "von/tools/test_recovered_geometry_fifo_sequencer_93560.py",
             "unresolved_behavior": "Live FIFO/MMIO transports, the 0xf5058 subroutine and its g0 effects (modeled as an input), RAM provenance of C8/CC, ordinal-vs-ordered compare semantics, and the 0x8e310 tail-call effects remain outside this contract."
           },
-          "notes": "Six cross-references. Richest family member yet: g1 re-derives the familiar 0x02be2b64 as base + 0x8ab40 on the sequencer legs. Boundary edges 59/60, 82/83, 142/143/144 pinned in the test."
+          "notes": "Six cross-references. Richest family member yet: g1 re-derives the familiar 0x02be2b64 as base + 0x8ab40 on the sequencer legs. The first 11 packet words precede the stateful tail call and selector 6 follows it. Boundary edges 59/60, 82/83, 142/143/144 pinned in the test."
         },
         {
           "id": "maincpu.geometry-fifo-prologue-93240",
@@ -13981,11 +15899,11 @@
           "ranges": [{"start": "0x00093240", "end": "0x000933ac"}],
           "symbol": "prologue_cell",
           "modeling": {
-            "boundary": "Models the 0x93240 float prologue (init word, low-leg integer keep vs unreachable +30.0f, high-leg -30.0f, float32 w2 sum), the standard 12-word packet, and the tail-call args with the [0x5024e8] unsigned mod-30 word.",
+            "boundary": "Models the 0x93240 routine flow: derive the low/high leg from (g3 + 0xbfff) & 0xffff, adjust and update the persistent 0x562530 float by -/+0.2 with the recovered +/-30.0f fallbacks, form the float32 w2 sum, emit the standard 12-word packet, and form the tail-call args with the [0x5024e8] unsigned mod-30 word.",
             "test": "von/tools/test_recovered_geometry_fifo_prologue_93240.py",
-            "unresolved_behavior": "Live FIFO/MMIO transports, the [0x5024e8]/[0x562530] cell provenance, the hardware float-to-int rounding mode (nearest-even assumed; no halfway case exists), the dead path-A clamp proof's reliance on init range, and the 0x8e310 tail-call effects remain outside this contract."
+            "unresolved_behavior": "Live FIFO/MMIO transports, the [0x5024e8]/[0x562530] cell provenance, the exact extended-real intermediate precision, the persistent mailbox ownership, and the 0x8e310 tail-call effects remain outside this contract."
           },
-          "notes": "Four cross-references; three pass g3 = 0 (high leg, cell -30.0f) with float payload goldens. The +30.0f low-leg fallback is provably unreachable (init - 0.05 > -30.0 for all init). Caught a real modeling bug: C (int) truncation vs hardware round-to-nearest, fixed with nearbyint."
+          "notes": "Four cross-references; three pass g3 = 0 and therefore select the high leg, while the mailbox value determines whether the +0.2 result is retained or the -30.0f fallback is used. The C model now keeps the selector-derived leg separate from the persistent mailbox operand, matching the listing's load from 0x562530 and real +/-0.2 operations."
         },
         {
           "id": "maincpu.geometry-indexed-packet-8d5d0",
