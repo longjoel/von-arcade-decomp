@@ -11202,6 +11202,44 @@
           "notes": "Static listing recovers a single zero store to DM 0x30100 followed by delayed return; no payload, output, or broad state clear is present."
         },
         {
+          "id": "sharc.scalar-alu-00-02",
+          "name": "scalar_alu_00_02",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_sharc_scalar_alu_00_02.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-sharc-program.bin",
+            "von/build/probe_sharc_opcode_00_02.lua",
+            "von/build/probe_sharc_chop.lua",
+            "von/build/sharc-opcode-00-02.log",
+            "von/build/sharc-chop.log",
+            "von/tools/test_recovered_sharc_scalar_alu_00_02.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00020133",
+              "end": "0x0002013b"
+            },
+            {
+              "start": "0x0002013b",
+              "end": "0x00020143"
+            },
+            {
+              "start": "0x00020143",
+              "end": "0x0002014b"
+            }
+          ],
+          "symbol": "sharc_scalar_fadd",
+          "modeling": {
+            "boundary": "Models SHARC opcodes 0x00-0x02 (F0=F0+F1/F0-F1/F0*F1 over two FIFO words, one response word) with truncating export: double-precision op chopped to float32 bits, matching four one-ulp hardware discriminators.",
+            "test": "von/tools/test_recovered_sharc_scalar_alu_00_02.py",
+            "unresolved_behavior": "Denormal/overflow/NaN export, 40-bit-vs-64-bit wide-computation equivalence beyond the tested domain, FIFO waits/output timing, and gameplay caller purposes remain outside this ALU contract."
+          },
+          "notes": "Handler PCs from the file-0x099 dispatch table (SHARC 0x20000-based), cross-validated against all ledgered range starts. Nine live goldens; the four chop discriminators exclude round-to-nearest."
+        },
+        {
           "id": "sharc.opcode-44-constant-initializer",
           "name": "opcode_44_constant_initializer",
           "classification": "code",
