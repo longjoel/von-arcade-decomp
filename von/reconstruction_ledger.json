@@ -13855,6 +13855,22 @@
           "notes": "Six cross-references. Richest family member yet: g1 re-derives the familiar 0x02be2b64 as base + 0x8ab40 on the sequencer legs. Boundary edges 59/60, 82/83, 142/143/144 pinned in the test."
         },
         {
+          "id": "maincpu.geometry-fifo-prologue-93240",
+          "name": "geometry_fifo_prologue_93240",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_fifo_prologue_93240.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_fifo_prologue_93240.py"],
+          "ranges": [{"start": "0x00093240", "end": "0x000933ac"}],
+          "symbol": "prologue_cell",
+          "modeling": {
+            "boundary": "Models the 0x93240 float prologue (init word, low-leg integer keep vs unreachable +30.0f, high-leg -30.0f, float32 w2 sum), the standard 12-word packet, and the tail-call args with the [0x5024e8] unsigned mod-30 word.",
+            "test": "von/tools/test_recovered_geometry_fifo_prologue_93240.py",
+            "unresolved_behavior": "Live FIFO/MMIO transports, the [0x5024e8]/[0x562530] cell provenance, the hardware float-to-int rounding mode (nearest-even assumed; no halfway case exists), the dead path-A clamp proof's reliance on init range, and the 0x8e310 tail-call effects remain outside this contract."
+          },
+          "notes": "Four cross-references; three pass g3 = 0 (high leg, cell -30.0f) with float payload goldens. The +30.0f low-leg fallback is provably unreachable (init - 0.05 > -30.0 for all init). Caught a real modeling bug: C (int) truncation vs hardware round-to-nearest, fixed with nearbyint."
+        },
+        {
           "id": "maincpu.geometry-indexed-packet-8d5d0",
           "name": "geometry_indexed_packet_8d5d0",
           "classification": "code",
