@@ -13775,6 +13775,22 @@
           "notes": "Models the byte-indexed packet tail's selectors 5 and 46 (31+15), three widened vector halfwords, three masked bytes, and frame readback fixture. Device/MMIO setup remains external."
         },
         {
+          "id": "maincpu.geometry-fifo-packet-934b0",
+          "name": "geometry_fifo_packet_934b0",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_fifo_packet_934b0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_fifo_packet_934b0.py"],
+          "ranges": [{"start": "0x000934b0", "end": "0x00093554"}],
+          "symbol": "geometry_fifo_packet",
+          "modeling": {
+            "boundary": "Models the 0x934b0 12-word FIFO command packet: words 5/18, incoming g0/g1/g2, 21, g3 & 0xffff, 19, three 0x3e4ccccd fills, 6, plus the 0x8e310 tail-call arg formation (a0 0x02b68d3a, a1 +0x79e2a, a2 from [0x562490]).",
+            "test": "von/tools/test_recovered_geometry_fifo_packet_934b0.py",
+            "unresolved_behavior": "The live 0x884000 FIFO writes, the [0x562490] provenance, caller-side float payload semantics, and the 0x8e310 tail-call effects remain outside this packet contract."
+          },
+          "notes": "Twelve callers (eleven clustered at 0x99afc-0x99c5c, one at 0x96988); sampled arg sets pin float payloads (16.2/-2.2-style constants) with g3 0xffffc000. Packet keeps incoming g2; the [0x562490] reload feeds only the tail call."
+        },
+        {
           "id": "maincpu.geometry-indexed-packet-8d5d0",
           "name": "geometry_indexed_packet_8d5d0",
           "classification": "code",
