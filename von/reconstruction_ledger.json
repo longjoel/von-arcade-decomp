@@ -13823,6 +13823,22 @@
           "notes": "Five callers at 0x92730, three at 0x933b0; bodies differ only in RAM cells. Caller goldens at 0x968a0/0x968c4 pin the payload words. One twin entry covers both ranges."
         },
         {
+          "id": "maincpu.geometry-fifo-dispatch-90c10",
+          "name": "geometry_fifo_dispatch_90c10",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_fifo_dispatch_90c10.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_fifo_dispatch_90c10.py", "von/build/probe_dispatch_table.lua"],
+          "ranges": [{"start": "0x00090c10", "end": "0x00090d44"}, {"start": "0x00090d50", "end": "0x00090e74"}, {"start": "0x00090e80", "end": "0x00090fa8"}],
+          "symbol": "fifo_dispatch_packet_build",
+          "modeling": {
+            "boundary": "Models the shared triple template: 14-word FIFO packet (fixed float words, g14, one site constant, [0x802008] passthrough, closing 6), mod-30 index into the 30-entry ROM table at 0x2be52b0, and the null-deref skip versus 0x800010/0x804000 control-register block.",
+            "test": "von/tools/test_recovered_geometry_fifo_dispatch_90c10.py",
+            "unresolved_behavior": "Live FIFO/MMIO transports, RAM provenance of g0/g14/[0x802008] and dereferenced pointers, remi sign semantics for negative g0, entry pointer/value meanings, and per-site caller purposes remain outside this contract."
+          },
+          "notes": "Three callers per site, always invoked as a 0x90c10/50/80 triple. Bodies differ only in the site word (0xb800, 3<<14, 0xc800) at the same position. ROM table read live; entry 0 is null so index 0 always skips the register block."
+        },
+        {
           "id": "maincpu.geometry-indexed-packet-8d5d0",
           "name": "geometry_indexed_packet_8d5d0",
           "classification": "code",
