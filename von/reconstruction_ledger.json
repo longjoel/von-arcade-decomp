@@ -13804,7 +13804,23 @@
             "test": "von/tools/test_recovered_geometry_fifo_packet_92830.py",
             "unresolved_behavior": "The live 0x884000 FIFO writes, the [0x562494] provenance, caller-side payload semantics, and the 0x8e310 tail-call effects remain outside this packet contract."
           },
-          "notes": "Six cross-references. First proven member of the packet-template family: 0x92830 differs from 0x934b0 only in the three site constants. The stateful 0x92730/0x933b0 variant pair (g14 words, 0x5624f0 toggle, 0xf5058 call) is a separate slice."
+          "notes": "Six cross-references. First proven member of the packet-template family: 0x92830 differs from 0x934b0 only in the three site constants. The stateful 0x92730/0x933b0 variant pair is covered by maincpu.geometry-fifo-packet-stateful-92730."
+        },
+        {
+          "id": "maincpu.geometry-fifo-packet-stateful-92730",
+          "name": "geometry_fifo_packet_stateful_92730",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_fifo_packet_stateful_92730.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_fifo_packet_stateful_92730.py"],
+          "ranges": [{"start": "0x00092730", "end": "0x00092824"}, {"start": "0x000933b0", "end": "0x000934a4"}],
+          "symbol": "fifo_packet_stateful_build",
+          "modeling": {
+            "boundary": "Models the shared 0x92730/0x933b0 stateful template: 13-word FIFO packet (5/44, g0/g1/g2, g14 twice, g3 low half, 19, three 0x3e4ccccd fills, 6), the 1-bit F-cell toggle gated on A-cell zero plus g0 bit 0, and tail-call args (base 0x02b53ca2 adjusted iff F nonzero, 0x02be2b64, A cell).",
+            "test": "von/tools/test_recovered_geometry_fifo_packet_stateful_92730.py",
+            "unresolved_behavior": "The live 0x884000 FIFO writes, the 0xf5058 subroutine and its g0 effects (modeled as an input), RAM cell provenance (0x5624a8/f0 vs 0x5624ac/f4), caller-side payload semantics, and the 0x8e310 tail-call effects remain outside this contract."
+          },
+          "notes": "Five callers at 0x92730, three at 0x933b0; bodies differ only in RAM cells. Caller goldens at 0x968a0/0x968c4 pin the payload words. One twin entry covers both ranges."
         },
         {
           "id": "maincpu.geometry-indexed-packet-8d5d0",
