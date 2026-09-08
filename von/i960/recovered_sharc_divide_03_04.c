@@ -1,13 +1,19 @@
 /* SHARC divide/residual services: opcodes 0x03 (quotient) and 0x04 (residual).
  *
- * Listing von/build/disasm/vonj-sharc-bootstrap.lst shows the handler as
- * chained Goldschmidt passes: a22 seeds F1 = RECIPS F12, then three
- * correction rounds (a23-a29: d = x*d, n = x*n, e = 2-d, repeated)
- * produce the quotient; a2a-a41 chain three more passes (F5, F3, F2)
- * that agree with the first pass on the tested domain, and the a42-a4f
- * tail forms F7 = F8-F12 style residual combines. Bootstrap sets
- * MODE1 = 0x18000 (TRUNCATE|RND32, listing addr 0x080), so hardware
- * truncates every intermediate toward zero at 32 bits.
+ * The live dispatch table (DM 0x30000+opcode snapshot) routes 0x03 to
+ * PM 0x2014b and 0x04 to PM 0x2015b (listing file offsets 0x14b/0x15b).
+ * Each handler reads exactly two FIFO words (R0 = numerator,
+ * R12 = denominator), sets R11 = 2.0, seeds F0 = RECIPS F12 with
+ * R7 = R0 (numerator into F7), then runs three Goldschmidt correction
+ * rounds (d = x*d, n = x*n, e = 2-d, repeated) and finishes
+ * F0 = F0*F7 (quotient). The 0x04 handler additionally stashes
+ * R2 = R12 (denominator into F2) and R1 = R7 (numerator bits into F1),
+ * then forms F0 = F0*F2 (q*D) and F0 = F1-F0 (N - q*D). The same
+ * schedule appears with three chained passes in the 3-operand
+ * normalize path (a22-a41); the 2-operand divide handlers run a
+ * single pass each. Bootstrap sets MODE1 = 0x18000 (TRUNCATE|RND32,
+ * listing addr 0x080), so hardware truncates every intermediate
+ * toward zero at 32 bits.
  *
  * Engine behavior, pinned by forced-FIFO probes (von/build/
  * probe_sharc_opcode_04{c,d,w,v}.lua):
