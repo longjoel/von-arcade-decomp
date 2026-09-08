@@ -46,9 +46,14 @@ typedef struct {
     u32 a0, a1, a2;
 } tail_call_args;
 
+void fifo_packet_tail_args_p(u32 base, u32 off, u32 mem, tail_call_args *o)
+{
+    o->a0 = base;
+    o->a1 = base + off;
+    o->a2 = mem;
+}
+
 void fifo_packet_tail_args(u32 mem562490, tail_call_args *o)
 {
-    o->a0 = TAIL_CALL_A0;
-    o->a1 = TAIL_CALL_A0 + TAIL_CALL_A1_OFF;
-    o->a2 = mem562490;
+    fifo_packet_tail_args_p(TAIL_CALL_A0, TAIL_CALL_A1_OFF, mem562490, o);
 }

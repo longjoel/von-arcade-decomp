@@ -13788,7 +13788,23 @@
             "test": "von/tools/test_recovered_geometry_fifo_packet_934b0.py",
             "unresolved_behavior": "The live 0x884000 FIFO writes, the [0x562490] provenance, caller-side float payload semantics, and the 0x8e310 tail-call effects remain outside this packet contract."
           },
-          "notes": "Twelve callers (eleven clustered at 0x99afc-0x99c5c, one at 0x96988); sampled arg sets pin float payloads (16.2/-2.2-style constants) with g3 0xffffc000. Packet keeps incoming g2; the [0x562490] reload feeds only the tail call."
+          "notes": "Twelve callers (eleven clustered at 0x99afc-0x99c5c, one at 0x96988); sampled arg sets pin float payloads (16.2/-2.2-style constants) with g3 0xffffc000. Packet keeps incoming g2; the [0x562490] reload feeds only the tail call. Tail-arg formation is shared via fifo_packet_tail_args_p; site 0x92830 reuses it."
+        },
+        {
+          "id": "maincpu.geometry-fifo-packet-92830",
+          "name": "geometry_fifo_packet_92830",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": ["von/i960/recovered_geometry_fifo_packet_92830.c", "von/i960/recovered_geometry_fifo_packet_934b0.c"],
+          "evidence": ["von/build/disasm/vonj-maincpu.lst", "von/tools/test_recovered_geometry_fifo_packet_92830.py"],
+          "ranges": [{"start": "0x00092830", "end": "0x000928d4"}],
+          "symbol": "fifo_packet_92830_tail_args",
+          "modeling": {
+            "boundary": "Models the 0x92830 twin of the 0x934b0 packet template: identical 12-word FIFO packet via the shared core, with site constants base 0x02b4a4bc, offset 0x98750, and the [0x562494] tail-call word.",
+            "test": "von/tools/test_recovered_geometry_fifo_packet_92830.py",
+            "unresolved_behavior": "The live 0x884000 FIFO writes, the [0x562494] provenance, caller-side payload semantics, and the 0x8e310 tail-call effects remain outside this packet contract."
+          },
+          "notes": "Six cross-references. First proven member of the packet-template family: 0x92830 differs from 0x934b0 only in the three site constants. The stateful 0x92730/0x933b0 variant pair (g14 words, 0x5624f0 toggle, 0xf5058 call) is a separate slice."
         },
         {
           "id": "maincpu.geometry-indexed-packet-8d5d0",
