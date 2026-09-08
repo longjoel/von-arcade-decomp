@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Test the recovered finite SHARC reciprocal and residual services."""
+"""Test the recovered finite SHARC reciprocal and residual services.
+
+These vectors pin the interpreter engine (round-to-nearest host
+floats), including the (1.7,1/3) residual 0xB4000000. The truncating
+hardware/DRC contract lives in von/tools/test_recovered_sharc_divide_03_04.py,
+where the same case yields 0x34000000; see
+von/i960/recovered_sharc_divide_03_04.c for the engine analysis."""
 
 from __future__ import annotations
 

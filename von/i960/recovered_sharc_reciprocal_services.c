@@ -1,4 +1,10 @@
-/* Recovered normal finite contracts for SHARC opcodes 0x03 and 0x04. */
+/* Recovered normal finite contracts for SHARC opcodes 0x03 and 0x04.
+ *
+ * NOTE: this model rounds every intermediate to nearest (volatile
+ * host floats), which reproduces the -nodrc interpreter engine, not
+ * the truncating hardware. The hardware/DRC contract is
+ * recovered_sharc_divide_03_04.c (exact integer Goldschmidt chop);
+ * e.g. residual(1.7, 1/3) is 0xB4000000 here but 0x34000000 there. */
 #include <stdint.h>
 #include "recovered_float.h"
 
