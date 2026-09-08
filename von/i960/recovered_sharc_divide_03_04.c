@@ -148,8 +148,15 @@ static u32 chop_sub(u32 a, u32 b)
          * magnitudes add. */
         diff = ((u64)big << 39) + (gap >= 64 ? 0 : ((u64)small << 39) >> gap);
     } else {
-        if (gap >= 64)
-            return pack_norm(sign, big_exp, (u32)big);
+        if (gap >= 63) {
+            /* The subtrahend is a nonzero fraction of an ulp, so
+             * the magnitude drops by exactly one ulp toward zero.
+             * (For gap <= 62 the general path below sees a nonzero
+             * integer subtrahend and borrows the same ulp.) */
+            if (big == 0x800000u)
+                return pack_norm(sign, big_exp - 1, 0xffffffu);
+            return pack_norm(sign, big_exp, (u32)big - 1);
+        }
         diff = ((u64)big << 39) - (((u64)small << 39) >> gap);
     }
     if (diff == 0)
