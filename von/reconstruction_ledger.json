@@ -11240,6 +11240,38 @@
           "notes": "Handler PCs from the file-0x099 dispatch table (SHARC 0x20000-based), cross-validated against all ledgered range starts. Nine live goldens; the four chop discriminators exclude round-to-nearest."
         },
         {
+          "id": "sharc.stack-05-06",
+          "name": "stack_05_06",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_sharc_stack_05_06.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-sharc-program.bin",
+            "von/build/probe_sharc_opcode_05_06.lua",
+            "von/build/sharc-opcode-05-06.log",
+            "von/tools/test_recovered_sharc_stack_05_06.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0002016d",
+              "end": "0x0002018f"
+            },
+            {
+              "start": "0x0002018f",
+              "end": "0x00020199"
+            }
+          ],
+          "symbol": "sharc_stack_push_depth",
+          "modeling": {
+            "boundary": "Models the 0x05/0x06 depth discipline (push saturates at 7, pop floors at 0 with a 12-word pointer rewind only on nonzero depth) plus the live-attested observable invariance: no push/pop/overflow/drain sequence changes opcode-0x1a output.",
+            "test": "von/tools/test_recovered_sharc_stack_05_06.py",
+            "unresolved_behavior": "The push copy's exact addressing (M7/DAG update order), queue-slot contents and consumers, pointer advance on push, and FIFO timing remain outside this discipline contract."
+          },
+          "notes": "Handler bounds from the file-0x099 dispatch table. Exporters may ignore 0x05/0x06 traffic: six probe points confirm observable state is untouched, including 8-deep overflow and 9-deep drain."
+        },
+        {
           "id": "sharc.opcode-44-constant-initializer",
           "name": "opcode_44_constant_initializer",
           "classification": "code",
