@@ -44,7 +44,7 @@ def main() -> int:
         lib = ctypes.CDLL(str(library))
         lib.prologue_init.argtypes = [ctypes.c_uint32]
         lib.prologue_init.restype = ctypes.c_uint32
-        lib.prologue_cell.argtypes = [ctypes.c_uint32]
+        lib.prologue_cell.argtypes = [ctypes.c_uint32, ctypes.c_uint32]
         lib.prologue_cell.restype = ctypes.c_uint32
         lib.fadd_bits.argtypes = [ctypes.c_uint32] * 2
         lib.fadd_bits.restype = ctypes.c_uint32
@@ -54,23 +54,28 @@ def main() -> int:
         lib.fifo_prologue_tail_args.argtypes = [ctypes.c_uint32,
                                                 ctypes.POINTER(TailArgs)]
         lib.fifo_prologue_tail_args.restype = None
+        lib.fifo_prologue_run.argtypes = [ctypes.c_uint32] * 4 + [
+            ctypes.POINTER(ctypes.c_uint32), ctypes.c_uint32,
+            ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(TailArgs)]
+        lib.fifo_prologue_run.restype = None
 
         assert lib.prologue_init(0) == 0xBFFF, "init"
         assert lib.prologue_init(0x4001) == 0, "wrap"
         assert lib.prologue_init(0x5000) == 0xFFF, "low leg"
 
-        assert lib.prologue_cell(0xBFFF) == NEG30, "high leg"
-        assert lib.prologue_cell(0x7FFF) == NEG30, "high edge"
-        assert lib.prologue_cell(0x7FFE) == 0x7FFE, "low edge keeps"
-        assert lib.prologue_cell(0xFFF) == 0xFFF, "low leg keeps"
-        assert lib.prologue_cell(0) == 0, "zero keeps (nearest-even)"
+        assert lib.prologue_cell(fbits(0.0), 1) == fbits(0.2), "high keeps mailbox"
+        assert lib.prologue_cell(fbits(29.0), 1) == fbits(29.2), "high keeps mailbox"
+        assert lib.prologue_cell(fbits(30.0), 0) == fbits(29.8), "low keeps mailbox"
+        assert lib.prologue_cell(fbits(-29.0), 0) == fbits(-29.2), "low keeps mailbox"
+        assert lib.prologue_cell(fbits(-31.0), 0) == fbits(30.0), "low fallback"
+        assert lib.prologue_cell(fbits(31.0), 1) == NEG30, "high fallback"
 
         assert lib.fadd_bits(0, NEG30) == NEG30, "0 + -30"
         assert lib.fadd_bits(fbits(1.0), 10) == fbits(1.0), "absorbs"
 
         for g0, g1, g2 in ((0x00000000, 0x41B40000, 0xC195999A),
                            (0x00000000, 0x41B4CCCD, 0xC19A6666)):
-            cell = lib.prologue_cell(lib.prologue_init(0))
+            cell = lib.prologue_cell(fbits(31.0), 1)
             assert cell == NEG30
             words = (ctypes.c_uint32 * 12)()
             lib.fifo_prologue_packet_build(
@@ -83,6 +88,18 @@ def main() -> int:
         assert out.a0 == 0x02B4B652, hex(out.a0)
         assert out.a1 == (0x02B4B652 + 0x97512) & 0xFFFFFFFF, hex(out.a1)
         assert out.a2 == 77 % 30, "unsigned remainder"
+
+        mailbox = ctypes.c_uint32(fbits(31.0))
+        words = (ctypes.c_uint32 * 12)()
+        composed = TailArgs()
+        lib.fifo_prologue_run(0, 0x41B40000, 0xC195999A, 0,
+                               ctypes.byref(mailbox), 77, words,
+                               ctypes.byref(composed))
+        assert mailbox.value == NEG30
+        assert list(words) == [5, 18, NEG30, 0x41B40000, 0xC195999A,
+                               21, 0, 19, F, F, F, 6]
+        assert (composed.a0, composed.a1, composed.a2) == (
+            0x02B4B652, (0x02B4B652 + 0x97512) & 0xFFFFFFFF, 17)
         print("PASS: prologue legs, fadd, packet x2, tail args")
     return 0
 

@@ -3,6 +3,15 @@
 typedef unsigned int u32;
 typedef signed int s32;
 typedef unsigned char u8;
+typedef unsigned short u16;
+
+struct recovered_audio_enqueue_plan
+{
+    u32 accepted;
+    u32 service_requested;
+    u32 count;
+    u8 bytes[3];
+};
 
 /* Pure descriptors for the unresolved 0x29a80/0x29ae8 setup helpers. */
 u32 recovered_audio_device_copy_plan(u32 index, u32 *source,
@@ -36,6 +45,21 @@ u32 recovered_audio_device_table_clear_plan(u32 index, u32 *address,
     return 1U;
 }
 
+/* Commit one nonempty 0x51a0c0 pointer/value pair from the 0x29bba tail. */
+u32 recovered_audio_device_pending_store_plan(u32 index, u32 pointer,
+                                               u32 pending_value,
+                                               u32 *destination,
+                                               u16 *value,
+                                               u32 *clear_address)
+{
+    if (index >= 52U || pointer == 0U)
+        return 0U;
+    *destination = pointer;
+    *value = (u16)pending_value;
+    *clear_address = 0x0051a0c0U + (index << 3);
+    return 1U;
+}
+
 u32 recovered_audio_service_table_reset_plan(u32 index, u32 *address,
                                              u32 *value)
 {
@@ -61,6 +85,31 @@ u32 recovered_audio_device_record_index(u32 selector, u32 exponent,
                                         u32 mask)
 {
     return (selector << (exponent & 0xffffU)) & (mask & 0xffffU);
+}
+
+/* Complete the 0x29b20 ROM-record lookup before the device halfword store. */
+u16 recovered_audio_device_record_lookup(const volatile u16 *record_table,
+                                         u32 selector, u32 exponent,
+                                         u32 mask)
+{
+    u32 index = recovered_audio_device_record_index(selector, exponent, mask);
+
+    return record_table[index];
+}
+
+/* The 0x29b84 status tail before its separate pointer-table cleanup loop. */
+u32 recovered_audio_device_status_plan(s32 status,
+                                       const volatile u16 *status_table,
+                                       u16 *value)
+{
+    if (status == 0)
+        return 0U;
+    if (status < 0) {
+        *value = 0x7fffU;
+        return 1U;
+    }
+    *value = status_table[(u32)status];
+    return 1U;
 }
 
 /* Pure 0x29ca0 copy: 96 rows, 64 words per row, 0x200-byte row stride. */
@@ -190,6 +239,35 @@ u32 recovered_audio_frame_bytes(u32 value, u32 selector, u8 *output)
     output[1] = (u8)selector;
     output[2] = (u8)value;
     return 3U;
+}
+
+/* Pure branch/data plan for the complete 0x2a4e0 producer. */
+u32 recovered_audio_u16_enqueue_plan(u32 value, u32 mode, u32 board_status,
+                                     u32 read_index, u32 write_index,
+                                     struct recovered_audio_enqueue_plan *plan)
+{
+    u8 encoded[3];
+    u32 count;
+
+    plan->accepted = 0U;
+    plan->service_requested = 0U;
+    plan->count = 0U;
+    plan->bytes[0] = 0U;
+    plan->bytes[1] = 0U;
+    plan->bytes[2] = 0U;
+    count = recovered_audio_command_bytes(value, mode, board_status, encoded);
+    if (count == 0U || !recovered_audio_queue_has_space(
+            read_index, write_index, count))
+        return 1U;
+    plan->accepted = 1U;
+    plan->service_requested = 1U;
+    plan->count = count;
+    plan->bytes[0] = encoded[0];
+    if (count > 1U)
+        plan->bytes[1] = encoded[1];
+    if (count > 2U)
+        plan->bytes[2] = encoded[2];
+    return 1U;
 }
 
 static void recovered_audio_send_frame(const u8 *frame, u32 count)

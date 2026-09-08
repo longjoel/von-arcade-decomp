@@ -182,7 +182,9 @@ def main() -> int:
         entry for entry in json.loads(WORKLIST.read_text(encoding="utf-8"))["units"]
         if entry.get("entry") == "0x00079d60"
     )
-    if worklist_entry.get("observed_call_edges") != 5:
+    edge_count = worklist_entry.get(
+        "possible_static_edges", worklist_entry.get("observed_call_edges"))
+    if edge_count != 5:
         raise SystemExit("secondary dispatcher worklist edge count changed")
     if worklist_entry.get("triage") != "modeled-integration-queue":
         raise SystemExit("secondary dispatcher worklist triage changed")

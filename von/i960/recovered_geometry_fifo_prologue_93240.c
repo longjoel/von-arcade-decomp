@@ -6,23 +6,13 @@
  * the already-recovered 0x8e310 packet tail, which is outside this
  * contract.
  *
- * Prologue: init = (g3 + 0xbfff) & 0xffff. As extended-real, init is
- * shifted by -0.05 (init <= 0x7ffe) or +0.05 (init > 0x7ffe) using the
- * double 0x3fc999999999999a, rounded back to integer, and compared:
- * - Low leg compares against the double -30.0 formed by the r4/r5
- *   pair (0, 0xc03e0000). Since init - 0.05 >= -0.05 > -30.0 always,
- *   the +30.0f fallback (0x41f00000) is unreachable and the leg
- *   keeps the rounded integer.
- * - High leg compares against the double +30.0 (pair (0, 0x403e0000));
- *   init + 0.05 > 30.0 always, so it always takes the -30.0f fallback
- *   (0xc1f00000).
- * In short the cell takes init's integer bits (low leg) or -30.0f
- * (high leg). The integer-to-float roundings are exact (small
- * integers) and init +/- 0.05 never lands on a halfway case, so the
- * i960 rounding mode cannot change the result; round-to-nearest-even
- * is assumed and documented.
- * The cell is stored to [0x562530] (a mailbox read only here), then
- * reloaded and added to g0 with a real (float32) add for packet w2.
+ * Prologue: init = (g3 + 0xbfff) & 0xffff selects the arithmetic leg. The
+ * value operated on is the existing float mailbox at 0x562530, not init:
+ * the low leg subtracts the extended-real constant 0.2 and keeps it when
+ * it is >= -30.0, otherwise it uses +30.0f; the high leg adds 0.2 and keeps
+ * it when it is <= +30.0, otherwise it uses -30.0f. The stored result is a
+ * float32 bit pattern. Keeping the mailbox argument explicit preserves the
+ * stateful boundary instead of treating the selector-derived init as data.
  *
  * Packet: the standard 12-word template with a float sum in w2:
  * w = [5, 18, g0 + cell (float32), g1, g2, 21, g3 & 0xffff, 19,
@@ -38,8 +28,6 @@
  */
 
 typedef unsigned int u32;
-
-#include <math.h>
 
 #define PROLOGUE_NEG30_BITS 0xc1f00000U
 #define PROLOGUE_POS30_BITS 0x41f00000U
@@ -67,17 +55,17 @@ u32 prologue_init(u32 g3)
     return (g3 + 0xbfffU) & 0xffffU;
 }
 
-u32 prologue_cell(u32 init)
+u32 prologue_cell(u32 mailbox_bits, u32 high_leg)
 {
-    double shifted;
-    int rounded;
-    if (init > 0x7ffeU)
-        return PROLOGUE_NEG30_BITS;
-    shifted = (double)(int)init - 0.05;
-    rounded = (int)nearbyint(shifted);
-    if ((double)rounded >= -30.0)
-        return (u32)rounded;
-    return PROLOGUE_POS30_BITS;
+    float mailbox = bits_to_float(mailbox_bits);
+    double shifted = high_leg ? (double)mailbox + 0.2
+                              : (double)mailbox - 0.2;
+
+    if (high_leg)
+        return shifted <= 30.0 ? float_to_bits((float)shifted)
+                               : PROLOGUE_NEG30_BITS;
+    return shifted >= -30.0 ? float_to_bits((float)shifted)
+                            : PROLOGUE_POS30_BITS;
 }
 
 u32 fadd_bits(u32 a, u32 b)
@@ -111,4 +99,21 @@ void fifo_prologue_tail_args(u32 mem5024e8, prologue_tail_args *o)
     o->a0 = TAIL_CALL_A0;
     o->a1 = TAIL_CALL_A0 + TAIL_CALL_A1_OFF;
     o->a2 = mem5024e8 % 30U;
+}
+
+/*
+ * Compose the routine-level flow at 0x93240.  mailbox_bits represents the
+ * persistent [0x562530] cell and is updated before the packet's float add;
+ * tail_args describes the arguments passed to the final 0x8e310 call.
+ */
+void fifo_prologue_run(u32 g0, u32 g1, u32 g2, u32 g3,
+                       u32 *mailbox_bits, u32 mem5024e8,
+                       u32 *words, prologue_tail_args *tail_args)
+{
+    u32 init = prologue_init(g3);
+    u32 cell = prologue_cell(*mailbox_bits, init > 0x7ffeU);
+
+    *mailbox_bits = cell;
+    fifo_prologue_packet_build(fadd_bits(g0, cell), g1, g2, g3, words);
+    fifo_prologue_tail_args(mem5024e8, tail_args);
 }

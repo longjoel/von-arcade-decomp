@@ -57,6 +57,10 @@ def main() -> int:
         recovered = ctypes.CDLL(str(library))
         recovered.recovered_random_step.argtypes = [ctypes.c_uint32]
         recovered.recovered_random_step.restype = ctypes.c_uint32
+        recovered.recovered_random_seed_state.argtypes = [
+            ctypes.POINTER(ctypes.c_uint32), ctypes.c_uint32
+        ]
+        recovered.recovered_random_seed_state.restype = None
         recovered.recovered_signed_band.argtypes = [ctypes.c_uint32]
         recovered.recovered_signed_band.restype = ctypes.c_uint32
 
@@ -70,6 +74,11 @@ def main() -> int:
                 raise SystemExit(
                     f"PRNG mismatch at 0x{state:08x}: 0x{actual:08x} != 0x{expected:08x}"
                 )
+
+        seed_state = ctypes.c_uint32(0xDEADBEEF)
+        for seed in (0, 1, 0x7FFFFFFF, 0x80000000, 0xFFFFFFFF):
+            recovered.recovered_random_seed_state(ctypes.byref(seed_state), seed)
+            assert seed_state.value == seed
 
         for raw in range(0x10000):
             actual = recovered.recovered_signed_band(raw)

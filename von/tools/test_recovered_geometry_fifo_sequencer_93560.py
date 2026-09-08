@@ -48,6 +48,11 @@ def main() -> int:
         lib.fifo_seq_packet_build.argtypes = [ctypes.c_uint32] * 4 + [
             ctypes.POINTER(ctypes.c_uint32)]
         lib.fifo_seq_packet_build.restype = None
+        lib.fifo_seq_packet_prefix_build.argtypes = [ctypes.c_uint32] * 4 + [
+            ctypes.POINTER(ctypes.c_uint32)]
+        lib.fifo_seq_packet_prefix_build.restype = None
+        lib.fifo_seq_packet_complete.argtypes = [ctypes.POINTER(ctypes.c_uint32)]
+        lib.fifo_seq_packet_complete.restype = None
         lib.fifo_seq_step.argtypes = [ctypes.c_uint32] * 3 + [
             ctypes.POINTER(Step)]
         lib.fifo_seq_step.restype = None
@@ -56,6 +61,13 @@ def main() -> int:
         lib.fifo_seq_packet_build(1, 2, 3, 0x1FFFF, words)
         assert list(words) == [
             5, 18, 1, 2, 3, 21, 0xFFFF, 19, F, F, F, 6], "packet"
+
+        prefix = (ctypes.c_uint32 * 12)(*[0xaaaaaaaa] * 12)
+        lib.fifo_seq_packet_prefix_build(1, 2, 3, 0x1FFFF, prefix)
+        assert list(prefix[:11]) == [5, 18, 1, 2, 3, 21, 0xFFFF, 19, F, F, F]
+        assert prefix[11] == 0xaaaaaaaa
+        lib.fifo_seq_packet_complete(prefix)
+        assert prefix[11] == 6
 
         B1, B2, BS, A1 = 0x02B5C3A6, 0x02B60728, 0x02B58024, 0x02BE2B64
         check(lib, 99, 7, 10,

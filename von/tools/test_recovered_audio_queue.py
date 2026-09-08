@@ -15,6 +15,15 @@ SOURCE = ROOT / "von/i960/recovered_audio_queue.c"
 CONTROL_SOURCE = ROOT / "von/i960/recovered_host_control.c"
 
 
+class EnqueuePlan(ctypes.Structure):
+    _fields_ = [
+        ("accepted", ctypes.c_uint32),
+        ("service_requested", ctypes.c_uint32),
+        ("count", ctypes.c_uint32),
+        ("bytes", ctypes.c_ubyte * 3),
+    ]
+
+
 def expected_bytes(value: int, mode: int, board_status: int) -> bytes:
     value &= 0xFFFF
     if value == 0x00FF:
@@ -63,6 +72,11 @@ def main() -> int:
         ]
         recovered.recovered_audio_queue_has_space.restype = ctypes.c_uint32
         recovered.recovered_audio_short_delay_iterations.restype = ctypes.c_uint32
+        recovered.recovered_audio_u16_enqueue_plan.argtypes = [
+            ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32,
+            ctypes.c_uint32, ctypes.c_uint32, ctypes.POINTER(EnqueuePlan),
+        ]
+        recovered.recovered_audio_u16_enqueue_plan.restype = ctypes.c_uint32
 
         if recovered.recovered_audio_short_delay_iterations() != 4:
             raise SystemExit("short delay iteration count mismatch")
@@ -132,9 +146,32 @@ def main() -> int:
                         )
                     capacity_vectors += 1
 
+        plan_vectors = 0
+        for value in (0, 0xFF, 0x100, 0x1234, 0xFFFF):
+            for mode, board_status in ((0, 0), (1, 2), (1, 0), (2, 2)):
+                for read_index, write_index in (
+                    (0, 0), (1, 0), (0, 1), (32, 0), (0, 32)
+                ):
+                    plan = EnqueuePlan()
+                    result = recovered.recovered_audio_u16_enqueue_plan(
+                        value, mode, board_status, read_index, write_index,
+                        ctypes.byref(plan),
+                    )
+                    assert result == 1
+                    expected = expected_bytes(value, mode, board_status)
+                    available = (read_index - write_index - 1) & 0x3F
+                    accepted = bool(expected) and available >= len(expected)
+                    assert bool(plan.accepted) == accepted
+                    assert bool(plan.service_requested) == accepted
+                    assert plan.count == (len(expected) if accepted else 0)
+                    assert bytes(plan.bytes[:plan.count]) == (
+                        expected if accepted else b""
+                    )
+                    plan_vectors += 1
+
     print(
         f"PASS: {vectors:,} framing, {status_vectors:,} parameterized framing, "
-        f"and {capacity_vectors:,} capacity vectors"
+        f"{capacity_vectors:,} capacity, and {plan_vectors:,} enqueue-plan vectors"
     )
     return 0
 

@@ -73,7 +73,7 @@ label(0x000009f0, "reset_startup_continuation",
       "Continuation after _start_ip returns; establishes the runtime frame before entering startup_main_data_entry.")
 label(0x00000a10, "reset_runtime_frame_setup")
 label(0x000186f0, "startup_main_data_entry",
-      "First post-register-stack startup call reached from reset continuation at 0xa28.")
+      "First post-register-stack startup call reached from reset continuation at 0xa28. Seeds startup globals and timeout, drains the one-count frame guard, then calls 0x186c0, 0x18960, and 0x18a10 before entering the mode loop.")
 ensure_function(0x000186f0, "startup_main_data_entry", 0x00018904)
 label(0x00018680, "startup_mode_dispatch_table",
       "Indirect startup dispatch table indexed by low nibble of 0x5039f4.")
@@ -92,13 +92,20 @@ label(0x000186b0, "startup_mode_arm_12_null")
 label(0x000186b4, "startup_mode_arm_13_null")
 label(0x000186b8, "startup_mode_arm_14_null")
 label(0x000186bc, "startup_mode_arm_15")
-label(0x000186c0, "startup_pre_dispatch_helper")
-label(0x00018a10, "startup_video_or_device_helper")
-label(0x00018ab0, "startup_state_service")
+label(0x000186c0, "startup_pre_dispatch_helper",
+      "Publishes startup command 3, clears the command byte, and invokes the 16-byte clear helper on the device command buffer at 0x5770c0.")
+label(0x00018a10, "startup_status_helper_18a10",
+      "Classifies 0x1d00028 into mode 1/2/3, publishes 0x503a08, then opens the 120-call 0x18ab0 service loop only when 0xc5870 returns zero and startup mode is 5.")
+label(0x00018ab0, "startup_state_service",
+      "Calls the 0x28de8 frame poll, updates the latest/profile-4 extrema state, and always continues through the 0x2d60 post-service helper.")
 label(0x00018538, "startup_status_service")
 label(0x000294b0, "startup_warning_or_text_service")
 label(0x000f50a8, "startup_input_formatter")
 label(0x000188a0, "startup_device_write_loop")
+label(0x00018918, "startup_return_thunk_18918",
+      "Moves the private continuation through g1, clears g14, returns zero through bx (g1), and rejoins at 0x18928.")
+label(0x00018960, "startup_system_setup_18960",
+      "Runs the ordered I/O, video, asset, audio, text, geometry, stage-table, and queue services before the 0x2440 validation wrapper.")
 
 # RAM and memory-mapped locations touched by the reset/startup slice.
 # Names intentionally describe observed use, not guessed hardware ownership.
@@ -150,7 +157,8 @@ label(0x0001f0d0, "text_status_context_render")
 label(0x00002080, "rom_signature_crc_check")
 label(0x000022f0, "indexed_device_register_write")
 label(0x00002330, "device_timing_register_setup")
-label(0x00002440, "io_self_test_wrapper")
+label(0x00002440, "io_self_test_wrapper",
+      "Runs the input initializer, validates the two startup records through the 0x2080/0x2040 helpers, conditionally clears 0x50240c, and performs the second CRC/device-ready phase.")
 label(0x00002850, "controller_command_upload")
 label(0x00002990, "controller_indexed_command_upload")
 label(0x00002c70, "input_initializer_select")
@@ -159,15 +167,24 @@ label(0x00002d60, "input_sampler_select")
 label(0x00002da0, "input_controller_sample_and_pack",
       "Per-frame 315-5649 sample: averages the eight-byte history at 0x502490, reads controller ports, and packs the active-low state into 0x502498-0x5024bc.")
 label(0x000034c0, "input_state_reset_fields")
-label(0x00003540, "input_state_bit_update")
+label(0x00003540, "input_state_step_3540",
+      "Clears the transient input byte, then increments the packed state while bit 3 of 0x502482 is set, otherwise resets it to zero.")
 label(0x00003a38, "input_byte_state_parser")
 label(0x00003ae0, "input_dual_byte_parser")
 label(0x00003ba0, "controller_timing_status_check")
 label(0x000183b8, "device_address_classify")
 label(0x00018438, "device_mode_pair_validate")
 label(0x00018488, "host_byte_queue_initialize")
-label(0x0001c2c0, "text_video_transfer_wrapper")
-label(0x0001cbb8, "text_control_character_handler")
+label(0x0001c2c0, "text_video_transfer_wrapper",
+      "Snapshots argument/context and four FP registers, then builds the 512-halfword 0x01008000 workspace and 0x0100a000 metadata block.")
+label(0x0001cbb8, "text_control_character_handler",
+      "Handles TAB (column rounded to the next eight-cell boundary with wrap at 61) and LF (return to origin column), incrementing row only through 46; other controls are inert.")
+label(0x000226b0, "startup_state_service_gate_226b0",
+      "Subtracts 10 from the service counter, selects sentinel/transfer/clear/no-op routes, and increments 0x504d10 on return.")
+label(0x00025040, "state_dispatch_25040",
+      "Initializes record fields from 0x50249c/0x5024a4, dispatches explicit service/state cases, and enters the common record-tail update.")
+label(0x00027550, "geometry_record_transform_service",
+      "Seeds a geometry record, selects a profile asset from mode/record kind, and connects the profile helper, stage selector, and 0x6f600 producer.")
 label(0x0001d090, "text_special_glyph_writer")
 label(0x0001d1d0, "text_alternate_string_walker")
 label(0x0001d210, "text_special_glyph_string_walker")
@@ -181,14 +198,21 @@ label(0x0001df70, "text_plane_region_clear")
 label(0x0001e030, "text_status_render_context")
 label(0x00029a80, "audio_device_table_clear")
 label(0x00029ae8, "audio_service_table_reset")
-label(0x00029b20, "audio_device_table_upload")
+label(0x00029b20, "audio_device_table_upload",
+      "Loops over 23 records, masks selector/exponent-derived indices, reads ROM halfwords, stores them at 0x1802010 + 2*record, conditionally selects the 0x180203e status halfword (zero skips, negative clamps to 0x7fff), then commits nonzero 0x51a0c0 pointer/value pairs.")
 label(0x00029c08, "audio_command_value_clamp")
 label(0x00029ca0, "audio_device_buffer_copy")
+label(0x00029dc0, "upload_masked_blend_planes",
+      "Runs three 32-word plane kernels for eight outer passes; mode bits 0-2 select fade versus scale forms, with pair-2 receiving the extra 0x180 stride at each plane transition.")
+label(0x00029f60, "upload_direct_planes",
+      "Mode-zero upload path: applies one fade/scale factor to all three planes over eight 32-word passes with uniform 0x200-byte-per-pass pointer cadence.")
+label(0x0002a00c, "upload_direct_fade_kernel")
 label(0x0002a430, "audio_scsp_settle_delay",
       "Short volatile delay between SCSP control writes; recovered as four countdown iterations.")
 label(0x0002a458, "audio_scsp_fifo_send_u16",
       "Host-side SCSP command producer. Queues 0xae, high byte, low byte; 0xff is a one-byte special command.")
-label(0x0002a4e0, "audio_scsp_fifo_enqueue")
+label(0x0002a4e0, "audio_scsp_fifo_enqueue",
+      "Special-cases low-halfword 0xff as a one-byte command; otherwise applies the mode-1/status-2 suppression gate, reserves one or three ring bytes through 0x2a458, enqueues them via 0x2a4a8, and requests service through 0x1348.")
 label(0x0002a5f0, "audio_scsp_fifo_send_u16_idle_gate",
       "Sibling command producer with the mode-1/board-status-zero suppression gate.")
 label(0x0002a690, "audio_scsp_send_level",
@@ -208,21 +232,25 @@ label(0x0051aa80, "audio_fifo_bytes_64")
 label(0x009c0000, "scsp_command_port")
 label(0x009c0004, "scsp_status_control_port")
 label(0x000292d8, "geometry_command_stream_upload")
-label(0x000295d0, "geometry_profile_upload_variant")
-label(0x000296d0, "geometry_service_state_initialize")
+label(0x000294b0, "geometry_profile_upload_setup",
+      "Fixed profile-3 setup prefix: programs 0x800160/0x800070/0x800080/0x800030, calls 0x292d8 with headers 0/32 from 0x293b0, then emits the 0x800090/0x804000/0x8000a0 handshake and finishes through 0x28d30.")
+label(0x000295d0, "geometry_profile_upload_variant",
+      "Alternate fixed profile stream: uses 0x46000000, calls 0x292d8 with headers 0/32 from 0x293b0, programs 0x800030, emits 0x3f333333/0xbf000000 and 0x3f000000 through 0x804000, then finishes through 0x28d30.")
+label(0x000296d0, "geometry_service_state_initialize",
+      "Initializes service slots at 0x515098-0x5150b4, then calls 0x29778 with head 0x5150c0/stride 0x100 and 0x29738 with head 0x5190c0/stride 0x40.")
 label(0x00029738, "geometry_pointer_table_initialize")
 label(0x00029778, "geometry_pointer_table_initialize_alt")
 label(0x00029d50, "geometry_tile_buffer_transform")
 label(0x0002b430, "geometry_object_record_dispatch",
-      "Match capture confirms repeated polygon-ROM object submission through the 0x00800101 command class; this routine indexes the 0x51c5b0 record table, dispatches each record, and increments its per-slot count. In the verified post-start window, all 109 observed OBAs retain one stable tpa/tha pair; this supports a stable submission tuple without assigning semantic model names.")
+      "Indexes 0x51c5b0 records with 0x54-byte stride, repeats for the record +0x08 count, routes slot-left < slot-right through the 0x2b420 table or otherwise calls 0x6fd50, and increments the 0x51bb30 slot count. Match capture confirms the surrounding polygon-ROM submission path.")
 label(0x0002be30, "geometry_frame_service_initialize",
-      "Post-start original-ROM capture reaches this frame-service path before sustained match geometry; initialization emits the 8/16 FIFO prefix and dispatches the twelve frame-service arms.")
+      "Calls the alternate profile upload 0x295d0, emits FIFO selectors 8/16, clears 0x50427a and 0x503c7a, calls 0x2a990(0xd000,0), advances/reset counters, and dispatches phase % 12 through 0x2bee4.")
 label(0x0002d9a0, "geometry_transform_dispatch",
-      "Emits the transformed geometry packet and stores the derived frame fields at 0x51aad0–0x51aae4.")
+      "Calls the alternate profile upload and 0x2a990, emits FIFO selectors 8/16/10/31/29/30/10/20/21/18, and stores response-derived fields at 0x51aad0–0x51aae4.")
 label(0x0002e1c8, "geometry_status_continuation_trampoline",
-      "Continuation trampoline that clears g14 and branches through the caller-supplied continuation.")
+      "Loads return stub 0x2e1d4 into g14, moves it to g0, clears g14, and returns through bx(g0).")
 label(0x0002e1e8, "geometry_status_continuation_trampoline_alt",
-      "Alternate continuation trampoline with the same g14 indirect-return sequence.")
+      "Loads return stub 0x2e1f4 into g14, moves it to g0, clears g14, and returns through bx(g0).")
 label(0x0002e320, "geometry_frame_packet_emit",
       "Normalizes a geometry selector, loads its packet tuple, and emits the 0x804000 command record.")
 label(0x0002e450, "geometry_object_update_variant_a",
@@ -312,7 +340,9 @@ label(0x000324e0, "geometry_object_motion_phase_helper_a",
 label(0x00032540, "geometry_object_motion_phase_helper_b",
       "Invokes the alternate phase callback and clears the transient geometry result state.")
 label(0x00032810, "geometry_object_state_machine",
-      "Updates one runtime object through its state dispatch, geometry motion, profile output, and frame-result paths.")
+      "Copies source-record fields, emits the bounded packet-31/packet-10 prefix, publishes response fields, then dispatches the 0x1b2 state through fourteen arms at 0x32968.")
+label(0x000371e0, "geometry_frame_step",
+      "Decrements object timers, updates fixed-point fields, and dispatches the phase at 0x172 through the table at 0x37130 after the 0x25040/0x24f98 gate.")
 label(0x00032968, "geometry_object_state_dispatch_table",
       "Fourteen internal object-state arms selected from the state field at offset 0x1b2.")
 label(0x00036460, "geometry_object_profile_state_variant_a",
@@ -1062,7 +1092,12 @@ label(0x0006cc20, "geometry_command_packet_writer_variant_f",
 label(0x00027550, "geometry_record_transform_service",
       "Runtime match geometry uses the associated object-record path; this service stores the record transform fields before calling the 0x6f600 geometry producer.")
 ensure_function(0x00027550, "geometry_record_transform_service", 0x00027c50)
-label(0x000281f0, "texture_profile_dispatch_table")
+label(0x000281f0, "texture_profile_setup",
+      "Loads a profile table word, stores it at 0x512bd0, decompresses into swapped 0x11200000/0x11000000 banks, and routes decoder statuses 1 and 2 to the observed state updates.")
+label(0x00028270, "texture_profile_match",
+      "Compares the selected 0x280c0 profile-table word with 0x512bd0 and returns one only when they match.")
+label(0x000280c0, "texture_profile_source_table",
+      "Five ROM source pointers consumed by the 0x281f0 profile setup index table.")
 label(0x000284b8, "geometry_command_window_clear_route")
 
 # Fine-grained startup control-flow anchors.  These are instruction-site
@@ -1559,7 +1594,7 @@ label(0x000d1ab0, "startup_profile_handler_3_geometry_setup",
 label(0x000de670, "startup_geometry_status_workspace_init",
       "Initializes status/geometry workspace fields and emits setup packets.")
 label(0x0006f600, "geometry_fixed_point_record_producer",
-      "Converts two geometry inputs to fixed-point coordinates and emits the associated FIFO record.")
+      "Sibling coordinate producer to 0x6ece0 and 0x6f6f0: validates cvtzri coordinates, submits the shared 0x41 half-coordinate lookup, emits the six-word 0x35 continuation, and returns the device response.")
 label(0x0006f900, "geometry_profile_table_loader_a",
       "Loads one profile record from the ROM table at 0x6eb60 into the shared geometry profile words.")
 label(0x0006f970, "geometry_profile_table_loader_b",
@@ -1584,6 +1619,7 @@ ensure_function(0x0002b700, "startup_status_arm_post_test_transition", 0x0002b77
 ensure_function(0x0002b770, "startup_status_arm_subcounter_decrement", 0x0002b7b0)
 ensure_function(0x0002b940, "startup_status_arm_continuation_trampoline", 0x0002b960)
 ensure_function(0x0002bdd0, "startup_geometry_status_dispatch", 0x0002be30)
+ensure_function(0x0002be30, "geometry_frame_service_initialize", 0x0002bee4)
 ensure_function(0x0002d9a0, "geometry_transform_dispatch", 0x0002dc50)
 ensure_function(0x0002e1c8, "geometry_status_continuation_trampoline", 0x0002e1e0)
 ensure_function(0x0002e1e8, "geometry_status_continuation_trampoline_alt", 0x0002e200)
@@ -1632,6 +1668,7 @@ ensure_function(0x00032330, "geometry_object_motion_variant_y", 0x000324e0)
 ensure_function(0x000324e0, "geometry_object_motion_phase_helper_a", 0x00032540)
 ensure_function(0x00032540, "geometry_object_motion_phase_helper_b", 0x00032560)
 ensure_function(0x00032810, "geometry_object_state_machine", 0x00036460)
+ensure_function(0x000371e0, "geometry_frame_step", 0x00037460)
 ensure_function(0x00036460, "geometry_object_profile_state_variant_a", 0x00036690)
 ensure_function(0x00036690, "geometry_object_profile_state_variant_b", 0x000367f0)
 ensure_function(0x000367f0, "geometry_object_profile_state_variant_c", 0x00036980)
@@ -2133,7 +2170,14 @@ ensure_function(0x000d1280, "startup_profile_handler_2_geometry_setup", 0x000d13
 ensure_function(0x000d1ab0, "startup_profile_handler_3_geometry_setup", 0x000d1bd8)
 ensure_function(0x000de670, "startup_geometry_status_workspace_init", 0x000de988)
 ensure_function(0x0006f600, "geometry_fixed_point_record_producer", 0x0006f6f0)
+ensure_function(0x0006ece0, "geometry_float_to_fixed_helper", 0x0006ede0)
 ensure_function(0x0006f6f0, "geometry_float_transform_helper", 0x0006f900)
+ensure_function(0x0006fa40, "geometry_pool64_acquire", 0x0006fa84)
+ensure_function(0x0006fa90, "geometry_pool64_release", 0x0006fac4)
+ensure_function(0x0006f9e0, "geometry_pool64_reset", 0x0006fa30)
+ensure_function(0x0006fad0, "geometry_pool32_reset", 0x0006fb10)
+ensure_function(0x0006fb10, "geometry_pool32_acquire", 0x0006fb50)
+ensure_function(0x0006fb50, "geometry_pool32_release", 0x0006fb84)
 ensure_function(0x0006fb90, "geometry_record_initializer", 0x0006fd50)
 ensure_function(0x0006fd50, "geometry_link_release", 0x0006fe70)
 ensure_function(0x0006fec0, "geometry_device_command_initialize", 0x0006ff20)
@@ -2148,7 +2192,7 @@ ensure_function(0x00071080, "geometry_object_match_update", 0x00072050)
 ensure_function(0x00072c00, "match_object_state_service", 0x00072ea0)
 ensure_function(0x00072ea0, "match_state_result_service", 0x00073490)
 ensure_function(0x00073498, "match_result_counter_service", 0x00073500)
-ensure_function(0x00073508, "geometry_range_classify", 0x000735d0)
+ensure_function(0x00073508, "signed_difference_band_classify", 0x000735d0)
 ensure_function(0x000735d0, "match_result_state_dispatch", 0x00073618)
 ensure_function(0x000736a0, "geometry_profile_handler_0", 0x000737c8)
 ensure_function(0x000737c8, "geometry_profile_handler_1", 0x00073900)
@@ -2193,12 +2237,44 @@ ensure_function(0x00075424, "match_phase_selector_arm_3", 0x0007542c)
 ensure_function(0x0007542c, "match_phase_selector_arm_4", 0x00075434)
 ensure_function(0x00075434, "match_phase_selector_arm_5", 0x00075450)
 ensure_function(0x00075450, "match_phase_substate_dispatch", 0x00075474)
+ensure_function(0x00075cf0, "match_phase_substate_common_update", 0x00075cf8)
+ensure_function(0x00075cf8, "match_phase_substate_counter_return", 0x00075d08)
+ensure_function(0x00075d08, "match_phase_counter_dispatch", 0x00075d60)
+ensure_function(0x00075bbc, "match_phase_secondary_selector", 0x00075c1c)
+ensure_function(0x00075c58, "match_phase_late_selector", 0x00075cb4)
+ensure_function(0x00075cb4, "match_phase_late_arm_0", 0x00075cbc)
+ensure_function(0x00075cbc, "match_phase_late_arm_1", 0x00075cc4)
+ensure_function(0x00075cc4, "match_phase_late_arm_2", 0x00075cdc)
+ensure_function(0x00075cdc, "match_phase_late_arm_3", 0x00075ce4)
+ensure_function(0x00075ce4, "match_phase_late_arm_4", 0x00075cf0)
+ensure_function(0x00075c1c, "match_phase_secondary_arm_0", 0x00075c24)
+ensure_function(0x00075c24, "match_phase_secondary_arm_1", 0x00075c2c)
+ensure_function(0x00075c2c, "match_phase_secondary_arm_2", 0x00075c34)
+ensure_function(0x00075c34, "match_phase_secondary_arm_3", 0x00075c3c)
+ensure_function(0x00075c3c, "match_phase_secondary_arm_4", 0x00075c58)
+ensure_function(0x00075d60, "match_phase_counter_arm_0", 0x00075d68)
+ensure_function(0x00075d68, "match_phase_counter_arm_1", 0x00075d70)
+ensure_function(0x00075d70, "match_phase_counter_arm_2", 0x00075d78)
+ensure_function(0x00075d78, "match_phase_counter_arm_3", 0x00075d80)
+ensure_function(0x00075d80, "match_phase_counter_arm_4", 0x00075d88)
+ensure_function(0x00075d88, "match_phase_counter_default", 0x00075d90)
 ensure_function(0x000754ac, "match_phase_substate_arm_0", 0x000754b4)
 ensure_function(0x000754b4, "match_phase_substate_arm_1", 0x000754bc)
 ensure_function(0x000754bc, "match_phase_substate_arm_2", 0x000754c4)
 ensure_function(0x000754c4, "match_phase_substate_arm_3", 0x000754cc)
 ensure_function(0x000754cc, "match_phase_substate_arm_4", 0x000754e4)
 ensure_function(0x000754e4, "match_phase_substate_default", 0x000754e8)
+ensure_function(0x00075d90, "stage_selector_setup", 0x000760c0)
+ensure_function(0x000761b0, "geometry_object_threshold_query", 0x00076240)
+ensure_function(0x00092730, "geometry_fifo_packet_stateful_site_a", 0x00092824)
+ensure_function(0x00093240, "geometry_fifo_float_prologue", 0x000933b0)
+ensure_function(0x00092830, "geometry_fifo_packet_template_site_a", 0x000928d4)
+ensure_function(0x000933b0, "geometry_fifo_packet_stateful_site_b", 0x000934a4)
+ensure_function(0x000934b0, "geometry_fifo_packet_template_site_b", 0x00093554)
+ensure_function(0x00093560, "geometry_fifo_packet_sequencer", 0x000936f0)
+ensure_function(0x00086240, "stage_post_setup", 0x00086624)
+ensure_function(0x00086630, "stage_bucket_helper", 0x000866b0)
+ensure_function(0x000866c0, "stage_record_tables_initialize", 0x00086958)
 ensure_function(0x0006f900, "geometry_profile_table_loader_a", 0x0006f968)
 ensure_function(0x0006f970, "geometry_profile_table_loader_b", 0x0006f9d8)
 ensure_function(0x000e2120, "text_asset_selector_upload", 0x000e2130)
@@ -2258,10 +2334,13 @@ ensure_function(0x00028c80, "geometry_command_batch_loop", 0x00028cf4)
 ensure_function(0x00028d80, "geometry_pipeline_startup", 0x00028ddc)
 ensure_function(0x00028b40, "geometry_float_conversion_helper", 0x00028b7c)
 ensure_function(0x00028b80, "geometry_buffer_prepare", 0x00028c00)
+ensure_function(0x00028840, "geometry_profile_constant_selector", 0x0002898c)
 ensure_function(0x00028418, "geometry_initial_handshake", 0x00028464)
 ensure_function(0x00028d08, "geometry_register_clear", 0x00028d24)
 ensure_function(0x00028548, "texture_initializer", 0x000285f4)
 ensure_function(0x00028120, "texture_loader_profile_setup", 0x000281dc)
+ensure_function(0x000281f0, "texture_profile_setup", 0x00028268)
+ensure_function(0x00028270, "texture_profile_match", 0x000282a4)
 ensure_function(0x00027e50, "texture_decompressor", 0x000280bc)
 ensure_function(0x00028d30, "geometry_auxiliary_submit_select", 0x00028d7c)
 
@@ -2269,24 +2348,185 @@ ensure_function(0x00028d30, "geometry_auxiliary_submit_select", 0x00028d7c)
 label(0x00028170, "texture_load_done_message")
 label(0x0002812c, "texture_load_message")
 label(0x0002a4e0, "command_mode_validator")
-label(0x0006ece0, "geometry_float_to_fixed_helper")
+label(0x0006ece0, "geometry_float_to_fixed_helper",
+      "Coordinate lookup producer: truncates and bounds-checks two float inputs, submits opcode 0x41 with the 512x512 half-coordinate index, copies the selected 20-byte record's two output halfwords, and emits the shared 0x35 continuation before its final FIFO read.")
 label(0x000bf0c0, "packed_bit_search_helper")
 label(0x000e1f20, "text_byte_to_tile_planes")
 label(0x000e1fb0, "text_byte_to_tile_planes_offset_100",
       "Same 64-triplet expansion as 0xe1f20, writing each plane into the +0x100 destination bank.")
 label(0x000f5058, "runtime_prng_next")
+ensure_function(0x000f50a8, "runtime_prng_seed", 0x000f50bc)
+label(0x000f50a8, "runtime_prng_seed",
+      "Stores the caller-supplied 32-bit value into persistent PRNG state at 0x5785d0 and returns through the saved continuation.")
+ensure_function(0x000f50c0, "text_string_length", 0x000f50f4)
+label(0x000f50c0, "text_string_length",
+      "Counts bytes from the caller pointer through the first NUL and returns the NUL-terminated length without modifying the string.")
 label(0x000f5d40, "memcpy_aligned")
 label(0x000f5c58, "memcmp_bytes")
+label(0x000f5e80, "memmove_overlap_copy",
+      "Overlap-aware copy sibling: checks source/destination interval overlap, delegates disjoint ranges to 0xf5d40, and copies overlapping ranges backward when destination is above source.")
 label(0x000f5100, "text_string_render_dispatch")
-label(0x000f5190, "text_format_parser_core")
+label(0x000f5190, "text_format_parser_core",
+      "Parses one formatter byte, bounds the dispatch index to 0..120, and jumps through the exact 121-entry table at 0xf5210; unsupported slots converge at 0xf5bf4.")
+label(0x000f5210, "text_format_dispatch_table",
+      "121-entry formatter table: index 0 emits an ordinary byte; sparse conversion handlers route to 0xf53f4, 0xf5408, 0xf5410, 0xf546c, 0xf5474, 0xf547c, 0xf5544, 0xf554c, 0xf5588, 0xf5590, 0xf5598, 0xf55a0, 0xf561c, 0xf5620, 0xf5688, 0xf5790, 0xf5800, 0xf5804, 0xf5860, 0xf58bc, 0xf5954, 0xf5958, 0xf59b4, and 0xf59bc; all other entries use 0xf5bf4.")
 label(0x0002a430, "short_countdown_delay")
 label(0x0002a458, "command_queue_space_check")
 label(0x0002a4a8, "command_queue_byte_push")
 label(0x0002a5f0, "command_mode_validator_alt")
 label(0x0002a990, "geometry_command_packet_submit")
 label(0x00079050, "randomized_record_state_dispatch",
-      "The first original-ROM diagnostic observes object 0x5040d0, related 0x503ad0 via object + 0x74, object state 0, and common-tail transition 7; the reconstructed runtime adapter is bounded to this capture-derived tick until pool rotation is traced.")
-label(0x00079d60, "randomized_record_state_dispatch_alt")
+      "Receives an object pointer in g0, loads the related pointer from object + 0x74 into r4, advances the 0x5785d0 PRNG through 0xf5058 (returned in g0 for the state arms), then dispatches the object state through 0x7907c; the reconstructed wrapper remains capture-bounded until pool rotation is traced.")
+ensure_function(0x00079d60, "secondary_object_state_dispatch", 0x0007a218)
+ensure_function(0x0007a3e0, "route_head_7a3e0", 0x0007a438)
+label(0x0007a3e0, "route_head_entry",
+      "Own state 8 takes the mode-11 state-8 route; other states continue through peer-state and ratio-head selection.")
+label(0x0007a408, "route_head_peer_state_split",
+      "Peer states 0 and 3 enter the ratio comparison at 0x7a504; otherwise own states 1, 3, 4, and 5 enter the ratio path and the remaining states take 0x7a4a8.")
+label(0x0007a438, "route_head_ratio_arm",
+      "Begins the mode-1 ratio comparison using the four sign-extended +0x1d0/+0x1d8 halfword values from own and peer records.")
+ensure_function(0x0007a318, "transition_setup_7a318", 0x0007a3d0)
+ensure_function(0x0007a9f0, "transition_route_7a9f0", 0x0007ad88)
+ensure_function(0x0007b430, "transition_route_7b430", 0x0007b46c)
+ensure_function(0x0007b46c, "transition_packet_body_7b46c", 0x0007b89c)
+label(0x0007b46c, "transition_packet_body_7b46c_entry",
+      "Non-sentinel 0x7b430 continuation: emits paired command-29/30 requests using the related record at object +0x74 and the 0x505060 table-derived record.")
+label(0x0007b6a0, "transition_packet_body_7b46c_response_compare",
+      "Compares response-derived signed bands, selects the +/-0x4000 coordinate frame, and classifies the object-relative difference through 0x73508.")
+label(0x0007b744, "transition_packet_body_7b46c_table_exit",
+      "Publishes action 10 and a 0x72630 table-derived transition, or follows the 0x728d0 selector override path.")
+label(0x0007b7e4, "transition_packet_body_7b46c_global_tail",
+      "Applies the final status/transition/action gates using 0x504da4, 0x504dc8, 0x504dc0, and object state 7.")
+ensure_function(0x0007bf10, "transition_route_7bf10", 0x0007bf58)
+ensure_function(0x0007bf58, "transition_packet_body_7bf58", 0x0007c464)
+label(0x0007bf58, "transition_packet_body_7bf58_entry",
+      "Non-sentinel 0x7bf10 continuation: emits the related-record command packet from table base 0x505060 and preserves the extra 0x504d84 status tail.")
+label(0x0007c03c, "transition_packet_body_7bf58_state_gate",
+      "Uses linked-record state 5/4 to select the 0x41200000 adjustment before the command-29/30 packet sequence.")
+label(0x0007c218, "transition_packet_body_7bf58_response_compare",
+      "Compares response-derived bands and routes either to the 0x726c0 table transition or the expanded command packet.")
+label(0x0007c424, "transition_packet_body_7bf58_global_tail",
+      "Applies the final 0x504d98/0x504da4/0x504dc8/0x504dc0 gate before returning.")
+ensure_function(0x0007c470, "transition_route_7c470", 0x0007c4a8)
+label(0x0007c470, "transition_route_7c470_entry",
+      "Third sentinel/state sibling: states 2 and 7 call 0x78740, other states call 0x786d0, and non-sentinel selectors continue at packet arm 0x7c4a8.")
+ensure_function(0x0007c4a8, "transition_packet_body_7c4a8", 0x0007c7a4)
+label(0x0007c4a8, "transition_packet_body_7c4a8_entry",
+      "Non-sentinel 0x7c470 continuation: mirrors the paired command-29/30 packet setup using table base 0x505060 and the related record at object +0x74.")
+label(0x0007c6d8, "transition_packet_body_7c4a8_response_compare",
+      "Compares response-derived signed bands and selects the +/-0x4000 coordinate frame before the 0x73508 classification and 0x72630 transition lookup.")
+label(0x0007c7a8, "transition_packet_body_7c4a8_followup",
+      "Invokes the shared follow-up packet helper after the first packet arm rejects its response-band condition.")
+ensure_function(0x0007c7b0, "transition_packet_followup_7c7b0", 0x0007cb58)
+label(0x0007c7b0, "transition_packet_followup_7c7b0_entry",
+      "Follow-up packet helper: selects related-record versus 0x505060 table inputs from the 0x504e20 pair and emits the command-29/30 response sequence.")
+label(0x0007c8f0, "transition_packet_followup_state_gate",
+      "Applies the mode/control, linked-record state, 0x504e4c, and related-selector predicates before status/transition/action-20 promotion.")
+label(0x0007c998, "transition_packet_followup_override_tail",
+      "Publishes selector state 3, action 20, caller g14 as 0x504d94, and status 1 on the matched override arm.")
+ensure_function(0x0007cb60, "transition_followup_gate_7cb60", 0x0007cbc0)
+label(0x0007cb60, "transition_followup_gate_entry",
+      "Dispatches the post-packet comparison: timing/selector rejection returns through 0x783c8, the accepted arm calls 0x7c7b0, and the clear arm calls 0x82800.")
+label(0x0007cb84, "transition_followup_gate_selector_bound",
+      "Selectors through 7 return through the action-5 wrapper; only selectors above 7 reach the final converted-value comparison.")
+label(0x0007cbb0, "transition_followup_gate_followup_call",
+      "Accepted final comparison calls the related-record follow-up helper at 0x7c7b0.")
+label(0x0007cb9c, "transition_followup_gate_state_handler",
+      "Clear final comparison loads object state at +0x64, calls 0x82800, and stores the returned state value at 0x504d80.")
+ensure_function(0x0007cc50, "transition_mode_gate_7cc50", 0x0007ce0c)
+label(0x0007cc50, "transition_mode_gate_entry",
+      "Requires mode bit 1; when clear, delegates to the 0x7a3e0 route head, otherwise converts 0x504e0e and compares it with 0x504d60.")
+label(0x0007ce40, "transition_mode_gate_action10",
+      "Timing-passed arm calls the shared action-10 wrapper at 0x78408 and then tests the 0x504da4/0x504dc8 controls.")
+label(0x0007ce74, "transition_mode_gate_periodic_selector",
+      "When both controls equal 1 and the 0x5024e8 remainder is at most 59, publishes selector state 3.")
+label(0x0007ce84, "transition_mode_gate_action30",
+      "Timing-clear arm enters the shared tail that publishes status 1, selector 3, and action 30 without changing the transition field.")
+ensure_function(0x0007ce10, "transition_mode2_gate_7ce10", 0x0007ceac)
+label(0x0007ce10, "transition_mode2_gate_entry",
+      "Requires mode bit 2; when clear, delegates to 0x7a3e0, otherwise compares converted 0x504e0e timing against 0x504d60.")
+label(0x0007ce40, "transition_mode2_gate_action10",
+      "Timing-passed arm calls 0x78408 and checks the 0x504da4/0x504dc8 controls before the periodic selector test.")
+label(0x0007ce74, "transition_mode2_gate_periodic_selector",
+      "Both controls equal 1 and a 0x5024e8 remainder at most 59 publish selector state 3.")
+label(0x0007ce84, "transition_shared_action30_tail",
+      "Shared timing-clear tail writes status 1, selector 3, and action 30 without changing the transition field.")
+ensure_function(0x0007ceb0, "transition_mode5_route_7ceb0", 0x0007cfd8)
+label(0x0007ceb0, "transition_mode5_route_entry",
+      "Tests mode bit 5 and loads the related record at object +0x74; clear mode selects the action-30 coordinate/global path, while set mode enters the timing/table path.")
+label(0x0007ceec, "transition_mode5_table_action10",
+      "Timing-table arm loads 0x72840, publishes action 10, and upgrades control 1 to transition 2/action 25.")
+label(0x0007cf34, "transition_mode5_coordinate_path",
+      "Mode-clear continuation classifies the related/current coordinate difference for object state 3, or uses global selector 0x504d68 otherwise.")
+label(0x0007cfb0, "transition_mode5_action30_tail",
+      "Publishes the 0x72780 table result, action 30, and status 1 before returning.")
+ensure_function(0x0007cfe0, "transition_mode5_dispatch_7cfe0", 0x0007d068)
+label(0x0007cfe0, "transition_mode5_dispatch_entry",
+      "Mode bit 5 calls the existing 0x79d60 secondary dispatcher and publishes status 1; clear mode proceeds through the 0x504e0c timing comparison.")
+label(0x0007d008, "transition_mode5_dispatch_wrapper",
+      "Timing-clear arm calls the shared wrapper at 0x78408.")
+label(0x0007d010, "transition_mode5_dispatch_action10",
+      "Timing-table arm loads 0x72840, publishes action 10, and control 1 upgrades transition to 2/action 25.")
+label(0x0007d058, "transition_mode5_dispatch_secondary",
+      "Mode-bit-5 arm calls 0x79d60 and then writes status 1.")
+ensure_function(0x0007d100, "transition_mode1_route_7d100", 0x0007d1ec)
+label(0x0007d100, "transition_mode1_route_entry",
+      "Mode bit 1 delegates to 0x7a3e0; clear mode enters the 0x504e0e/0x504d60 timing split.")
+label(0x0007d138, "transition_mode1_route_wrapper",
+      "Timing wrapper arm calls 0x78408, then gates transition 2/action 30 on control 1 and the post-call mode bit.")
+label(0x0007d184, "transition_mode1_route_table",
+      "Timing table arm loads 0x72840 and initializes action 10; control 1 or the bounded selector test enters the transition-2/action-30 tail.")
+label(0x0007d1c0, "transition_mode1_route_promotion_tail",
+      "Publishes transition 2/action 30 and writes status 1 unless the object state is 7.")
+ensure_function(0x0007d1f0, "state_byte_pair_scan_7d1f0", 0x0007d358)
+ensure_function(0x0007d670, "state_route_select_7d670", 0x0007d7f4)
+ensure_function(0x0007dcc0, "state_byte_window_7dcc0", 0x0007dd60)
+ensure_function(0x0007e390, "state_geometry_descriptor_7e390", 0x0007e440)
+ensure_function(0x0007e440, "state_geometry_packet_prefix_7e440", 0x0007e5e8)
+ensure_function(0x0007ea10, "state31_initializer_7ea10", 0x0007eab0)
+ensure_function(0x0007f4d0, "transition_scan_7f4d0", 0x0007f5ec)
+ensure_function(0x0007fca0, "transition_precondition_7fca0", 0x0007fd24)
+ensure_function(0x00080710, "transition_route_80710", 0x000807d0)
+ensure_function(0x000810d0, "transition_mode_route_810d0", 0x000811b8)
+ensure_function(0x00081120, "transition_mode_route_81120", 0x000811b8)
+ensure_function(0x0008168c, "transition_status_tail_8168c", 0x000816cc)
+ensure_function(0x00081e60, "state_dispatch_81e60", 0x00081f54)
+ensure_function(0x00081f60, "timing_selector_81f60", 0x00082038)
+ensure_function(0x00082ae0, "state_scheduler_gate_82ae0", 0x00082b38)
+ensure_function(0x00082b38, "state_scheduler_dispatch_82b4c", 0x00082c08)
+ensure_function(0x00082c08, "state_scheduler_handler_82c08", 0x00082c18)
+ensure_function(0x00082c6c, "state_scheduler_handler_82c6c", 0x00082cb0)
+ensure_function(0x00082cc0, "state_scheduler_constant_handlers_82cc0", 0x00082ce8)
+ensure_function(0x00082ce8, "state_scheduler_state4_handlers_82ce8", 0x00082d18)
+ensure_function(0x00082d18, "state_scheduler_handler_82d18", 0x00082d34)
+ensure_function(0x00082db0, "state_service_dispatch_82db0", 0x00082df8)
+ensure_function(0x00082e40, "state_service_handler_82e40", 0x00082e64)
+ensure_function(0x00082ea0, "state_service_handler_82ea0", 0x00082ed4)
+ensure_function(0x00082ed4, "state_service_mod8_handlers_82ed4", 0x00082f10)
+ensure_function(0x00082f6c, "state_service_handler_82f6c", 0x00082f84)
+ensure_function(0x00082f84, "state_service_random_mod7_82f84", 0x00082f90)
+ensure_function(0x00082f90, "state_service_high_dispatch_82f90", 0x00082fdc)
+ensure_function(0x00082fac, "state_service_shared_dispatch_82fac", 0x00082fdc)
+ensure_function(0x00082fdc, "state_service_shared_handler_prefix_82fdc", 0x000830c0)
+ensure_function(0x000830c0, "state_service_postprocess_830c0", 0x00083108)
+ensure_function(0x00083110, "state_scheduler_early_gate_83110", 0x00083148)
+ensure_function(0x00083310, "state_scheduler_early_gate_83310", 0x00083348)
+ensure_function(0x00083348, "state_scheduler_ratio_prefix_83310", 0x000833dc)
+ensure_function(0x000833dc, "state_scheduler_ratio_handlers_833dc", 0x00083428)
+ensure_function(0x0008342c, "state_scheduler_remainder_handler_8342c", 0x000834a8)
+ensure_function(0x00082d74, "state_scheduler_tail_82d74", 0x00082da4)
+ensure_function(0x00082040, "state_action_dispatch_82040", 0x00082088)
+ensure_function(0x00082650, "state_status_prefix_82650", 0x000826b0)
+ensure_function(0x00082800, "state_handler_dispatch_82800", 0x00082840)
+label(0x00079d60, "secondary_object_state_dispatch",
+      "Ten-entry object-state dispatcher through the table at 0x79d8c; state-arm predicates remain separate, while the common exits publish transitions 13, 14, and 15.")
+label(0x00079d8c, "secondary_dispatch_state_table",
+      "Ten target addresses for object states 0 through 9: 0x79db4, 0x79e10, 0x79e8c, 0x79ef4, 0x79f5c, 0x79ff4, 0x7a098, 0x7a150, 0x7a204, and 0x7a214.")
+label(0x0007a080, "secondary_dispatch_exit_15")
+label(0x0007a11c, "secondary_dispatch_exit_14")
+label(0x0007a1f4, "secondary_dispatch_exit_13")
+label(0x0007a204, "secondary_dispatch_state_8_exit_13")
+label(0x0007a214, "secondary_dispatch_return")
 label(0x000790a4, "object_state_zero_classifier",
       "Recovered state-0 classifier; recognizes role values 1 through 6 and tests mode bit 1.")
 label(0x00079178, "object_state_one_classifier")
@@ -2330,12 +2570,406 @@ ensure_function(0x000e3a70, "text_render_three_byte_token", 0x000e3aa8)
 label(0x000e39c0, "text_indexed_status_label")
 label(0x000e39f0, "text_status_string_render")
 label(0x000e3a00, "text_status_glyph_match")
-label(0x0006fec0, "geometry_device_command_initialize")
+label(0x0006fec0, "geometry_device_command_initialize",
+      "Selector-zero geometry control pulse: writes 0x303 to 0x800030, then the paired 0x80/0x1f40204 store at 0x804000/0x804004 and 0xf80140 to 0x804008, 0x80400c, and 0x804000 twice.")
 label(0x000027d8, "indirect_return_trampoline")
-label(0x00073508, "geometry_range_classify")
+label(0x00073508, "signed_difference_band_classify",
+      "Classifies the low 16 bits of a signed difference into ten inclusive bands (0..4 for nonnegative values, 5..9 for negative values); callers use the result as a profile/status table index.")
+label(0x0007a318, "transition_setup_7a318",
+      "Callback-returning setup reached from the 0x7802c action arm: control gate 0x504dc8 == 1 publishes 1 to 0x504d84 and 0x504d98; object states 1,2,4,5,7 publish the cursor-clamped value to 0x504db8, while other states select 12 or 13 at 0x504d94 through the literal-first unsigned cmpobl.")
+label(0x0007a9f0, "transition_route_7a9f0",
+      "Initializes 0x504db8 to 10, calls timing route 0x786d0 when 0x504e24 is the -1 sentinel or 0x504dc0 <= 99, and otherwise enters the 0x505060 packet-record path; packet arithmetic remains a separate boundary.")
+label(0x0007b430, "transition_route_7b430",
+      "When 0x504e20 is the -1 sentinel, object states 2 and 7 call 0x78740 and all other states call 0x786d0; non-sentinel values enter the 0x505060 packet path after reading object +0x74.")
+label(0x0007bf10, "transition_route_7bf10",
+      "When 0x504e20 is the -1 sentinel, object states 2 and 7 call 0x78740 and all other states call 0x786d0, then publish 1 to 0x504d84; non-sentinel values enter the 0x505060 packet path after reading object +0x74.")
+label(0x0007d1f0, "state_byte_pair_scan_7d1f0",
+      "Scans one byte at 0x504da0+0x9a and one at +0x98 for a nonzero value within the inclusive reference..reference+5 band; the 0x94..0x96 scan has no retained result. A shared gate then checks the 0x504d9c/0x504d94/0x504db4/base-offset and object-state predicates before the 0x7d358 selector table.")
+label(0x0007d358, "state_selector_table_7d358",
+      "Ten-entry state-handler table: states 0..9 branch to 0x7d380, 0x7d390, 0x7d3a4, 0x7d404, 0x7d4e8, 0x7d568, 0x7d5a4, 0x7d5dc, 0x7d604, and 0x7d660.")
+ensure_function(0x0007d380, "state_selector_body_0_7d380", 0x0007d390)
+label(0x0007d380, "state_selector_body_0_7d380",
+      "State-0 body: mode bit 1 selects shared target 0x7d5f4; clear mode returns through 0x7d644.")
+ensure_function(0x0007d390, "state_selector_body_1_7d390", 0x0007d3a4)
+label(0x0007d390, "state_selector_body_1_7d390",
+      "State-1 body: mode bit 1 selects 0x7d5f4, otherwise mode bit 2 selects 0x7d4b4, with 0x7d644 as fallback.")
+ensure_function(0x0007d3a4, "state_selector_body_2_7d3a4", 0x0007d404)
+label(0x0007d3a4, "state_selector_body_2_7d3a4",
+      "State-2 body: mode bit 1 selects 0x7d5f4; clear mode rejects the coordinate band to 0x7d654, otherwise 0x5024e8 modulo 600 selects 0x7d644 through 449 and 0x7d654 above it.")
+ensure_function(0x0007d404, "state_selector_body_3_7d404", 0x0007d4c4)
+label(0x0007d404, "state_selector_body_3_7d404",
+      "State-3 body: modulo-600 values through 299 return to 0x7d644; accepted control/coordinate predicates publish selector 3 at 0x7d4b4, otherwise the shared tail chooses 0x7d5f4 or 0x7d654 from g3/g13, control 0x504dc8, and mode bit 1.")
+ensure_function(0x0007d4e8, "state_selector_body_4_7d4e8", 0x0007d568)
+label(0x0007d4e8, "state_selector_body_4_7d4e8",
+      "State-4 body: mode bit 1 selects 0x7d5f4; clear mode rejects the coordinate band or g3/g13/control gate to 0x7d654, otherwise modulo 600 through 199 selects 0x7d644 and larger values select 0x7d654.")
+ensure_function(0x0007d568, "state_selector_body_5_7d568", 0x0007d5a4)
+label(0x0007d568, "state_selector_body_5_7d568",
+      "State-5 body: modulo 600 values through 119, missing g3/g13, control != 1, or clear mode bit 1 return to 0x7d644; the fully matched arm reaches 0x7d5f4.")
+ensure_function(0x0007d5a4, "state_selector_body_6_7d5a4", 0x0007d5dc)
+label(0x0007d5a4, "state_selector_body_6_7d5a4",
+      "State-6 body: initial or post-control mode bit 1 selects 0x7d5f4; control != 1 returns to 0x7d644, otherwise the converted 0x504df8 comparison selects 0x7d4b4 or 0x7d644.")
+ensure_function(0x0007d5dc, "state_selector_body_7_7d5dc", 0x0007d604)
+label(0x0007d5dc, "state_selector_body_7_7d5dc",
+      "State-7 body: mode bit 1 and control 0x504dc8 == 1 publish selector 2 and reach 0x7d5f4; either rejection returns through 0x7d654.")
+ensure_function(0x0007d604, "state_selector_body_8_7d604", 0x0007d660)
+label(0x0007d604, "state_selector_body_8_7d604",
+      "State-8 body: mode bit 2 with control 0x504dc8 == 1 reaches selector-3 target 0x7d4b4; otherwise modulo 600 through 299 returns to 0x7d644 and larger values use 0x7d654.")
+label(0x0007d4b4, "state_selector_shared_tail_3",
+      "Shared selector tail writes selector value 3 to 0x504d98 and returns.")
+label(0x0007d5f4, "state_selector_shared_tail_2",
+      "Shared selector tail writes selector value 2 to 0x504d98 and returns.")
+label(0x0007d644, "state_selector_shared_tail_1",
+      "Shared selector tail writes selector value 1 to 0x504d98 and returns.")
+label(0x0007d654, "state_selector_shared_tail_continuation",
+      "Shared selector tail stores caller g14 to 0x504d98 and returns.")
+label(0x0007d670, "state_route_select_7d670",
+      "Scans seven six-byte records at 0x505060, skips zero +4 signed halfwords, selects the first minimum signed +2 halfword, and falls back to status 11 when 0x504d70 <= 4 or 10 otherwise; selected records branch to packet builder 0x7d7f4 and continue into the 0x884000 command path.")
+label(0x0007d7f4, "state_route_selected_packet_builder",
+      "Selected record path indexes the winning six-byte record from 0x505060 and emits its command-29/30 coordinate packet through 0x884000.")
+ensure_function(0x0007d7f4, "state_selected_packet_builder_7d7f4", 0x0007d914)
+label(0x0007d7f4, "state_selected_packet_builder_entry",
+      "Computes selected-index times six from table 0x505060, reads record offsets +0/+2/+4, and begins the fixed command-10/29/30 FIFO sequence.")
+label(0x0007d83c, "state_selected_packet_builder_command30",
+      "Emits command 30 and the second coordinate payload after the command-29 response.")
+label(0x0007d900, "state_selected_packet_builder_result_lookup",
+      "Classifies the final signed difference through 0x73508, indexes 0x72630, and stores the result at 0x504d94.")
+label(0x0007db80, "state_followup_handler_table_7db80",
+      "Ten-entry follow-up handler table: indices 0/1 -> 0x7dba8, 2/3 -> 0x7dbb8, 4 -> 0x7dbc8, 5 -> 0x7dbd8, 6 -> 0x7dbf4, 7 -> 0x7dc04, 8 -> 0x7dc98, and 9 -> 0x7dca8.")
+label(0x0007db70, "state_followup_dispatch_7db70",
+      "Bounds selector g6 against the ten-entry table at 0x7db80; valid selectors branch through the table and larger selectors fall back to 0x7dca8.")
+label(0x0007da8c, "state_followup_primary_table_7da8c",
+      "24-entry primary follow-up table dispatches the earlier selector arms and the distinct handlers at 0x7daf0, 0x7db00, 0x7db1c, 0x7db2c, and 0x7db54.")
+label(0x0007d920, "state_followup_producer_7d920",
+      "Computes the follow-up status/result and selector gates before entering the primary or secondary handler tables.")
+label(0x0007d930, "state_followup_range_class_7d930",
+      "Masks state-base plus offsets 0xe24f/0xa24f/0x224f/0x624f to 16 bits and selects class 1 when any value is at most 0x49e.")
+label(0x0007df00, "state_followup_selector_gate_7df00",
+      "Routes selector r6 == 0x44 to 0x7df58; all other selectors publish status 7/control 1/selector r6 and call 0x79d60.")
+label(0x0007df58, "state_followup_special_route_7df58",
+      "Routes (g6 == 0x55 and r6 != 0x56) or (g6 == 0xa3 and object state +0x64 == 6) through table 0x72780, selector/control/action publication, and call 0x79050; other cases continue at 0x7dfb8.")
+label(0x0007dfb8, "state_followup_class_route_7dfb8",
+      "When g6 == 0xa3 and object state +0x64 is 3 or 6, derives the state-dependent classifier input, looks up 0x72780, publishes selector/control/action 30, and calls 0x79050; other cases continue to 0x7e064.")
+label(0x0007e064, "state_followup_fallback_gate_7e064",
+      "Admits the 0x81610 route for timing modulo 480 <= 239, object state not 3/7, 0x509b34 > 0x1f4, g5 != 4, and g6 == 0xa3; publishes continuation/control and optional selector 1, otherwise continues at 0x7e0d0.")
+label(0x0007e0d0, "state_followup_state89_gate_7e0d0",
+      "States 8/9 take the floating gate and either return through 0x7e130 or call 0x81610; other states continue at 0x7e144.")
+label(0x0007e230, "state_followup_action25_publication_7e230",
+      "Looks up classifier output through 0x72660, writes index-1 to 0x504db4, then publishes control 1/action 25/caller g14/result status to the transition cells.")
+label(0x0007e278, "state_followup_record_probe_prelude_7e278",
+      "Saves the existing transition control/selector/action values and initializes the probe publication cells before the indexed-record and callback gates.")
+label(0x0007e2cc, "state_followup_record_probe_gate_7e2cc",
+      "Saves the prior control/selector/action, publishes control 1/selector g6/action -1, then requires 0x5770f0 > 9, the indexed record halfword threshold, selector != 0xaf/0xa9, and callback 0x816d0 == 1 before the success publication; failures continue at 0x7e33c.")
+label(0x0007e33c, "state_followup_descriptor_fallback_7e33c",
+      "Calls 0x7e390 with saved selector inputs; zero result restores 0x504d9c/0x504da0/0x504db4, while nonzero result writes status 4 to 0x504d94 only when 0x504dc4 < -15.")
+label(0x0007d9e4, "state_followup_publication_counter_clamp",
+      "Publishes selected status/result to base 0x504d60 offsets +0x58/+0x34 (0x504db8/0x504d94), increments 0x51c930, and clamps the counter to 0..24 before the ratio gate.")
+label(0x0007d9b4, "state_followup_result_status_select",
+      "Uses nonzero range class g6 to select result table 0x72ab0[g6]; class zero enters a real-value threshold for 0x72630[0], with literal status 20 as the low fallback and status 31+g9 on table paths.")
+label(0x0007da10, "state_followup_ratio_gate",
+      "Zero-extends object halfwords +0x1d0/+0x1d8, divides them as i960 real values, and returns to 0x7db70 when the ratio is at most the literal 0.4 threshold.")
+label(0x0007da54, "state_followup_span_gate",
+      "Forms divisor r17+31, divides 0x503a14 by it, adds one, and routes spans at least 25 to 0x7db70; otherwise a counter above 24 reaches 0x7db54.")
+label(0x0007daf0, "state_followup_primary_handler_20",
+      "Publishes selector 20 to 0x504d98.")
+label(0x0007db00, "state_followup_primary_handler_23_28",
+      "Publishes selector 23 and status 28 to 0x504d98/0x504d94.")
+label(0x0007db1c, "state_followup_primary_handler_21",
+      "Publishes selector 21 to 0x504d98.")
+label(0x0007db2c, "state_followup_primary_handler_status_counter",
+      "Publishes caller g14 as status and decrements 0x51c930 when object field +0x172 equals 4.")
+label(0x0007db54, "state_followup_primary_handler_continuation",
+      "Publishes caller g14 as status and stores it at 0x51c930 when object field +0x170 is not 6.")
+label(0x0007dba8, "state_followup_handler_19a",
+      "Publishes selector 19 to 0x504d98.")
+label(0x0007dbc8, "state_followup_handler_20",
+      "Publishes selector 20 to 0x504d98.")
+label(0x0007dbd8, "state_followup_handler_23_28",
+      "Publishes selector 23 and status 28 to the transition cells.")
+label(0x0007dbf4, "state_followup_handler_21",
+      "Publishes selector 21 to 0x504d98.")
+label(0x0007dc04, "state_followup_geometry_handler",
+      "Negates object halfwords at +0x10/+0x8 for command 10, reads FIFO response and object +0x184 low halves, classifies through 0x73508/0x72b10, then writes g9+31, selector 23, and the result status.")
+label(0x0007dbb8, "state_followup_handler_19b",
+      "Second selector-19 handler arm: publishes selector 19 to 0x504d98.")
+label(0x0007dbe8, "state_followup_handler_23_status28",
+      "Publishes selector 23 to 0x504d98 and status 28 to 0x504d94.")
+label(0x0007dc98, "state_followup_handler_29",
+      "Publishes status/selector value 29 to 0x504d94.")
+label(0x0007dca8, "state_followup_handler_counter_tail",
+      "When object field +0x170 is not 6, stores caller g14 at 0x51c930.")
+label(0x0007dcc0, "state_byte_window_7dcc0",
+      "Entry guard requires signed 0x509b34 > 0x1f3. Per-slot byte window requires a nonzero status byte, zero masked 0x0f00 halfword gate, and object byte in the inclusive status..status+5 band before command-10 emission.")
+label(0x0007dd00, "state_byte_window_scan_7dd00",
+      "Scans 32 related-object slots against the two status bytes at 0x504e3a/0x504e3b, preserving the per-status match masks before the packet-selection path.")
+label(0x0007e390, "state_geometry_descriptor_7e390",
+      "Maps object slot through +0x200 with a 32-byte stride, uses the resulting byte as a 48-byte descriptor index from 0x562cb0, reads descriptor offsets +4/+0xc/+0x24, and selects the state-3 0x3ff80000 arithmetic arm; constants 0x40c00000 and 0x42f00000 are preserved raw.")
+label(0x0007e440, "state_geometry_packet_prefix_7e440",
+      "Emits the recovered eight-record command-29/30 prefix: signed descriptor halfwords become masked 16-bit lanes, with the first four lanes carrying the g5*g2 product and the next four carrying the g7*g6 product.")
+label(0x0007e5e8, "state_geometry_difference_prep_7e5e8",
+      "Consumes the packet responses, forms the object/descriptor coordinate differences, stores the first derived value at frame +0x60, and prepares the command-10 operand registers.")
+label(0x0007e6a0, "state_geometry_classifier_prep_7e6a0",
+      "Sign-extends the low halfword of the command-10 response/object difference, combines the preceding raw mulr results with reverse-subtracts, and enters classifier 0x73508.")
+label(0x0007e6d4, "state_geometry_packet31_gate_7e6d4",
+      "Emits command 31 with descriptor/related fields, reads the FIFO response, and admits 0x7e788 only when the first three signed products are positive and the fourth is nonzero; zero or failed predicates continue at 0x7e778.")
+label(0x0007e788, "state_geometry_packet10_classify_7e788",
+      "Emits command 10 from the selected record fields, branches on response-delta bit 15, sign-extends record/object halfwords, applies the 0x504de4 bias arm, and enters classifier 0x73508 before table 0x72660.")
+label(0x0007e834, "state_geometry_action30_publication_7e834",
+      "Looks up classifier result through 0x72660, publishes action 30 and status, then admits the 0x7e864 threshold path only when 0x509b34 exceeds 0x5dc; equality exits at 0x7e9f4.")
+label(0x0007e950, "state_geometry_status_dispatch_7e950",
+      "Subtracts 8 from published status, dispatches indices 0-11 through the compact 0x7e96c table, preserves higher/underflow values at the common tail, optionally calls 0x79050 when 0x504da4 == 1, and republishes action 30.")
+label(0x0007ea10, "state31_initializer_7ea10",
+      "Requires signed 0x509b30 > 0x1f3; state 31 requires related/object state 6 and 0x504e48 == 3 before writing 3/0x64/1/7/30 to 0x504d9c/0x504da0/0x504d94/0x504d98/0x504db8. Other states use the exact eight-entry 0x7eab0 threshold dispatch.")
+label(0x0007ebcc, "state31_slot_scan_7ebcc",
+      "Scans 32 active related slots, emits command 62 with the four object/related fields, retains the lowest qualifying FIFO response and slot mask, and routes object state 8 through the 0x72780/table-3 publication tail.")
+label(0x0007ecc0, "state31_global_callback_gate_7ecc0",
+      "Uses 0x5770f0 > 9 to choose callback 0x816d0 versus 0x81b30, then repeats the zero-response test and admits selectors 0/2/5 with status 0/9 toward 0x7ed34; other paths split to 0x7ee28 or 0x7f0f8.")
+label(0x0007ed34, "state31_selector_publication_7ed34",
+      "Admits status 0/9 with related state 3 plus mode bit 2 or state 2 plus mode bit 1, requires selector 0, and publishes selector 2/action 25/control 3/caller status/continuation 0x64 for state 2; state 3 continues at 0x7edc4.")
+label(0x0007edc4, "state31_range_publication_7edc4",
+      "Routes related state 4 directly or accepts signed related +0x172 shifted by 16 only in the strict-lower/inclusive-upper 0x150000..0x190000 band; outside values publish status 23, then selector 3/action 20/control 3/continuation 0x64 converge at 0x7efd8.")
+label(0x0007ee28, "state31_fallback_admission_7ee28",
+      "After the nonnegative timing gate, requires object state 3, related state 5 or 6, and selector 0/2/5 before returning at 0x7ee8c; failed admissions continue through 0x7f0bc or the separate 0x7ee90 route.")
+label(0x0007ee90, "state31_classifier_route_7ee90",
+      "Partitions global 0x504d70 at 4 and selects classifier offsets -0xc00/-0x1800/-0x800 or +0x1800/+0x2800 from related/object states before the 0x72780 publication at 0x7efb0.")
+label(0x0007efb0, "state31_common_publication_7efb0",
+      "Publishes the 0x72780 classifier result to 0x504d94, calls 0x79050 with the related pointer, then writes action 30, control 3, and selector 0x64 before returning.")
+label(0x0007eff0, "state31_classifier1_status_dispatch_7eff0",
+      "Enters the 0x7f010 status table only when classifier result is 1, maps status-minus-8 indices to status 1/4/5/6/2/3 or preserves common values, calls 0x79050 at 0x7f08c, and otherwise continues at 0x7f098.")
+label(0x0007f098, "state31_classifier1_bypass_7f098",
+      "Requires object state 6, related state 3, and selector 0/2/5; the admitted path writes status 7, calls 0x79d60 with the related pointer, then publishes action 30/control 3/selector 0x64 before returning, while failures continue at 0x7f0f8.")
+label(0x0007f0f8, "state31_zero_frame_admission_7f0f8",
+      "Requires the saved frame value to compare equal to zero, excludes related state 7 with object state 5, and admits selector 3/6/1/4/7; selectors 3/6 continue to 0x7f168, other admitted selectors to 0x7f1f8, and failed gates to 0x7f32c.")
+label(0x0007f168, "state31_timing_publication_gate_7f168",
+      "Routes direct state pairs and the two 0x504d60-vs-0x40690000 timing arms through the final related-state 6/object-state 5 exclusion; accepted paths write status 7 and branch to 0x7f4ac, while rejected paths continue at 0x7f1f8.")
+label(0x0007f1f8, "state31_double_state6_fastpath_7f1f8",
+      "Checks object and related state together; the exact 6/6 pair sets the classifier input to zero and jumps to the 0x7f31c table lookup, while other pairs continue at 0x7f210.")
+label(0x0007f210, "state31_selector_offset_route_7f210",
+      "Builds the classifier offset from selector-minus-3 and object/related states: base 0x1000, 0x1800, or 0x3000, with signed positive/negative arms, then converges at the 0x72780 lookup through 0x7f31c.")
+label(0x0007f31c, "state31_classifier_table_tail_7f31c",
+      "Loads g4 from 0x72780[g0*4], moves the related-object pointer r5 into g0, and transfers to 0x7ecb0 with the table result and pointer preserved.")
+label(0x0007f32c, "state31_classifier1_fast_publication_7f32c",
+      "Admits classifier result 1, writes selector 3, and returns with control 0x64 when the r6-vs-zero compare is equal; the non-equal classifier-1 arm continues at 0x7f364 and other results branch to 0x7f44c.")
+label(0x0007f364, "state31_threshold_status_dispatch_7f364",
+      "Converts 0x504df4, compares the resulting threshold against r6, stores r8 to 0x504da0, then dispatches status-minus-8 through 0x7f3ac; mapped statuses converge at 0x7f428 for optional callback 0x79050 and action 30.")
+label(0x0007f4d0, "transition_scan_7f4d0",
+      "Requires signed 0x509b28 > 0x1f3, then scans status bytes 0x504e38 and 0x504e39 across 32 object slots at related+0x200 with a 0x20 stride; each match uses the inclusive status..status+5 byte window before the later candidate/state route.")
+label(0x0007fca0, "transition_precondition_7fca0",
+      "Normalizes related +0x172 by zero-extending its low halfword; accepts the range arm for 0x10000 < value <= 0xd0000, or the state arm for related +0x64 in {0,6}, +0x172 in {1,14}, and +0x170 == 6. Later 0x504dec/current timing selection remains separate.")
+label(0x00080710, "transition_route_80710",
+      "Uses 0x504d70 <= 1 to subtract 0x6800 from the current +0x184 halfword, values 2..9 to add 0x6800, and otherwise exits; classifies the related-current difference through 0x73508, selects 0x72630[g6], initializes 0x504db8 to 10, and calls 0x82800 only when current timing is below converted 0x504df8.")
+label(0x000810d0, "transition_mode_route_810d0",
+      "Requires signed 0x509b2c > 0x1f3 and normalized related +0x172 in 0x150000..0x190000, then enters 0x81120 for the mode/state route.")
+label(0x00081120, "transition_mode_route_81120",
+      "For nonpositive current timing requires mode bit 3; accepts object state 1 or 5 and rejects related states 1,5,6,7, then writes 7/30/2/0x64 to 0x504d94/0x504db8/0x504d9c/0x504da0 and calls 0x79d60.")
+label(0x0008168c, "transition_status_tail_8168c",
+      "Publishes status 18 for global state 2 or 7; otherwise computes 0x5024e8 modulo 240 and publishes 18 for remainder <= 0x77 or 19 above that boundary.")
+label(0x00081e60, "state_dispatch_81e60",
+      "Calls 0x84d90 only for globals 0x5039f4 == 4, 0x503a00 == 10, and mode 0x504e42 == 0; then dispatches mode-zero object states 0..9 through the exact table at 0x81eb4.")
+label(0x00081f60, "timing_selector_81f60",
+      "Classifies the state/timing prefix, updates the paired 0x504d78/0x504d7c cells, and clears 0x504d88 on the fallback arm; state 6 takes the fast path for negative floating-point 0x504d60 timing, while the nearby 0x404e0000 load is dead and delta tests are unsigned.")
+label(0x00082ae0, "state_scheduler_gate_82ae0",
+      "Runs 0x81f60 first; when 0x503a14 <= (g28+31), 0x5039f4 == 4, and 0x504dbc < 6, object states below 8 call 0x82db0 while state 8+ calls 0x81e60 only for 0x504d7c == 5; otherwise control continues into the downstream scheduler.")
+label(0x00082b38, "state_scheduler_dispatch_82b4c",
+      "After requiring status 0x504d84 == 1, rejects selectors above g28+12 and dispatches the bounded selector through the 44-entry table at 0x82b58.")
+label(0x00082c08, "state_scheduler_handler_82c08",
+      "Table selector 6 writes state 7 to 0x504d7c when 0x504e1c == 0; otherwise it calls the existing 0x81e60 state dispatcher, then joins the common scheduler tail.")
+label(0x00082c6c, "state_scheduler_handler_82c6c",
+      "Table selector 19 writes status 2 for object states other than 4; state 4 writes status 8 when signed 0x504dc0 <= 0x78000, otherwise writes status 3 and selects state 28 for 0x504e28 == 1 or state 5.")
+label(0x00082cc0, "state_scheduler_constant_handlers_82cc0",
+      "Constant scheduler entries write 0x504d98: 0x82cc0 -> 3, 0x82cc8 -> 1, 0x82cd0 -> 13, 0x82cd8 -> 14, and 0x82ce0 -> 15, then join the common tail.")
+label(0x00082ce8, "state_scheduler_state4_handlers_82ce8",
+      "Target 0x82ce8 writes status 3 plus state 28 for object state 4, otherwise status 2; target 0x82d04 writes status 2 for state 4, otherwise status 3.")
+label(0x00082d18, "state_scheduler_handler_82d18",
+      "Writes status 3 and selector 20 for object state 8; all other states take the shared status-8 path.")
+label(0x00082db0, "state_service_dispatch_82db0",
+      "Dispatches object states 0..8 through the exact table at 0x82dd4; states above 8 take the high-state route at 0x82f90.")
+label(0x00082e40, "state_service_handler_82e40",
+      "Requires random remainder 4 modulo 5; then selects downstream value 2 for object state 3 or 5 for all other states, while non-4 remainders use the shared fallback.")
+label(0x00082ea0, "state_service_handler_82ea0",
+      "Requires object state 3; random remainder 4 modulo 6 selects downstream value 3, remainder 5 selects value 6, and all other combinations use the shared fallback.")
+label(0x00082ed4, "state_service_mod8_handlers_82ed4",
+      "The 0x82ed4 handler maps remainder < 3 plus object state 3 to value 3 and remainder 6 to value 4; 0x82f10 maps remainders 4/5 plus state 3 to value 3 and remainder 7 plus state 3 to value 6; all other cases share fallback.")
+label(0x00082f6c, "state_service_handler_82f6c",
+      "Requires random remainder 4 modulo 5 and object state 3, then selects shared downstream value 2; every other combination falls through to the common dispatch.")
+label(0x00082f84, "state_service_random_mod7_82f84",
+      "Computes remi 7 on the random helper result and passes the signed remainder to the shared 0x82fac selector table.")
+label(0x00082f90, "state_service_high_dispatch_82f90",
+      "Adjusts negative random results by 3, subtracts the value masked with ~3 to form the selector, and dispatches unsigned selectors 0..7 through the table at 0x82fbc; nonnegative inputs normalize to 0..3, while negative or larger results use the shared reject path.")
+label(0x00082fbc, "state_service_high_dispatch_82f90_table",
+      "Targets: 0x82fdc, 0x82ff4, 0x8300c, 0x83024, 0x8303c, 0x83050, 0x83058, and 0x8307c.")
+label(0x00082fac, "state_service_shared_dispatch_82fac",
+      "Unsigned selector <= 7 dispatches through the shared eight-entry table at 0x82fbc; larger selectors take the 0x830a0 reject path.")
+label(0x00082fdc, "state_service_shared_handler_prefix_82fdc",
+      "Selectors 0..3 publish d94 values 5/6/2/3 and call 0x79050 before selecting 30; selectors 4..6 publish d98 1/2/3 with selector 20 and caller g14 to d94; selector 7 publishes d94 7, calls 0x79d60, and selects 30; reject publishes d98 1, d94 g14, and selector 10.")
+label(0x000830c0, "state_service_postprocess_830c0",
+      "If current object state is 3 and status is 9, rewrites status to 12; then if the related object state is 0, overrides status to 1, selector to 10, and d94 to caller g14.")
+label(0x00083110, "state_scheduler_early_gate_83110",
+      "For signed 0x504dc0 <= 149 and related +0x172 equal to 19 or 20, writes caller g14 to 0x504d98 and returns; all other inputs continue into the timing/status path.")
+label(0x00083310, "state_scheduler_early_gate_83310",
+      "Sibling gate: for signed 0x504dc0 <= 149 and related +0x172 equal to 19 or 20, writes caller g14 to 0x504d98 and returns; all other inputs continue into the ratio/status path.")
+label(0x00083348, "state_scheduler_ratio_prefix_83310",
+      "Publishes 0x504e1c = 1, compares the converted 0x5042a8/0x5042a2 ratio against the 0.9 double constant, clears mode bit 2 above the threshold, and dispatches state 5 through the exact modulo-5 table at 0x833c8.")
+label(0x000833c8, "state_scheduler_ratio_prefix_83310_table",
+      "Targets: 0x833dc, 0x833e8, 0x833f8, 0x83408, and 0x83418.")
+label(0x000833dc, "state_scheduler_ratio_handlers_833dc",
+      "Ratio-table selector 0 calls 0x79d60; selectors 1 and 2 publish status 28, selector 3 publishes 26, and selector 4 publishes 21 to 0x504d80.")
+label(0x0008342c, "state_scheduler_remainder_handler_8342c",
+      "Remainder 5 selects status 21; remainder 4 with mode bit 1 selects 26; negative remainders with mode bit 2 select 28; all other paths call 0x79d60, then write caller g14 to 0x504d8c and 15 to 0x504d90.")
+label(0x00083ac0, "state_scheduler_dispatch_83ac0",
+      "Early gate: signed 0x504dc0 <= 149 and related +0x172 equal to 19/20 writes caller g14 to 0x504d98. Otherwise publishes 0x504e1c = 1, calls 0x82800 when current timing is below converted 0x504df8, selects status 18 for negative timing, and uses separate state-5 remi-6 versus other-state remi-7/mode-bit paths; the latter publishes g14/15 to 0x504d8c/0x504d90.")
+label(0x00083cc0, "state_scheduler_early_gate_83cc0",
+      "For signed 0x504dc0 <= 149 and related +0x172 equal to 19 or 20, writes caller g14 to 0x504d98 and returns; all other inputs continue after loading 0x504d7c. The continuation has distinct state-5 mode/timing and other-state remainder-18 paths.")
+label(0x00083f9c, "state_scheduler_state5_handler_83f9c",
+      "State-5 continuation: mode bit 1 selects status 26 when 0x504e28 == 1, otherwise status 37; with bit 1 clear, status 39 is selected only when current timing exceeds converted 0x504dd8 and mode bit 2 is set, otherwise status 37.")
+label(0x00084018, "state_scheduler_quadword_tail_84018",
+      "Loads the 0x504d80 quadword, replaces its first word with the candidate status, preserves the remaining three words, and publishes 0x504d90 = 30 exactly for status 26 or 37; all other statuses publish 15 before the stq commit.")
+label(0x00084150, "state_scheduler_random_handler_84150",
+      "Consumes the signed helper value from the 0x840b0 state-5 random/timing prefix: values below 4 with mode bit 2 select status 32; negative values with mode bit 1 select status 37; all other values select status 33.")
+label(0x000841ec, "state_scheduler_nonstate_handler_841ec",
+      "Non-state continuation: helper values below 4 with mode bit 2 select status 32; positive helper values with mode bit 1 select status 37; otherwise status 33 is selected.")
+label(0x00084240, "state_scheduler_initializer_84240",
+      "Installs the 0x84290 return trampoline, clears callback g14, publishes 0x504e1c = 1, initializes status 0x504d80 = 43, selector 0x504d90 = 15, caller field 0x504d8c = 0, and 0x504d9c = 7 before bx(g1).")
+label(0x000842d0, "scheduler_wrapper_842d0",
+      "Returns when 0x504e50 bit 0 is set; otherwise calls 0x84330, 0x85c00, 0x848d0, 0x84b10, and 0x858f0 in order, then calls 0x85b00 only when the low byte of 0x5024e8 is zero.")
+label(0x00084330, "scheduler_setup_prefix_84330",
+      "Adjusts the stack by 16, masks 0x5024e8 with 3, and when the result is zero clears three halfword slots (six bytes) at 0x509a60 using the incoming g14 value before continuing into the bitfield setup.")
+label(0x00084470, "scheduler_flag_finalize_84470",
+      "Reads the synthesized 0x509a60 halfword; sets bit 7 when bits 5 and 1 are both set, otherwise sets bit 6 when bit 4 is paired with bit 0 or 1, or when bit 5 is paired with bit 0.")
+label(0x000844f4, "scheduler_counter_prefix_844f4",
+      "Uses (0x5024e8 & 3) as a slot selector; nonzero slots jump to 0x847b0, while slot 0 increments 0x509a68 and subtracts 60 when the new counter exceeds 59 before continuing packet construction.")
+label(0x000848d0, "scheduler_counter_update_848d0",
+      "For nonnegative 0x509a6c, increments and stores the counter, resetting it to zero above 120; for negative values, returns unless 0x503a14 exceeds 239, then continues into 0x8490c.")
+label(0x00084b10, "scheduler_recovery_gate_84b10",
+      "Updates 0x509a70 with a 120 ceiling/reset, derives table base 0x5074a0 + related field +0x64 times 1024, and enters the recovery scan only for 0x509ac0 == 1, clear 0x504e50 bit 2, 0x503a14 > 239, and updated counter zero.")
+label(0x00084bb4, "scheduler_recovery_search_84bb4",
+      "Scans eight recovery records at 136-byte stride using halfword field +0x86; when the working target exceeds a record, selects it and replaces the target with that record value before continuing.")
+label(0x00084c98, "scheduler_recovery_row_84c98",
+      "Builds a recovery row at table base + selected index * 144, copies six scalar fields to offsets 0/2/4/6/8/a, stores 240 - 4*normalized delay at +0x84, copies 60 source +0xc halfwords from (counter + 1) modulo 60, and writes 100 to the selected recovery record +0x86.")
+label(0x00084d60, "scheduler_recovery_status_tail_84d60",
+      "Stores the recovery flag to 0x509ac0, extracts bit 3 from the 0x504e50 control byte, and stores that boolean to 0x509b10 before returning.")
+label(0x00084d90, "scheduler_control_gate_84d90",
+      "Saves g8 at fp+0x40, tests bit 0 of 0x504e50, restores g8 and returns when set, otherwise restores g8 and continues at 0x84dc4.")
+label(0x00084dac, "scheduler_success_publication_84dac",
+      "Sets bit 8 in live g13, stores the result at 0x504e42, stores caller g14 at 0x504e44, and branches to 0x84f10.")
+label(0x00085058, "scheduler_success_publication_85058",
+      "Loads matched row +0x8c, sets bit 9 in g13, stores the result at 0x504e42, stores the row value at 0x504e44, restores g8, and returns.")
+label(0x00085080, "scheduler_control_gate_85080",
+      "Saves g8 and g12 at fp+0x50/fp+0x60, tests bit 0 of 0x504e50, restores both registers and returns when set, otherwise continues at 0x850ac.")
+label(0x000850ac, "scheduler_ratio_gate_850ac",
+      "Masks 0x5024e8 to a byte and uses literal-first cmpobl 10,g4: values above 10 exit to 0x85128, while 0 through 10 continue into the ratio setup.")
+label(0x000850c0, "scheduler_ratio_predicate_850c0",
+      "Sign-extends the object/related +0x1d0 and +0x1d8 halfwords, forms first/second ratios, subtracts related from object, and exits on nonnegative difference; negative difference continues at 0x85134.")
+label(0x00085134, "scheduler_frame_scan_prefix_85134",
+      "Selects frame record 0x5096a0 + slot*16 and table row 0x5074a0 + state*1088, derives upper-halfword targets minus 70, and branches to 0x853a0 when masked row field +0x86 is <=49.")
+label(0x000851a8, "scheduler_frame_row_global_match_851a8",
+      "Masks the selected row's field +0, compares it with 0x504d68, and sets the r7 match flag when equal; unequal rows leave r7 clear.")
+label(0x000851c0, "scheduler_frame_row_band_flag_851c0",
+      "Masks row field +6 and sets r5 when it is within frame_upper+/-70; for frame_upper <=69 the lower-bound check is bypassed, otherwise the interval is inclusive.")
+label(0x00085204, "scheduler_frame_row_secondary_match_85204",
+      "Masks row field +4 and the loaded frame g9 low halfword, increments r5 when they are equal, and then reaches the shared 0x847c0 call.")
+label(0x0008521c, "scheduler_frame_row_call_setup_8521c",
+      "Reloads the original object's +0x74 value into g0, passes fp+0x40 and fp+0x44 in g1/g2, and calls the shared row handler at 0x847c0.")
+label(0x0008522c, "scheduler_frame_row_frame_match_8522c",
+      "Masks row field +6 to a byte, compares it with the value restored from fp+0x40, and increments r7 on equality.")
+label(0x000852ac, "scheduler_frame_scan_terminal_gate_852ac",
+      "Branches to 0x853a0 when r5 <= 2 or r7 <= 1; only r5 >= 3 and r7 >= 2 continue at 0x852b4.")
+label(0x000852b4, "scheduler_frame_scan_publication_852b4",
+      "Sets bit 10 in r10 and publishes row +0x84 to 0x504e44; selector 0..6 dispatches statuses 6,5,4,2,3,1,1, while larger selectors publish caller g14, then restores g8/g12.")
+label(0x000853a0, "scheduler_frame_scan_loop_853a0",
+      "Increments the row index, advances both scan pointers by 0x88, loops while the new index is <=7, and restores g8/g12 after the eighth failed row.")
+label(0x000853c0, "scheduler_frame_decode_853c0",
+      "Decodes 0x504e42/0x504e44 into object +0xec +0x1c: bit 8 selects 0x5050a0/state*1152/selector*25+20 versus 0x5074a0/state*1088/selector*17+12, indexes by value_504e44>>2, packs the table nibble pair, increments 0x504e44, and resets 0x504e42 above 239 before returning through 0x85494.")
+label(0x0008552c, "scheduler_callback_flag_decode_8552c",
+      "Extracts the selected word high byte and derives callback g1/g2, g3, and g13 from bit-pair predicates: 4&5, 0|!1, 2|!3, and 6|!7.")
+label(0x0008558c, "scheduler_callback_alignment_8558c",
+      "Rounds positive 0x504e44 up and nonpositive values down to a 4-byte boundary, computes original-aligned delta, and uses cmpibge 1,delta to select fallback dimensions 8/8 below delta 1.")
+label(0x000855b8, "scheduler_callback_global_gate_855b8",
+      "Requires 0x503a80 == 0 and 0x504dc0 <= 149, derives 0x503a14/48 + 1, and exits to 0x85678 when 0x503a18 minus that target is >=20; otherwise continues to object-ratio checks.")
+label(0x000855f8, "scheduler_callback_object_gate_855f8",
+      "Requires signed object +0x1d0 > (+0x1d8 >> 2); when timing difference exceeds 45, computes 0x5024e8 modulo 300 and forces dimensions 1/1 only for remainders above 45.")
+label(0x00085634, "scheduler_callback_timing_gate_85634",
+      "Recomputes 0x503a14/48 + 1, exits when 0x503a18 minus that target is >=20 or 0x5024e8 modulo 300 is <=90, and forces g1/g2 to 1/1 for remainders above 90.")
+label(0x00085678, "scheduler_callback_selector_gate_85678",
+      "Branches to 0x85784 for every decoded low-nibble selector other than 1; selector 1 alone enters the repeated timing/position gate.")
+label(0x00085784, "scheduler_callback_selector2_ratio_85784",
+      "Branches to 0x857e4 unless selector is 2; selector 2 with 0x504dc0 <=149, object ratio +0x1d0/+0x1d8 >1.65, and dimensions 2/2 changes g1 to 1.")
+label(0x000857e4, "scheduler_callback_selector3_ratio_857e4",
+      "Branches to 0x85844 unless selector is 3; selector 3 with 0x504dbc <=32, object ratio +0x1d0/+0x1d8 >1.65, and dimensions 2/1 changes g1 to 1.")
+label(0x00085844, "scheduler_callback_finalize_85844",
+      "Converts g1/g2 to persistent dimensions 1/2/4 using 0x504dac/0x504db0 bit 0, then sets mode bits 3/4/5 from g3/g13 ==16 and source bit 3, storing the results to 0x504dac/0x504db0.")
+label(0x000858f0, "scheduler_callback_object_scale_858f0",
+      "Snapshots object +0x48/+0x4a at 0x509b8c/0x509b90; when object +0x190 is zero and related state is 11/14, selects related +0x63c/+0x640, divides by 100, and scales the second snapshot field.")
+label(0x000859b8, "scheduler_callback_result_dispatch_859b8",
+      "Masks 0x509b8c to a byte, calls helper 0x86638, subtracts 1, exits to 0x85af0 above index 4, and dispatches indices 0..4 to 0x859ec/0x85a20/0x85a54/0x85a88/0x85abc.")
+label(0x000859ec, "scheduler_callback_accumulator_update_859ec",
+      "The five result handlers divide 0x509b90 by 0x503a78+1, add the quotient to 0x509b24/28/2c/30/34 by dispatch index, clamp at 10000, store, and return.")
+label(0x00085af0, "scheduler_callback_result_reject_85af0",
+      "Empty reject/return stub reached when the normalized callback result index exceeds 4.")
+label(0x00085b00, "scheduler_callback_frame_build_85b00",
+      "Loads six published accumulator words, writes scaled callback-frame fields at fp+0x40..0x54, then scans the six values for the three smallest signed entries; a spread above 0x1f3 publishes mode 6, otherwise it publishes the lowest entry index to 0x504e48.")
+label(0x00085c00, "scheduler_callback_variant_scale_85c00",
+      "Suppresses the signed object +0x4a working value when object +0x190 is nonzero; for related states 11/14, divides related +0x63c/+0x640 by 100 and multiplies the result by object +0x4a.")
+label(0x00085d04, "scheduler_callback_table_row_adjust_85d04",
+      "For the g2-selected callback-table path, addresses 0x5050a0 + state*1152 + selector*144 + 0x8e, adds 30 to the current halfword, and writes 1000 to the paired row only when its value exceeds 1000.")
+label(0x00085e20, "scheduler_callback_table_row_decay_85e20",
+      "Addresses the same state/selector row, subtracts 10 from its current halfword, and writes 40 to the paired row when the paired value is <=49; values above 49 take the direct reject/return branch.")
+label(0x00085ef8, "scheduler_callback_byte_map_finalize_85ef8",
+      "Walks 32 records with 32-byte strides and fills zero odd-byte map entries with the 0x504e42 low nibble plus bit 7 when the object byte/halfword are nonzero and 0x504e42 bit 11 is set.")
+label(0x00085f8c, "scheduler_callback_secondary_gate_85f8c",
+      "Scans the sibling map for bit-6 entries and routes each through 0x86000 when previous bits 9/8/11, current halfword zero, or object byte zero holds; otherwise it routes through 0x860a0.")
+label(0x00086000, "scheduler_callback_secondary_primary_86000",
+      "Replaces the selected bit-6 map entry with g14, rejects low-nibble collisions, and updates 0x5074a0 + state*1088 + selector*136 + 0x86 by +30, capping the paired row at 1000 when above it.")
+label(0x000860a0, "scheduler_callback_secondary_fallback_gate_860a0",
+      "Requires the selected map byte's bit 6 and admits the fallback mutation when previous-halfword bit 10 is set or the working scale from 0x85c00 is nonzero; otherwise it exits through 0x86174.")
+label(0x000860d4, "scheduler_callback_secondary_fallback_mutation_860d4",
+      "Uses the secondary state/selector row, subtracts 10 from the current halfword, writes paired value 40 when it is <=49, and replaces the matching candidate map entry with g14 before the 0x86174 continuation.")
+label(0x00086174, "scheduler_callback_secondary_byte_map_finalize_86174",
+      "Walks 32 secondary records with +0x20 strides and fills zero 0x509ad0 odd-byte map slots with (0x504e42 low nibble)|0x80 when the object byte/halfword are nonzero and global bit 11 is set.")
+label(0x000861e0, "scheduler_callback_halfword_setup_861e0",
+      "Captures return trampoline 0x86238, sign-extends input halfwords into 0x509b94/0x509b98, zeroes the second value when 0x503b18 is zero, and lets nonzero 0x503b1a override it before bx(g2).")
+label(0x000865e0, "stage_mode_publication_865e0",
+      "Publishes the selected four-word/two-word mode values to previous, current, and active threshold snapshots at 0x509b60/0x509b70, 0x509b20/0x509b30, and 0x509b40/0x509b50, then writes callback g14 to latches 0x509b80/0x509b84/0x509b88.")
+label(0x00085c88, "scheduler_callback_byte_map_scan_85c88",
+      "Scans 32 odd-byte map entries for bit-7 candidates, applies the primary previous-halfword bit-10 gate or fallback bit-9/8/11/zero tests, replaces a candidate with g14, and rejects low-nibble collisions before handing off to the row adjustment.")
+label(0x00085a20, "scheduler_callback_accumulator_update_85a20", "Alias-shaped accumulator handler storing the clamped quotient sum at 0x509b28.")
+label(0x00085a54, "scheduler_callback_accumulator_update_85a54", "Alias-shaped accumulator handler storing the clamped quotient sum at 0x509b2c.")
+label(0x00085a88, "scheduler_callback_accumulator_update_85a88", "Alias-shaped accumulator handler storing the clamped quotient sum at 0x509b30.")
+label(0x00085abc, "scheduler_callback_accumulator_update_85abc", "Alias-shaped accumulator handler storing the clamped quotient sum at 0x509b34.")
+label(0x0008490c, "scheduler_object_ratio_prefix_8490c",
+      "Rejects nonzero object +0x190; related state 11 selects object +0x63c and state 14 selects +0x640, divides the selected value by immediate 100, multiplies object +0x4a by that quotient, and exits through 0x84b08 when the product is zero.")
+label(0x00084994, "scheduler_record_search_84994",
+      "Scans up to eight records with a 16-byte stride, comparing the working target against each record's halfword at +0x8e; when target > record, selects that record and replaces the working target with its value before continuing.")
+label(0x000849d0, "scheduler_frame_slot_849d0",
+      "Normalizes the 0x8d2a0 result as result-1 or 180 when negative, subtracts it from 0x509a68, adds 60 when the slot is negative, and scales the resulting frame slot by 16 for 0x5096a0 access.")
+label(0x00084a34, "scheduler_packet_row_84a34",
+      "Builds the selected record row at table base + selected index * 144, writes source halfwords at offsets 0xa/0xc/0xe/0x10/0x12, and writes 240 - 4*normalized delay at row offset 0x8c.")
+label(0x00084a80, "scheduler_packet_row_copy_84a80",
+      "Copies scalar halfwords from the 0x5096a0 frame record to the row, copies 60 +0xc halfwords into row offsets beginning at +0x14, and writes immediate 100 at row offset +0x8e before returning through 0x84b08.")
+label(0x00082dd4, "state_service_dispatch_82db0_table",
+      "Targets: 0x82df8, 0x82e0c, 0x82e40, 0x82e64, 0x82ea0, 0x82ed4, 0x82f10, 0x82f6c, and 0x82f84.")
+label(0x00082d74, "state_scheduler_tail_82d74",
+      "Copies the 0x504d80 quadword while clearing its second word; publishes 0x504d90 = 15 when status is unsigned <= 6 or exactly 8, then returns.")
+label(0x00082b58, "state_scheduler_dispatch_82b4c_table",
+      "44-entry scheduler table; shared reject target is 0x82d68, with handler targets spanning 0x82c08..0x82d48 and final target 0x82d5c.")
+label(0x00082040, "state_action_dispatch_82040",
+      "Rejects object states above 9, then dispatches states 0..9 through the exact action table at 0x82060.")
+label(0x00082650, "state_status_prefix_82650",
+      "The exact early prefix writes status 8 for r5/r6 == 0/0, writes 3 or 4 for 0/1 based on 0x504d70 <= 4, and otherwise continues into the state/descriptor path.")
+label(0x00082800, "state_handler_dispatch_82800",
+      "Unsigned selector <= 9 dispatches through the exact ten-entry table at 0x82818; values above 9 take the shared reject/return path.")
+label(0x00082818, "state_handler_dispatch_82800_table",
+      "Targets: 0x82840, 0x82874, 0x8288c, 0x828a4, 0x828bc, 0x828d4, 0x828f0, 0x8293c, 0x828e8, 0x82950.")
+label(0x00082060, "state_action_dispatch_82040_table",
+      "Ten action targets: 0x82088, 0x820cc, 0x82120, 0x8218c, 0x82248, 0x82330, 0x823cc, 0x824b8, 0x82534, and 0x825c0.")
+label(0x00081eb4, "state_dispatch_81e60_table",
+      "Ten state targets: 0x81edc, 0x81ee8, 0x81ef4, 0x81f00, 0x81f0c, 0x81f18, 0x81f24, 0x81f30, 0x81f3c, and 0x81f48.")
+label(0x0007eab0, "state31_threshold_dispatch_table",
+      "Eight selector targets at 0x7eab0: threshold sources 0x504e3c, 0x504e40, 0x504e3c, 0x504e3e, 0x504e40, 0x504e3c, 0x504e40, and 0x504e40.")
 label(0x000017c8, "startup_device_mode_select")
 label(0x00001348, "startup_device_mode_enable")
 label(0x00001380, "startup_device_mode_transition")
+label(0x00001424, "startup_mode_one_device_sequence",
+      "Mask-1 dispatcher continuation: calls video transfer 0x1c2c0, upload selector 0x29d50, asset helper 0xe2330, audio record/status upload 0x29b20, then input initializer 0x2cb0 before returning to the common tail.")
 label(0x00001bb8, "startup_hardware_reset")
 label(0x0001bc20, "asset_word_byte_swap")
 label(0x0001bc90, "asset_tiled_row_copy")
@@ -2378,12 +3012,14 @@ label(0x00071080, "geometry_object_match_update",
       "Match-phase object geometry update: reads the object record, derives transformed frame values, emits geometry packets through 0x884000/0x804000, and updates the associated runtime counters.")
 label(0x00072c00, "match_object_state_service",
       "State-gated object service: checks match mode and object fields, dispatches object-side services, updates shared result/status fields, and returns through its frame epilogue.")
+label(0x00072c10, "match_state_geometry_orchestrator",
+      "Gates geometry work, invokes threshold/transition services, funnels through the match-result cluster, and publishes the final result pair.")
 label(0x00072ea0, "match_state_result_service",
       "Match-state/result service: selects mode-dependent parameters, updates shared result fields and object state, and emits the resulting command data.")
 label(0x00073498, "match_result_counter_service",
-      "Updates the shared result pair and counter state, then returns through the continuation saved in g6.")
+      "Increments the second word of the 0x504db0 pair through the supplied limit; on overflow stores 0xffffffff, clears 0x504d9c, conditionally clears 0x504da4, and returns through g6.")
 label(0x000735d0, "match_result_state_dispatch",
-      "Dispatches result-state handling through the mode/count table at 0x73618 after selecting the object-side context.")
+      "If 0x504e42 is nonzero, diverts to 0x853c8; otherwise bounds 0x504d94 at 33 and selects the exact 34-entry target table rooted at 0x73618, with 0x74848 as the default route.")
 label(0x000736a0, "geometry_profile_handler_0",
       "Profile-table handler 0: scans nine geometry records, emits selector 29/30 packets, classifies residuals, and branches to the shared continuation.")
 label(0x000737c8, "geometry_profile_handler_1",
@@ -2482,6 +3118,144 @@ label(0x000754cc, "match_phase_substate_arm_4",
       "Substate-table arm: selects phase value 15, updates the secondary phase value, and returns.")
 label(0x000754e4, "match_phase_substate_default",
       "Substate-table default arm: returns without changing the selected phase value.")
+label(0x00075cf0, "match_phase_substate_common_update",
+      "Shared phase-substate continuation: publishes the selected status at 0x504d94.")
+label(0x00075cf8, "match_phase_substate_counter_return",
+      "Phase-substate counter return: writes counter value 10 to 0x504db8 and returns.")
+label(0x00075d08, "match_phase_counter_dispatch",
+      "Phase-counter dispatcher: normalizes 0x504d94 and selects one of five counter/status arms.")
+label(0x00075bbc, "match_phase_secondary_selector",
+      "Parallel phase selector: normalizes r4 and 0x504d94 through the 0x75be0 table.")
+label(0x00075c58, "match_phase_late_selector",
+      "Late phase selector: subtracts five from r4 and dispatches normalized status through 0x75c7c.")
+label(0x00075cb4, "match_phase_late_arm_0",
+      "Late phase arm: selects status value 5 and joins the shared status writer.")
+label(0x00075cbc, "match_phase_late_arm_1",
+      "Late phase arm: selects status value 1 and joins the shared status writer.")
+label(0x00075cc4, "match_phase_late_arm_2",
+      "Late phase arm: selects status and counter value 10, then returns.")
+label(0x00075cdc, "match_phase_late_arm_3",
+      "Late phase arm: selects status value 8 and joins the shared status writer.")
+label(0x00075ce4, "match_phase_late_arm_4",
+      "Late phase arm: selects status value 14 and joins the shared status writer.")
+label(0x00075c1c, "match_phase_secondary_arm_0",
+      "Parallel phase arm: selects status value 5 and joins the shared status writer.")
+label(0x00075c24, "match_phase_secondary_arm_1",
+      "Parallel phase arm: selects status value 4 and joins the shared status writer.")
+label(0x00075c2c, "match_phase_secondary_arm_2",
+      "Parallel phase arm: selects status value 9 and joins the shared status writer.")
+label(0x00075c34, "match_phase_secondary_arm_3",
+      "Parallel phase arm: selects status value 16 and joins the shared status writer.")
+label(0x00075c3c, "match_phase_secondary_arm_4",
+      "Parallel phase arm: selects status value 17 and publishes counter 10.")
+label(0x00075d60, "match_phase_counter_arm_0",
+      "Phase-counter arm: selects status value 6 and rejoins the shared status writer.")
+label(0x00075d68, "match_phase_counter_arm_1",
+      "Phase-counter arm: selects status value 1 and rejoins the shared status writer.")
+label(0x00075d70, "match_phase_counter_arm_2",
+      "Phase-counter arm: selects status value 11 and rejoins the shared status writer.")
+label(0x00075d78, "match_phase_counter_arm_3",
+      "Phase-counter arm: selects status value 8 and rejoins the shared status writer.")
+label(0x00075d80, "match_phase_counter_arm_4",
+      "Phase-counter arm: selects status value 14 and rejoins the shared status writer.")
+label(0x00075d88, "match_phase_counter_default",
+      "Phase-counter default arm: returns without changing the selected status.")
+label(0x00075d90, "stage_selector_setup",
+      "Selects the stage mode selector, derives the stage-table index and geometry scale, computes bounded 0x504dbc/0x504dc0 timing values, and seeds shared stage setup fields; the row-copy tail begins at 0x75fe4.")
+label(0x00075fe4, "stage_selector_descriptor_copy",
+      "Indexes the 0x72050 descriptor table by object state and copies the selected 18-word, 0x48-byte record into 0x504dd4..0x504e1c; the pure copy contract is recovered as object_state_descriptor_75f00.")
+label(0x00076030, "stage_post_setup_call",
+      "Calls 0x86240 after descriptor copying, marks 0x504e1c complete, publishes the related-object packed 14-byte profile at 0x504e34, conditionally replaces it from the current-object profile table, and clears stage status latches at 0x504e42/0x504e44.")
+label(0x000760c0, "stage_profile_setup_related_record",
+      "Indexes the packed 14-byte profile table at 0x72370 by related-object state +0x64, publishing its 8-byte value, word, and halfword into 0x504e34/0x504e3c/0x504e40.")
+label(0x00076128, "stage_profile_setup_current_record",
+      "When global 0x5039f4 is not four, selects one of the 0x503a98/0x503a9c row selectors by current-object +0x68, indexes the same 0x72370 profile table, and overwrites the related profile result window.")
+label(0x000761b0, "geometry_object_threshold_query",
+      "Consumes 0x504dc0, maps its bounded stage threshold through four IEEE-754 constants, emits geometry selector 29, and continues with the object-relative command-10 query and signed residual checks.")
+label(0x000761d0, "geometry_object_threshold_query_band_45000000",
+      "Selects 0x45000000 for counters through 0x54, including the initial <=0x4f/<=0x54 branches.")
+label(0x000761f0, "geometry_object_threshold_query_band_45800000",
+      "Selects 0x45800000 for counters 0x55 through 0x59.")
+label(0x00076204, "geometry_object_threshold_query_band_46000000",
+      "Selects 0x46000000 for counters 0x5a through 0x5e.")
+label(0x00076218, "geometry_object_threshold_query_band_46800000",
+      "Selects the final 0x46800000 threshold for counters above 0x5e, then emits selector 29 at 0x76234.")
+label(0x0007669c, "geometry_object_threshold_query_left",
+      "Calls geometry_object_threshold_query for the first object after publishing the paired signed displacement bands at 0x504d64/0x504d68, then stores its result at 0x504dcc.")
+label(0x000766dc, "geometry_object_threshold_query_right",
+      "Calls geometry_object_threshold_query for the second object after publishing the second signed displacement band at 0x504d6c/0x504d70; the shared query result continues into the projection setup.")
+label(0x00076240, "geometry_fifo_argument_prefix",
+      "Sign-extends object coordinate +0x184, forms the 16-bit-wrapped plus/minus 0x6000 arguments, and begins the command-29/30 FIFO request sequence.")
+label(0x00076340, "geometry_fifo_response_transform",
+      "Continues the command-29/30 response reads into masked coordinates and the floating-point cross-product/sign-selection sequence; response semantics remain hardware-boundary evidence.")
+label(0x00076590, "geometry_object_cross_request_pair",
+      "Builds reversed command-10 request pairs from current/related object offsets +0x08/+0x10, subtracts the two FIFO responses from signed +0x184 coordinates, and feeds the low halfwords through 0x73508.")
+label(0x00076624, "geometry_object_cross_request_band_left",
+      "Stores the first signed coordinate delta at 0x504d64 and its ten-band classification at 0x504d68 before preparing the reversed request pair.")
+label(0x00076678, "geometry_object_cross_request_band_right",
+      "Stores the second signed coordinate delta at 0x504d6c and its ten-band classification at 0x504d70 before entering the threshold query.")
+label(0x00076808, "geometry_projection_threshold_reclamp",
+      "Recomputes the 0x504dc0 threshold from quantized projection g4 and r4, selecting the 3/2 or 100 base, adding 0x50+r4, clamping to 300, and forcing nonpositive results to 1.")
+label(0x00076848, "geometry_projection_threshold_publish",
+      "Publishes the re-clamped projection threshold at 0x504dc0 before the mode-dependent object-state gates.")
+label(0x00076858, "geometry_projection_mode_threshold_gates",
+      "For mode != 1, applies the object +0x1d0/+0x1d8 and 0x503a14/0x503a18 span gates before raising 0x504dc0 to 101; then applies the r4 <= 2 and r4 <= 4 raises to 90 and 100.")
+label(0x000768b8, "geometry_projection_low_r4_threshold_gates",
+      "Applies the final low-r4 threshold guards: thresholds above 85 become 90 for r4 <= 2, and thresholds above 90 become 100 for r4 <= 4.")
+label(0x000768f4, "geometry_related_threshold_bias",
+      "Adds 10 to 0x504dc0 when related-object state +0x64 is 0, 3, 4, or 6, or when global stage ordinal 0x503a80 is 2; otherwise preserves the threshold.")
+label(0x00076934, "geometry_profile_result_pair_dispatch",
+      "Passes the current and related objects through the shared 0x778b0 profile-result helper after the threshold bias, publishing the paired 0x504e20/0x504e24 and 0x504e28/0x504e2c fields.")
+label(0x00092830, "geometry_fifo_packet_template_site_a",
+      "Emits the fixed 12-word command-5/18/21/19 FIFO packet, masks g3 to its low halfword, and tail-calls 0x8e310 with site-specific base 0x02b4a4bc, offset 0x98750, and [0x562494].")
+label(0x00093240, "geometry_fifo_float_prologue",
+      "Selects a low/high real-arithmetic leg from (g3 + 0xbfff) & 0xffff, adjusts the persistent 0x562530 float by +/-0.2 with +/-30.0 fallbacks, emits the 12-word command-5/18/21/19 packet, and tail-calls 0x8e310 with modulo-30 state.")
+label(0x000934b0, "geometry_fifo_packet_template_site_b",
+      "Emits the matching fixed 12-word command-5/18/21/19 FIFO packet, masks g3 to its low halfword, and tail-calls 0x8e310 with base 0x02b68d3a, offset 0x79e2a, and [0x562490].")
+label(0x00093560, "geometry_fifo_packet_sequencer",
+      "Emits the shared 11-word command-5/18/21/19 FIFO prefix, selects the C8-gated modulo-120 or modulo-168 tail sequence using 0x5624c8/0x5624cc, tail-calls 0x8e310 once, then emits completion selector 6.")
+label(0x000935d8, "geometry_fifo_packet_sequencer_c8_gate",
+      "When 0x5624cc is zero, advances 0xf5058 and stores its low two bits into 0x5624c8 before selecting the modulo-120 or modulo-168 path.")
+label(0x00093624, "geometry_fifo_packet_sequencer_mod168",
+      "Advances 0x5624cc modulo 168 and applies the exact 59/23/59 unsigned branch mapping to the 0x8e310 third argument.")
+label(0x000936b8, "geometry_fifo_packet_sequencer_mod120",
+      "Advances 0x5624cc modulo 120 and selects base 0x02b5c3a6 or 0x02b60728 from C8, with shared second argument 0x02be2b64.")
+label(0x00092730, "geometry_fifo_packet_stateful_site_a",
+      "Emits the stateful 13-word command-5/44/21/19 FIFO packet with both g14 payload words, toggles the 0x5624f0 cell through the 0xf5058 result, and tail-calls 0x8e310 with the selected 0x02b53ca2 base variant.")
+label(0x000933b0, "geometry_fifo_packet_stateful_site_b",
+      "Twin stateful command-5/44/21/19 FIFO packet site using the alternate 0x5624ac/0x5624f4 RAM cells; shares the g14/toggle/tail contract with 0x92730.")
+label(0x00086240, "stage_post_setup",
+      "Normalizes stage-dependent threshold words into 0x509b20..0x509b50, maintains active/previous stage snapshots, initializes stage tables, and dispatches mode-specific setup data; exact hardware/object ownership remains a separate bounded target.")
+label(0x00086438, "stage_working_table_clear",
+      "Clears the packed 0x5096a0 halfword lanes, 0x509a60 seed words, two 0x40-byte stage byte tables, and scalar latches before mode-specific setup; lane layout is modeled as a write plan.")
+label(0x00086534, "stage_mode_seed_dispatch",
+      "Gates mode-specific threshold publication on nonzero stage and zero 0x503a74, then dispatches the mode byte to four fixed preset arms.")
+label(0x00086570, "stage_mode_seed_1",
+      "Publishes preset (0x2bd, 0x1f5, 0x1f5, 0x1f5; pair 0x1f5/0x1f5) to the stage threshold and snapshot fields.")
+label(0x0008658c, "stage_mode_seed_2",
+      "Publishes preset (0x9c5, 0x5dd, 0x4b1, 0x5dd; pair 0x7d1/0x5dd) to the stage threshold and snapshot fields.")
+label(0x000865a8, "stage_mode_seed_3",
+      "Publishes the signed negative sentinel 0xfffffd44 to all four threshold words and both pair words.")
+label(0x000865c8, "stage_mode_seed_default",
+      "Publishes zero to all four threshold words and both pair words for unrecognized mode bytes.")
+label(0x00086630, "stage_bucket_helper",
+      "Maps a nonnegative stage/profile counter through the (value - 1) modulo-6 residue: residues 1..3 return 4, residue 4 returns 3, and residues 0/5 select the ceiling bucket from the byte table at 0x842a0.")
+label(0x000866c0, "stage_record_tables_initialize",
+      "Boot-time initializer called at 0x189f8: constructs packed records at 0x5050a0 and 0x5074a0, then clears the stage working tables and threshold/snapshot globals before returning at 0x86958; record-field semantics remain unresolved.")
+label(0x00086810, "stage_record_tables_reset_tail",
+      "Reset tail of the boot initializer: conditionally repeats the packed stage working-table clear, zeros threshold/current and active/previous snapshot groups at 0x509b20..0x509b70, clears guards 0x509b80..0x509b88, and clears scalar latches before returning at 0x86958.")
+label(0x00086828, "stage_record_tables_working_clear",
+      "Packed halfword/byte clear loop shared in shape with the 0x86240 stage post-setup clear; destination ownership remains address-specific until the initializer's record layout is recovered.")
+label(0x000868f0, "stage_record_tables_snapshot_zero",
+      "Zeroes the 0x509b60/0x509b70 previous snapshot, 0x509b20/0x509b30 current values, 0x509b40/0x509b50 active snapshot, and 0x509b80..0x509b88 guards.")
+label(0x000189f8, "startup_stage_record_tables_call",
+      "Boot sequence call into stage_record_tables_initialize at 0x866c0 after device/video setup and before the startup loop continuation.")
+label(0x000842a0, "stage_bucket_table_842a0",
+      "48-byte stage/profile bucket result table consumed by stage_bucket_helper at 0x866a4; extracted ROM bytes are modeled by recovered_stage_bucket_86630.c.")
+label(0x005050a0, "stage_record_table_5050a0",
+      "First boot-built packed stage record table: eight 0x90-byte sparse records initialized by stage_record_tables_initialize at 0x866c0.")
+label(0x005074a0, "stage_record_table_5074a0",
+      "Second boot-built packed stage record table: eight 0x88-byte sparse records initialized by stage_record_tables_initialize at 0x866c0.")
 label(0x000c5d70, "geometry_profile_packet_builder",
       "Masks shifted input values with 0xffff; profile 3 emits selectors 28, 27, and 43, while the fallback emits selector 43.")
 label(0x00070950, "geometry_packet_tail",
@@ -2493,7 +3267,7 @@ label(0x0009e450, "geometry_result_builder",
 label(0x0009eab0, "geometry_result_builder_variant_alt",
       "Shares the 0x562436/0x562cb0 tables and command 29/30 follow-ups; flagged arm emits command 10.")
 label(0x00028840, "geometry_profile_constant_selector",
-      "Reads backup byte 0x1d00027 and publishes profile words to 0x512bd4/0x512bd8/0x512bdc; default words are 0x3f0ccccd, 0x3f59999a, and 0x3e19999a. Nine indexed raw triples are recovered: (3f000000,3f4ccccd,3e4ccccd), (3ee66666,3f400000,3e800000), (3ee66666,3f266666,3eb33333), (3eb33333,3f0ccccd,3ee66666), (3eb33333,3ee66666,3f0ccccd), (3f800000,3f59999a,0), (3f733333,3f59999a,0), (3f59999a,3f59999a,3d4ccccd), (3f400000,3f59999a,3dcccccd).")
+      "Reads backup byte 0x1d00027 and publishes profile words to 0x512bd4/0x512bd8/0x512bdc; default words are 0x3f0ccccd, 0x3f59999a, and 0x3e19999a. Ten indexed routes are recovered: the first nine are full raw triples, while backup value 10 selects first word 0x3f266666 and the default second/third words.")
 label(0x000c8fa0, "command_profile_initializer",
       "Uses 14-entry profile tables, skips setup for profile 13, initializes selector/pending fields to zero, and publishes the setup handle twice.")
 label(0x000c8f10, "command_profile_dispatch",
@@ -2509,23 +3283,192 @@ label(0x00023d60, "geometry_board_setup_prefix",
 label(0x0006fd1c, "geometry_allocator_commit",
       "Advances the allocation head by 0x30, increments the source count, and derives availability as 0 minus the next-head word.")
 label(0x0006fd50, "geometry_link_release",
-      "Uses 999 as the no-record sentinel; redirects record offsets 0x14/0x18 or side-table offsets 0x5c4/0x5c8 and decrements the reference count.")
+      "First returns the source slot through the 32-entry release leaf at 0x6fb58, then uses 999 as the no-record sentinel to redirect record offsets 0x14/0x18 or side-table offsets 0x5c4/0x5c8 and decrements the reference count.")
 label(0x00023ca0, "geometry_cleanup_helper",
       "Clears object bytes 0xa0, 0xa1, and 0xa2; publishes float bits 0x41200000 to 0x504d54 and 0x504d58; returns through 0x23cd8.")
 label(0x00023954, "geometry_object_lifecycle_tail",
       "Increments byte offset 0x19 only when byte offset 0x18 is zero and the prior value is at most 31; otherwise preserves it.")
 label(0x000783c8, "transition_wrapper",
       "Indexes table 0x72690 with selector 0x504d68 and sets action 5.")
+ensure_function(0x00078120, "transition_helper_78120", 0x00078190)
+label(0x00078120, "transition_helper_78120",
+      "Transition helper prefix: gates 0x504dc0/0x504dd0, masks 0x504d6c, publishes state 2, and selects bit-15 helper paths.")
+ensure_function(0x00078448, "transition_action10_table_wrapper_78448", 0x00078478)
+ensure_function(0x00078488, "transition_action10_table_wrapper_78488", 0x000784b8)
+label(0x00078448, "transition_action10_table_wrapper_78448",
+      "Action-10 wrapper: indexes table 0x72990 by 0x504d68 and publishes the selected transition.")
+label(0x00078488, "transition_action10_table_wrapper_78488",
+      "Action-10 wrapper: indexes table 0x729f0 by 0x504d68 and publishes the selected transition.")
+label(0x00078190, "transition_helper_state2_packet",
+      "State-2 packet body: emits selectors 29/30/10 with signed halfword-adjusted object fields, classifies the response, and selects table 0x72930.")
+label(0x00078264, "transition_helper_state2_packet_alt",
+      "Alternate state-2 packet body: uses -0x4000 halfword adjustment and result table 0x72960 before the shared result tail.")
+label(0x00078334, "transition_helper_state2_result_tail",
+      "State-2 result tail: publishes counter 5 and the selected table result to 0x504d94, then returns.")
+ensure_function(0x0007834c, "transition_helper_bypass", 0x00078390)
+label(0x0007834c, "transition_helper_bypass",
+      "Transition-helper bypass: publishes state 3, selects status 12/13 from 0x504d68, writes counter 5, and returns.")
+label(0x00078640, "object_action_state_gate_78640",
+      "Object-action state gate: state 8 calls 0x78790; other states continue through the inline 0x78658 timing path.")
+label(0x00078658, "object_action_inline_timing_78658",
+      "Inline object-action timing route: calls 0x784c8, rejects invalid absolute differences, then selects action 5 or action 10.")
+ensure_function(0x00078408, "transition_wrapper_action10", 0x00078438)
+label(0x00078410, "transition_wrapper_action10_table_lookup",
+      "Indexes the action-10 transition table at 0x72750 with selector 0x504d68, writes the selected transition to 0x504d94, and publishes action 10 at 0x504db8.")
+ensure_function(0x00078818, "transition_conditioned_wrapper", 0x00078880)
+label(0x00078830, "transition_conditioned_wrapper_table_lookup",
+      "Indexes table 0x72690 and normally publishes action 5; when bit 5 of 0x504e30 is set and 0x504dc8 equals 1, writes status 1, selector state 6, and action 20 before the fixed 0x78880 continuation.")
+ensure_function(0x00078bd8, "transition_state3_wrapper", 0x00078c74)
+label(0x00078c04, "transition_state3_priority_gate",
+      "For object state 3 with mode bits 2 and 3 both set, publishes selector state 18 and status 1; otherwise the bit-3 plus gate-1 path publishes selector state 16. Both overrides set action 20 after the normal table-0x72690/action-5 setup.")
+ensure_function(0x00078c80, "transition_state3_variant", 0x00078d44)
+label(0x00078cb4, "transition_state3_variant_priority_gate",
+      "Uses the state-3/mode-mask-0xc selector-18 override first; otherwise bit 4 plus gate 1 selects state 17, with state 3 plus bit 2 upgrading it to 18. Override paths publish status 1 and action 20.")
+ensure_function(0x00078d50, "transition_conditioned_wrapper_18", 0x00078dc0)
+label(0x00078d78, "transition_conditioned_wrapper_18_gate",
+      "Shares the bit-5 plus gate-1 predicate with 0x78818, but publishes selector state 18 and action 20 instead of selector state 6; normal execution retains action 5.")
+ensure_function(0x00079c10, "transition_timing_threshold_helper", 0x00079cb8)
+label(0x00079c18, "transition_timing_lower_threshold",
+      "Converts the lower timing threshold word at 0x504e04 and compares it with current timing at 0x504d60 before publishing the default selector/action state.")
+label(0x00079c44, "transition_timing_upper_threshold",
+      "Converts the upper timing threshold word at 0x504e06 and performs the second bounded comparison against 0x504d60.")
+label(0x00079c88, "transition_timing_threshold_recheck",
+      "Rechecks the current value against the lower threshold before routing to the action-10 or action-5 transition wrappers.")
+label(0x00079c9c, "transition_timing_action5_gate",
+      "Compares the current timing value with the upper threshold and routes the accepted interval to the action-5 wrapper at 0x783c8.")
+ensure_function(0x00079cc0, "transition_timing_threshold_helper_variant", 0x00079d1c)
+label(0x00079cc0, "transition_timing_variant_lower_threshold",
+      "Converts the lower threshold at 0x504e04 and compares it with current timing at 0x504d60 before selecting the action-10 path or checking the upper threshold.")
+label(0x00079cdc, "transition_timing_variant_action10_route",
+      "Routes the first threshold outcome through the action-10 wrapper at 0x78408.")
+label(0x00079ce4, "transition_timing_variant_upper_threshold",
+      "Converts the upper threshold at 0x504e06 and compares it with current timing before the action-5/action-10 split.")
+label(0x00079d00, "transition_timing_variant_state_dispatch",
+      "Dispatches the accepted threshold case by state through action-10 wrappers at 0x78488 or 0x78448.")
+ensure_function(0x00079630, "transition_post_threshold_selector", 0x00079714)
+label(0x00079630, "transition_post_threshold_time_gate",
+      "Converts threshold word 0x504dfc, compares it with current timing 0x504d60, and enters the normalized selector fan-out only on the accepted side; the fallback routes to the action-5 wrapper.")
+label(0x0007967c, "transition_post_threshold_selector_table",
+      "Eight-entry normalized selector table maps indices to transition values 1, 1, 2, 2, 3, 3, 5, and 6 before the shared object-state update at 0x79050.")
+label(0x000796ec, "transition_post_threshold_action30_tail",
+      "Re-enters the shared object-state dispatcher with the normalized value, then publishes action 30 at 0x504db8.")
+ensure_function(0x00079720, "transition_dispatch_79720", 0x00079834)
+label(0x00079720, "transition_dispatch_79720_threshold_gate",
+      "Converts threshold word 0x504dfc and compares it with timing 0x504d60 before the ten-entry caller-state dispatch; the opposite comparison tail may route to action 5.")
+label(0x00079750, "transition_dispatch_79720_state_table",
+      "Ten-entry table maps caller states 0/1 to 0x79784/0x79794, 2-4 to transition 12, 5-7 to transition 13, and 8/9 to 0x797d0/0x797e0.")
+label(0x000797ec, "transition_dispatch_79720_shared_state_tail",
+      "Gate-1 arms publish status 1, re-enter 0x79050, overwrite transition with 1, and publish action 30.")
+ensure_function(0x00079840, "transition_dispatch_728d0_variant", 0x0007990c)
+label(0x00079840, "transition_dispatch_728d0_variant_threshold_gate",
+      "Converts threshold word 0x504dfa and compares it with timing 0x504d60 before loading the caller-state transition from table 0x728d0.")
+label(0x0007985c, "transition_dispatch_728d0_variant_table_lookup",
+      "Loads table 0x728d0 using the caller-state index, initializes action 5, and routes the low-state and high-state groups through separate gates.")
+label(0x00079880, "transition_dispatch_728d0_variant_low_state_gate",
+      "For the low-state group, gate 1 publishes status 1 and re-enters 0x79050 before writing transition 1 and action 30; the alternate arm writes transition 18.")
+label(0x000798b4, "transition_dispatch_728d0_variant_high_state_gate",
+      "For caller states at least 7, gate 1 re-enters 0x79050 and publishes transition 3/action 30; the alternate arm writes transition 19.")
+ensure_function(0x00079910, "transition_dual_window_variant", 0x00079a8c)
+label(0x00079910, "transition_dual_window_lower_threshold",
+      "Converts threshold word 0x504e0e and compares it with timing 0x504d60 before checking upper threshold word 0x504e10.")
+label(0x00079944, "transition_dual_window_gate_override",
+      "When the timing window and gate 1 both pass, publishes selector state 3, clears the transition field, and sets status 1/action 20; otherwise the 0x728d0 action-10 table path remains active.")
+label(0x00079980, "transition_dual_window_table_path",
+      "Loads 0x728d0 by caller state, initializes action 10, and upgrades states 0 or 9 to selector state 3 with status 1/action 20.")
+label(0x000799fc, "transition_dual_window_state8_tail",
+      "Applies the later state-8 and state-9 selector/gate overrides, each publishing selector state 3, status 1, and action 20 when its bounded selector predicate passes.")
+ensure_function(0x00079a90, "transition_mode2_window_variant", 0x00079c04)
+label(0x00079a90, "transition_mode2_window_gate",
+      "Tests mode state 1, then converts threshold words 0x504e0e/0x504e10 and gates the selector-3 override on mode bit 2 plus transition gate 1.")
+label(0x00079b28, "transition_mode2_window_table_path",
+      "Loads the 0x728d0 table for the alternate timing path, initializes action 10, and promotes caller states 0 or 9 to selector state 3/action 20 with status 1.")
+label(0x00079b74, "transition_mode2_window_state_tail",
+      "Applies state-8 and state-9 checks against the current selector and gate, publishing selector state 3, status 1, and action 20 on the matched path.")
+label(0x00078dd0, "geometry_entry_state_gate",
+      "Reads object state at offset 0x64; states 2 and 4 call the service at 0x7cbc0 immediately, while all other states continue into the geometry packet builder.")
+label(0x00078de4, "geometry_entry_packet_path",
+      "Non-service states begin the command-29 geometry packet path using object and shared-state fields.")
+ensure_function(0x00078dec, "geometry_packet_timing_route", 0x00079040)
+label(0x00078dec, "geometry_packet_timing_prologue",
+      "Loads and converts 0x504e0c, reads 0x504dbc and the related-object pointer from object +0x74, then begins the command-29/30 response sequence.")
+label(0x00078e48, "geometry_packet_command30_setup",
+      "Publishes command 30 after the first response and derives the paired coordinate payload from object +0x184 and the related record.")
+label(0x00078ef0, "geometry_packet_primary_timing_split",
+      "Compares the first response-derived value with the 0x40510000 floor; the accepted arm publishes status/transition overrides or continues to the secondary timing test.")
+label(0x00078f5c, "geometry_packet_secondary_timing_split",
+      "Converts the second response-derived threshold, compares current timing at 0x504d60, and routes accepted values through the existing action-10/action-5 wrappers.")
+label(0x00078fa0, "geometry_packet_selector_fallback",
+      "Maps the related selector around 0x504d68 to transition 12 or 13 and publishes the default action 5 when timing remains in the bounded interval.")
+label(0x00078fdc, "geometry_packet_control_override",
+      "Publishes status 1 and transition 2/3, upgrades state 4 to transition 3, and replaces the action with 25 before returning.")
+ensure_function(0x0007cbc0, "transition_service_7cbc0", 0x0007cc44)
+label(0x0007cbd4, "transition_service_timing_gate",
+      "Compares the converted 0x504e0c field against the 0x504d60 timing quad; the clear path calls action-5 wrapper 0x783c8, while the passed path selects the 0x72900 action-10 service.")
+label(0x0007cbe4, "transition_service_action10_arm",
+      "Loads selector table 0x72900, publishes action 10, and conditionally enters the control-1 transition override.")
+label(0x0007cc0c, "transition_service_control_override",
+      "Control value 1 publishes status 1, transition 2 or 3 by object state 4, and replaces the action with 25.")
+ensure_function(0x000784c8, "transition_status_dispatch_784c8", 0x0007863c)
+label(0x000784c8, "transition_status_dispatch_entry",
+      "Ten-entry status predicate dispatcher; selector arms conditionally write 1 to 0x504d84 and return through the saved continuation.")
+label(0x00078508, "transition_status_selector_0_bit1",
+      "Selector 0 status arm: writes status 1 when mode bit 1 is set.")
+label(0x00078524, "transition_status_selector_1_bit2",
+      "Selector 1 status arm: writes status 1 when mode bit 2 is set.")
+label(0x00078540, "transition_status_selector_2_mode6",
+      "Selector 2 status arm: writes status 1 when either mode bit 1 or bit 2 is set.")
+label(0x00078638, "transition_status_dispatch_return",
+      "Default/out-of-range return path with no status write.")
 label(0x000784c8, "transition_selector_dispatch",
       "Has ten targets from 0x78508 through 0x78618; selectors at or above 10 return immediately. Action-5 values are 8,12,12,12,12,13,13,13,19,8; action-10 values are 9,16,12,12,12,13,13,13,17,9.")
 label(0x000786d0, "object_action_timing_split",
-      "Uses a floating absolute-difference validity check; valid values route to action 5 when current is at least threshold, otherwise action 10, while nonfinite differences reject.")
+      "Runs the shared 0x784c8 status dispatcher on object state, then uses a floating absolute-difference validity check; valid values route to action 5 when current is at least threshold, otherwise action 10, while nonfinite differences reject.")
+ensure_function(0x00078740, "timing_status_variant_78740", 0x00078780)
+label(0x00078740, "timing_status_variant_entry",
+      "Runs the shared status dispatcher, then compares the timer against converted 0x504dd8: strictly greater selects action 10, while less-than-or-equal writes status 1 directly.")
+label(0x00078774, "timing_status_variant_status_arm",
+      "Non-greater comparable timing values publish status 1 without calling an action wrapper.")
+ensure_function(0x00078790, "state8_action_route_78790", 0x00078808)
+label(0x00078790, "state8_action_route_entry",
+      "State-8 timing route: validates the 0x504d60 versus converted 0x504dd6 difference, then selects action 10/action 5 or the 0x72990/0x729f0 action-10 variants.")
+label(0x000787c0, "state8_action_invalid_timing",
+      "Unordered normalized timing publishes status 1 and returns without an action call.")
+label(0x000787d4, "state8_action_control_split",
+      "For current timing above threshold, control 0x504e28 selects the action-5 fallback or the related-band action-10 table variant.")
+ensure_function(0x00078890, "state_geometry_packet_78890", 0x00078a28)
+label(0x00078890, "state_geometry_packet_prologue",
+      "Converts the 0x504df8 divisor prologue, selects the 0x729c0 table value, and begins paired command-29/30 requests using object +0x184 plus 0x5000 and the derived scale word.")
+label(0x00078950, "state_geometry_command10_delta_pair",
+      "Forms command-10 operands from object +0x08/+0x10, related +0x08/+0x10, and the two preceding FIFO responses.")
+label(0x000789b0, "state_geometry_command31_tail",
+      "Emits the six-word 31+31 tail [62, current-minus-response, related +0x08, current +0x10 plus response, related +0x10, scale].")
+label(0x000789e8, "state_geometry_packet_control_override",
+      "When mode bit 5 and 0x504dc8 == 1, writes status 1, transition 6, and action 20 after the command-31 response.")
+ensure_function(0x00078a30, "state_geometry_packet_78a30", 0x00078bc8)
+label(0x00078a30, "state_geometry_packet_78a30_prologue",
+      "Sibling of 0x78890: selects table 0x72a20 and emits the same command-29/30/10/31 packet flow with object +0x184 minus 0x5000 before the shared bit-5/control-1 override.")
 label(0x00024690, "geometry_command6_dynamic_loop",
       "Starts at index 0, increments by 1, requires active-mask bit 2, and emits six-word packets with header 5,19 and trailer 1,58; readback is at 0x802008, publish is at 0x801008, and computed values divide by 600.")
 label(0x000df0cc, "geometry_object_response_vector_selector",
       "Sign-extended related-object halfword selects triplet 0, 1, or 2; other selectors write three zero words.")
 label(0x00077e60, "action_jump_dispatch",
       "Uses a 44-entry jump table at 0x77e7c; selectors at or above 44 fall back to 0x78084, with table targets spanning 0x77f2c through 0x7807c.")
+ensure_function(0x00077de0, "state_history_shift_forward", 0x00077e10)
+ensure_function(0x00077e20, "state_history_shift_reverse", 0x00077e50)
+label(0x00077de0, "state_history_shift_forward",
+      "Copies 0xf4 bytes from 0x504f60 to 0x504d60, then copies the resulting 0x504d60 state to 0x504e60 through 0xf5d40.")
+label(0x00077e20, "state_history_shift_reverse",
+      "Copies 0xf4 bytes from 0x504e60 to 0x504d60, then copies 0xf4 bytes from 0x504f60 to 0x504e60 through 0xf5d40.")
+ensure_function(0x00077c40, "record_flag_scan", 0x00077dd0)
+label(0x00077c40, "record_flag_scan",
+      "Scans 32 records from object +0x200 at 0x20-byte stride in two passes, initializes output byte 0x504e50, counts bit-13 matches against threshold 20, and updates output bits 2/3/4/5/6/7; one second-pass bound remains register-derived.")
+ensure_function(0x00078090, "divisor_clamp_78090", 0x00078110)
+label(0x000780a4, "divisor_clamp_mode_gate",
+      "Selects the wide divisor 0xbb8 for modes 4 and 7; the literal-first cmpibge arm preserves the separate mode-7 check.")
+label(0x000780d0, "divisor_clamp_signed_divide",
+      "Divides the signed dividend at 0x504dc0 by the selected divisor, then clamps the quotient to the upper bound 90.")
+label(0x000780e4, "divisor_clamp_flag_gate",
+      "Compares the original dividend against 120 (15 shifted left three); values above the threshold publish flag 1.")
 label(0x000e2330, "video_dispatch_prefix",
       "Treats dispatch state 0xff as no-op, values above 0x81 as default, and other values as table indices; bank-A special case uses geometry mode 0 or mode 2/palette 1/gate 0/equal board and palette values.")
 ensure_function(0x000e2330, "video_dispatch_prefix", 0x000e23b4)
@@ -2841,7 +3784,19 @@ label(0x000df2f4, "geometry_dual_distance_predicate",
 label(0x000df120, "geometry_projection_y_window_gate",
       "Accepts selected Y only within the inclusive signed interval [window base, window base plus extent].")
 label(0x0006fb90, "geometry_record_initializer",
-      "Clears a 0x54-byte record, copies eleven template words into aligned fields, stores association or sentinel 999, and initializes the second association field to 999.")
+      "Clears an 84-byte record image, copies eleven template words into the recovered offsets, narrows source +0x24 to the unaligned destination +0x3e halfword, stores association or sentinel 999, and initializes the second association field to 999.")
+label(0x0006fa40, "geometry_pool64_acquire",
+      "Increments the 64-entry geometry slot cursor at 0x51c880 before loading a slot from 0x51c85c; counts above 63 return 0xffffffff without changing the cursor.")
+label(0x0006fa90, "geometry_pool64_release",
+      "Decrements the 64-entry geometry slot cursor and stores the released value into 0x51c860 at the new index.")
+label(0x0006f9e0, "geometry_pool64_reset",
+      "Clears the 64-entry pool at 0x51c860, clears the corresponding field in each 0x54-byte record at 0x51c5b0, and resets 0x51c880 to zero.")
+label(0x0006fad0, "geometry_pool32_reset",
+      "Clears all 32 words of the secondary geometry pool at 0x51c890 and resets its cursor at 0x51c910.")
+label(0x0006fb10, "geometry_pool32_acquire",
+      "Increments the 32-entry geometry slot cursor at 0x51c910 before loading a slot from 0x51c88c; counts above 31 return 0xffffffff without changing the cursor.")
+label(0x0006fb50, "geometry_pool32_release",
+      "Decrements the 32-entry geometry slot cursor and stores the released value into 0x51c890 at the new index.")
 label(0x00020ae0, "hardware_strip_clear",
       "Fills 0x5ff words at 0x100d000 with either 0xffff or zero based on mode, then returns through stub 0x20b48 with the fill register cleared.")
 label(0x00022d30, "hud_reset_route",

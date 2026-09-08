@@ -37,8 +37,8 @@ with tempfile.TemporaryDirectory() as td:
     assert route(8, 5) == (A, 11, 0x78790)
     assert route(8, 0) == (A, 11, 0x78790)
     # Peer 0/3 routes to the 0x7a9f0 arm.
-    assert route(2, 0) == (C, 9, 0x7A9F0)
-    assert route(2, 3) == (C, 9, 0x7A9F0)
+    assert route(2, 0) == (C, 9, 0x7A504)
+    assert route(2, 3) == (C, 9, 0x7A504)
     # Own 1/3/4/5 fall into the ratio computation.
     assert route(1, 2)[0] == RATIO
     assert route(3, 2)[0] == RATIO

@@ -12,6 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "von/i960/recovered_host_control.c"
+LISTING = ROOT / "von/build/disasm/vonj-maincpu.lst"
 
 
 def expected_timer(mask: int) -> tuple[int, int]:
@@ -103,7 +104,13 @@ def main() -> int:
                 raise SystemExit(
                     f"interrupt rearm mismatch mask=0x{mask:04x}: "
                     f"0x{actual_control:08x} != 0x{expected_control:08x}"
-                )
+                    )
+
+        listing = LISTING.read_text(encoding="utf-8")
+        sequence = listing[listing.index("   1424:"):listing.index("   1438:")]
+        for target in ("0x1c2c0", "0x29d50", "0xe2330", "0x29b20", "0x2cb0"):
+            if f"call\t{target}" not in sequence:
+                raise SystemExit(f"mask-1 device sequence missing call {target}")
 
     print(
         f"PASS: {vectors:,} host interrupt-mask vectors, "

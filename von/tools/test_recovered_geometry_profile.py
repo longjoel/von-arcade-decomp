@@ -28,6 +28,7 @@ EXPECTED = (
     (0x3F733333, 0x3F59999A, 0x00000000),
     (0x3F59999A, 0x3F59999A, 0x3D4CCCCD),
     (0x3F400000, 0x3F59999A, 0x3DCCCCCD),
+    (0x3F266666, 0x3F59999A, 0x3E19999A),
 )
 DEFAULT = (0x3F0CCCCD, 0x3F59999A, 0x3E19999A)
 
@@ -56,8 +57,8 @@ def main() -> int:
             third = ctypes.c_uint32()
             direct = select(backup, ctypes.byref(first), ctypes.byref(second), ctypes.byref(third))
             actual = (first.value, second.value, third.value)
-            expected = EXPECTED[backup - 1] if 1 <= backup <= 9 else DEFAULT
-            if (direct == 1) != (1 <= backup <= 9) or actual != expected:
+            expected = EXPECTED[backup - 1] if 1 <= backup <= 10 else DEFAULT
+            if (direct == 1) != (1 <= backup <= 10) or actual != expected:
                 raise SystemExit(
                     f"profile mismatch backup={backup}: direct={direct} {actual!r} != {expected!r}"
                 )

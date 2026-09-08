@@ -20,6 +20,9 @@ struct recovered_object_state_context
 recovered_object_state_u32 recovered_object_state_dispatch(
     const struct recovered_object_state_context *context,
     recovered_object_state_u32 *transition);
+recovered_object_state_u32 recovered_random_next(void);
+recovered_object_state_u32 recovered_object_state_runtime_tick_for_object(
+    volatile unsigned char *object);
 recovered_object_state_u32 recovered_object_state_runtime_tick(void);
 
 #endif

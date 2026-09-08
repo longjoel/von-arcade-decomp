@@ -1,16 +1,23 @@
 {
   "schema_version": 1,
+  "coverage_tier": "A",
+  "edge_semantics": "possible_static_edges",
   "coverage_source": "von/build/attract-coverage/vonj-attract-60s.json",
   "discovered_units": 262,
-  "represented_units": 102,
-  "modeled_units": 72,
+  "represented_units": 228,
+  "modeled_units": 198,
   "integrated_units": 30,
-  "untriaged_units": 160,
+  "untriaged_units": 34,
+  "modeled_wip_limit": 1,
+  "active_modeled_units": [],
   "ordering": "modeled integration queue first, then integrated validation, then untriaged; address order preserves dependency locality",
   "units": [
     {
       "entry": "0x00000a30",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -22,7 +29,10 @@
     },
     {
       "entry": "0x00001348",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -34,7 +44,10 @@
     },
     {
       "entry": "0x00001380",
-      "observed_call_edges": 2,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -46,7 +59,10 @@
     },
     {
       "entry": "0x000017c8",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -58,7 +74,10 @@
     },
     {
       "entry": "0x00001bb8",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -69,8 +88,56 @@
       ]
     },
     {
+      "entry": "0x00002040",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.rom-signature-compare-2040",
+      "sources": [
+        "von/i960/recovered_rom_signature_compare_2040.c"
+      ]
+    },
+    {
+      "entry": "0x00002080",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.adjusted-crc-probe-2080",
+      "sources": [
+        "von/i960/recovered_crc_probe_2080.c"
+      ]
+    },
+    {
+      "entry": "0x000022f0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.record-checksum-writer-22f0",
+      "sources": [
+        "von/i960/recovered_record_checksum_22f0.c"
+      ]
+    },
+    {
       "entry": "0x00002330",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -81,8 +148,26 @@
       ]
     },
     {
+      "entry": "0x00002440",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.io-self-test-wrapper-2440",
+      "sources": [
+        "von/i960/recovered_io_self_test_wrapper_2440.c"
+      ]
+    },
+    {
       "entry": "0x00002700",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -94,7 +179,10 @@
     },
     {
       "entry": "0x000027d8",
-      "observed_call_edges": 13,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 13,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -105,8 +193,26 @@
       ]
     },
     {
+      "entry": "0x00002850",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.io-controller-command-upload-2850",
+      "sources": [
+        "von/i960/recovered_io.c"
+      ]
+    },
+    {
       "entry": "0x000028b0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -117,8 +223,26 @@
       ]
     },
     {
+      "entry": "0x00002990",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.io-controller-indexed-upload-2990",
+      "sources": [
+        "von/i960/recovered_io.c"
+      ]
+    },
+    {
       "entry": "0x00002bb0",
-      "observed_call_edges": 2,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -129,8 +253,41 @@
       ]
     },
     {
+      "entry": "0x00002c70",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.flag-dispatch-2c70",
+      "sources": [
+        "von/i960/recovered_flag_dispatch_2c70.c"
+      ]
+    },
+    {
+      "entry": "0x00002cb0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.flag-dispatch-2c70",
+      "sources": [
+        "von/i960/recovered_flag_dispatch_2c70.c"
+      ]
+    },
+    {
       "entry": "0x00002cf8",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -141,8 +298,26 @@
       ]
     },
     {
+      "entry": "0x00002d60",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.flag-dispatch-2c70",
+      "sources": [
+        "von/i960/recovered_flag_dispatch_2c70.c"
+      ]
+    },
+    {
       "entry": "0x00002da0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -154,7 +329,10 @@
     },
     {
       "entry": "0x00003120",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -165,8 +343,208 @@
       ]
     },
     {
+      "entry": "0x000034c0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.init-schedule-34c0",
+      "sources": [
+        "von/i960/recovered_init_schedule_34c0.c"
+      ]
+    },
+    {
+      "entry": "0x00003540",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.input-state-step-3540",
+      "sources": [
+        "von/i960/recovered_input_state_step_3540.c"
+      ]
+    },
+    {
+      "entry": "0x00003a38",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.input-byte-parser-attract-bridge",
+      "sources": [
+        "von/i960/recovered_input_byte_parser_3a38.c",
+        "von/i960/recovered_input_byte_parser_wrapper_3ae0.c"
+      ]
+    },
+    {
+      "entry": "0x00003ae0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.input-byte-parser-attract-bridge",
+      "sources": [
+        "von/i960/recovered_input_byte_parser_3a38.c",
+        "von/i960/recovered_input_byte_parser_wrapper_3ae0.c"
+      ]
+    },
+    {
+      "entry": "0x00003ba0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.retry-3ba0",
+      "sources": [
+        "von/i960/recovered_retry_3ba0.c"
+      ]
+    },
+    {
+      "entry": "0x000183b8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.port-classify-183b8",
+      "sources": [
+        "von/i960/recovered_port_classify_183b8.c"
+      ]
+    },
+    {
+      "entry": "0x00018438",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.pair-match-18438",
+      "sources": [
+        "von/i960/recovered_pair_match_18438.c"
+      ]
+    },
+    {
+      "entry": "0x00018538",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.queue-pump-18538",
+      "sources": [
+        "von/i960/recovered_queue_pump_18538.c"
+      ]
+    },
+    {
+      "entry": "0x000186c0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.startup-pre-dispatch-helper-186c0",
+      "sources": [
+        "von/i960/recovered_startup_pre_dispatch_helper_186c0.c"
+      ]
+    },
+    {
+      "entry": "0x000186f0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.startup-main-data-init-186f0",
+      "sources": [
+        "von/i960/recovered_startup_main_data_init_186f0.c"
+      ]
+    },
+    {
+      "entry": "0x00018918",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.startup-return-thunk-18918",
+      "sources": [
+        "von/i960/recovered_startup_return_thunk_18918.c"
+      ]
+    },
+    {
+      "entry": "0x00018960",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.startup-system-setup-18960",
+      "sources": [
+        "von/i960/recovered_startup_system_setup_18960.c"
+      ]
+    },
+    {
+      "entry": "0x00018a10",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.startup-status-helper-18a10",
+      "sources": [
+        "von/i960/recovered_startup_status_helper_18a10.c"
+      ]
+    },
+    {
       "entry": "0x00018ab0",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -177,32 +555,41 @@
       ]
     },
     {
-      "entry": "0x0001bc90",
-      "observed_call_edges": 1,
-      "triage": "integrated-validation-queue",
-      "stage": "trace-validated",
+      "entry": "0x0001c2c0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
       "priority": 0,
       "weight": null,
-      "work_unit": "maincpu.text-video-row-transfer-plan",
+      "work_unit": "maincpu.video-transfer-prefix-1c2c0",
       "sources": [
-        "von/i960/recovered_text.c"
+        "von/i960/recovered_video_transfer_prefix_1c2c0.c"
       ]
     },
     {
-      "entry": "0x0001ccf8",
-      "observed_call_edges": 7,
-      "triage": "integrated-validation-queue",
-      "stage": "trace-validated",
+      "entry": "0x0001cbb8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
       "priority": 0,
       "weight": null,
-      "work_unit": "maincpu.text-tile-control-write",
+      "work_unit": "maincpu.text-control-handler-1cbb8",
       "sources": [
-        "von/i960/recovered_text.c"
+        "von/i960/recovered_text_control_handler_1cbb8.c"
       ]
     },
     {
       "entry": "0x0001ce00",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -214,7 +601,10 @@
     },
     {
       "entry": "0x0001cea0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -225,20 +615,86 @@
       ]
     },
     {
-      "entry": "0x0001d1b0",
-      "observed_call_edges": 4,
-      "triage": "integrated-validation-queue",
-      "stage": "trace-validated",
+      "entry": "0x0001d090",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
       "priority": 0,
       "weight": null,
-      "work_unit": "maincpu.text-string-byte-dispatch",
+      "work_unit": "maincpu.glyph-emit-1d090",
       "sources": [
-        "von/i960/recovered_text_string_walk.c"
+        "von/i960/recovered_glyph_emit_1d090.c"
+      ]
+    },
+    {
+      "entry": "0x0001d1d0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-walk-dispatch-1d210",
+      "sources": [
+        "von/i960/recovered_text_walk_dispatch_1d210.c"
+      ]
+    },
+    {
+      "entry": "0x0001d210",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-walk-dispatch-1d210",
+      "sources": [
+        "von/i960/recovered_text_walk_dispatch_1d210.c"
+      ]
+    },
+    {
+      "entry": "0x0001d570",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 3,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-status-glyph-bridge-1d570",
+      "sources": [
+        "von/i960/recovered_text_status_glyph.c"
+      ]
+    },
+    {
+      "entry": "0x0001d880",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-status-string-bridge-1d880",
+      "sources": [
+        "von/i960/recovered_text_status_string.c"
       ]
     },
     {
       "entry": "0x0001d9e0",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -249,8 +705,63 @@
       ]
     },
     {
+      "entry": "0x0001dc10",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-plane-block-bridges-1dc10",
+      "sources": [
+        "von/i960/recovered_text_plane0_block.c",
+        "von/i960/recovered_text_plane0_attributed_block.c"
+      ]
+    },
+    {
+      "entry": "0x0001dc90",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-plane-block-bridges-1dc10",
+      "sources": [
+        "von/i960/recovered_text_plane0_block.c",
+        "von/i960/recovered_text_plane0_attributed_block.c"
+      ]
+    },
+    {
+      "entry": "0x0001dd10",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-render-bridge-1dd10-1f0d0",
+      "sources": [
+        "von/i960/recovered_text_plane0_attributed_block.c",
+        "von/i960/recovered_text_plane0_fill.c",
+        "von/i960/recovered_text_status_render_route.c",
+        "von/i960/recovered_text_mode_setup.c",
+        "von/i960/recovered_text_video_upload_wrapper.c",
+        "von/i960/recovered_text_status_panel_route.c"
+      ]
+    },
+    {
       "entry": "0x0001de80",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -261,8 +772,246 @@
       ]
     },
     {
+      "entry": "0x0001df00",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.block-fill-1df00",
+      "sources": [
+        "von/i960/recovered_block_fill_1df00.c"
+      ]
+    },
+    {
+      "entry": "0x0001df70",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-render-bridge-1dd10-1f0d0",
+      "sources": [
+        "von/i960/recovered_text_plane0_attributed_block.c",
+        "von/i960/recovered_text_plane0_fill.c",
+        "von/i960/recovered_text_status_render_route.c",
+        "von/i960/recovered_text_mode_setup.c",
+        "von/i960/recovered_text_video_upload_wrapper.c",
+        "von/i960/recovered_text_status_panel_route.c"
+      ]
+    },
+    {
+      "entry": "0x0001e030",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-render-bridge-1dd10-1f0d0",
+      "sources": [
+        "von/i960/recovered_text_plane0_attributed_block.c",
+        "von/i960/recovered_text_plane0_fill.c",
+        "von/i960/recovered_text_status_render_route.c",
+        "von/i960/recovered_text_mode_setup.c",
+        "von/i960/recovered_text_video_upload_wrapper.c",
+        "von/i960/recovered_text_status_panel_route.c"
+      ]
+    },
+    {
+      "entry": "0x0001ef70",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.home-dispatch-1ef70",
+      "sources": [
+        "von/i960/recovered_home_dispatch_1ef70.c"
+      ]
+    },
+    {
+      "entry": "0x0001f010",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 3,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-render-bridge-1dd10-1f0d0",
+      "sources": [
+        "von/i960/recovered_text_plane0_attributed_block.c",
+        "von/i960/recovered_text_plane0_fill.c",
+        "von/i960/recovered_text_status_render_route.c",
+        "von/i960/recovered_text_mode_setup.c",
+        "von/i960/recovered_text_video_upload_wrapper.c",
+        "von/i960/recovered_text_status_panel_route.c"
+      ]
+    },
+    {
+      "entry": "0x0001f060",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-render-bridge-1dd10-1f0d0",
+      "sources": [
+        "von/i960/recovered_text_plane0_attributed_block.c",
+        "von/i960/recovered_text_plane0_fill.c",
+        "von/i960/recovered_text_status_render_route.c",
+        "von/i960/recovered_text_mode_setup.c",
+        "von/i960/recovered_text_video_upload_wrapper.c",
+        "von/i960/recovered_text_status_panel_route.c"
+      ]
+    },
+    {
+      "entry": "0x0001f0d0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.text-render-bridge-1dd10-1f0d0",
+      "sources": [
+        "von/i960/recovered_text_plane0_attributed_block.c",
+        "von/i960/recovered_text_plane0_fill.c",
+        "von/i960/recovered_text_status_render_route.c",
+        "von/i960/recovered_text_mode_setup.c",
+        "von/i960/recovered_text_video_upload_wrapper.c",
+        "von/i960/recovered_text_status_panel_route.c"
+      ]
+    },
+    {
+      "entry": "0x00020210",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.mixed-video-upload-20210",
+      "sources": [
+        "von/i960/recovered_video_mixed_upload.c"
+      ]
+    },
+    {
+      "entry": "0x000226b0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.startup-state-service-gate-226b0",
+      "sources": [
+        "von/i960/recovered_startup_state_service_gate_226b0.c"
+      ]
+    },
+    {
+      "entry": "0x00023670",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-object-init-23670",
+      "sources": [
+        "von/i960/recovered_geometry_object_init_23670.c"
+      ]
+    },
+    {
+      "entry": "0x00023ce8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-position-delta-23ce8",
+      "sources": [
+        "von/i960/recovered_geometry_position_delta_23ce8.c"
+      ]
+    },
+    {
+      "entry": "0x00025040",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-dispatch-25040",
+      "sources": [
+        "von/i960/recovered_state_dispatch_25040.c"
+      ]
+    },
+    {
+      "entry": "0x00027550",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-record-transform-prefix-27550",
+      "sources": [
+        "von/i960/recovered_geometry_record_transform_prefix_27550.c"
+      ]
+    },
+    {
+      "entry": "0x000281f0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.texture-profile-setup-281f0",
+      "sources": [
+        "von/i960/recovered_texture_profile_setup_281f0.c"
+      ]
+    },
+    {
       "entry": "0x00028840",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -274,7 +1023,10 @@
     },
     {
       "entry": "0x00028b40",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -286,7 +1038,10 @@
     },
     {
       "entry": "0x00028b80",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -298,7 +1053,10 @@
     },
     {
       "entry": "0x00028c80",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -310,7 +1068,10 @@
     },
     {
       "entry": "0x00028de8",
-      "observed_call_edges": 7,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 7,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -322,7 +1083,10 @@
     },
     {
       "entry": "0x00028e88",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -333,8 +1097,101 @@
       ]
     },
     {
+      "entry": "0x000292d8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-port-word-pump-292d8",
+      "sources": [
+        "von/i960/recovered_fifo_upload_292d8.c"
+      ]
+    },
+    {
+      "entry": "0x000294b0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-profile-upload-294b0",
+      "sources": [
+        "von/i960/recovered_fifo_upload_292d8.c"
+      ]
+    },
+    {
+      "entry": "0x000295d0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-profile-upload-295d0",
+      "sources": [
+        "von/i960/recovered_fifo_upload_292d8.c"
+      ]
+    },
+    {
+      "entry": "0x000296d0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-service-state-initialize-296d0",
+      "sources": [
+        "von/i960/recovered_pointer_table_init_29738.c"
+      ]
+    },
+    {
+      "entry": "0x00029738",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.pointer-table-bridge-29738",
+      "sources": [
+        "von/i960/recovered_pointer_table_init_29738.c"
+      ]
+    },
+    {
+      "entry": "0x00029778",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.pointer-table-bridge-29738",
+      "sources": [
+        "von/i960/recovered_pointer_table_init_29738.c"
+      ]
+    },
+    {
       "entry": "0x00029a80",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -346,7 +1203,10 @@
     },
     {
       "entry": "0x00029ae8",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -358,7 +1218,10 @@
     },
     {
       "entry": "0x00029b20",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -370,7 +1233,10 @@
     },
     {
       "entry": "0x00029ca0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -382,7 +1248,10 @@
     },
     {
       "entry": "0x0002a430",
-      "observed_call_edges": 5,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 5,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -394,7 +1263,10 @@
     },
     {
       "entry": "0x0002a458",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -406,7 +1278,10 @@
     },
     {
       "entry": "0x0002a4a8",
-      "observed_call_edges": 10,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 10,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -418,7 +1293,10 @@
     },
     {
       "entry": "0x0002a4e0",
-      "observed_call_edges": 24,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 24,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -430,7 +1308,10 @@
     },
     {
       "entry": "0x0002a5f0",
-      "observed_call_edges": 7,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 7,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -442,7 +1323,10 @@
     },
     {
       "entry": "0x0002a870",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -454,7 +1338,10 @@
     },
     {
       "entry": "0x0002a990",
-      "observed_call_edges": 3,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 3,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -465,8 +1352,212 @@
       ]
     },
     {
+      "entry": "0x0002b430",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-object-record-dispatch-2b430",
+      "sources": [
+        "von/i960/recovered_geometry_object_dispatch_2b430.c"
+      ]
+    },
+    {
+      "entry": "0x0002be30",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-frame-service-initialize-2be30",
+      "sources": [
+        "von/i960/recovered_geometry_frame_service_initialize_2be30.c"
+      ]
+    },
+    {
+      "entry": "0x0002d9a0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-transform-dispatch-2d9a0",
+      "sources": [
+        "von/i960/recovered_geometry_transform_dispatch_2d9a0.c"
+      ]
+    },
+    {
+      "entry": "0x0002e1c8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-status-trampolines-2e1c8",
+      "sources": [
+        "von/i960/recovered_geometry_status_trampolines_2e1c8.c"
+      ]
+    },
+    {
+      "entry": "0x0002e1e8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-status-trampolines-2e1c8",
+      "sources": [
+        "von/i960/recovered_geometry_status_trampolines_2e1c8.c"
+      ]
+    },
+    {
+      "entry": "0x00032810",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-object-state-prefix-32810",
+      "sources": [
+        "von/i960/recovered_geometry_object_state_prefix_32810.c"
+      ]
+    },
+    {
+      "entry": "0x000371e0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-frame-step-prefix-371e0",
+      "sources": [
+        "von/i960/recovered_geometry_frame_step_371e0.c"
+      ]
+    },
+    {
+      "entry": "0x0003ecd0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.status-record-pool-cluster-3ecd0",
+      "sources": [
+        "von/i960/recovered_status_record_init_3ecd0.c",
+        "von/i960/recovered_status_record_init_3ed60.c",
+        "von/i960/recovered_status_record_seed_3f4e8.c"
+      ]
+    },
+    {
+      "entry": "0x0003ed60",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.status-record-pool-cluster-3ecd0",
+      "sources": [
+        "von/i960/recovered_status_record_init_3ecd0.c",
+        "von/i960/recovered_status_record_init_3ed60.c",
+        "von/i960/recovered_status_record_seed_3f4e8.c"
+      ]
+    },
+    {
+      "entry": "0x0003ef50",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.status-record-geometry-emitter-3ef50",
+      "sources": [
+        "von/i960/recovered_status_record_geometry_emit_3ef50.c"
+      ]
+    },
+    {
+      "entry": "0x0003f4e8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.status-record-pool-cluster-3ecd0",
+      "sources": [
+        "von/i960/recovered_status_record_init_3ecd0.c",
+        "von/i960/recovered_status_record_init_3ed60.c",
+        "von/i960/recovered_status_record_seed_3f4e8.c"
+      ]
+    },
+    {
+      "entry": "0x00041f20",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-runtime-packet-dispatch-41f20",
+      "sources": [
+        "von/i960/recovered_geometry_runtime_packet_dispatch_41f20.c"
+      ]
+    },
+    {
+      "entry": "0x000423a8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.startup-record-table-clear-423a8",
+      "sources": [
+        "von/i960/recovered_startup_record_table_clear_423a8.c"
+      ]
+    },
+    {
       "entry": "0x0006ece0",
-      "observed_call_edges": 15,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 15,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -477,8 +1568,41 @@
       ]
     },
     {
+      "entry": "0x0006ede0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.command6-pair-6ede0",
+      "sources": [
+        "von/i960/recovered_command6_pair_6ede0.c"
+      ]
+    },
+    {
+      "entry": "0x0006f600",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-35-producer-6f600",
+      "sources": [
+        "von/i960/recovered_geometry_35_producer_6f600.c"
+      ]
+    },
+    {
       "entry": "0x0006f6f0",
-      "observed_call_edges": 5,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 5,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -489,8 +1613,41 @@
       ]
     },
     {
+      "entry": "0x0006f908",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-profile-table-loader",
+      "sources": [
+        "von/i960/recovered_geometry_profile_table_loader.c"
+      ]
+    },
+    {
+      "entry": "0x0006f9e8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-pool64-reset-6f9e8",
+      "sources": [
+        "von/i960/recovered_geometry_pool64_reset_6f9e8.c"
+      ]
+    },
+    {
       "entry": "0x0006fa48",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -502,7 +1659,10 @@
     },
     {
       "entry": "0x0006fad8",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -514,7 +1674,10 @@
     },
     {
       "entry": "0x0006fb18",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -526,7 +1689,10 @@
     },
     {
       "entry": "0x0006fb90",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -538,7 +1704,10 @@
     },
     {
       "entry": "0x0006fec0",
-      "observed_call_edges": 6,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 6,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -549,8 +1718,57 @@
       ]
     },
     {
+      "entry": "0x00072c10",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.match-state-geometry-orchestrator-72c10",
+      "sources": [
+        "von/i960/recovered_match_state_geometry_orchestrator_72c10.c"
+      ]
+    },
+    {
+      "entry": "0x00072ea0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.match-state-result-prefix-72ea0",
+      "sources": [
+        "von/i960/recovered_match_state_result_prefix_72ea0.c"
+      ]
+    },
+    {
+      "entry": "0x00073498",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.match-result-cluster-73498",
+      "sources": [
+        "von/i960/recovered_match_result_counter_73498.c",
+        "von/i960/recovered_match_result_state_dispatch_735d0.c"
+      ]
+    },
+    {
       "entry": "0x00073508",
-      "observed_call_edges": 20,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 20,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -561,8 +1779,164 @@
       ]
     },
     {
+      "entry": "0x000735d0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.match-result-cluster-73498",
+      "sources": [
+        "von/i960/recovered_match_result_counter_73498.c",
+        "von/i960/recovered_match_result_state_dispatch_735d0.c"
+      ]
+    },
+    {
+      "entry": "0x00074860",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.match-status-transition-gate-74860",
+      "sources": [
+        "von/i960/recovered_match_status_transition_gate_74860.c"
+      ]
+    },
+    {
+      "entry": "0x00074e60",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.match-transition-state-dispatch-74e60",
+      "sources": [
+        "von/i960/recovered_match_transition_state_dispatch_74e60.c"
+      ]
+    },
+    {
+      "entry": "0x00075200",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.match-geometry-range-update-75200",
+      "sources": [
+        "von/i960/recovered_match_geometry_range_update_75200.c"
+      ]
+    },
+    {
+      "entry": "0x00075d90",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.stage-selector-75d90",
+      "sources": [
+        "von/i960/recovered_stage_selector_75d90.c"
+      ]
+    },
+    {
+      "entry": "0x000761b0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.object-threshold-constant-761b0",
+      "sources": [
+        "von/i960/recovered_object_threshold_constant_761b0.c"
+      ]
+    },
+    {
+      "entry": "0x00076590",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-object-band-pair-76590",
+      "sources": [
+        "von/i960/recovered_geometry_object_band_pair_76590.c"
+      ]
+    },
+    {
+      "entry": "0x00077c40",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.record-flag-scan-77c40",
+      "sources": [
+        "von/i960/recovered_record_flag_scan_77c40.c"
+      ]
+    },
+    {
+      "entry": "0x00077de0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-shift-77e20",
+      "sources": [
+        "von/i960/disassembly-annotations.md",
+        "von/i960/recovered_memory.c"
+      ]
+    },
+    {
+      "entry": "0x00077e20",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-shift-77e20",
+      "sources": [
+        "von/i960/disassembly-annotations.md",
+        "von/i960/recovered_memory.c"
+      ]
+    },
+    {
       "entry": "0x00077e60",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -573,8 +1947,26 @@
       ]
     },
     {
+      "entry": "0x00078090",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.divisor-clamp-78090",
+      "sources": [
+        "von/i960/recovered_divisor_clamp_78090.c"
+      ]
+    },
+    {
       "entry": "0x000783c8",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -585,8 +1977,101 @@
       ]
     },
     {
+      "entry": "0x00078408",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-action-wrapper-10",
+      "sources": [
+        "von/i960/recovered_transition_wrapper.c"
+      ]
+    },
+    {
+      "entry": "0x000784c8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-status-dispatch-784c8",
+      "sources": [
+        "von/i960/recovered_transition_status_dispatch_784c8.c"
+      ]
+    },
+    {
+      "entry": "0x000786d0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.object-action-timing-variant",
+      "sources": [
+        "von/i960/recovered_timing_variant.c"
+      ]
+    },
+    {
+      "entry": "0x00078818",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-conditioned-wrapper-78818",
+      "sources": [
+        "von/i960/recovered_transition_conditioned_wrapper_78818.c"
+      ]
+    },
+    {
+      "entry": "0x00078bd8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-state3-wrapper-78bd8",
+      "sources": [
+        "von/i960/recovered_transition_state3_wrapper_78bd8.c"
+      ]
+    },
+    {
+      "entry": "0x00078dd0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-entry-gate-78dd0",
+      "sources": [
+        "von/i960/recovered_geometry_entry_gate_78dd0.c"
+      ]
+    },
+    {
       "entry": "0x00079050",
-      "observed_call_edges": 11,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 11,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -597,8 +2082,26 @@
       ]
     },
     {
+      "entry": "0x00079630",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-post-threshold-79630",
+      "sources": [
+        "von/i960/recovered_transition_post_threshold_79630.c"
+      ]
+    },
+    {
       "entry": "0x00079d60",
-      "observed_call_edges": 5,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 5,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -609,8 +2112,416 @@
       ]
     },
     {
+      "entry": "0x0007a318",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-setup-7a318",
+      "sources": [
+        "von/i960/recovered_transition_setup_7a318.c"
+      ]
+    },
+    {
+      "entry": "0x0007a3e0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.route-head-7a3e0",
+      "sources": [
+        "von/i960/recovered_route_head_7a3e0.c"
+      ]
+    },
+    {
+      "entry": "0x0007a9f0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-route-7a9f0",
+      "sources": [
+        "von/i960/recovered_transition_route_7a9f0.c"
+      ]
+    },
+    {
+      "entry": "0x0007b430",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-route-7b430",
+      "sources": [
+        "von/i960/recovered_transition_route_7b430.c"
+      ]
+    },
+    {
+      "entry": "0x0007bf10",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-route-7bf10",
+      "sources": [
+        "von/i960/recovered_transition_route_7bf10.c"
+      ]
+    },
+    {
+      "entry": "0x0007d1f0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-byte-pair-scan-7d1f0",
+      "sources": [
+        "von/i960/recovered_state_byte_pair_scan_7d1f0.c"
+      ]
+    },
+    {
+      "entry": "0x0007d670",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-route-select-7d670",
+      "sources": [
+        "von/i960/recovered_state_route_select_7d670.c"
+      ]
+    },
+    {
+      "entry": "0x0007dcc0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-byte-window-7dcc0",
+      "sources": [
+        "von/i960/recovered_state_byte_window_7dcc0.c"
+      ]
+    },
+    {
+      "entry": "0x0007e390",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-geometry-descriptor-7e390",
+      "sources": [
+        "von/i960/recovered_state_geometry_descriptor_7e390.c"
+      ]
+    },
+    {
+      "entry": "0x0007ea10",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state31-initializer-7ea10",
+      "sources": [
+        "von/i960/recovered_state31_initializer_7ea10.c"
+      ]
+    },
+    {
+      "entry": "0x0007f4d0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-scan-7f4d0",
+      "sources": [
+        "von/i960/recovered_transition_scan_7f4d0.c"
+      ]
+    },
+    {
+      "entry": "0x0007fca0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-precondition-7fca0",
+      "sources": [
+        "von/i960/recovered_transition_precondition_7fca0.c"
+      ]
+    },
+    {
+      "entry": "0x00080710",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-route-80710",
+      "sources": [
+        "von/i960/recovered_transition_route_80710.c"
+      ]
+    },
+    {
+      "entry": "0x000807d0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-route-80710",
+      "sources": [
+        "von/i960/recovered_transition_route_80710.c"
+      ]
+    },
+    {
+      "entry": "0x000810d0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-mode-route-810d0",
+      "sources": [
+        "von/i960/recovered_transition_mode_route_810d0.c"
+      ]
+    },
+    {
+      "entry": "0x00081120",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.transition-mode-route-810d0",
+      "sources": [
+        "von/i960/recovered_transition_mode_route_810d0.c"
+      ]
+    },
+    {
+      "entry": "0x00081e60",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-dispatch-81e60",
+      "sources": [
+        "von/i960/recovered_state_dispatch_81e60.c"
+      ]
+    },
+    {
+      "entry": "0x00081f60",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.timing-selector-81f60",
+      "sources": [
+        "von/i960/recovered_timing_selector_81f60.c"
+      ]
+    },
+    {
+      "entry": "0x00082040",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-action-dispatch-82040",
+      "sources": [
+        "von/i960/recovered_state_action_dispatch_82040.c"
+      ]
+    },
+    {
+      "entry": "0x00082650",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-status-prefix-82650",
+      "sources": [
+        "von/i960/recovered_state_status_prefix_82650.c"
+      ]
+    },
+    {
+      "entry": "0x00082800",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-handler-dispatch-82800",
+      "sources": [
+        "von/i960/recovered_state_handler_dispatch_82800.c"
+      ]
+    },
+    {
+      "entry": "0x00082ae0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-scheduler-gate-82ae0",
+      "sources": [
+        "von/i960/recovered_state_scheduler_gate_82ae0.c"
+      ]
+    },
+    {
+      "entry": "0x00083110",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-scheduler-early-gate-83110",
+      "sources": [
+        "von/i960/recovered_state_scheduler_early_gate_83110.c"
+      ]
+    },
+    {
+      "entry": "0x00083ac0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.state-scheduler-dispatch-83ac0",
+      "sources": [
+        "von/i960/recovered_state_scheduler_dispatch_83ac0.c"
+      ]
+    },
+    {
+      "entry": "0x00086240",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.stage-post-setup-86240",
+      "sources": [
+        "von/i960/recovered_stage_post_setup_86240.c"
+      ]
+    },
+    {
+      "entry": "0x000866c0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.stage-record-tables-866c0",
+      "sources": [
+        "von/i960/recovered_stage_record_tables_866c0.c"
+      ]
+    },
+    {
+      "entry": "0x0009de50",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 3,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-result-builder-entry-9de50",
+      "sources": [
+        "von/i960/recovered_geometry_result_builder_9de50.c"
+      ]
+    },
+    {
       "entry": "0x0009e050",
-      "observed_call_edges": 6,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 6,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -621,8 +2532,71 @@
       ]
     },
     {
+      "entry": "0x0009e250",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 3,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-result-builder-entry-9e250",
+      "sources": [
+        "von/i960/recovered_geometry_result_builder_9e250.c"
+      ]
+    },
+    {
+      "entry": "0x0009e650",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-result-builder-entry-9e450",
+      "sources": [
+        "von/i960/recovered_geometry_result_builder_9e450.c"
+      ]
+    },
+    {
+      "entry": "0x0009e880",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-result-builder-entry-9e880",
+      "sources": [
+        "von/i960/recovered_geometry_result_builder_9e880.c"
+      ]
+    },
+    {
+      "entry": "0x0009eab0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.geometry-result-builder-entry-9eab0",
+      "sources": [
+        "von/i960/recovered_geometry_result_builder_9eab0.c"
+      ]
+    },
+    {
       "entry": "0x000bf0c0",
-      "observed_call_edges": 15,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 15,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -634,7 +2608,10 @@
     },
     {
       "entry": "0x000c5130",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -646,7 +2623,10 @@
     },
     {
       "entry": "0x000c5240",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -658,7 +2638,10 @@
     },
     {
       "entry": "0x000c5310",
-      "observed_call_edges": 2,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -670,7 +2653,10 @@
     },
     {
       "entry": "0x000c5530",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -682,7 +2668,10 @@
     },
     {
       "entry": "0x000c55a8",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -694,7 +2683,10 @@
     },
     {
       "entry": "0x000c5608",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -706,7 +2698,10 @@
     },
     {
       "entry": "0x000c5870",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -718,7 +2713,10 @@
     },
     {
       "entry": "0x000c5d48",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -730,7 +2728,10 @@
     },
     {
       "entry": "0x000c5d70",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -742,7 +2743,10 @@
     },
     {
       "entry": "0x000c8f10",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -754,7 +2758,10 @@
     },
     {
       "entry": "0x000c8f60",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -766,7 +2773,10 @@
     },
     {
       "entry": "0x000c8fa0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -778,7 +2788,10 @@
     },
     {
       "entry": "0x000e1e08",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -790,7 +2803,10 @@
     },
     {
       "entry": "0x000e1f20",
-      "observed_call_edges": 14,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 14,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -802,7 +2818,10 @@
     },
     {
       "entry": "0x000e2040",
-      "observed_call_edges": 7,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 7,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -814,7 +2833,10 @@
     },
     {
       "entry": "0x000e2120",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -826,7 +2848,10 @@
     },
     {
       "entry": "0x000e2130",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -838,7 +2863,10 @@
     },
     {
       "entry": "0x000e2330",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -849,8 +2877,56 @@
       ]
     },
     {
+      "entry": "0x000e3830",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.decimal-emit-e3830",
+      "sources": [
+        "von/i960/recovered_decimal_emit_e3830.c"
+      ]
+    },
+    {
+      "entry": "0x000e39c0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.rank-string-e39c0",
+      "sources": [
+        "von/i960/recovered_rank_string_e39c0.c"
+      ]
+    },
+    {
+      "entry": "0x000e39f0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.results-alias-thunks",
+      "sources": [
+        "von/i960/disassembly-annotations.md"
+      ]
+    },
+    {
       "entry": "0x000e3a10",
-      "observed_call_edges": 6,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 6,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -861,8 +2937,26 @@
       ]
     },
     {
+      "entry": "0x000e3a70",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.tribyte-emit-e3a70",
+      "sources": [
+        "von/i960/recovered_tribyte_emit_e3a70.c"
+      ]
+    },
+    {
       "entry": "0x000f5058",
-      "observed_call_edges": 28,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 28,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -873,32 +2967,58 @@
       ]
     },
     {
+      "entry": "0x000f50a8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "modeled-integration-queue",
+      "stage": "modeled",
+      "priority": 0,
+      "weight": null,
+      "work_unit": "maincpu.runtime-random-seed",
+      "sources": [
+        "von/i960/recovered_runtime_math.c"
+      ]
+    },
+    {
       "entry": "0x000f5100",
-      "observed_call_edges": 9,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 9,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
       "weight": null,
       "work_unit": "maincpu.text-general-formatter-boundary",
       "sources": [
-        "von/i960/disassembly-annotations.md"
+        "von/i960/disassembly-annotations.md",
+        "von/i960/recovered_text_formatter_dispatch.c"
       ]
     },
     {
       "entry": "0x000f5190",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
       "weight": null,
       "work_unit": "maincpu.text-general-formatter-boundary",
       "sources": [
-        "von/i960/disassembly-annotations.md"
+        "von/i960/disassembly-annotations.md",
+        "von/i960/recovered_text_formatter_dispatch.c"
       ]
     },
     {
       "entry": "0x000f5c58",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "modeled-integration-queue",
       "stage": "modeled",
       "priority": 0,
@@ -910,7 +3030,10 @@
     },
     {
       "entry": "0x00002730",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -922,7 +3045,10 @@
     },
     {
       "entry": "0x00018488",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -934,7 +3060,10 @@
     },
     {
       "entry": "0x0001bb90",
-      "observed_call_edges": 6,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 6,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -946,7 +3075,10 @@
     },
     {
       "entry": "0x0001bc20",
-      "observed_call_edges": 3,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 3,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -957,8 +3089,26 @@
       ]
     },
     {
+      "entry": "0x0001bc90",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "trace-validated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.text-video-row-transfer-plan",
+      "sources": [
+        "von/i960/recovered_text.c"
+      ]
+    },
+    {
       "entry": "0x0001bda0",
-      "observed_call_edges": 2,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -970,7 +3120,10 @@
     },
     {
       "entry": "0x0001c220",
-      "observed_call_edges": 2,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -982,7 +3135,10 @@
     },
     {
       "entry": "0x0001c618",
-      "observed_call_edges": 8,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 8,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -994,7 +3150,10 @@
     },
     {
       "entry": "0x0001c730",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1006,7 +3165,10 @@
     },
     {
       "entry": "0x0001cac8",
-      "observed_call_edges": 23,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 23,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1018,9 +3180,12 @@
     },
     {
       "entry": "0x0001cc40",
-      "observed_call_edges": 2,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
-      "stage": "integrated",
+      "stage": "trace-validated",
       "priority": 1,
       "weight": null,
       "work_unit": "maincpu.text-character-output",
@@ -1029,8 +3194,41 @@
       ]
     },
     {
+      "entry": "0x0001ccf8",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 7,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "trace-validated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.text-tile-control-write",
+      "sources": [
+        "von/i960/recovered_text.c"
+      ]
+    },
+    {
+      "entry": "0x0001d1b0",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "trace-validated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.text-string-byte-dispatch",
+      "sources": [
+        "von/i960/recovered_text_string_walk.c"
+      ]
+    },
+    {
       "entry": "0x0001d310",
-      "observed_call_edges": 5,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 5,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1042,7 +3240,10 @@
     },
     {
       "entry": "0x0001da90",
-      "observed_call_edges": 4,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 4,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1054,7 +3255,10 @@
     },
     {
       "entry": "0x00027e50",
-      "observed_call_edges": 3,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 3,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "trace-validated",
       "priority": 1,
@@ -1066,7 +3270,10 @@
     },
     {
       "entry": "0x00028120",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1078,7 +3285,10 @@
     },
     {
       "entry": "0x000282e0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1090,7 +3300,10 @@
     },
     {
       "entry": "0x00028418",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1102,7 +3315,10 @@
     },
     {
       "entry": "0x000284b8",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1114,7 +3330,10 @@
     },
     {
       "entry": "0x00028548",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1126,7 +3345,10 @@
     },
     {
       "entry": "0x00028620",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1138,7 +3360,10 @@
     },
     {
       "entry": "0x00028c08",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1150,7 +3375,10 @@
     },
     {
       "entry": "0x00028d08",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1162,7 +3390,10 @@
     },
     {
       "entry": "0x00028d30",
-      "observed_call_edges": 3,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 3,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1174,7 +3405,10 @@
     },
     {
       "entry": "0x00028d80",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1185,8 +3419,41 @@
       ]
     },
     {
+      "entry": "0x00029c08",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.clamp-store-29c08",
+      "sources": [
+        "von/i960/recovered_clamp_store_29c08.c"
+      ]
+    },
+    {
+      "entry": "0x00029d50",
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
+      "triage": "integrated-validation-queue",
+      "stage": "integrated",
+      "priority": 1,
+      "weight": null,
+      "work_unit": "maincpu.upload-select-29d50",
+      "sources": [
+        "von/i960/recovered_upload_select_29d50.c"
+      ]
+    },
+    {
       "entry": "0x0002a8a0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1198,7 +3465,10 @@
     },
     {
       "entry": "0x000f5d40",
-      "observed_call_edges": 10,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 10,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "integrated-validation-queue",
       "stage": "integrated",
       "priority": 1,
@@ -1209,822 +3479,11 @@
       ]
     },
     {
-      "entry": "0x00002040",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00002080",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000022f0",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00002440",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00002850",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00002990",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00002c70",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00002cb0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00002d60",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000034c0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00003540",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00003a38",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00003ae0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00003ba0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000183b8",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00018438",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00018538",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000186c0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000186f0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00018918",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00018960",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00018a10",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001c2c0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001cbb8",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001d090",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001d1d0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001d210",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001d570",
-      "observed_call_edges": 3,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001d880",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001dc10",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001dc90",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001dd10",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001df00",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001df70",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001e030",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001ef70",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001f010",
-      "observed_call_edges": 3,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001f060",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0001f0d0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00020210",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000226b0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00023670",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00023ce8",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00025040",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00027550",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000281f0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000292d8",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000294b0",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000295d0",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000296d0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00029738",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00029778",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00029c08",
-      "observed_call_edges": 1,
-      "triage": "integrated-validation-queue",
-      "stage": "integrated",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.clamp-store-29c08",
-      "sources": [
-        "von/i960/recovered_clamp_store_29c08.c"
-      ]
-    },
-    {
-      "entry": "0x00029d50",
-      "observed_call_edges": 1,
-      "triage": "integrated-validation-queue",
-      "stage": "integrated",
-      "priority": 0,
-      "weight": null,
-      "work_unit": "maincpu.upload-select-29d50",
-      "sources": [
-        "von/i960/recovered_upload_select_29d50.c"
-      ]
-    },
-    {
-      "entry": "0x0002b430",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0002be30",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0002d9a0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0002e1c8",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0002e1e8",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00032810",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000371e0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0003ecd0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0003ed60",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0003ef50",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0003f4e8",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00041f20",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000423a8",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0006ede0",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0006f600",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0006f908",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0006f9e8",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00072c10",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00072ea0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00073498",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000735d0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00074860",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00074e60",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00075200",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00075d90",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000761b0",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00076590",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
       "entry": "0x00076b00",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2034,7 +3493,10 @@
     },
     {
       "entry": "0x00077470",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2044,117 +3506,10 @@
     },
     {
       "entry": "0x000778b0",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00077c40",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00077de0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00077e20",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00078090",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00078408",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000784c8",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000786d0",
-      "observed_call_edges": 4,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00078818",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00078bd8",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00078dd0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00079630",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2164,127 +3519,10 @@
     },
     {
       "entry": "0x00079c10",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0007a318",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0007a3e0",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0007a9f0",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0007b430",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0007bf10",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0007d1f0",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0007d670",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0007dcc0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0007e390",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0007ea10",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0007f4d0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0007fca0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2294,47 +3532,10 @@
     },
     {
       "entry": "0x0007ff40",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00080710",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000807d0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000810d0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00081120",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2344,7 +3545,10 @@
     },
     {
       "entry": "0x00081610",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2354,107 +3558,10 @@
     },
     {
       "entry": "0x00081b30",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00081e60",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00081f60",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00082040",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00082650",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00082800",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00082ae0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00083110",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00083ac0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x00086240",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000866c0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2464,7 +3571,10 @@
     },
     {
       "entry": "0x000881b8",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2474,7 +3584,10 @@
     },
     {
       "entry": "0x0008d400",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2484,7 +3597,10 @@
     },
     {
       "entry": "0x0008d5d0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2494,7 +3610,10 @@
     },
     {
       "entry": "0x0008dd40",
-      "observed_call_edges": 2,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2504,7 +3623,10 @@
     },
     {
       "entry": "0x0008dfc0",
-      "observed_call_edges": 2,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2514,7 +3636,10 @@
     },
     {
       "entry": "0x0009b288",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2524,7 +3649,10 @@
     },
     {
       "entry": "0x0009b308",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2534,7 +3662,10 @@
     },
     {
       "entry": "0x0009b320",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2544,7 +3675,10 @@
     },
     {
       "entry": "0x0009b498",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2554,57 +3688,10 @@
     },
     {
       "entry": "0x0009c050",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0009de50",
-      "observed_call_edges": 3,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0009e250",
-      "observed_call_edges": 3,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0009e650",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0009e880",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x0009eab0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2614,7 +3701,10 @@
     },
     {
       "entry": "0x000bd5a8",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2624,7 +3714,10 @@
     },
     {
       "entry": "0x000bd6b8",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2634,7 +3727,10 @@
     },
     {
       "entry": "0x000bd730",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2644,7 +3740,10 @@
     },
     {
       "entry": "0x000bd810",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2654,7 +3753,10 @@
     },
     {
       "entry": "0x000bd8e0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2664,7 +3766,10 @@
     },
     {
       "entry": "0x000be1f0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2674,7 +3779,10 @@
     },
     {
       "entry": "0x000bece0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2684,7 +3792,10 @@
     },
     {
       "entry": "0x000bedf0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2694,7 +3805,10 @@
     },
     {
       "entry": "0x000beee0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2704,7 +3818,10 @@
     },
     {
       "entry": "0x000befd0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2714,7 +3831,10 @@
     },
     {
       "entry": "0x000bf2f0",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2724,7 +3844,10 @@
     },
     {
       "entry": "0x000de670",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2734,7 +3857,10 @@
     },
     {
       "entry": "0x000de990",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2744,7 +3870,10 @@
     },
     {
       "entry": "0x000df070",
-      "observed_call_edges": 2,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 2,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2754,47 +3883,10 @@
     },
     {
       "entry": "0x000e37f0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000e3830",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000e39c0",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000e39f0",
-      "observed_call_edges": 2,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000e3a70",
-      "observed_call_edges": 2,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2804,7 +3896,10 @@
     },
     {
       "entry": "0x000e5d30",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,
@@ -2814,17 +3909,10 @@
     },
     {
       "entry": "0x000e5da0",
-      "observed_call_edges": 1,
-      "triage": "untriaged",
-      "stage": "planned",
-      "priority": 2,
-      "weight": null,
-      "work_unit": null,
-      "sources": []
-    },
-    {
-      "entry": "0x000f50a8",
-      "observed_call_edges": 1,
+      "discovery": "tier-a-entry",
+      "possible_static_edges": 1,
+      "dynamic_dependencies": [],
+      "causal_priority": 1,
       "triage": "untriaged",
       "stage": "planned",
       "priority": 2,

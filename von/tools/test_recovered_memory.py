@@ -36,6 +36,20 @@ def main() -> int:
             ctypes.c_uint32,
         ]
         recovered.recovered_memory_copy_forward.restype = None
+        recovered.recovered_memory_copy_overlap.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_void_p,
+            ctypes.c_uint32,
+        ]
+        recovered.recovered_memory_copy_overlap.restype = None
+        recovered.recovered_state_shift_77de0.argtypes = [
+            ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p
+        ]
+        recovered.recovered_state_shift_77de0.restype = None
+        recovered.recovered_state_shift_77e20.argtypes = [
+            ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p
+        ]
+        recovered.recovered_state_shift_77e20.restype = None
 
         vectors = 0
         for source_alignment in range(16):
@@ -64,7 +78,53 @@ def main() -> int:
                         )
                     vectors += 1
 
-    print(f"PASS: {vectors:,} forward-copy alignment and length vectors")
+        overlap_vectors = 0
+        for source_offset in range(8):
+            for destination_offset in range(8):
+                for length in range(65):
+                    storage = (ctypes.c_ubyte * 96)()
+                    initial = bytearray(
+                        (index * 29 + 7) & 0xFF for index in range(96)
+                    )
+                    for index, value in enumerate(initial):
+                        storage[index] = value
+                    expected = bytearray(initial)
+                    expected[destination_offset:destination_offset + length] = (
+                        initial[source_offset:source_offset + length]
+                    )
+                    recovered.recovered_memory_copy_overlap(
+                        ctypes.byref(storage, destination_offset),
+                        ctypes.byref(storage, source_offset),
+                        length,
+                    )
+                    assert bytes(storage) == bytes(expected)
+                    overlap_vectors += 1
+
+        current = (ctypes.c_ubyte * 0xf4)(*range(0xf4))
+        previous = (ctypes.c_ubyte * 0xf4)(
+            *((index + 1) & 0xff for index in range(0xf4))
+        )
+        next_state = (ctypes.c_ubyte * 0xf4)(*[0xA5] * 0xf4)
+        recovered.recovered_state_shift_77de0(current, previous, next_state)
+        assert bytes(current) == bytes(previous)
+        assert bytes(next_state) == bytes(previous)
+
+        current = (ctypes.c_ubyte * 0xf4)(*[0xA5] * 0xf4)
+        next_state = (ctypes.c_ubyte * 0xf4)(*range(0xf4))
+        previous = (ctypes.c_ubyte * 0xf4)(
+            *((index + 1) & 0xff for index in range(0xf4))
+        )
+        output = (ctypes.c_ubyte * 0xf4)(*[0x5A] * 0xf4)
+        recovered.recovered_state_shift_77e20(
+            current, next_state, output, previous
+        )
+        assert bytes(current) == bytes(next_state)
+        assert bytes(output) == bytes(previous)
+
+    print(
+        f"PASS: {vectors:,} forward-copy and {overlap_vectors:,} "
+        "overlap-copy vectors"
+    )
     return 0
 
 

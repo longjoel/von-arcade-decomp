@@ -690,7 +690,10 @@ The state-shift helper at `0x77e20` chains two `0xf5d40` forward copies of
 `0xf4` bytes: first `0x504d60` to `0x504e60`, then `0x504f60` to `0x504d60`.
 Like the `0x2330` wrapper it is a call-site contract reusing
 `recovered_memory_copy_forward()` with fully immediate addresses and
-length, so no second copy implementation is introduced.
+length, so no second copy implementation is introduced. The corresponding
+`recovered_state_shift_77de0()` and `recovered_state_shift_77e20()` adapters
+now expose both fixed sequences as host-buffer operations and are tested for
+the full `0xf4`-byte transfer.
 
 The divider at `0x78090` selects `0xbb8` for modes `4`/`7` and `0x64`
 otherwise (the `cmpibge` arm compares literal-first, so mode `7` still
@@ -719,7 +722,7 @@ like the `0x27d8` trampoline.
 
 The head of `0x7a3e0` routes on the object's `+0x64` state and its peer's
 (`+0x74`): own `8` reports mode `11` through `0x78790`; peer `0`/`3`
-reports mode `9` through `0x7a9f0`; own `1`/`3`/`4`/`5` falls into the
+reports mode `9` and enters the ratio comparison at `0x7a504`; own `1`/`3`/`4`/`5` falls into the
 ratio computation; anything else takes the `0x7a4a8` arm. All arms test
 equality, so no operand-order proof is needed. The pure decision is in
 `recovered_route_head_7a3e0.c`; the downstream bodies stay outside.
@@ -770,6 +773,374 @@ response is added to `+0x10` into `+0x90` and `+0x9c`; bytes `+0xa0/+0xa1`
 are cleared. The common prefix is modeled in
 `recovered_geometry_object_init_23670.c`; branch-specific packet tails remain
 separate.
+
+The `0x83348` ratio prefix is now modeled separately from its early gate. It
+sets `0x504e1c = 1`, compares the converted `0x5042a8/0x5042a2` ratio with
+the recovered `0.9` double constant, clears mode bit 2 only above that
+threshold, and dispatches state 5 through the exact table at `0x833c8`.
+
+The five ratio-table handlers at `0x833dc` are now connected: selector 0
+calls `0x79d60`; selectors 1 and 2 publish status 28; selector 3 publishes
+26; and selector 4 publishes 21 to `0x504d80`.
+
+The `0x8342c` remainder/mode handler is now bounded. It selects status 21
+for remainder 5, status 26 for remainder 4 with mode bit 1, and status 28
+for a negative remainder with mode bit 2; all other paths call `0x79d60`.
+Every arm then writes caller `g14` to `0x504d8c` and `15` to `0x504d90`.
+
+The dispatcher at `0x83ac0` is now bounded through its shared tail. Its
+inclusive signed `0x504dc0 <= 149` gate accepts related states 19/20 by
+writing caller `g14` to `0x504d98`. The continuation sets `0x504e1c = 1`,
+calls `0x82800` when `0x504d60` is below converted `0x504df8`, and writes
+status 18 for negative timing. State 5 uses a six-entry remainder table
+(0/1 call `0x79d60`, 2/3/4 publish 28/26/21); other states use remainder 7,
+where the mode bits select 26 or 28 and the common tail publishes `g14/15`.
+
+The `0x83cc0` entry has the same bounded early gate: signed
+`0x504dc0 <= 149` plus related state 19/20 writes caller `g14` to
+`0x504d98` and returns. Its continuation is not merged with `0x83ac0`: state
+5 loads mode/timing inputs and the other-state branch uses remainder 18 with
+additional nested remainder tests. Only the shared gate is modeled so far.
+
+The state-5 branch beginning at `0x83f9c` is now modeled independently. It
+always publishes `0x504e1c = 1`; mode bit 1 selects fixed status 26 when
+`0x504e28 == 1`, otherwise `31 + 0x504e30`. With mode bit 1 clear, the
+converted `0x504dd8` timing comparison and mode bit 2 select status `39`
+only above the threshold; all other cases select status `37`.
+
+The shared continuation at `0x84018` is now bounded as a quadword tail. It
+loads `0x504d80..0x504d8c`, replaces only the first word with the selected
+status, and preserves the other three words. It publishes selector `30` when
+the status is `26` or `31 + 0x504e30`; every other status publishes `15`.
+
+The state-5 random consumer at `0x84150` is now bounded. Given the signed
+helper produced by the preceding random/timing arithmetic, helper `< 4` with
+mode bit 2 publishes status 32; a negative helper with mode bit 1 publishes
+status 37; the default publishes status 33. The helper normalization
+itself remains an explicit upstream input.
+
+The parallel non-state consumer at `0x841ec` is also bounded: helper `< 4`
+with mode bit 2 selects 32; positive helper with mode bit 1 selects
+status 37; otherwise the immediate add produces status 33.
+Its result reaches the shared `0x84228` `g14/15` publication tail.
+
+The counter updater at `0x848d0` is now bounded. Nonnegative
+`0x509a6c` increments and stores the value, resetting it to zero above 120.
+Negative values return unless `0x503a14 > 239`, in which case execution
+continues at `0x8490c`.
+
+The recovery gate at `0x84b10` is now bounded. It updates `0x509a70` with
+the same increment/reset ceiling of 120, derives table base
+`0x5074a0 + related_field_64 * 1024`, and reaches the scan only when
+`0x509ac0 == 1`, `0x504e50` bit 2 is clear, `0x503a14 > 239`, and the updated
+counter is zero.
+
+The recovery-record loop at `0x84bb4` is now bounded separately from
+`0x84994`: it scans eight entries at a 136-byte stride, compares field
+`+0x86`, and on target-greater selects the current record while replacing the
+working target with its value.
+
+The recovery-row writer at `0x84c98` is now bounded. It uses a 144-byte row
+stride, copies six scalar fields at offsets `0/2/4/6/8/a`, stores
+`240 - 4*normalized_delay` at `+0x84`, copies 60 source `+0xc` halfwords
+starting at `(0x509a68 + 1) mod 60`, and marks the selected recovery record's
+`+0x86` field with 100.
+
+The opening `0x8490c` object-ratio prefix is now bounded. Nonzero object
+halfword `+0x190` returns; related state 11 selects `+0x63c`, state 14
+selects `+0x640`, and the selected value is divided by immediate 100 before
+being multiplied by object `+0x4a`. A zero product exits through `0x84b08`;
+the subsequent record scan remains separate.
+
+The record loop at `0x84994` is now bounded as an eight-entry threshold
+search. It compares a working target against each record's halfword at
+`+0x8e` using a 16-byte stride; when the target exceeds the record, that
+record is selected and becomes the next working target, while target-less
+records are skipped. A target that never exceeds a record produces no
+selection in this bounded model.
+
+The frame-slot arithmetic at `0x849d0` is now bounded independently of the
+unknown `0x8d2a0` mapping. It uses the callee result minus one, substitutes
+180 for a negative value, subtracts from `0x509a68`, adds 60 for a negative
+slot, and scales the slot by 16 before reading the `0x5096a0` record.
+
+The packet-row writer at `0x84a34` is now bounded. It computes the selected
+row as `table_base + index * 144`, copies five source halfwords into offsets
+`0xa`, `0xc`, `0xe`, `0x10`, and `0x12`, and stores
+`240 - 4*normalized_delay` at row offset `0x8c`. The later row-copy loop is
+kept separate.
+
+The bulk row copy at `0x84a80` is now bounded. It copies the source scalar
+fields at offsets `0/2/4/6/a`, transfers 60 successive source `+0xc`
+halfwords into destination offsets beginning at `+0x14`, writes immediate
+100 at destination offset `+0x8e`, and exits through `0x84b08`.
+
+The initializer at `0x84240` is now bounded: it captures return trampoline
+address `0x84290`, clears callback `g14`, publishes `0x504e1c = 1`, status `43`,
+selector `15`, `0x504d8c = 0`, and `0x504d9c = 7`, then transfers through
+`bx(g1)`.
+
+The wrapper at `0x842d0` is now connected as a fixed call chain. A set bit 0
+in `0x504e50` returns immediately; otherwise it calls `0x84330`, `0x85c00`,
+`0x848d0`, `0x84b10`, and `0x858f0` in order, then conditionally calls
+`0x85b00` when the low byte of `0x5024e8` is zero.
+
+The setup prefix at `0x84330` is bounded through its first state reset. It
+adjusts the stack by 16, masks `0x5024e8` with 3, and when the result is zero
+stores the incoming `g14` into three halfword slots spanning six bytes at
+`0x509a60`. The following bitfield synthesis remains a separate boundary.
+
+The flag finalizer at `0x84470` is now modeled. It sets bit 7 when the
+existing halfword has bits 5 and 1; otherwise it sets bit 6 when bit 4 is
+paired with bit 0 or 1, or when bit 5 is paired with bit 0. Unmatched inputs
+are preserved unchanged.
+
+The prefix at `0x844f4` is now bounded. It uses `(0x5024e8 & 3)` as a slot
+selector; nonzero slots branch directly to `0x847b0`. Slot 0 increments
+`0x509a68`, subtracting 60 after values above 59, then continues into the
+object/global packet construction.
+
+The common recovery-status tail at `0x84d60` is now bounded. It stores the
+incoming recovery flag at `0x509ac0`, extracts control-byte bit 3 from
+`0x504e50`, stores that boolean at `0x509b10`, and returns.
+
+The control gate at `0x84d90` is now bounded. It saves `g8` at `fp+0x40`,
+tests bit 0 of `0x504e50`, restores `g8`, and returns when that bit is set;
+otherwise it restores `g8` and continues at `0x84dc4`.
+
+The common success publication at `0x84dac` is now bounded. It sets bit 8 in
+live `g13`, stores that value at `0x504e42`, stores caller `g14` at
+`0x504e44`, and branches to `0x84f10`.
+
+The scan-success edge at `0x85058` is now bounded separately. It loads the
+matched row's `+0x8c` value, sets bit 9 in `g13`, stores the result at
+`0x504e42`, stores the loaded row value at `0x504e44`, restores `g8`, and
+returns.
+
+The following control/ABI gate at `0x85080` is also bounded. It saves `g8`
+and `g12` at `fp+0x50`/`fp+0x60`, tests bit 0 of `0x504e50`, restores both
+registers, and returns when that bit is set; otherwise it continues at
+`0x850ac`.
+
+The low-byte gate at `0x850ac` is bounded independently. It masks
+`0x5024e8` to `0xff`; literal-first `cmpobl 10,g4` exits to `0x85128` for
+values above `10`, while `0` through `10` continue into the object/related
+ratio setup. The subsequent fixed-point conversion and float comparison are
+not included in this gate model.
+
+The ratio body at `0x850c0` is now bounded through its branch to `0x85134`.
+It sign-preserves the object and related `+0x1d0/+0x1d8` halfwords, converts
+them with `cvtir`, computes each as first/second, and subtracts the related
+ratio from the object ratio. The `bge` exits to `0x85128` for zero or positive
+difference and continues only for a strictly negative difference. The loaded
+`0x3fe00000` word is not consumed by this comparison and remains explicitly
+unmodeled as a dead load.
+
+The setup prefix at `0x85134` is bounded through its first scan gate. It
+selects `0x5096a0 + frame_slot*16`, derives the table row
+`0x5074a0 + object_state*1088`, extracts the upper halfwords of the loaded
+frame pair, and subtracts `70` from each. The row's masked `+0x86` field is
+compared with `49`; values `0..49` branch to `0x853a0`, while larger values
+continue at `0x851a8`. The flag-counting record scan after that boundary is
+not included.
+
+The first row predicate at `0x851a8` is now bounded. It masks the selected
+row's field `+0` to 16 bits and compares it with `0x504d68`; equality sets
+the scan's `r7` match flag, while inequality leaves that flag clear. The
+adjacent range checks and the later `r5` count remain outside this leaf.
+
+The row-handler ABI setup at `0x8521c` is now connected explicitly. It
+reloads the original object's `+0x74` value into `g0`, forms `fp+0x40` and
+`fp+0x44` for `g1` and `g2`, and calls the shared handler at `0x847c0`. The
+handler's internal row processing remains a separate boundary.
+
+The post-handler frame match at `0x8522c` is bounded separately. It masks
+row field `+6` to a byte, compares that result with the value restored from
+`fp+0x40`, and increments the accumulated `r7` count on equality. The later
+row-band checks and terminal count gates remain outside this leaf.
+
+The terminal count gate at `0x852ac` is now bounded. Literal-first
+`cmpibge 2,r5` exits to `0x853a0` when `r5 <=2`; otherwise
+`cmpibge 1,r7` applies the same exit for `r7 <=1`. Only counts
+`r5 >=3` and `r7 >=2` continue at `0x852b4`.
+
+The successful continuation at `0x852b4` is now modeled through its common
+return. It sets bit 10 in `r10` and publishes the selected row's `+0x84`
+low halfword to `0x504e44`. Frame selectors `0..6` use the exact dispatch
+table `{6,5,4,2,3,1,1}` to write `0x504d9c`; selectors above `6` write the
+caller `g14` value instead. Each table arm restores saved `g8/g12` and
+returns.
+
+The failed-row loop at `0x853a0` is now bounded. It increments `r10`,
+advances the frame-row and table-row pointers by `0x88`, and uses the
+literal-first `cmpi 7,r10` gate to revisit `0x8518c` for indices through `7`.
+After the eighth failed row, it restores saved `g8/g12` and returns.
+
+The decoder beginning at `0x853c0` is now bounded through its return
+trampoline at `0x85494`. Bit 8 of `0x504e42` selects the table geometry
+`0x5050a0 + state*1152 + selector*25 + 20` or
+`0x5074a0 + state*1088 + selector*17 + 12`; the table is indexed by
+`0x504e44 >> 2`. The selected value is packed as its high nibble shifted
+left four plus its low nibble and stored at object `+0xec+0x1c`.
+`0x504e44` is incremented, and values above `239` clear `0x504e42` before
+the return trampoline.
+
+The callback flag decoder at `0x8552c` is now bounded. It extracts the
+selected table word's high byte, starts with `(g1,g2,g3,g13)=(1,1,8,8)`,
+then applies the observed rules: bits `4&5` select `(2,1)`, bit `0` or clear
+bit `1` selects `(1,2)`, bit `2` or clear bit `3` selects `g3=g13=16`, and
+bit `6` or clear bit `7` selects `(2,2)`.
+
+The callback alignment edge at `0x8558c` is now bounded. It rounds positive
+`0x504e44` upward and nonpositive values downward to a 4-byte boundary,
+computes `original-aligned` through `subo`, and applies literal-first
+`cmpibge 1,delta`. Deltas below `1` select fallback dimensions `8/8`; larger
+deltas retain the decoded dimensions.
+
+The global admission gate at `0x855b8` is now bounded. It exits to `0x85678`
+when `0x503a80` is nonzero, `0x504dc0` exceeds `149`, or the derived
+`0x503a18 - (0x503a14/48 + 1)` is at least `20`. Only the remaining inputs
+continue into the object fixed-point ratio checks.
+
+The object gate at `0x855f8` is now bounded. It rejects when signed object
+`+0x1d0 <= (+0x1d8 >> 2)`. For timing differences through `45`, the modulo
+branch is skipped; above `45`, `0x5024e8 % 300` is computed and only a
+remainder above `45` forces callback dimensions to `1/1`. Accepted ratio
+inputs continue at `0x85634`.
+
+The second timing gate at `0x85634` is now bounded. It recomputes
+`0x503a14/48 + 1`, exits when the difference from `0x503a18` is at least
+`20`, then requires `0x5024e8 % 300 >90` to reach the `g1/g2 = 1/1` override
+at `0x85670`; remainders `<=90` exit through `0x85678`.
+
+The selector gate at `0x85678` is now bounded. It compares the decoded
+low-nibble selector with `1`; selector `1` enters the following timing and
+position checks, while every other selector branches directly to `0x85784`.
+
+The selector-2 adjustment at `0x85784` is now bounded. Selector values other
+than `2` branch to `0x857e4`; selector `2` continues only when
+`0x504dc0 <=149` and the object first/second ratio exceeds `1.65`. If the
+current dimensions are `2/2`, that path changes `g1` to `1` before joining
+`0x857e4`.
+
+The selector-3 adjustment at `0x857e4` is now bounded. It skips to
+`0x85844` unless the selector is `3`; that path requires `0x504dbc <=32`, an
+object first/second ratio above `1.65`, and current dimensions `2/1`, then
+changes `g1` to `1`.
+
+The converged finalizer at `0x85844` is now bounded. `g1` and `g2` become
+persistent dimensions `1`, `2`, or `4`, with value `2` selecting source bit
+0 and otherwise producing `4`. For `g3/g13 ==16`, source bit 3 selects mode
+bit 4 or 5; other values set bit 3. The resulting words are stored at
+`0x504dac` and `0x504db0`.
+
+The object-scale publication at `0x858f0` is now bounded. It sign-preserves
+object `+0x48/+0x4a` into `0x509b8c/0x509b90`; when object `+0x190` is zero,
+related state `11` selects `+0x63c` and state `14` selects `+0x640`. The
+selected related value is divided by `100` and multiplied by object `+0x4a`
+for the second snapshot word; other states and nonzero `+0x190` preserve the
+original second value.
+
+The callback result dispatch at `0x859b8` is now connected. It masks
+`0x509b8c` to a byte, calls helper `0x86638`, subtracts one from the helper
+result, and branches to `0x85af0` when the normalized index exceeds `4`.
+Indices `0..4` use the exact targets `0x859ec`, `0x85a20`, `0x85a54`,
+`0x85a88`, and `0x85abc`.
+
+The five result handlers are now consolidated as one parameterized model. Each
+divides `0x509b90` by `0x503a78+1`, adds the quotient to its indexed
+accumulator at `0x509b24`, `0x509b28`, `0x509b2c`, `0x509b30`, or `0x509b34`,
+clamps the result to `10000`, stores it, and returns.
+
+The callback-frame builder at `0x85b00` loads those six published words and
+writes the original first word, `5/3`-scaled words 1, 3, and 5, doubled word 2,
+and `(5*word4)>>2` into `fp+0x40..0x54`. Its loop keeps the three smallest
+signed values and the index of the smallest. A third-minus-lowest spread above
+`0x1f3` publishes mode `6` to `0x504e48`; otherwise it publishes the lowest
+entry index. The `0x85af0` target is an empty reject/return stub for out-of-range
+dispatch.
+
+The setup prefix at `0x85c00` computes a signed working value from object
+`+0x4a`. A nonzero object `+0x190` suppresses it to zero; with that field clear,
+related state 11 selects `+0x63c` and state 14 selects `+0x640`, dividing the
+selected related value by `100` before multiplying by object `+0x4a`. Other
+related states preserve the original signed `+0x4a`; the 32-entry table
+mutation beginning at `0x85c54` remains a separate boundary.
+
+The selected-row adjustment at `0x85d04` is independently bounded. It indexes
+the `0x5050a0` table as `state*1152 + selector*144 + 0x8e`, adds `30` to the
+current signed halfword, and checks the corresponding paired row. Values at or
+below `1000` take the direct return branch; larger paired values are replaced
+with `1000`.
+
+The sibling row-decay leaf at `0x85e20` uses the same `state*1152 + selector*144`
+layout. It subtracts `10` from the selected halfword, then rejects when the
+paired value is above `49`; values at or below `49` cause the paired halfword to
+be replaced by `40`.
+
+The byte-map scan at `0x85c88` is now bounded through its row-adjustment
+handoff. It scans 32 odd-byte entries, accepts bit-7 entries through the
+previous-halfword bit-10 primary gate or the bit-9/8/11 and zero-value fallback
+gates, stores callback `g14` into the selected entry, and rejects any candidate
+whose low nibble already appears in the 32-entry map. Accepted candidates carry
+the original bit-5 flag into the separate row-adjustment leaf.
+
+The shared finalizer at `0x85ef8` walks 32 object records using `+0x20`
+strides. It fills an odd-byte map slot only when the object `+0x200` byte and
+`+0x204` halfword are nonzero, the slot is zero, and bit 11 of `0x504e42` is
+set. The written value is `(0x504e42 & 0xf) | 0x80`; existing map bytes remain
+unchanged.
+
+The sibling byte-map gate at `0x85f8c` scans the second map for bit-6 entries.
+For a set bit-6 entry, any previous-halfword bit 9/8/11, zero current
+halfword, or zero object byte routes to `0x86000`; with all four conditions
+clear it routes to `0x860a0`. Entries without bit 6 are skipped by this gate.
+
+The `0x86000` primary branch replaces the selected map byte with `g14`, then
+rejects if the selected entry's original low nibble appears elsewhere in the
+32-entry map. A unique candidate addresses the `0x5074a0` table at
+`state*1088 + selector*136 + 0x86`, adds `30` to the current halfword, and
+replaces a paired value above `1000` with `1000`.
+
+The fallback entry at `0x860a0` first requires map bit 6. It then continues to
+`0x860d4` when previous-halfword bit 10 is set or the working scale produced by
+`0x85c00` is nonzero; with bit 6 clear, or with both conditions clear, it exits
+through `0x86174`.
+
+The fallback mutation at `0x860d4` addresses the same secondary row as the
+primary branch, subtracts `10` from the selected halfword, and writes `40` to
+the paired halfword when its value is at most `49`. Its following 32-entry
+low-nibble scan finds the candidate and stores callback `g14` back into that
+candidate map slot before the shared `0x86174` continuation.
+
+The secondary shared continuation at `0x86174` performs the same eligibility
+replenishment against the `0x509ad0` map. It advances object byte and halfword
+streams by `+0x20`, preserves nonzero map entries, and writes
+`(0x504e42 & 0xf) | 0x80` only when both object values are nonzero and global
+bit 11 is set.
+
+The callback setup at `0x861e0` saves return trampoline `0x86238`, sign-extends
+the incoming halfwords, and stores them at `0x509b94` and `0x509b98`. A zero
+`0x503b18` clears the second stored value; a nonzero `0x503b1a` then overrides
+it. Control returns through the saved callback using `bx(g2)`.
+
+The final mode-publication block at `0x865e0` copies the selected four-word
+and two-word thresholds into the previous, current, and active groups at
+`0x509b60/0x509b70`, `0x509b20/0x509b30`, and `0x509b40/0x509b50`. It then
+writes the caller's `g14` value to all three stage latches at
+`0x509b80`, `0x509b84`, and `0x509b88` before returning.
+
+The row-band predicate at `0x851c0` is now bounded. It masks row field `+6`
+to 16 bits and first rejects values above `frame_upper+70`. When the frame
+upper halfword is `<=69`, the remaining lower-bound check is bypassed; for
+larger upper values, the accepted interval is inclusive from
+`frame_upper-70` through `frame_upper+70`. Accepted rows set the scan's `r5`
+flag.
+
+The final pre-call row predicate at `0x85204` is also bounded. It masks row
+field `+4` and the loaded frame record's `g9` low halfword to 16 bits; an
+exact match increments `r5`, while a mismatch preserves the incoming count.
+The shared call setup beginning at `0x8521c` remains outside this leaf.
 
 The valid-transform branch at `0x2381c` (duplicated at `0x23b3c`) copies the
 parent fields `+0x14/+0x18/+0x1c` into the object base coordinates, then
@@ -1188,7 +1559,10 @@ The lower-level call target at `0x000f5d40-0x000f5e80` is a general forward
 non-overlap copy primitive, not a video-specific blitter. It selects aligned
 16-, 8-, 4-, 2-, and 1-byte loops but has the standard byte-for-byte forward
 copy contract captured by `recovered_memory_copy_forward()`. Its overlap-aware
-sibling begins at `0x000f5e80` and remains separate.
+sibling begins at `0x000f5e80` and is now recovered as
+`recovered_memory_copy_overlap()`: disjoint ranges use the forward leaf and
+overlapping ranges copy backward when the destination follows the source.
+The host model is tested across overlapping and disjoint offsets.
 
 The glyph writer at `0x0001d310-0x0001d410` masks characters to seven bits,
 maps printable bytes `0x20-0x7f` to indices `0-95` and other inputs to index
@@ -1211,6 +1585,13 @@ expanded byte. The inline format string at `0x0c57a0` is:
 ```text
 "Result : Node ID = %-2d\n"
 ```
+
+The parser's index dispatch is now captured in
+`recovered_text_formatter_dispatch.c`: the `0xf5210` table has 121 entries,
+index 0 is the ordinary-byte path, sparse conversion slots route to their
+exact handler addresses, and every other in-range slot converges at
+`0xf5bf4`. Handler behavior and full printf conversion semantics remain
+separate.
 
 This is static evidence that newline handling is part of the diagnostic text
 path. The direct callers at `0x000012c4`, `0x000c5a98`, `0x000c5ab0`,
@@ -1321,6 +1702,12 @@ The 60-second input-free trace identifies `0x000f5058` as a heavily reused
 product across bit 31. Clearing bit 31 leaves the new state in the range
 `0..0x7fffffff`. `recovered_random_step()` expresses the arithmetic separately
 from the MMIO-addressed state wrapper so deterministic vectors can be tested.
+The adjacent `0xf50a8` leaf is the matching seed operation: it stores the
+caller value directly to `0x5785d0`. The host-testable
+`recovered_random_seed_state()` form injects the destination while the
+production wrapper preserves that hardware mapping. The `0xf50c0` helper scans
+a NUL-terminated byte string and returns its length; both boundaries are now
+formally labeled alongside the existing C runtime models.
 
 The leaf at `0x00073508` sign-extends its low 16-bit argument and returns one
 of ten bands. Nonnegative boundaries are `0x038d`, `0x1554`, `0x3fff`, and
@@ -1340,6 +1727,10 @@ one-byte special case. After enqueue, `0x00001348` raises bit 10 in the host
 control mirror and MMIO register to request service. The recovered source
 keeps the capacity, enqueue, framing, suppression gate, and kick operations
 separate enough for focused validation.
+The new `recovered_audio_u16_enqueue_plan()` surface joins those pieces into
+the complete `0x2a4e0` branch plan: it reports suppression, ring-full
+rejection, the one-byte `0xff` case, the three-byte normal case, and the
+resulting service request without performing the hardware writes.
 
 The `0x00001348-0x00001370` thunk is now represented as
 `recovered_host_service_request()`, rather than being folded into the producer.
@@ -1377,6 +1768,13 @@ the audio FIFO consumer. Other values are acknowledged without a downstream
 service. `recovered_host_interrupt_route()` records this route contract and
 is exhaustively checked for all 65,536 16-bit masks; the side-effecting
 downstream handlers remain separate work units.
+
+The mask-1 continuation at `0x1424` is now connected explicitly: it calls the
+video transfer prefix at `0x1c2c0`, the upload-selector prologue at `0x29d50`,
+the asset helper at `0xe2330`, the audio record/status uploader at `0x29b20`,
+and the input initializer at `0x2cb0`, in that order. This is a caller-side
+ordering fact; the individual device and asset protocols remain modeled at
+their respective boundaries.
 
 The nonfatal dispatcher tail at `0x00001750-0x00001780` writes `~mask` to
 `0xe80000`, then restores `mask` in both the `0x00501cd0` mirror and
@@ -1572,7 +1970,8 @@ argument. Ghidra and the listing agree on this order:
 2. When the argument is zero, upload the SHARC bootstrap at `0x282e0` and the
    geometry program at `0x28620`.
 3. Run initialization helpers at `0x28d08`, `0x28548`, `0x284b8`, and `0x28418`.
-4. In the zero-mode path, run texture/setup helpers at `0x28120` and `0x28d30`.
+4. In the zero-mode path, run the texture loader/profile setup at `0x28120`
+   and then the auxiliary submit selector at `0x28d30`.
 5. Prepare the host buffer at `0x00509ba0` through `0x28b80`.
 6. Submit that buffer through the four-batch loop at `0x28c80`.
 7. Store `0xffff` at `0x0181c000` before returning.
@@ -1686,15 +2085,16 @@ word is zero in both paths.
 
 The startup gate at `0x28840` is more complex than its call site suggests. It
 reads backup SRAM byte `0x01d00027`, subtracts one, and dispatches through the
-nine-entry table at `0x2885c` (with the default path at `0x28974`). The selected
+ten-entry table at `0x2885c` (with the default path at `0x28974`). The selected
 path initializes profile-dependent floating-point constants and stores values
 at `0x00512bd4`, `0x00512bd8`, and `0x00512bdc` before continuing into a larger
 calculation. It is recorded as `geometry_profile_dispatch`, not reconstructed
 as a boolean status function.
 
 The direct profile constants are preserved in `recovered_geometry_profile.c`
-as raw IEEE-754 bit patterns. Backup values mapping to indices `0..8` are
-represented explicitly; zero and out-of-range values use the observed default
+as raw IEEE-754 bit patterns. Backup values mapping to indices `0..9` are
+represented explicitly; index `9` takes the first word from `0x28968` and the
+default second/third words. Zero and out-of-range values use the observed default
 triple. `von/tools/test_recovered_geometry_profile.py` now checks all 256 byte
 inputs and the 32-bit output ABI.
 
@@ -1724,6 +2124,24 @@ destinations swapped. A nonzero decoder result writes `0` and `5` to
 `0x00503a00` and `0x005039f4` respectively. The broad printf-style formatter
 remains separate, but this loader uses no format arguments and is now
 semantically C-covered.
+
+The profile setup helper at `0x281f0` loads the selected word from the
+`0x280c0` table, publishes it at `0x00512bd0`, and passes that word as the
+decoder source while swapping the destination banks `0x11200000` and
+`0x11000000`. Decoder status `1` publishes state B `29`; status `2` saves the
+prior A/B pair at `0x503a0c/0x503a10`, then publishes A `5` and B `0`.
+The helper is called by the command-profile initializer at `0xc8fc4` and by
+the runtime profile path at `0xd3970`.
+
+The five words at `0x280c0` are, in order, `0x02c77438`, `0x02cdbad3`,
+`0x02d594a1`, `0x02ddeffc`, and `0x02e55c42`. They are modeled as an explicit
+bounded ROM table; the original indexed loads do not themselves perform a
+range check.
+
+The follow-up predicate at `0x28270` reloads the selected word from the
+`0x280c0` table, compares it with the published `0x00512bd0` word, and
+returns `1` on equality or `0` otherwise. Its table value remains an explicit
+input to the pure C model because the profile table is shared with callers.
 
 The loader target `0x27e50` is now labeled `texture_decompressor`. Static
 analysis shows it initializes `0xfed` bytes at `0x00511bb0`, clears status at
@@ -4554,6 +4972,116 @@ static branch reduction. They remain separate from one unified pointer-based
 dispatcher and from input-driven runtime correlation; those are the remaining
 integration boundaries rather than missing arm semantics.
 
+The post-threshold helper at `0x79630–0x79714` is now bounded separately. It
+compares `0x504d60` against converted threshold word `0x504dfc`, normalizes
+the accepted `0xf5058` result through an eight-entry table yielding
+`1,1,2,2,3,3,5,6`, re-enters `0x79050`, and publishes action `30`. The
+upstream normalization arithmetic remains an open integration point; the
+table and downstream write sequence are static facts.
+
+The adjacent dispatch body at `0x79720–0x79834` is now modeled after its
+threshold gate. Its ten caller-state arms map `0/1 -> 18`, `2..4 -> 12`,
+`5..7 -> 13`, and `8/9 -> 19` when their gate is clear. Gate `1` on states
+`0/1/8/9` instead re-enters `0x79050`, writes transition `1`, status `1`, and
+action `30`. The unresolved entry comparison is supplied as an integration
+input, preserving the exact static dispatch body.
+
+The separate `0x79840–0x7990c` variant is now bounded in the annotations.
+It uses threshold word `0x504dfa` and ROM table `0x728d0`, initializes action
+`5`, and splits low and high caller-state groups. Gate-1 arms re-enter
+`0x79050` and publish action `30`, while alternate arms publish table-derived
+transitions such as `18` and `19`; this table is intentionally not conflated
+with `0x72690`.
+
+The corresponding pure model in `recovered_transition_728d0_variant_79840.c`
+now captures the post-gate schedule while taking the undecoded `0x728d0`
+value as an input. States `0/1` use the clear-gate selector `18`, states
+`2..7` retain the table value, and states above `7` use selector `19`; gate
+`1` changes the low/high groups to transitions `1/3`, re-enters `0x79050`,
+and publishes action `30` with status `1`.
+
+The following `0x79910` helper is now bounded through `0x79a8c` in the
+annotations. It checks the `0x504e0e`/`0x504e10` timing window, has a gated
+selector-3/action-20 override, otherwise uses the `0x728d0` action-10 table,
+and applies additional state-8/state-9 selector guards at `0x799fc`. The
+exact floating comparison polarity remains open pending a correlated trace.
+
+The companion at `0x79a90–0x79c04` is now bounded separately. It adds an
+initial mode-state check and a mode-bit-2 plus gate-1 selector-3/action-20
+override, then uses the `0x728d0` action-10 table path and the shared state-8
+and state-9 tail checks. Its threshold polarity remains open, and it is kept
+distinct from the neighboring `0x79910` helper.
+
+The compact timing helper at `0x79c10–0x79cb4` is modeled by
+`recovered_transition_timing_window_79c10.c`. It initializes the action-10
+route, selects the action-5 wrapper at `0x783c8` for its alternate threshold
+exit, and on the inner-window arm writes status 1, preserves caller `g14` as
+the selector value, and retains action 10. The converted threshold words at
+`0x504e04` and `0x504e06` remain explicit comparison inputs.
+
+Its sibling at `0x79cc0–0x79d50` is modeled by
+`recovered_transition_timing_window_variant_79cc0.c`. After the same two
+threshold outcomes it selects `0x78488` for selector values below `3`,
+`0x78448` for values `3`/`4`, and otherwise applies the `0x504dc8` gate with
+object state `7` selecting transition `2` and the remaining cases selecting
+transition `1`.
+
+The dual-window helper at `0x79910–0x79a8c` is modeled by
+`recovered_transition_dual_window_79910.c`. Its threshold result selects the
+action-10 wrapper, action-5 wrapper, inner status/selector override, or the
+`0x728d0` table path. The table path promotes caller states `0` and `9` to
+status/transition/action `1/3/20`; the later object-state-8 and state-9 tails
+apply the same promotion when their gate or related-selector predicates pass.
+
+The companion mode-2 helper at `0x79a90–0x79c04` is modeled by
+`recovered_transition_mode2_window_79a90.c`. It preserves the initial
+mode-word-equals-1 status write, gates the inner-window selector/action-20
+override on mode bit 2 and gate 1, and otherwise follows the same action and
+state-8/state-9 tail routes as `0x79910`.
+
+The entry gate at `0x78dd0–0x78de8` is modeled in
+`recovered_geometry_entry_gate_78dd0.c`: object states `2` and `4` route to
+the immediate `0x7cbc0` service call, while every other state proceeds into
+the `0x78de4` command-29 geometry packet path. Its route model now exposes
+those concrete destinations, connecting the service branch to the existing
+`0x7cbc0` model and the fall-through branch to the packet-builder boundary.
+The packet builder and its hardware response remain separate integration
+boundaries.
+
+The non-service continuation is now bounded as `0x78dec–0x79040` by the
+`geometry_packet_timing_route` annotation. Its entry loads `0x504e0c` and
+`0x504dbc`, emits the command-29/30 response sequence, applies the primary
+`0x40510000` and secondary timing splits, and reaches the existing action
+wrappers or the literal selector-12/13 fallback. The control override at
+`0x78fdc` publishes status 1, transition 2/3, and action 25. The downstream
+state dispatch at `0x79050` is a separate shared boundary and is not called
+directly by this block.
+
+The called service at `0x7cbc0–0x7cc44` is now bounded by
+`recovered_transition_service_7cbc0.c`. Its timing comparison is represented
+by an explicit `timing_passed` input: the clear arm calls the existing
+action-5 wrapper at `0x783c8`, while the passed arm selects a value from
+`0x72900` and publishes action `10`. When `0x504dc8 == 1`, it additionally
+writes status `1`, transition `2` (or `3` for object state `4`), and action
+`25`. The converted-field comparison and selector-table contents remain
+integration inputs rather than guessed semantics.
+
+The shared dispatcher at `0x784c8–0x7863c` is modeled by
+`recovered_transition_status_dispatch_784c8.c`. It has ten literal selector
+arms: selectors `0` and `6` test mode bit 1, selectors `1` and `3` test mode
+bit 2, and selectors `2`, `4`, `5`, `7`, `8`, and `9` test `(mode & 6) != 0`.
+Matching arms write status `1` to `0x504d84`; the model returns only that
+write decision so the persistent cell and saved continuation remain caller
+owned. Out-of-range selectors take the no-write default.
+
+The bounded C model in `recovered_transition_post_threshold_79630.c` now
+captures that table and tail: valid normalized indices select the eight
+literal transition values, while the out-of-range path skips the table write;
+both paths preserve the prior transition when no table write occurs, re-enter
+`0x79050`, and publish action `30`. The threshold result
+and `0xf5058` normalization are intentionally supplied by the integration
+caller until runtime evidence resolves them.
+
 The arm models are now exposed through the context-based
 `recovered_object_state_dispatch()` entry point. It carries the ROM-derived
 object fields, global words, timer bits, and caller state explicitly, dispatches
@@ -4614,6 +5142,14 @@ The terminal arms are now pinned too: state 8 (`0x7a204`) writes selector
 static control-flow audit of all ten table entries; only runtime pointer
 correlation and frequency remain open for this dispatcher.
 
+The instruction-locked routing seam is now represented by
+`recovered_secondary_dispatch_79d60.c`: object states 0 through 9 map to the
+exact addresses in `0x79d8c`, and the common exits map to published
+transitions 13, 14, and 15. Invalid states and non-terminal addresses return
+an explicit no-route sentinel. This model intentionally stops at the shared
+exit boundary; it does not guess the unresolved floating comparisons,
+pointer provenance, or live global effects inside states 1 through 7.
+
 The helper cluster immediately before it (`0x00079c10-0x00079d50`) is likewise
 distinct from the dispatcher body. These leaves convert the threshold words at
 `0x504e04` and `0x504e06`, compare them with the shared timing value at
@@ -4631,6 +5167,703 @@ The terminal leaf at `0x00079d20-0x00079d50` is now isolated. When
 exact gate/state mapping is implemented in `recovered_secondary_transition.c`
 and exhaustively tested over representative gate and state values.
 
+The action-`34` callback at `0x0007a318` is now modeled as a separate setup
+boundary. It independently publishes `1` to `0x504d84` and `0x504d98` when
+`0x504dc8 == 1`. Object states `1`, `2`, `4`, `5`, and `7` then publish the
+smaller of `0x504dbc+22` and `g28+31`, replacing it with `g29+31` when the
+second bound is smaller, into `0x504db8`. With the gate set, all other states
+instead take the literal action-10 arm at `0x7a394`. With the gate clear,
+remaining states select `12` or `13` at `0x504d94` from the literal-first
+unsigned `cmpobl 3,state-1`. The C plan
+in `recovered_transition_setup_7a318.c` keeps the callback return ABI outside
+the pure global-write schedule while testing every state partition.
+
+The transition setup pair is now connected at the C boundary as well. The
+existing `0x783c8` wrapper indexes `0x72690` and publishes action `5`; its
+distinct sibling at `0x78408` indexes `0x72750` and publishes action `10`.
+Both wrappers preserve the selector-driven transition value and differ only
+in their table/action pair. The shared test covers both write schedules.
+
+The adjacent conditioned adapter at `0x78818` is also modeled separately. It
+starts with the `0x72690` transition and action `5`; only the conjunction of
+bit 5 in `0x504e30` and `0x504dc8 == 1` changes the published state, setting
+`0x504d84` to `1`, `0x504d98` to `6`, and `0x504db8` to `20`. Its final
+`bx` targets the fixed return continuation at `0x78880`, which remains an ABI
+boundary rather than an inferred higher-level callback.
+
+The next family member at `0x78bd8` keeps the same table-`0x72690` and default
+action-5 setup but has a two-level override. The state-3 and mode-mask `0xc`
+test has priority and publishes selector `18`; if it does not match, mode bit
+3 combined with `0x504dc8 == 1` publishes selector `16`. Both paths set status
+`1` and action `20`; otherwise the initial action-5 state survives.
+
+The sibling at `0x78c80` uses the same priority shape with a different mode
+bit. State 3 plus mask `0xc` again selects `18`; otherwise bit 4 together
+with gate `1` selects `17`, and state 3 plus bit 2 upgrades that selector to
+`18`. Every override writes status `1` and action `20`, while the unmatched
+path retains the table-selected transition and action `5`.
+
+The `0x78d50` sibling reuses the same bit-5/gate-1 predicate as `0x78818`
+but publishes selector state `18` on the override path. Its default remains
+the table-selected transition with action `5`; a matched override writes
+status `1` and action `20` before returning through `0x78dc0`.
+
+The `0x7a9f0` arm selected by the `0x7a3e0` route head now has an explicit
+entry-gate model. It first writes state `10` to `0x504db8`; the
+`0x504e24 == -1` sentinel or a `0x504dc0` value at or below `99` calls the
+existing timing variant at `0x786d0`. Only a non-sentinel selector with
+`0x504dc0 > 99` enters the subsequent `0x505060` record/geometry packet path.
+The C boundary in `recovered_transition_route_7a9f0.c` captures the concrete
+`0x7aa30` packet-arm target and object `+0x74` related-record load without
+guessing the packet's floating-point and FIFO side effects.
+
+The paired caller at `0x7b430` is now connected through its exact sentinel
+dispatch. If `0x504e20` is `-1`, object states `2` and `7` call `0x78740`,
+while all other states call `0x786d0`; any non-sentinel value enters the
+separate `0x505060` packet path at `0x7b46c` after loading the related object
+pointer at offset `0x74`. `recovered_transition_route_7b430.c` models this prefix and
+leaves the packet's geometry calculations outside the verified seam.
+
+The second paired caller at `0x7bf10` has the same sentinel/state split, but
+its sentinel path additionally writes `1` to `0x504d84` after the timing call.
+States `2` and `7` select `0x78740`; all other states select `0x786d0`.
+Non-sentinel selectors enter the `0x505060` packet path at `0x7bf58` after
+loading the related pointer at `+0x74`. This prefix is captured independently in
+`recovered_transition_route_7bf10.c` so the extra status publication is not
+lost in the shared `0x7b430` model.
+
+The third sibling at `0x7c470–0x7c4a8` is now modeled independently. It
+keeps the same sentinel/state timing split without the post-call status write
+of `0x7bf10`, and exposes its non-sentinel packet continuation at `0x7c4a8`.
+That packet body is now bounded separately through `0x7c7a4`, with labels for
+its paired command setup, response-band comparison, and follow-up helper call.
+The follow-up helper itself is bounded at `0x7c7b0–0x7cb58`, including its
+selector-source split, response packet, state gates, and status/action-20
+override tail.
+
+The preceding dispatch prefix is modeled by
+`recovered_transition_followup_gate_7cb60.c`. Its converted timing and
+selector checks return through `0x783c8`; selectors above 7 then split on the
+final comparison, calling either the follow-up helper at `0x7c7b0` or the
+state handler at `0x82800`, whose result is stored at `0x504d80`.
+
+The neighboring mode/timing gate at `0x7cc50–0x7ce0c` is modeled by
+`recovered_transition_mode_gate_7cc50.c`. Mode bit 1 clear delegates to
+`0x7a3e0`; a clear timing comparison enters the shared `0x7ce84` tail, which
+publishes status `1`, selector `3`, and action `30`; the passed arm calls `0x78408` and may publish selector `3`
+when both control words equal `1` and the bounded `0x5024e8` remainder check
+passes.
+
+The sibling gate at `0x7ce10–0x7ceac` is modeled by
+`recovered_transition_mode2_gate_7ce10.c`. It uses mode bit 2 with the same
+timing/action-10 and control/remainder structure, and shares the
+`0x7ce84` status/selector/action-30 tail.
+
+The mode-bit-5 route at `0x7ceb0–0x7cfd8` is modeled by
+`recovered_transition_mode5_route_7ceb0.c`. Mode clear selects the
+object-state-3 coordinate classification or the global `0x504d68` selector,
+then uses table `0x72780` with action `30` and status `1`. Mode set selects
+the `0x72840` action-10 table or wrapper `0x78408`; control `1` upgrades the
+table arm to transition `2`/action `25`.
+
+The following dispatch at `0x7cfe0–0x7d068` is modeled by
+`recovered_transition_mode5_dispatch_7cfe0.c`. Mode bit 5 directly calls the
+existing `0x79d60` secondary dispatcher and writes status `1`; clear mode
+uses the `0x504e0c` timing split to reach `0x78408` or the `0x72840`
+action-10/control-1 path.
+
+The mode-bit-1 route at `0x7d100–0x7d1ec` is modeled by
+`recovered_transition_mode1_route_7d100.c`. Set mode delegates to `0x7a3e0`;
+clear mode selects wrapper `0x78408` or table `0x72840`, with the recovered
+promotion tail writing transition `2`/action `30` and status `1` except for
+object state `7`.
+
+The two non-sentinel continuations are now bounded independently in the
+Ghidra annotations: `0x7b46c–0x7b89c` and `0x7bf58–0x7c464`. Their labels mark
+the related-record command-29/30 setup, response-band comparisons, signed
+difference classification through `0x73508`, table-derived exits, and final
+global-state gates. The FIFO payload arithmetic remains an explicit downstream
+integration boundary.
+
+The state-machine entry at `0x7d1f0` is now modeled through its selector-table
+boundary and returns the concrete indirect handler target when the gate passes.
+Its first two loops inspect exactly one masked byte each, at record
+offsets `0x9a` and `0x98`; a nonzero byte sets a flag when the reference word
+lies in the inclusive byte-through-byte-plus-five band. The following loop
+walks offsets `0x94..0x96`, but its lower-bound result is discarded by the
+original code. The shared gate captures the `0x504d9c` and `0x504d94` status
+checks, `0x504db4`, base-relative thresholds, and object state `<= 9` before
+accepting selector `0..9`. The ten selector bodies at `0x7d380..0x7d660`,
+including their eventual `0x504d98` writes, remain a separate integration
+target. The literal dispatch table at `0x7d358` is modeled by
+`recovered_state_selector_table_7d358.c`, connecting states `0..9` to their
+ten concrete handler addresses and returning no target for out-of-range
+inputs.
+
+The first two selector bodies are modeled by `recovered_state_selector_bodies_7d380.c`:
+state 0 uses mode bit 1 to choose `0x7d5f4` or `0x7d644`, while state 1 gives
+mode bit 1 priority, then uses mode bit 2 for `0x7d4b4`, with the same
+`0x7d644` fallback.
+
+State 2 at `0x7d3a4` is modeled by
+`recovered_state_selector_body_2_7d3a4.c`. Mode bit 1 has priority for
+`0x7d5f4`; clear mode uses the coordinate-band result and then the exact
+`0x5024e8 % 600` cutoff at `449` to select `0x7d644` or `0x7d654`.
+
+State 3 at `0x7d404–0x7d4c4` is modeled by
+`recovered_state_selector_body_3_7d404.c`. Its modulo-600 cutoff is `299`,
+then the recovered control/coordinate predicate can publish selector `3` at
+`0x7d4b4`; the shared tail otherwise chooses `0x7d5f4` or `0x7d654` using
+`g3 || g13`, control `0x504dc8`, and mode bit 1.
+
+State 4 at `0x7d4e8–0x7d568` is modeled by
+`recovered_state_selector_body_4_7d4e8.c`. Mode bit 1 has priority for
+`0x7d5f4`; clear mode rejects failed coordinate or shared gates to `0x7d654`,
+and the accepted path uses the exact modulo-600 cutoff `199` for
+`0x7d644` versus `0x7d654`.
+
+State 5 at `0x7d568–0x7d5a4` is modeled by
+`recovered_state_selector_body_5_7d568.c`. It requires modulo-600 values
+above `119`, a nonzero `g3 || g13` condition, control `1`, and mode bit 1 to
+reach `0x7d5f4`; all other paths use `0x7d644`.
+
+State 6 at `0x7d5a4–0x7d5dc` is modeled by
+`recovered_state_selector_body_6_7d5a4.c`. It preserves the initial and
+post-control mode-bit checks, the control-1 gate, and the final converted
+`0x504df8` comparison selecting `0x7d4b4` or `0x7d644`.
+
+State 7 at `0x7d5dc–0x7d604` is modeled by
+`recovered_state_selector_body_7_7d5dc.c`. It requires mode bit 1 and
+control `0x504dc8 == 1`, then publishes selector `2` through `0x7d5f4`; both
+rejection arms use `0x7d654`.
+
+State 8 at `0x7d604–0x7d660` is modeled by
+`recovered_state_selector_body_8_7d604.c`. Mode bit 2 and control `1` select
+the selector-3 target `0x7d4b4`; otherwise the modulo-600 cutoff `299`
+chooses `0x7d644` or `0x7d654`.
+
+The converged selector tails are modeled by
+`recovered_state_selector_shared_tails_7d4b4.c`: targets `0x7d4b4`,
+`0x7d5f4`, and `0x7d644` publish selector values `3`, `2`, and `1` to
+`0x504d98`, while `0x7d654` stores the caller continuation value there.
+
+The `0x7dcc0` entry now has a verified local C seam. Its signed state-counter
+guard rejects values through `0x1f3`. For an accepted slot, the status byte
+must be nonzero, the selected halfword's `0x0f00` mask must be zero, and the
+object byte must lie inclusively between the status byte and five above it.
+That predicate gates the command-10 emission. The surrounding 32-slot scan,
+fixed-point comparison, selector routes, and persistent writes are still
+tracked as unresolved behavior.
+
+The adjacent `0x7d670` route selector is now connected at its record-scan
+boundary and exposes the selected packet continuation. It examines seven
+records at `0x505060` with a six-byte stride,
+ignores entries whose signed `+4` halfword is zero, and retains the first
+entry having the minimum signed `+2` halfword. With no enabled entry, the
+routine writes status `11` when `0x504d70 <= 4`, otherwise status `10`.
+Selected records continue at packet builder `0x7d7f4` and proceed to the
+`0x884000` command stream; that packet's
+coordinate arithmetic and later `0x504d94` mapping remain unresolved.
+
+The selected packet builder at `0x7d7f4–0x7d914` now has a structural model
+in `recovered_state_selected_packet_builder_7d7f4.c`. It preserves the
+`0x505060` six-byte record layout, command IDs `10/29/30`, FIFO target
+`0x884000`, classifier `0x73508`, result table `0x72630`, and destination
+`0x504d94`; payload arithmetic remains an explicit integration boundary.
+
+The follow-up dispatch table at `0x7db80` is modeled by
+`recovered_state_followup_table_7db80.c`, preserving all ten literal handler
+targets used by the larger `0x7d920` routine. The handlers’ individual
+transition-cell effects remain downstream boundaries.
+
+Its dispatcher prefix at `0x7db70–0x7db7c` is now modeled by
+`recovered_state_followup_dispatch_7db70.c`: selectors `0..9` branch through
+the literal table, while larger selectors use the `0x7dca8` fallback. This
+connects the table model to the separately modeled tail handler.
+
+The simple handler subset is modeled by
+`recovered_state_followup_simple_handlers_7dba8.c`: targets `0x7dba8` and
+`0x7dbb8` publish selector `19`, `0x7dbc8` publishes `20`, `0x7dbd8`
+publishes selector `23` with status `28`, and `0x7dbf4` publishes `21`.
+
+The remaining packet-producing handler at `0x7dc04–0x7dc94` is modeled by
+`recovered_state_followup_geometry_handler_7dc04.c`. It negates the object
+halfwords at `+0x10` and `+0x8`, emits command `10` and those payloads through
+`0x884000`, extracts the low halves of the FIFO response and object `+0x184`,
+and uses the `0x73508`/`0x72b10` result boundary. Its visible writes are
+`g9+31` to `0x504db8`, selector `23` to `0x504d98`, and the looked-up status
+to `0x504d94`; the floating-point and classifier implementation remain
+integration boundaries.
+
+The tail handlers at `0x7dc98` and `0x7dca8` are modeled by
+`recovered_state_followup_tail_handlers_7dc98.c`. The first writes value `29`
+to `0x504d94`; the second stores caller `g14` at `0x51c930` only when object
+field `+0x170` is not `6`. The remaining selector arithmetic and the meaning
+of that stored continuation remain unresolved.
+
+The preceding 24-entry table at `0x7da8c` is now modeled by
+`recovered_state_followup_primary_table_7da8c.c`. Its literal targets are
+preserved, including the distinct arms at `0x7daf0`, `0x7db00`, `0x7db1c`,
+`0x7db2c`, and `0x7db54`. Those arms are modeled in
+`recovered_state_followup_primary_handlers_7daf0.c`: they publish selectors
+20/23/21, publish caller `g14` as status, decrement the `0x51c930` counter
+when `+0x172 == 4`, or store the continuation when `+0x170 != 6`.
+
+The shared publication seam at `0x7d9e4–0x7da10` is modeled by
+`recovered_state_followup_counter_clamp_7d9e4.c`. It writes the selected
+status/result pair to `0x504db8/0x504d94`, increments `0x51c930`, and clamps
+the resulting counter to `0..24`; the upstream range/ratio selector remains
+unresolved.
+
+The preceding selector at `0x7d9b4–0x7d9e0` is modeled by
+`recovered_state_followup_result_select_7d9b4.c`. The `cmpi 0,g6` flags route
+nonzero range class `g6` to result table `0x72ab0[g6]`; class zero enters the
+real-value threshold for `0x72630[0]`, while the low arm supplies status `20`
+and no result-table value. Table contents and the i960 extended-real comparison
+are kept as inputs.
+
+The next ratio gate at `0x7da10–0x7da54` is modeled by
+`recovered_state_followup_ratio_gate_7da10.c`. The two `ldos` values are
+explicitly treated as zero-extended low halfwords before the i960 real divide;
+ratios at or below the literal `0.4` threshold continue to `0x7db70`.
+Divide-by-zero and the i960 extended-real encoding remain outside this model.
+
+The alternate span gate at `0x7da54–0x7da80` is modeled by
+`recovered_state_followup_span_gate_7da54.c`. It computes
+`r17+31` as the divisor, computes `0x503a14/(r17+31) + 1`, routes when
+`0x503a18 - target >= 25`, and otherwise exposes the literal-first
+`cmpobl 24,g6` fallback to `0x7db54`. The caller's `r17` value remains an
+input to this seam.
+
+The high-confidence gate chain is connected in
+`recovered_state_followup_gate_chain_7d920.c`: ratio `<= 0.4` or span
+difference `>= 25` enters the `0x7db70` dispatcher; otherwise a counter above
+24 falls to `0x7db54`, and the remaining path enters the primary table at
+`0x7da8c`. Selector production remains an input to this composition seam.
+
+The producer's range-class prefix at `0x7d930–0x7d984` is modeled by
+`recovered_state_followup_range_class_7d930.c`. It preserves the four literal
+offsets, 16-bit masking, threshold `0x49e`, and the observed any-window
+predicate that raises class `g6` to `1` when a value is at most the threshold;
+the `ldos` source base is sign-extended before those additions;
+the later table selection remains a separate boundary.
+
+The selector gate at `0x7df00–0x7df58` is modeled by
+`recovered_state_followup_selector_gate_7df00.c`. Selector `r6 == 0x44`
+continues to `0x7df58`; all other values enter `0x7df30`, which publishes
+status `7` to `0x504d94`, control `1` to `0x504d9c`, selector `r6` to
+`0x504da0`, and calls `0x79d60`.
+
+The `0x7df58–0x7dfb4` special route is modeled by
+`recovered_state_followup_special_route_7df58.c`. It selects the `0x72780`
+table path when `(g6 == 0x55 && r6 != 0x56)` or
+`(g6 == 0xa3 && object state +0x64 == 6)`, then publishes the table result,
+selector `r6`, control `1`, and action `30` before calling `0x79050`; all
+other cases continue at `0x7dfb8`.
+
+The classified route at `0x7dfb8–0x7e060` is modeled by
+`recovered_state_followup_class_route_7dfb8.c`. It accepts only `g6 == 0xa3`
+with object state `3` or `6`, preserves the state offsets `0x2000` and
+`0xfffff800`, records the global `<= 4` split and classifier boundary, then
+looks up `0x72780`, publishes selector/control/action `30`, and calls
+`0x79050`. The alternative `0x7e064` path remains separate.
+
+The fallback admission gate at `0x7e064–0x7e12c` is modeled by
+`recovered_state_followup_fallback_gate_7e064.c`. It admits `0x81610` only
+when `0x5024e8 % 480 <= 239`, object state is not `3` or `7`,
+`0x509b34 > 0x1f4`, the preserved `g5` value is not `4`, and `g6 == 0xa3`.
+The model records the continuation/control writes and optional selector `1`
+when `0x504dc8 == 1`; the floating comparison and `0x7e0d0` continuation
+remain explicit boundaries.
+
+The state-8/9 gate at `0x7e0d0–0x7e144` is modeled by
+`recovered_state_followup_state89_gate_7e0d0.c`. Object states `8` and `9`
+take the floating gate, returning through `0x7e130` when it fails or calling
+`0x81610` when it passes; all other states continue at `0x7e144`.
+
+The terminal publication tail at `0x7e230–0x7e274` is modeled by
+`recovered_state_followup_action25_publication_7e230.c`. It preserves the
+`0x72660[classifier]` result lookup, writes `classifier-1` to `0x504db4`,
+control `1` to `0x504d9c`, action `25` to `0x504db8`, caller `g14` to
+`0x504da0`, and the result to `0x504d94`.
+
+The record-probe gate at `0x7e278–0x7e33c` is modeled by
+`recovered_state_followup_record_probe_gate_7e2cc.c`. The prelude saves the
+existing control/selector/action cells, then publishes control `1`, selector
+`g6`, and action `-1`. The probe requires `0x5770f0 > 9`, an indexed signed
+record halfword above the `0x640000` shifted threshold, selector values other
+than `0xaf`/`0xa9`, and callback `0x816d0` returning `1`; success republishes
+selector/control, while failure continues into the `0x7e33c`/`0x7e390` path.
+
+The descriptor-helper fallback at `0x7e33c–0x7e384` is modeled by
+`recovered_state_followup_descriptor_fallback_7e33c.c`. It calls `0x7e390`
+with the saved selector inputs; a zero result restores control/selector/action
+from the saved registers, while a nonzero result publishes status `4` only
+when `0x504dc4 < -15`.
+
+The `0x7dcc0` byte-window model now also exposes the concrete two-status,
+32-slot scan at `0x7dd00`: each status byte at `0x504e3a/0x504e3b` produces a
+bit mask of slots whose object byte is in the inclusive five-count band and
+whose related halfword has no `0x0f00` bits. The subsequent response comparison,
+candidate selection, and persistent publication remain unresolved.
+
+The `0x7e390` geometry-state helper is now connected through its descriptor
+lookup boundary. A caller slot selects a byte at object offset `0x200` with
+32-byte stride; that byte indexes 48-byte records from `0x562cb0`. Descriptor
+fields at `+4`, `+0xc`, and `+0x24` are preserved with the `+0xc` halfword's
+sign extension, and object state `3` is exposed as the special arithmetic
+arm. Constants `0x40c00000`, `0x42f00000`, and `0x3ff80000` remain raw IEEE
+bits; the subsequent command-29/30 geometry math is not yet translated.
+
+The first geometry FIFO bursts at `0x7e440–0x7e5e8` are modeled by
+`recovered_state_geometry_packet_prefix_7e440.c`. It emits four alternating
+command `29`/`30` records from four register copies of the same descriptor
+halfword at `+8`, adding or subtracting the observed `3 << 13` lane offsets,
+including the fourth lane's reuse of the original sample plus the earlier
+`sample + 3 << 13` value, and masking to 16 bits. The first four records use
+the raw `g5*g2` product; after the field-`+0x18` setup, the next four use the
+raw `g7*g6` product with the `sample-r10` and `sample+r10` pairs. Those
+products remain inputs because they are generated by i960 `mulr` and the later
+real-format interpretation is not yet modeled.
+
+The classifier setup at `0x7e6a0–0x7e6d0` is modeled by
+`recovered_state_geometry_classifier_prep_7e6a0.c`. It subtracts the signed
+object `+0x184` halfword from the command-10 response, applies the observed
+left-then-arithmetic-right 16-bit sign extension, combines the raw preceding
+`mulr` results with the exact reverse-subtract order, and records the call to
+`0x73508`. The real products remain explicit inputs.
+
+The classifier-prep model now links its `classifier_g0` output to the shared
+`recovered_signed_band()` implementation for `0x73508`, so the ten-band leaf
+is exercised directly rather than represented only by a target address.
+
+The packet-31 gate at `0x7e6d4–0x7e788` is modeled by
+`recovered_state_geometry_packet31_gate_7e6d4.c`. It emits command `31` with
+descriptor `+0x10`, related `+8`, descriptor `+0x18`, and related `+0x10`,
+then records the FIFO response. The branch structure requires the first three
+signed products to be positive and the fourth product to be nonzero; both
+positive and negative nonzero fourth values reach `0x7e788`, while zero or any
+failed first-three test continues at `0x7e778`.
+
+The `0x7e788–0x7e834` continuation is modeled by
+`recovered_state_geometry_packet10_classify_7e788.c`. It emits command `10`
+with the selected record fields, tests bit 15 of the response minus record
+`+8`, and sign-extends both the record `+8` and object `+0x184` halfwords. The
+clear-bit arm adds no bias; the set-bit arm subtracts `0x504de4`, after which
+the object value is subtracted and the result enters `0x73508`, feeding result
+table `0x72660`.
+
+This caller now links its classifier input to the shared
+`recovered_signed_band()` implementation, including both the clear-bit and
+`0x504de4` bias arms.
+
+The action-30 publication at `0x7e834–0x7e864` is modeled by
+`recovered_state_geometry_action30_publication_7e834.c`. It preserves the
+classifier-indexed lookup through `0x72660`, writes the result to the status
+cell, publishes action `30`, and takes the deeper `0x7e864` path only when
+`0x509b34 > 0x5dc`; equality follows the `0x7e9f4` continuation.
+
+The status tail at `0x7e950–0x7e9f4` is modeled by
+`recovered_state_geometry_status_dispatch_7e950.c`. It computes the wrapping
+index `status - 8`, dispatches indices `0–11` through the literal table at
+`0x7e96c`, preserves the original status for indices `4–9` and out-of-range
+values, and applies the explicit `1/2/3/4/2/3` handler publications for the
+other entries. The common tail conditionally calls `0x79050` when
+`0x504da4 == 1` and always publishes action `30`.
+
+The response preparation at `0x7e5e8–0x7e660` is modeled by
+`recovered_state_geometry_difference_prep_7e5e8.c`. It preserves the i960
+`subr` operand order while consuming the four relevant FIFO responses,
+combining the object and descriptor fields, storing the first derived value at
+frame offset `+0x60`, and exposing the final register set passed into the
+following command-10 packet. The descriptor `+0x18` value is first added to
+the prior `g13` response; that sum is then added to the next FIFO response to
+form the command-10 payload. All values remain raw 32-bit registers.
+
+The `0x7ea10` state initializer is now connected through both its special
+write arm and threshold dispatch. A signed `0x509b30 > 0x1f3` gate precedes
+the logic. Related halfword `0x17a == 31` selects a strict state-6/state-6,
+mode-3 path that publishes `3`, `0x64`, `1`, `7`, and `30` to the five
+transition cells. Other halfword values index the exact eight-entry table at
+`0x7eab0`, whose handlers compare the zero-extended halfword against threshold
+words at `0x504e3c`, `0x504e3e`, or `0x504e40`. The following `0x7ebcc`
+32-slot scan is modeled by `recovered_state31_slot_scan_7ebcc.c`. Active bytes
+gate the fixed command-62 packet; a qualifying response replaces the current
+minimum and preserves the active-byte mask. The target-real comparison is an
+explicit per-slot predicate, while the state-8 tail exposes control `3`,
+selector `0x64`, the `0x72780` table index/result, and call `0x79050`.
+
+The following global/callback gate at `0x7ecc0–0x7ed20` is modeled by
+`recovered_state31_global_callback_gate_7ecc0.c`. Global `0x5770f0 > 9`
+selects callback `0x816d0` with the selected mask; otherwise the zero-response
+case uses `0x81b30`. The later repeated zero test is independent of that
+global choice: selectors `0`, `2`, or `5` and status `0` or `9` continue to
+`0x7ed34`, while failed checks take their observed alternate continuations.
+
+The selector/publication arm at `0x7ed34–0x7edc0` is modeled by
+`recovered_state31_selector_publication_7ed34.c`. It admits status `0` or `9`
+with related state `3` and mode bit `2`, or related state `2` and mode bit `1`,
+then requires selector `0`. State `2` publishes selector `2`, action `25`,
+control `3`, caller status, and continuation `0x64`; the state-3 arm hands off
+at `0x7edc4`.
+
+The range/publication arm at `0x7edc4–0x7ee24` is modeled by
+`recovered_state31_range_publication_7edc4.c`. Related state `4` bypasses the
+range test; otherwise signed related `+0x172` is shifted left 16 and accepted
+only when it is greater than `0x150000` and at most `0x190000`. Failed values
+replace the caller status with `23`. Both paths publish selector `3`, action
+`20`, control `3`, and continuation `0x64` before converging at `0x7efd8`.
+
+The deterministic front of the fallback at `0x7ee28–0x7ee8c` is modeled by
+`recovered_state31_fallback_admission_7ee28.c`. Once the timing sign gate has
+passed, object state `3`, related state `5` or `6`, and selector `0`, `2`, or
+`5` are required for the `0x7ee8c` return; failed predicates remain routed to
+the observed downstream fallback boundary.
+
+The alternate classifier route at `0x7ee90–0x7efb0` is modeled by
+`recovered_state31_classifier_route_7ee90.c`. The literal-first global split at
+`0x504d70 > 4` selects the observed negative offsets `-0xc00`, `-0x1800`, or
+`-0x800`, or high-arm offsets `+0x1800`/`+0x2800` according to related and
+object states. The resulting `0x504d64 + offset` is linked to the shared
+ten-band classifier, then converges on table `0x72780`, callback `0x79050`,
+action `30`, control `3`, and continuation `0x64`.
+
+The shared convergence at `0x7efb0–0x7efec` is modeled by
+`recovered_state31_common_publication_7efb0.c`. It writes the selected
+`0x72780` result to `0x504d94`, calls `0x79050` with the related pointer, then
+publishes action `30`, control `3`, and selector `0x64` before returning.
+
+The classifier-1 status route at `0x7eff0–0x7f098` is modeled by
+`recovered_state31_classifier1_status_dispatch_7eff0.c`. Only classifier result
+`1` enters the literal `0x7f010` table; normalized status indices map to
+published values `1`, `4`, `5`, `6`, `2`, or `3`, while common entries preserve
+the original status. The common tail calls `0x79050` and converges at
+`0x7f08c`; other classifier results continue at `0x7f098`.
+
+The classifier-1 bypass at `0x7f098–0x7f0d0` is modeled by
+`recovered_state31_classifier1_bypass_7f098.c`. It requires object state `6`,
+related state `3`, and selector `0`, `2`, or `5`. An admitted path writes
+status `7`, calls `0x79d60` with the related pointer, then publishes action
+`30`, control `3`, and selector `0x64`; failed predicates continue at
+`0x7f0f8`.
+
+The initial admission prefix at `0x7f0f8–0x7f168` is modeled by
+`recovered_state31_zero_frame_admission_7f0f8.c`. It requires the saved frame
+comparison to be zero, excludes related state `7` paired with object state `5`,
+and admits selector values `3`, `6`, `1`, `4`, and `7`. Selectors `3` and `6`
+continue to `0x7f168`, the other admitted values to `0x7f1f8`, and failed
+gates to `0x7f32c`.
+
+The state/timing publication gate at `0x7f168–0x7f1f8` is modeled by
+`recovered_state31_timing_publication_gate_7f168.c`. Direct state pairs and the
+two signed/floating timing comparisons against `0x40690000` converge on a
+final related-state `6`/object-state `5` exclusion. Accepted paths publish
+status `7` and branch to `0x7f4ac`; rejected paths continue at `0x7f1f8`.
+
+The paired state-6 fast path at `0x7f1f8–0x7f210` is modeled by
+`recovered_state31_double_state6_fastpath_7f1f8.c`. Only object state `6`
+paired with related state `6` sets the classifier input to zero and jumps to
+the shared `0x7f31c` table lookup; all other pairs continue at `0x7f210`.
+
+The selector/state offset route at `0x7f210–0x7f31c` is modeled by
+`recovered_state31_selector_offset_route_7f210.c`. It derives a base offset of
+`0x1000`, `0x1800`, or `0x3000` from the object/related states, chooses its sign
+from the unsigned `selector - 3` comparison, and converges on the `0x72780`
+classifier table through `0x7f31c`.
+
+The classifier table tail at `0x7f31c–0x7f32c` is modeled by
+`recovered_state31_classifier_table_tail_7f31c.c`. It loads the result from
+`0x72780[g0*4]`, moves the related-object pointer into the next-call register,
+and transfers to `0x7ecb0` with both values preserved.
+
+The classifier-result-1 prefix at `0x7f32c–0x7f364` is modeled by
+`recovered_state31_classifier1_fast_publication_7f32c.c`. Result `1` writes
+selector `3`; an equal `r6`/zero comparison additionally writes control
+`0x64` and returns, while the non-equal arm continues at `0x7f364`. Other
+classifier results branch to `0x7f44c`.
+
+The converted-threshold/status dispatch at `0x7f364–0x7f448` is modeled by
+`recovered_state31_threshold_status_dispatch_7f364.c`. It stores `r8` to
+`0x504da0`, gates the status table on the converted `0x504df4` comparison,
+maps status-minus-8 indices through `0x7f3ac`, and converges at `0x7f428` for
+optional callback `0x79050` and action `30`.
+
+The repeated scan at `0x7f4d0` is now connected as a pure match-mask model.
+After the signed `0x509b28 > 0x1f3` guard, it visits 32 related-object slots
+with a `0x20` stride and tests each slot against both status bytes at
+`0x504e38` and `0x504e39`. Nonzero statuses use the inclusive five-count
+window; the two resulting masks preserve which slots can enter the later
+minimum-candidate and state-transition logic, which remains unresolved.
+
+The `0x7fca0` transition precondition is now modeled independently. The
+related `+0x172` halfword is normalized by the observed shift pair; the range
+arm accepts normalized values strictly above `0x10000` through `0xd0000`.
+Values outside that range can still enter through the exact fallback tuple:
+related `+0x64` equal to `0` or `6`, related `+0x172` equal to `1` or `14`,
+and related `+0x170` equal to `6`. The following `0x504dec` versus current
+timing decision is deliberately left outside this precondition seam.
+
+The compact route at `0x80710` is now connected to the existing signed-band
+classifier. Global state `0x504d70` selects the `-0x6800` current-halfword
+offset for values through `1`, the `+0x6800` offset for values `2..9`, and an
+early return above `9`. The resulting related-current difference feeds
+`0x73508`; the selected `0x72630` value and base state `10` are exposed in
+the plan, along with the strict current-below-threshold condition that calls
+`0x82800`. Live table values and that helper's side effects remain external.
+
+The paired `0x810d0`/`0x81120` route is now connected through its complete
+successful prefix. The outer gate requires signed `0x509b2c > 0x1f3` and a
+zero-extended related `+0x172` in `0x150000..0x190000`. The inner route uses
+mode bit 3 only when current timing is nonpositive, accepts object state 1 or
+5, and rejects related states 1, 5, 6, and 7. Its write plan publishes 7,
+30, 2, and `0x64` to `0x504d94`, `0x504db8`, `0x504d9c`, and `0x504da0`,
+with the existing `0x79d60` dispatcher call represented separately.
+
+The compact status tail at `0x8168c` is now modeled exactly. Global states 2
+and 7 publish status 18 unconditionally. All other states reduce
+`0x5024e8` modulo 240 and publish 18 for remainders through `0x77`, otherwise
+19. This tail is shared by the unresolved preceding offset/classifier arm.
+
+The `0x81e60` state dispatcher is now connected at its table boundary. It
+performs the startup call to `0x84d90` only for the exact global tuple
+`(0x5039f4, 0x503a00, 0x504e42) = (4, 10, 0)`. It then accepts only mode zero
+and object states `0..9`, routing them through the ten-entry table at
+`0x81eb4`; the ten handler bodies remain independent downstream units.
+
+The adjacent `0x82040` action dispatcher is now bounded with its exact
+state table. It rejects object states above 9 and routes states 0 through 9
+to `0x82088`, `0x820cc`, `0x82120`, `0x8218c`, `0x82248`, `0x82330`,
+`0x823cc`, `0x824b8`, `0x82534`, and `0x825c0`. The handler-local timing,
+random, and transition effects remain downstream.
+
+The `0x82800` handler dispatcher is now bounded with its exact ten-entry
+table. Selectors `0..9` route to `0x82840`, `0x82874`, `0x8288c`, `0x828a4`,
+`0x828bc`, `0x828d4`, `0x828f0`, `0x8293c`, `0x828e8`, and `0x82950`; values
+above 9 take the shared reject/return path. Handler-local effects remain
+separate downstream units.
+
+The `0x81f60` helper is now represented as a complete selector/update plan.
+Its state-6 fast path selects `2` or `3` when the floating-point value at
+`0x504d60` is negative; the nearby loaded `0x404e0000` is dead at this
+compare. The general path preserves the state-3, `0x504dc8`, and
+`0x504dcc` partitions, writes the paired `0x504d78/0x504d7c` cells, and
+clears `0x504d88` on the fallback arm.
+
+The `0x82ae0` scheduler prefix is now connected to that selector. It always
+runs `0x81f60`, then requires `0x503a14 <= g28+31`, `0x5039f4 == 4`, and
+`0x504dbc < 6`. Object states below 8 route to `0x82db0`; states 8 and above
+route to `0x81e60` only when `0x504d7c == 5`. All other cases continue into the
+unresolved scheduler/table path.
+
+The post-status `0x82b38` scheduler dispatch is now bounded. It requires
+`0x504d84 == 1`, rejects selectors above the unsigned `g28+12` bound, and
+indexes the exact 44-entry table at `0x82b58`. The table preserves the shared
+`0x82d68` reject target and its distinct `0x82c08..0x82d5c` handler targets.
+
+The selector-6 handler at `0x82c08` is now connected to the table model. It
+writes state `7` to `0x504d7c` when `0x504e1c` is zero; nonzero control values
+call the existing `0x81e60` dispatcher. Both arms rejoin the common scheduler
+tail.
+
+The selector-19 handler at `0x82c6c` is now modeled. Non-4 object states
+write status `2`; state 4 writes status `8` when signed `0x504dc0 <= 0x78000`.
+Above that boundary it writes status `3` and selects state `28` for
+`0x504e28 == 1`, otherwise state `5`.
+
+The constant scheduler targets at `0x82cc0` are now connected as one exact
+family: entries `0x82cc0`, `0x82cc8`, `0x82cd0`, `0x82cd8`, and `0x82ce0`
+write `0x504d98` values `3`, `1`, `13`, `14`, and `15`, respectively, before
+joining the common tail.
+
+The complementary state-4 handlers at `0x82ce8` and `0x82d04` are now
+captured. `0x82ce8` writes status `3` and state `28` for object state 4,
+otherwise status `2`; `0x82d04` writes status `2` for state 4 and status `3`
+otherwise.
+
+The `0x82db0` service dispatcher is now bounded with its nine-entry object
+state table. States `0..8` route to `0x82df8`, `0x82e0c`, `0x82e40`, `0x82e64`,
+`0x82ea0`, `0x82ed4`, `0x82f10`, `0x82f6c`, and `0x82f84`; states above 8 use
+the high-state route at `0x82f90`.
+
+The service handler at `0x82e40` is now bounded at its random/state gate:
+only remainder `4 mod 5` proceeds, selecting value `2` for object state 3
+and value `5` for every other state. Other remainders use the shared fallback.
+
+The service handler at `0x82ea0` is now bounded at its random/state gate.
+It requires object state 3, then maps remainder `4 mod 6` to value 3 and
+remainder `5 mod 6` to value 6; all other combinations fall through.
+
+The modulo-8 service variants are now bounded as well. `0x82ed4` accepts
+state 3 with remainder `< 3` for value 3, or any state with remainder 6 for
+value 4. `0x82f10` accepts state 3 with remainder 4 or 5 for value 3, and
+remainder 7 for value 6; all other cases use the shared fallback.
+
+The `0x82f6c` service leaf is now bounded as well: only remainder `4 mod 5`
+with object state 3 selects downstream value 2; every other combination falls
+through to the common dispatch.
+
+The `0x82f84` leaf is now represented as the shared-selector input boundary:
+its `remi 7` result is passed unchanged to `0x82fac`, including signed
+negative remainders.
+
+The high-state service path at `0x82f90` is now modeled through its shared
+dispatch boundary. It adds 3 only for negative random values, subtracts the
+adjusted value with its low two bits cleared, and dispatches unsigned results
+0..7 through the exact table at `0x82fbc` (this leaf's nonnegative inputs
+normalize to 0..3); negative and larger selectors use the reject path.
+
+The shared `0x82fac` service dispatcher is now explicit: unsigned selectors
+`0..7` route through the table at `0x82fbc`, while larger selectors take the
+reject path at `0x830a0`. This is the common downstream boundary for the
+service-handler remainder models.
+
+The shared target prefix at `0x82fdc` is now modeled. Selectors `0..3`
+publish `0x504d94 = 5/6/2/3`, call `0x79050`, and select `30`; selectors
+`4..6` publish statuses `1/2/3`, select `20`, and preserve caller `g14` for
+`0x504d94`; selector 7 publishes `7`, calls `0x79d60`, and selects `30`.
+The reject arm publishes status `1`, selector `10`, and caller `g14`.
+
+The shared postprocessing at `0x830c0` is now bounded. Current state 3 with
+status 9 is rewritten to status 12; afterward, related state 0 overrides the
+status to 1, selector to 10, and `0x504d94` to caller `g14`.
+
+The early gate at `0x83110` is now bounded independently. It writes caller
+`g14` to `0x504d98` and returns when signed `0x504dc0 <= 149` and related state
+is 19 or 20; the equality and threshold boundaries continue into the
+downstream timing/status path.
+
+The sibling gate at `0x83310` has the same inclusive signed threshold and
+related-state `19/20` predicate, and likewise writes caller `g14` to
+`0x504d98` before returning. Its nonmatching ratio/status path remains
+separate.
+
+The handler at `0x82d18` is now bounded: object state 8 publishes status `3`
+and selector `20`; every other state selects the shared status `8` path.
+
+The shared tail at `0x82d74` is now modeled as a quadword write plan. It
+clears the second word at `0x504d84` and writes `0x504d90 = 15` when the
+published status is unsigned `<= 6` or exactly `8`; statuses `7` and `9+`
+leave that cell unchanged.
+
+The `0x82650` status prefix is now captured independently. It terminates
+with status 8 for `(r5,r6)=(0,0)`. For `(0,1)`, it terminates with status 3
+when `0x504d70 <= 4` and status 4 otherwise. Every other pair continues into
+the state/descriptor path, whose packet and secondary-dispatch effects remain
+unresolved.
+
+The threshold helper at `0x79c10` is now bounded in the annotations. It
+converts the lower and upper threshold words at `0x504e04` and `0x504e06`,
+compares them with current timing at `0x504d60`, initializes selector state
+`1` and action `10`, and then routes through the existing action-10 or
+action-5 wrappers. Exact floating comparison polarity remains deliberately
+open pending an input-correlated trace.
+
+The sibling helper at `0x79cc0–0x79d1c` is now bounded as well. It converts
+the same lower/upper threshold words, compares current timing, and fans out
+to the action-5/action-10 wrappers; its state-based tail reaches `0x78488` or
+`0x78448`. The labels record the literal and call boundaries without claiming
+an interval polarity that has not yet been confirmed dynamically.
+
 ### Geometry Slot Pools: `0x0006fa40-0x0006fb80`
 
 The geometry setup immediately following the projection validators contains
@@ -4641,27 +5874,38 @@ parallel 32-entry pair at `0x6fb10` / `0x6fb50` has the same contract with a
 31 maximum. The acquire/release primitives are implemented in
 `recovered_geometry_slot_pool.c` and tested across every valid count and the
 full-pool boundary; the larger allocator that populates these tables remains
-separate.
+separate. The reset leaf at `0x6fad0` clears the 32-entry release pool and
+resets the parallel cursor at `0x51c910`; the five leaves are now separately
+labeled in the annotation script, preserving their distinct pool roles.
+The preceding `0x6f9e0` reset is the 64-entry counterpart: it clears
+`0x51c860`, clears the corresponding field in each 0x54-byte record at
+`0x51c5b0`, and zeroes `0x51c880`. Its compact C contract is covered by the
+same slot-pool test while retaining the strided record field as an explicit
+input array.
 
 The allocator at `0x0006fb90-0x0006fd4c` now has a bounded record-init model.
 An allocated slot selects an 84-byte destination record. Eleven template words
-are copied into the record's header and geometry fields; offsets `0x1c` through
-`0x2c` and `0x48` through `0x50` are cleared, while the association fields use
-`999` when the source association is empty and otherwise preserve its value
-alongside a `999` sentinel. The deterministic portion is implemented in
+are copied into the record's header and geometry fields; the source `+0x24`
+word is narrowed to the unaligned destination halfword at `+0x3e`. Offsets
+`0x1c` through `0x2c` and `0x48` through `0x50` are cleared, while the
+association fields use `999` when the source association is empty and
+otherwise preserve its value alongside a `999` sentinel. The deterministic
+portion is implemented in
 `recovered_geometry_record_init.c` and tested for both association branches.
 The subsequent free-list head/count mutation is deliberately not included
 until its linked-record semantics are correlated.
 
 The paired release routine at `0x0006fd50-0x0006fe6c` now has an explicit
-association-repair plan. It releases a 32-pool entry, then processes the
+association-repair plan. It first returns the source slot through the
+32-entry release leaf at `0x6fb58`, then processes the
 source record's `0x14` and `0x18` links symmetrically: a non-`999` link updates
 the referenced record's opposite field (`0x18` or `0x14`), while a `999` link
 updates the corresponding side table at `0x51c5c8` or `0x51c5c4`. The source
 reference count is decremented with 32-bit wraparound. The plan is implemented
-in `recovered_geometry_link_release.c` and tested across sentinel, ordinary,
-and wrapped-count cases; actual mapped-memory writes remain outside the pure
-plan.
+in `recovered_geometry_link_release.c`; its `recovered_geometry_link_release_apply`
+wrapper preserves the pool-release-before-repair ordering and is tested across
+sentinel, ordinary, and wrapped-count cases. Actual mapped-memory writes remain
+outside the pure plan.
 
 The shared return tail at `0x000795c4-0x00079630` is now isolated. It only
 acts when the object halfword at `+0x172` is `31`, the current object's state
@@ -4972,12 +6216,48 @@ uses tiles `5,7`, bank B uses `1,3`, and both paths converge through the
 `e35a0` tail. The preceding `g5-0x200`/`29` comparison selects the separate
 `0x21f` family above this range and is not folded into the pure payload.
 
-The untriaged `0x000786d0` action arm is now reduced to a pure timing split:
-after the normalized-difference guard, `current >= threshold` routes to the
-action-5 helper and the remaining comparable case routes to action 10; an
-unordered/NaN-like normalized result is rejected. The preceding `0x784c8`
-state update and the action-helper mapped writes remain outside this adapter
-and are recorded as integration work.
+The `0x000786d0` action arm is now represented as a composed plan: it first
+applies the shared `0x784c8` status predicate using object state and mode
+bits, then performs the pure timing split. After the normalized-difference
+guard, `current >= threshold` routes to the action-5 helper and the remaining
+comparable case routes to action 10; an unordered/NaN-like normalized result
+is rejected. The action-helper mapped writes remain outside this adapter and
+are recorded as integration work.
+
+Its sibling at `0x78740–0x78780` is modeled separately in
+`recovered_timing_status_variant_78740.c`. It uses the same absolute
+normalized-difference validity guard, but the comparable split is inverted:
+strictly greater current timing calls the action-10 wrapper, while current
+less than or equal to the converted `0x504dd8` value writes status `1`
+directly. The model also carries the preceding `object +0x64` selector and
+mode-bit decision through the shared `0x784c8` status dispatcher. This arm has
+no action-5 call; unordered values reject both paths.
+
+The state-8 target at `0x78790–0x78808` is modeled by
+`recovered_state8_action_route_78790.c`. For valid timing, current at or
+below the converted `0x504dd6` threshold selects the ordinary action-10
+wrapper. Above threshold selects action 5 when `0x504e28 != 1`; when that
+control is `1`, the related band from `0x504d68` selects the `0x72990` or
+`0x729f0` action-10 table variant (`<=4` versus `>4`). Invalid normalized
+timing writes status `1` and makes no action selection. This is the special
+state-8 body entered by `0x78640`; table payload writes remain delegated.
+
+The neighboring state geometry packet at `0x78890–0x78a28` is modeled by
+`recovered_state_geometry_packet_78890.c`. It preserves the selected
+`0x729c0` value and action-5 default, emits command `29` and command `30`
+with the wrapped object `+0x184` coordinate and shared scale word, derives
+the command-10 pair from the two FIFO responses and object/related offsets,
+then emits the six-word `31+31` tail. The mode-bit-5 plus control-1 tail
+override writes status `1`, transition `6`, and action `20`. The divisor/FPU
+scale, FIFO response values, and final command-31 response are explicit
+integration inputs or external effects.
+
+The following sibling at `0x78a30–0x78bc8` shares the packet implementation
+and control-1 override. Its only recovered packet-shaping differences are
+the selector source table `0x72a20` and the wrapped object `+0x184 - 0x5000`
+coordinate bias. The test exercises this opposite-bias entry through the
+same C packet plan, while selector-table contents and FIFO effects remain
+external inputs.
 
 The `0x000784c8` helper is now represented at its selector-dispatch boundary:
 unsigned selectors `0..9` target the ten handlers at `0x78508` through
@@ -5130,6 +6410,10 @@ return the raw float constant `0x47c34f80` (`99999.0`) without touching the
 FIFO. The callback-backed reconstruction and packet/edge vectors are in
 `von/i960/recovered_geometry_coordinate.c` and
 `von/tools/test_recovered_geometry_coordinate.py`.
+This establishes the common coordinate-producer prefix shared with
+`0x6f600` and `0x6f6f0`: all three use the same 0..1023 truncation and
+512x512 half-coordinate `0x41` lookup, then diverge in record outputs and
+the amount of post-read state handling they perform.
 
 ### Fixed-Record Occupancy Scan: `0x000bf0c0`
 
@@ -5296,13 +6580,18 @@ mode  0  1  2       3       4       5  6       7  8  9       10 11 12 13 14 15
 entry eb40 eb40 e8f0  e6f0  e7f0  eb40 ea40  eb40 eb40 ea40  eb40 eb40 eb40 eb40 eb40 eb40
 ```
 
-The companion setup leaf at `0x6f900` is now statically audited by
+The companion setup leaves at `0x6f900` and `0x6f970` are now statically
+audited by
 `von/tools/test_geometry_projection_mode_setup.py`. It scales the selected
 mode by three words, reads the six-word record at `0x6eb60`, and publishes
 the record's first/second/fourth/sixth fields through `0x51bb24`,
 `0x51bb28`, `0x51bb20`, and the geometry FIFO. The oracle checks this store
 contract and all 16 first-word targets above, including the five nontrivial
 validator targets (`0x6e6f0`, `0x6e7f0`, `0x6e8f0`, `0x6e940`, `0x6ea40`).
+The shared field flow is modeled in
+`recovered_geometry_profile_table_loader.c`: the two entries select the same
+24-byte record shape and differ only in their local `bx` return stubs at
+`0x6f964` and `0x6f9d4`.
 The selected byte-map values and their runtime mode changes remain open.
 
 The mask globals are likewise runtime-built, not fixed ROM constants. The
@@ -5446,8 +6735,12 @@ control FIFO at `0x00804000`:
 ```
 
 The first `0x80` is produced by setting bit 7 in a zero word. A nearby load of
-`0x01f40204` is dead in this routine; it is not part of the observed write
-sequence. This preserves the host-side command contract, while the meaning of
+`0x01f40204` supplies the upper word of the `stl` at `0x00804000`, so it is
+written at `0x00804004` before the remaining word stores. The exact callback-
+backed C contract is in
+`von/i960/recovered_geometry_control_selector_6fec0.c`, with the selector gate
+and all seven address/value writes checked by
+`von/tools/test_recovered_geometry_control_selector_6fec0.py`. The meaning of
 the geometry-board words remains hardware-specific.
 
 ### Geometry Result Builder: `0x0009e050`
@@ -5898,6 +7191,12 @@ wrappers at `0x77f2c–0x7807c`. The exact selector-to-target map is captured in
 `recovered_action_dispatch.c` and exhaustively tested, while the semantics of
 the individual action bodies remain separate.
 
+The adjacent scanner at `0x77c40–0x77dd0` now has a structural C plan in
+`recovered_record_flag_scan_77c40.c`. It fixes the object `+0x200` base,
+`0x20` record stride, 32-record/two-pass traversal, output byte `0x504e50`,
+threshold 20, and the literal counter/output-bit positions. The unresolved
+register-derived comparison is deliberately left outside that plan.
+
 ### Transition Action Wrapper: `0x000783c8`
 
 The four-edge wrapper at `0x783c8` preserves its return address, indexes the
@@ -5910,7 +7209,9 @@ separate slices.
 ### Timing-Sample Extrema Wrapper: `0x00018ab0`
 
 The four-edge wrapper at `0x18ab0` calls the hardware polling leaf `0x28de8`
-and always records its returned poll count at `0x504c80`. When the profile word
+and always records its returned poll count at `0x504c80`. It then always
+continues through the dispatcher entry at `0x2d60`, whose zero/nonzero flag
+arms lead to the recovered `0x2d88` thunk or the `0x2da0` sampler body. When the profile word
 at `0x5039f4` equals 4, it also updates the low-water mark at `0x1d00210`
 when the sample is smaller and the high-water mark at `0x1d0020c` when it is
 larger. Other profiles leave both extrema unchanged. The deterministic update
@@ -5978,6 +7279,22 @@ in `recovered_geometry_allocator_commit.c` is tested across ordinary and
 32-bit wraparound inputs; pointer-linked memory traversal remains outside the
 model.
 
+The compact match-result counter helper at `0x00073498` loads the pair at
+`0x504db0`, increments its second word, and retains that value while it is
+`<= limit`. On overflow it stores `0xffffffff` as the second word and clears
+`0x504d9c`; it also clears `0x504da4` only when `0x504d98` is nonzero and
+`0x504dc0 <= 99`. The pure transition and both
+side-effect flags are modeled in
+`von/i960/recovered_match_result_counter_73498.c` and tested by
+`von/tools/test_recovered_match_result_counter_73498.py`.
+
+The immediate state dispatcher at `0x735d0` first sends any nonzero
+`0x504e42` state to `0x853c8`. Otherwise it selects the 34-entry table rooted
+at `0x73618` when `0x504d94 <= 33`, and uses `0x74848` for larger indices.
+The complete target vector is preserved in
+`von/i960/recovered_match_result_state_dispatch_735d0.c` and checked by
+`von/tools/test_recovered_match_result_state_dispatch_735d0.py`.
+
 ### Geometry Command Packet: `0x0006ff20-0x0006fff8`
 
 The first command builder after the selector pulse is now represented as a
@@ -5988,6 +7305,25 @@ values. Arithmetic is unsigned 32-bit modulo behavior matching the i960
 register operations. The plan is implemented in
 `recovered_geometry_command_packet.c` and tested with wraparound vectors; the
 geometry device's interpretation of the packet remains a separate boundary.
+
+### Geometry FIFO Float Prologue: `0x00093240-0x000933ac`
+
+The float-prologue site at `0x93240` derives only a leg selector from
+`(g3 + 0xbfff) & 0xffff`; its arithmetic input is the persistent float at
+`0x562530`. The low leg subtracts the extended-real `0.2` and uses `+30.0f`
+if the result is below `-30.0`; the high leg adds `0.2` and uses `-30.0f` if
+the result exceeds `+30.0`. The selected float is stored back to `0x562530`
+and added to `g0` with the i960 real add before packet word 2 is emitted.
+
+The exact packet is `(5, 18, g0 + cell, g1, g2, 21, g3 & 0xffff, 19,
+0x3e4ccccd, 0x3e4ccccd, 0x3e4ccccd, 6)`. The `[0x5024e8]` value is not a
+packet word; it supplies the unsigned modulo-30 tail argument for `0x8e310`.
+This stateful distinction is modeled in
+`von/i960/recovered_geometry_fifo_prologue_93240.c` and checked by
+`von/tools/test_recovered_geometry_fifo_prologue_93240.py`.
+The file’s `fifo_prologue_run` entry also composes the selector, mailbox
+update, packet construction, and modulo-30 tail-argument flow in the same
+order as the assembly.
 
 The first three responses from the shared `0x38` request are copied verbatim
 into both paired result records: response words land at offsets `0`, `4`, and
@@ -6061,13 +7397,69 @@ constant words `0x41700000) or `0x44bb8000). Each read returns an initial
 
 The listing shows those returned words immediately feeding later masked
 coordinates and a floating-point cross-product/sign-selection sequence
-(`0x763a4-0x76498)); the captured FIFO data alone does not determine the
-response function or the object-relative inputs. Therefore this boundary is
-documented as captured evidence, not promoted to a pure model.
+(`0x763a4-0x76498`). The signed-halfword argument prefix is now labeled
+`geometry_fifo_argument_prefix` at `0x76240` and modeled in
+`recovered_geometry_fifo_argument_plan_76240.c`, including the exact
+16-bit-wrapped `+0x6000`, `-0x6000`, and center words. The captured FIFO
+responses, object-relative secondary operands, and the later transform remain
+hardware-boundary evidence rather than being guessed into that arithmetic
+model; the response/transform boundary is labeled at `0x76340`.
 
-The next minimal capture must log `g0), the object words at
-`g0+0x14`, `g0+0x1c), and `g0+0x184), plus each FIFO read/write
-`(PC,direction,data)) for the same range. That correlates request operands
+The following object-pair routine at `0x76590` is now modeled by
+`recovered_geometry_object_band_pair_76590.c`. Its deterministic prefix forms
+reversed request operands from object offsets `+0x08` and `+0x10`, then
+subtracts supplied command-10 responses from the current/related signed
+`+0x184` coordinates. The stored low-halfword deltas and calls into the
+ten-band `0x73508` classifier are preserved exactly; FIFO response
+production and the later `0x761b0` query remain external. Labels at
+`0x76624` and `0x76678` mark the left/right band publication sites.
+
+The integer tail at `0x76808–0x76850` is modeled by
+`recovered_geometry_projection_threshold_reclamp_76808.c`. Given the already
+quantized projection value, it preserves the `r4 <= 20` split, the
+`0x50 + r4` offset, the signed `300` clamp, and the nonpositive-to-`1`
+fallback before publishing `0x504dc0`. The preceding floating-point
+derivation and following object-state gates remain outside this bounded
+arithmetic model; `0x76848` is labeled as its publication point.
+
+The mode-dependent continuation at `0x76858–0x768f0` is modeled by
+`recovered_geometry_projection_mode_threshold_gates_76858.c`. It preserves
+the masked `+0x1d0/+0x1d8` comparison, the `0x503a14/0x503a18` span gate,
+the threshold-`101` raise, and the final low-`r4` raises to `90` and `100`.
+The C contract is register-oriented because the semantic identity of these
+fields and the surrounding mode state is not yet proven.
+
+The related-object bias at `0x768f4–0x76930` is modeled by
+`recovered_geometry_related_threshold_bias_768f4.c`: related states
+`0/3/4/6` or stage ordinal `2` add `10` to `0x504dc0`, with 32-bit wrapping.
+The following `0x76934` path is labeled as the paired call into `0x778b0`,
+which publishes the two profile-result pairs; that helper's object semantics
+remain outside this bounded threshold contract.
+
+The fixed packet sites at `0x92830` and `0x934b0` are now connected as one
+template family. Both emit the exact twelve-word sequence
+`(5,18,g0,g1,g2,21,g3&0xffff,19,0.2f,0.2f,0.2f,6)` to `0x884000`, then
+tail-call `0x8e310`. The packet core is shared by
+`recovered_geometry_fifo_packet_934b0.c`; the `0x92830` wrapper supplies its
+distinct tail-call base/offset and reload address (`0x02b4a4bc`, `0x98750`,
+`0x562494`), while `0x934b0` uses (`0x02b68d3a`, `0x79e2a`, `0x562490`).
+The six observed `0x92830` callers and the twelve observed `0x934b0` callers
+therefore share packet semantics but retain site-specific tail arguments.
+The stateful `0x92730`/`0x933b0` pair remains separate because it adds `g14`
+payload words, the `0x5624f0` toggle, and a different tail call.
+
+The adjacent `0x93560` sequencer is now separately annotated and modeled.
+Its first eleven FIFO words match the fixed packet family, but the final
+selector `6` is emitted only after the C8/CC state machine has selected and
+submitted one `0x8e310` tail call. A zero `0x5624cc` first advances `0xf5058`
+and stores its low two bits in `0x5624c8`; C8 values 1/2 use modulo-120 bases,
+while the other values use the modulo-168 59/23/59 mapping. The C model and
+boundary vectors are in `recovered_geometry_fifo_sequencer_93560.c` and
+`von/tools/test_recovered_geometry_fifo_sequencer_93560.py`.
+
+The next minimal capture must log `g0`, the object words at
+`g0+0x14`, `g0+0x1c`, and `g0+0x184`, plus each FIFO read/write
+`(PC,direction,data)` for the same range. That correlates request operands
 and returned words without broad instruction tracing and is required before
 modeling the transform.
 
@@ -6295,16 +7687,16 @@ The clear/reset stores are now promoted as
 `recovered_stage_record_reset_86810.c`; only the gate at `0x86810` and the
 caller-dependent continuation remain outside that contract.
 
-The post-setup tail at `0x76030–0x761a8` is now modeled by
-`recovered_stage_profile_setup_76030.c`. It publishes the fixed completion
+The post-setup tail at `0x76030–0x761a8` is modeled by
+`recovered_stage_postcall_76030.c`. It publishes the fixed completion
 and latch stores, reads a packed 14-byte record from the related object's
 state-selected row in `0x72370`, and—when `0x5039f4 != 4`—selects a second
 `0x72370` row using one of the global selectors `0x503a98`/`0x503a9c`,
 chosen by the current object's `+0x68` flag.
 The second load overwrites the first result in `0x504e34/0x504e3c/0x504e40`,
-as the listing does; the packed field meanings and table ownership remain
-unresolved. The pure byte-packed contract is tested by
-`von/tools/test_recovered_stage_profile_setup_76030.py`.
+as the listing does; the packed field meanings and selector provenance remain
+unresolved. The contract is tested by
+`von/tools/test_recovered_stage_postcall_76030.py`.
 
 The next routine, `0x761b0`, is now labeled `geometry_object_threshold_query`.
 Its bounded prefix consumes the selector clamp published by `0x75d90`
@@ -6358,8 +7750,8 @@ behind `word[0x64(g0)]` stays open. Modeled in
 `von/i960/recovered_stage_row_copy_75fe4.c` with the eight-row
 table, tested by
 `von/tools/test_recovered_stage_row_copy_75fe4.py`. The nested call and
-packed profile publication after `0x76030` are modeled separately in
-`recovered_stage_profile_setup_76030.c`; the profile record's natural field
+packed profile publication after `0x76030` are modeled in the tracked
+`recovered_stage_postcall_76030.c`; the profile record's natural field
 meanings remain open.
 
 Replay-methodology notes: a write tap installed once from `setup()`

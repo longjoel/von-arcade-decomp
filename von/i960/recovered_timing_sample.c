@@ -24,3 +24,18 @@ void recovered_timing_sample_update(struct recovered_timing_sample_state *state,
     if (sample > state->high)
         state->high = sample;
 }
+
+/*
+ * The ROM's 0x18ab0 wrapper always enters 0x2d60 after the state update.
+ * Keep that helper's body outside this slice while making the caller edge
+ * explicit and injectable for host-side tests.
+ */
+void recovered_timing_sample_update_and_post_service(
+    struct recovered_timing_sample_state *state,
+    uint32_t sample,
+    uint32_t profile,
+    void (*post_service)(void))
+{
+    recovered_timing_sample_update(state, sample, profile);
+    post_service();
+}

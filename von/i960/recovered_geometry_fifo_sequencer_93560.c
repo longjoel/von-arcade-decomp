@@ -33,7 +33,8 @@ typedef unsigned int u32;
 #define SEQ_A1_CONST 0x02be2b64U
 #define SEQ_A1_OFF 0x8ab40U
 
-void fifo_seq_packet_build(u32 g0, u32 g1, u32 g2, u32 g3, u32 *words)
+void fifo_seq_packet_prefix_build(u32 g0, u32 g1, u32 g2, u32 g3,
+                                  u32 *words)
 {
     words[0] = 5U;
     words[1] = 18U;
@@ -46,7 +47,19 @@ void fifo_seq_packet_build(u32 g0, u32 g1, u32 g2, u32 g3, u32 *words)
     words[8] = SEQ_FILL_CONST;
     words[9] = SEQ_FILL_CONST;
     words[10] = SEQ_FILL_CONST;
+}
+
+/* The final selector 6 is emitted after the sequencer's 0x8e310 tail call. */
+void fifo_seq_packet_complete(u32 *words)
+{
     words[11] = 6U;
+}
+
+/* Convenience view of the complete twelve-word packet for static consumers. */
+void fifo_seq_packet_build(u32 g0, u32 g1, u32 g2, u32 g3, u32 *words)
+{
+    fifo_seq_packet_prefix_build(g0, g1, g2, g3, words);
+    fifo_seq_packet_complete(words);
 }
 
 typedef struct {

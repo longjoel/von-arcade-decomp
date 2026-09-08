@@ -10,9 +10,26 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "von/i960/recovered_texture.c"
+LISTING = ROOT / "von/build/disasm/vonj-maincpu.lst"
 
 
 def main() -> int:
+    listing = LISTING.read_text(encoding="utf-8")
+    for address, fragment in (
+        ("28168", "call\t0x27e50"),
+        ("2816c", "cmpibne\t0,g0,0x281c4"),
+        ("281bc", "call\t0x27e50"),
+        ("281c0", "cmpibe\t0,g0,0x281dc"),
+        ("281c8", "st\tg14,0x503a00"),
+        ("281d0", "st\tg3,0x5039f4"),
+    ):
+        line = next((line for line in listing.splitlines()
+                     if f"{address}:" in line), "")
+        if fragment not in line:
+            raise SystemExit(
+                f"texture loader instruction {address} missing {fragment}"
+            )
+
     with tempfile.TemporaryDirectory(prefix="von-texture-loader-result-") as directory:
         directory = Path(directory)
         stubs = directory / "stubs.c"

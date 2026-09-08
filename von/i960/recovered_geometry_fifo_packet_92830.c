@@ -9,7 +9,7 @@
  * Decoded from von/build/disasm/vonj-maincpu.lst.
  */
 
-#include "von/i960/recovered_geometry_fifo_packet_934b0.c"
+#include "recovered_geometry_fifo_packet_934b0.c"
 
 #define SITE92830_BASE 0x02b4a4bcU
 #define SITE92830_OFF 0x98750U

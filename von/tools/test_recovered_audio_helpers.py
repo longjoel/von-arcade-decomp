@@ -51,6 +51,11 @@ def main() -> int:
                                  ctypes.POINTER(ctypes.c_uint32),
                                  ctypes.POINTER(ctypes.c_uint32)]
             function.restype = ctypes.c_uint32
+        recovered.recovered_audio_device_pending_store_plan.argtypes = [
+            ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32,
+            ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(ctypes.c_uint16),
+            ctypes.POINTER(ctypes.c_uint32)]
+        recovered.recovered_audio_device_pending_store_plan.restype = ctypes.c_uint32
         recovered.recovered_audio_device_copy_plan.argtypes = [
             ctypes.c_uint32, ctypes.POINTER(ctypes.c_uint32),
             ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(ctypes.c_uint32),
@@ -63,6 +68,14 @@ def main() -> int:
         recovered.recovered_audio_device_record_index.argtypes = [
             ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32]
         recovered.recovered_audio_device_record_index.restype = ctypes.c_uint32
+        recovered.recovered_audio_device_record_lookup.argtypes = [
+            ctypes.POINTER(ctypes.c_uint16), ctypes.c_uint32,
+            ctypes.c_uint32, ctypes.c_uint32]
+        recovered.recovered_audio_device_record_lookup.restype = ctypes.c_uint16
+        recovered.recovered_audio_device_status_plan.argtypes = [
+            ctypes.c_int32, ctypes.POINTER(ctypes.c_uint16),
+            ctypes.POINTER(ctypes.c_uint16)]
+        recovered.recovered_audio_device_status_plan.restype = ctypes.c_uint32
         recovered.recovered_audio_device_buffer_copy.argtypes = [
             ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(ctypes.c_uint32)]
         recovered.recovered_audio_device_buffer_copy.restype = None
@@ -123,6 +136,26 @@ def main() -> int:
                 raise SystemExit("audio device clear plan ended early")
             if (address.value, value.value) != (0x0051a0c0 + index * 8, 0):
                 raise SystemExit(f"audio device clear mismatch index={index}")
+        destination = ctypes.c_uint32()
+        pending_value = ctypes.c_uint16()
+        clear_address = ctypes.c_uint32()
+        pending_vectors = 0
+        for index, pointer, pending_value_input in (
+                (0, 0x0180203e, 0x12345678),
+                (17, 0x01d00022, 0xffff), (51, 0x01800000, 0x10001)):
+            actual = recovered.recovered_audio_device_pending_store_plan(
+                index, pointer, pending_value_input, ctypes.byref(destination),
+                ctypes.byref(pending_value), ctypes.byref(clear_address))
+            expected = (pointer, pending_value_input & 0xffff,
+                        0x0051a0c0 + index * 8)
+            if actual != 1 or (destination.value, pending_value.value,
+                               clear_address.value) != expected:
+                raise SystemExit(f"audio pending store mismatch index={index}")
+            pending_vectors += 1
+        if recovered.recovered_audio_device_pending_store_plan(
+                0, 0, 1, ctypes.byref(destination), ctypes.byref(pending_value),
+                ctypes.byref(clear_address)) != 0:
+            raise SystemExit("empty audio pending slot was committed")
         for index in range(24):
             if recovered.recovered_audio_service_table_reset_plan(
                     index, ctypes.byref(address), ctypes.byref(value)) != 1:
@@ -151,6 +184,42 @@ def main() -> int:
                     raise SystemExit("audio record index mismatch")
                 index_vectors += 1
 
+        record_table = (ctypes.c_uint16 * 0x10000)(
+            *((index * 0x31 + 0x17) & 0xffff for index in range(0x10000))
+        )
+        lookup_vectors = 0
+        for selector, exponent, mask in (
+                (0x0003, 0, 0xffff), (0x0123, 1, 0xff),
+                (0x4567, 7, 0x7fff), (0xffff, 15, 0xffff)):
+            index = (selector << exponent) & mask
+            actual = recovered.recovered_audio_device_record_lookup(
+                record_table, selector, exponent, mask)
+            expected = (index * 0x31 + 0x17) & 0xffff
+            if actual != expected:
+                raise SystemExit("audio record lookup mismatch")
+            lookup_vectors += 1
+
+        status_table = (ctypes.c_uint16 * 0x400)(
+            *((index * 0x53 + 0x21) & 0xffff for index in range(0x400))
+        )
+        status_vectors = 0
+        for status in (-0x400, -1, 0, 1, 0x17, 0x3ff):
+            value = ctypes.c_uint16()
+            actual = recovered.recovered_audio_device_status_plan(
+                status, status_table, ctypes.byref(value))
+            expected_valid = status != 0
+            if actual != expected_valid:
+                raise SystemExit("audio device status write presence mismatch")
+            if status < 0:
+                expected = 0x7fff
+            elif status > 0:
+                expected = (status * 0x53 + 0x21) & 0xffff
+            else:
+                expected = 0
+            if value.value != expected:
+                raise SystemExit("audio device status value mismatch")
+            status_vectors += 1
+
         words_per_row = 128
         source_buffer = (ctypes.c_uint32 * (96 * words_per_row))()
         destination_buffer = (ctypes.c_uint32 * (96 * words_per_row))()
@@ -170,8 +239,11 @@ def main() -> int:
     print(
         f"PASS: {clamp_vectors:,} clamp, {frame_vectors:,} frame, "
         f"and {len(expected_status)} SCSP initialization vectors, "
-        f"2 device-copy, 52 device-clear, 24 service-reset, and "
-        f"{index_vectors:,} device-index vectors, and 6,144 buffer-copy vectors"
+        f"2 device-copy, 52 device-clear, {pending_vectors} pending-store, "
+        f"24 service-reset, and "
+        f"{index_vectors:,} device-index, {lookup_vectors} record-lookup, and "
+        f"{status_vectors} status-plan vectors, "
+        f"and 6,144 buffer-copy vectors"
     )
     return 0
 

@@ -40,12 +40,12 @@ def main() -> int:
         plan.restype = ctypes.c_ulong
 
         expected = {
-            0: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
-            1: (1, 4, 5, 6, 7, 8, 10, 11),
-            0xFFFFFFFF: (1, 4, 5, 6, 7, 8, 10, 11),
+            0: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
+            1: (1, 4, 5, 6, 7, 8, 11, 12),
+            0xFFFFFFFF: (1, 4, 5, 6, 7, 8, 11, 12),
         }
         for mode, wanted in expected.items():
-            steps = (ctypes.c_ulong * 11)()
+            steps = (ctypes.c_ulong * 12)()
             count = plan(mode, steps)
             if tuple(steps[:count]) != wanted:
                 raise SystemExit(

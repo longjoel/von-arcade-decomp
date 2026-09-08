@@ -11,6 +11,11 @@ enum recovered_timing_variant_route {
     RECOVERED_TIMING_VARIANT_ACTION_10 = 2,
 };
 
+struct recovered_timing_variant_plan {
+    enum recovered_timing_variant_route route;
+    uint32_t status_write;
+};
+
 static float recovered_timing_variant_float(u32 bits)
 {
     union {
@@ -34,4 +39,37 @@ enum recovered_timing_variant_route recovered_timing_variant_route(u32 current_b
         return RECOVERED_TIMING_VARIANT_REJECT;
     return current >= threshold ? RECOVERED_TIMING_VARIANT_ACTION_5
                                  : RECOVERED_TIMING_VARIANT_ACTION_10;
+}
+
+static u32 recovered_timing_variant_status_write(u32 selector, u32 mode_bits)
+{
+    switch (selector) {
+    case 0U:
+    case 6U:
+        return (mode_bits & 0x2U) != 0U;
+    case 1U:
+    case 3U:
+        return (mode_bits & 0x4U) != 0U;
+    case 2U:
+    case 4U:
+    case 5U:
+    case 7U:
+    case 8U:
+    case 9U:
+        return (mode_bits & 0x6U) != 0U;
+    default:
+        return 0U;
+    }
+}
+
+/* 0x786d0 first runs 0x784c8 with object state as the selector. */
+struct recovered_timing_variant_plan
+recovered_timing_variant_plan(u32 current_bits, u32 threshold_bits,
+                              u32 object_state, u32 mode_bits)
+{
+    struct recovered_timing_variant_plan plan;
+    plan.route = recovered_timing_variant_route(current_bits, threshold_bits);
+    plan.status_write = recovered_timing_variant_status_write(object_state,
+                                                               mode_bits);
+    return plan;
 }

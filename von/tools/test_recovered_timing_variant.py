@@ -38,6 +38,21 @@ def main() -> int:
         if route(float_bits(float("nan")), float_bits(5.0)) != 0:
             raise SystemExit("NaN timing rejection mismatch")
 
+        class Plan(ctypes.Structure):
+            _fields_ = [("route", ctypes.c_int),
+                        ("status_write", ctypes.c_uint32)]
+
+        plan = recovered.recovered_timing_variant_plan
+        plan.argtypes = [ctypes.c_uint32, ctypes.c_uint32,
+                         ctypes.c_uint32, ctypes.c_uint32]
+        plan.restype = Plan
+        composed = plan(float_bits(4.0), float_bits(5.0), 3, 0x4)
+        if (composed.route, composed.status_write) != (2, 1):
+            raise SystemExit("composed timing/status plan mismatch")
+        composed = plan(float_bits(5.0), float_bits(5.0), 0, 0x4)
+        if (composed.route, composed.status_write) != (1, 0):
+            raise SystemExit("selector-0 mode-bit composition mismatch")
+
     print("PASS: 0x786d0 normalized timing split and NaN guard")
     return 0
 

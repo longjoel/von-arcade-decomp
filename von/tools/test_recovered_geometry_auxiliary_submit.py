@@ -10,9 +10,24 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "von/i960/recovered_geometry_commands.c"
+LISTING = ROOT / "von/build/disasm/vonj-maincpu.lst"
 
 
 def main() -> int:
+    listing = LISTING.read_text(encoding="utf-8")
+    for address, fragment in (
+        ("28d38", "cmpibne\t4,g4,0x28d64"),
+        ("28d48", "cmpibne\tg4,g3,0x28d64"),
+        ("28d5c", "bal\t0x28e88"),
+        ("28d74", "bal\t0x28e88"),
+    ):
+        line = next((line for line in listing.splitlines()
+                     if f"{address}:" in line), "")
+        if fragment not in line:
+            raise SystemExit(
+                f"auxiliary selector instruction {address} missing {fragment}"
+            )
+
     with tempfile.TemporaryDirectory(prefix="von-geometry-auxiliary-") as directory:
         directory = Path(directory)
         stubs = directory / "stubs.c"

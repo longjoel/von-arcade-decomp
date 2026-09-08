@@ -43,4 +43,24 @@ with tempfile.TemporaryDirectory() as directory:
             assert updates[1].value == link14
             assert new_count.value == 0xffffffff
 
+    apply = lib.recovered_geometry_link_release_apply
+    apply.restype = None
+    apply.argtypes = [ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32,
+                      ctypes.c_uint32, ctypes.POINTER(ctypes.c_uint32),
+                      ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(Update),
+                      ctypes.POINTER(ctypes.c_uint32)]
+    pool = (ctypes.c_uint32 * 32)(*[0xdead0000 + index for index in range(32)])
+    pool_count = ctypes.c_uint32(7)
+    updates = (Update * 2)()
+    new_count = ctypes.c_uint32()
+    apply(5, 12, 999, 0x33, pool, ctypes.byref(pool_count), updates,
+          ctypes.byref(new_count))
+    assert pool_count.value == 6
+    assert pool[6] == 5
+    assert updates[0].target_kind == 1 and updates[0].target_slot == 12
+    assert updates[0].target_offset == 0x18 and updates[0].value == 999
+    assert updates[1].target_kind == 0 and updates[1].target_slot == 5
+    assert updates[1].target_offset == 0x5c4 and updates[1].value == 12
+    assert new_count.value == 0x32
+
 print("recovered geometry link-release vectors: ok")

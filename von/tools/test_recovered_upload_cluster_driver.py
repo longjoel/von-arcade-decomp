@@ -38,6 +38,7 @@ def pattern(index):
 
 
 I960 = pathlib.Path(__file__).parents[1] / "i960"
+LISTING = pathlib.Path(__file__).parents[1] / "build/disasm/vonj-maincpu.lst"
 
 with tempfile.TemporaryDirectory() as td:
     so = pathlib.Path(td) / "upload-cluster.so"
@@ -114,5 +115,16 @@ with tempfile.TemporaryDirectory() as td:
             assert dsts[0][idx01] == oracle_fade(pattern(idx01), 0x80)
             assert dsts[1][idx01] == oracle_mul(pattern(idx01), 0x80)
             assert dsts[2][idx2] == oracle_fade(pattern(idx2), 0x80)
+
+    listing = LISTING.read_text(encoding="utf-8")
+    blend = listing[listing.index("   29dc0:"):listing.index("   29f60:")]
+    direct = listing[listing.index("   29f60:"):listing.index("   2a0bc:")]
+    for block, targets in (
+            (blend, ("0x29e20", "29e68:", "0x29e9c", "29ee0:",
+                     "0x29f18", "0x29ddc")),
+            (direct, ("0x2a00c", "29f80:", "0x2a018", "0x29f7c"))):
+        for target in targets:
+            if target not in block:
+                raise AssertionError(f"upload kernel listing missing {target}")
 
 print("PASS: upload-cluster driver runs (guard, direct, fade, blend)")

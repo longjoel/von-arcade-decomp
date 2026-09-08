@@ -12,7 +12,7 @@ struct recovered_ratio_duel_plan {
     u32 win_callee;
 };
 
-void recovered_ratio_duel_plan(int halfwords[4], u32 flag, u32 win_mode,
+void recovered_ratio_duel_plan(const int16_t halfwords[4], u32 flag, u32 win_mode,
                                u32 win_callee,
                                struct recovered_ratio_duel_plan *plan)
 {

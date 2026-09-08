@@ -114,6 +114,13 @@ The same trace confirms a second semantic cluster:
 | `0x2cb0` | selects the failure-mode sampler or its return stub using `0x5023e0` |
 | `0x2d60` | selects the input-byte averaging sampler or its return stub using `0x5023e0` |
 
+The `0x2440` wrapper is now captured as a pure control plan in
+`recovered_io_self_test_wrapper_2440.c`. It calls the `0x2c70` input
+initializer, gates each `0x502408`/`0x502448` record on the adjusted CRC and
+signature helpers, clears `0x50240c` on the signature-failure arm, and then
+performs the second masked CRC/device-ready phase. Mapped record reads and
+device-copy timing remain unresolved by design.
+
 These names are based on executed trace targets plus direct dataflow. The
 device semantics remain intentionally generic; the trace confirms execution
 and call structure, not the meaning of every individual controller bit.
@@ -145,8 +152,13 @@ names remain provisional until message/table arguments are correlated.
 The trace-confirmed helpers around `0x29a80` form a small audio-device setup
 family. `0x29a80` clears the table at `0x51a0c0` after programming two values
 through `0x1802000`; `0x29ae8` resets entries in the `0x504c30` service table;
-`0x29b20` converts indexed records from ROM into the device window at
-`0x1802010`; `0x29c08` clamps a command value into `0x51a260` and clears its
+`0x29b20` loops over 23 records, computes `(selector << (exponent & 0xffff)) &
+mask`, reads a ROM halfword at that index, and stores it into the device window
+at `0x1802010 + 2*record`. Its status tail skips `0x503aac == 0`, looks up
+positive values in the ROM table at `0x2bf749c`, and maps negative values to
+`0x7fff` at `0x180203e`. It then commits each nonzero pointer/value pair in
+the `0x51a0c0` table and clears that slot’s pointer word. `0x29c08` clamps a
+command value into `0x51a260` and clears its
 adjacent state fields; and `0x29ca0` copies 64-word rows between the two
 device windows at `0x1810000` and `0x1810100`. These names are based on direct
 loops and mapped-address use, while the device protocol remains unresolved.
@@ -155,16 +167,26 @@ loops and mapped-address use, while the device protocol remains unresolved.
 
 The next trace-confirmed entries extend the startup chain into geometry
 service setup. `0x292d8` uploads caller-provided words through `0x804000`
-after programming `0x800060`; `0x295d0` is a profile upload variant that
-calls it and finishes through `0x28d30`; `0x296d0` initializes service pointer
-slots at `0x515090–0x5150c0`; and `0x29738`/`0x29778` fill 64-entry pointer
-tables using offsets `0x40` and `0x100`.
+after programming `0x800060`. Its `0x294b0` caller supplies the fixed
+profile prefix, headers `(0, 32)`, and the 64-word source table at `0x293b0`,
+then emits the post-upload handshake and finishes through `0x28d30`.
+`0x295d0` is an alternate profile upload variant: it uses `0x46000000`, the
+same `(0, 32)`/`0x293b0` upload, then emits the `0x800030` setup and
+`0x3f333333`/`0xbf000000` tail before finishing through `0x28d30`;
+`0x296d0` initializes service pointer slots at `0x515098–0x5150b4`, then
+calls `0x29778` for head `0x5150c0` with stride `0x100` and `0x29738` for
+head `0x5190c0` with stride `0x40`; each fills 64 linked-list entries.
 
 `0x29d50` transforms 32-bit buffer samples across mapped windows rooted at
 `0x1810000`, `0x1810100`, `0x1814000`, and `0x1818000`. The trace also reaches
-`0x2b430`, which indexes object records and dispatches either to `0x6fd50` or
-an indirect table entry, and `0x2be30`, which initializes frame-service
-counters and dispatches through the 12-entry table at `0x2bee4`.
+`0x2b430`, which indexes 0x54-byte object records, repeats for the record
+`+0x08` count, dispatches to `0x6fd50` when the slot-left word is not below
+the slot-right word or to the indirect table at `0x2b420` otherwise, and
+increments the selected slot count. `0x2be30` calls the alternate `0x295d0`
+profile upload, emits selectors `8` and `16`, clears `0x50427a`/`0x503c7a`,
+calls `0x2a990(0xd000, 0)`, advances the frame counter, resets it and advances
+the phase when it exceeds `0xb4`, then dispatches `phase % 12` through the
+12-entry table at `0x2bee4`.
 The table targets are geometry entry points into shared downstream code rather
 than independent leaf functions; several paths converge on common returns in
 the `0x2d9xx` region.
@@ -191,9 +213,16 @@ from the object field at offset `0x174` and returns before `0x2f010`. Motion
 variant `0x2f010` updates the object/frame fields and returns through its
 continuation at `0x2f258`; parallel variant `0x2f260` returns at `0x2f35c`.
 
-The transform route at `0x2d9a0` is now bounded through its return at
-`0x2dc40`. It emits the `0x884000` packet and stores derived frame values in
-`0x51aad0–0x51aae4`; the following initializer begins at `0x2dc50`.
+The paired status trampolines at `0x2e1c8` and `0x2e1e8` are fixed ABI
+epilogues: each moves its preceding `lda` link (`0x2e1d4` or `0x2e1f4`) to
+`g0`, clears `g14`, and returns through `bx(g0)`. The transform route at `0x2d9a0` is now bounded through its return at
+`0x2dc40`. It calls the alternate profile uploader `0x295d0` and service
+helper `0x2a990`, emits the fixed selector sequence
+`8,16,10,31,29,30,10,20,21,18` through `0x884000`, and stores
+response-derived frame values at `0x51aad0–0x51aae4`; the following
+initializer begins at `0x2dc50`. The C model exposes those fixed edges and
+destinations while leaving the unmapped FIFO response arithmetic as
+caller-supplied values.
 
 ### Input/controller state cluster
 
@@ -208,7 +237,7 @@ complete instruction slices:
 | `0x186c0` | writes command byte `3` to `0x005770b1`, clears `0x005770b0`, then passes `0x005770c0` to the 16-byte clear helper at `0xc5d48` |
 | `0x186f0` | initializes startup state fields at `0x5039f8`, `0x504c84`, `0x5024d4`, `0x503a00`, `0x5039f4`, `0x5039f0`, `0x503aac`, and `0x503a7c` to zero after a one-count delay loop |
 | `0x18960` | runs the I/O self-test, preserves its result in `r4`, performs video/asset/audio setup, then renders one of the literal strings `"MODEL 2L Original"`, `"MODEL 2L BCRX"`, or `"MODEL 2L"` |
-| `0x18a10` | classifies `0x01d00028`: exact `0xff` selects state `2`, masked value `1` selects state `1`, and all other values select state `3`; state byte is written to `0x005770b1` and the flag to `0x503a08`; then calls `0xc5870` and accepts only a zero result or `0x5039f4 == 5` on the guarded path |
+| `0x18a10` | classifies `0x01d00028`: exact `0xff` selects state `2`, masked value `1` selects state `1`, and all other values select state `3`; state byte is written to `0x005770b1` and the flag to `0x503a08`; after `0xc5870` returns zero, mode `5` exits while other modes run 120 calls to `0x18ab0` |
 | `0x1ef70`/`0x1f010` | set text-plane dimensions to `(16,18)` or `(10,13)`, then select clear or patterned tile writes based on the argument |
 | `0x1efc0` | sets the same width `16` with height `2`; its nonzero branch uses source `0x2fd6d20`, row/column arguments `1,6`, while zero clears at `(31,6)` |
 | `0x1f060` | loads tile data from `0x01004000 + 0x1fce520`, sets attribute bit `6`, and transfers it through `0x1bc90` |
@@ -568,10 +597,11 @@ offset `0x184`, and immediate `0xffffe000`; command `29` response handling
 toggles only bit `31` (`0x80000000`).
 
 The profile selector at `0x28840` reads backup byte `0x1d00027` and publishes
-three raw float-bit words to `0x512bd4`, `0x512bd8`, and `0x512bdc`. It has nine
-indexed profiles (index is backup byte minus one) and a default path for zero
-or an index at/above `9`; the default words are `0x3f0ccccd`, `0x3f59999a`,
-and `0x3e19999a`. The profile initializer at `0xc8fa0` skips setup only for
+three raw float-bit words to `0x512bd4`, `0x512bd8`, and `0x512bdc`. It has ten
+indexed routes (index is backup byte minus one); index `9` selects first word
+`0x3f266666` and then shares the default second/third words. Zero or an index
+above `9` uses the default words `0x3f0ccccd`, `0x3f59999a`, and `0x3e19999a`.
+The profile initializer at `0xc8fa0` skips setup only for
 profile `13`, uses a 14-entry table family, initializes selector and pending
 fields to zero, and publishes the setup handle twice. The dispatch wrappers
 use a three-column table with middle/last-column indices `profile*3+1/+2`,
@@ -791,13 +821,14 @@ are `0x2fded40` and `0x2fdeda0`, respectively.
 The indirect-return thunks at `0x1f9c0` and `0x20160` both clear `g14` and
 branch through register `g0`; their return stubs are `0x1f9d4` and `0x20174`.
 
-The nine indexed profile triples at `0x28840` are, in order: (`0x3f000000`,
+The ten indexed profile routes at `0x28840` are, in order: (`0x3f000000`,
 `0x3f4ccccd`, `0x3e4ccccd`), (`0x3ee66666`, `0x3f400000`, `0x3e800000`),
 (`0x3ee66666`, `0x3f266666`, `0x3eb33333`), (`0x3eb33333`, `0x3f0ccccd`,
 `0x3ee66666`), (`0x3eb33333`, `0x3ee66666`, `0x3f0ccccd`), (`0x3f800000`,
 `0x3f59999a`, `0x00000000`), (`0x3f733333`, `0x3f59999a`, `0x00000000`),
 (`0x3f59999a`, `0x3f59999a`, `0x3d4ccccd`), and (`0x3f400000`,
-`0x3f59999a`, `0x3dcccccd`). These remain raw IEEE-754 bit patterns.
+`0x3f59999a`, `0x3dcccccd`), followed by first word `0x3f266666` with
+the default second/third words. These remain raw IEEE-754 bit patterns.
 
 The association-release helper at `0x6fd50` uses `999` as the no-record
 sentinel. It redirects link fields at record offsets `0x14` and `0x18`, or
@@ -1008,11 +1039,105 @@ The following state-machine operands are also bounded:
 
 | Entry | Directly observed values |
 | --- | --- |
-| `0x7d1f0` | scans byte pairs at `0x504da0 + 0x9a/0x9b` and then `+0x98/0x99`, masks each byte with `0xff`, and compares the masked value against a neighboring field with an allowed increment of `5` |
-| `0x7d670` | gates on `0x504d9c != 4`, accepts the shifted `0x172` field only in `0x150000..0x190000`, then checks `0x504d68` against `4` |
-| `0x7dcc0` | returns unless `0x509b34 > 0x1f3`; accepted processing uses float `0xbf800000`, object offsets `0x200`/`0x218`, byte mask `0xff`, and halfword mask `0xffff` |
-| `0x7e390` | indexes object bytes from offset `0x200` with a `32`-byte stride, looks up records from `0x562cb0` using a `48`-byte stride, and uses float constants `0x40c00000`, `0x42f00000`, and branch-specific `0x3ff80000`; the visible branch distinguishes caller field values below/at `3`, emits selector `29`, masks with `0xffff`, and its later route emits selector `30` after loading record offsets `0x10` and `0x18` and using offset/base constant `0xffffa000` |
-| `0x7ea10` | requires `0x509b30 > 0x1f3`, object halfword `0x172 == 31`, both object fields `0x64 == 6`, and `0x504e48 == 3` before storing `3`, `0x64`, `1` into `0x504d9c`, `0x504da0`, and `0x504d94` |
+| `0x7d1f0` | scans one byte at `0x504da0+0x9a` and one at `+0x98`; each nonzero byte must lie in the inclusive `reference..reference+5` band to set its flag. It also walks `+0x94..+0x96` with a discarded lower-bound check, then applies the shared `0x504d9c`/`0x504d94`/`0x504db4`/base-offset/object-state gate before the selector table at `0x7d358` |
+| `0x7d670` | scans seven six-byte records at `0x505060`, skips zero signed halfwords at record `+4`, selects the first minimum signed halfword at `+2`, and falls back to status `11` when `0x504d70 <= 4` or `10` otherwise; selected records feed the `0x884000` command packet path |
+| `0x7dcc0` | returns unless signed `0x509b34 > 0x1f3`; its byte-window predicate requires a nonzero status byte, zero masked `0x0f00` halfword field, and an object byte in the inclusive `status..status+5` band; accepted slots enter command `10` emission |
+| `0x7e390` | maps the object slot through `+0x200` with a `32`-byte stride, uses the resulting byte as a `48`-byte descriptor index from `0x562cb0`, reads descriptor offsets `+4/+0xc/+0x24`, and selects the exact state-3 arm; raw float constants are `0x40c00000`, `0x42f00000`, and special `0x3ff80000` |
+| `0x7ea10` | requires signed `0x509b30 > 0x1f3`; the `0x172 == 31` arm requires both object states `6` and `0x504e48 == 3`, then stores `3`, `0x64`, `1`, `7`, and `30` to `0x504d9c`, `0x504da0`, `0x504d94`, `0x504d98`, and `0x504db8`; other values use the eight-entry threshold table at `0x7eab0` |
+| `0x7f4d0` | requires signed `0x509b28 > 0x1f3`, scans status bytes `0x504e38..0x504e39` over 32 related-object slots at `+0x200` with a `0x20` stride, and retains the inclusive `status..status+5` match masks before candidate selection |
+| `0x7fca0` | zero-extends related halfword `+0x172`; accepts the range arm for `0x10000 < value <= 0xd0000`, or the fallback state tuple `(+0x64 in {0,6}, +0x172 in {1,14}, +0x170 == 6)` before the `0x504dec` timing branch |
+| `0x80710` | for `0x504d70 <= 1` subtracts `0x6800` from the current `+0x184` halfword, for values `2..9` adds it, classifies the related-current difference through `0x73508`, selects `0x72630[g6]`, initializes `0x504db8` to `10`, and calls `0x82800` when current timing is below converted `0x504df8` |
+| `0x810d0`/`0x81120` | requires signed `0x509b2c > 0x1f3` and normalized related `+0x172` in `0x150000..0x190000`; for nonpositive current timing requires mode bit `3`, accepts object state `1` or `5`, rejects related states `1/5/6/7`, then publishes `7`, `30`, `2`, and `0x64` to the transition cells and calls `0x79d60` |
+| `0x8168c` | forces status `18` for global states `2` or `7`; otherwise computes `0x5024e8 mod 240` and selects status `18` for remainder `<= 0x77` or `19` above it |
+| `0x81e60` | calls `0x84d90` for the exact startup tuple `0x5039f4 == 4`, `0x503a00 == 10`, `0x504e42 == 0`, then dispatches mode-zero object states `0..9` through the ten-entry table at `0x81eb4` |
+| `0x82040` | rejects object states above `9`, then dispatches states `0..9` through the exact ten-target action table at `0x82060` |
+| `0x82800` | rejects selectors above `9`, then dispatches selectors `0..9` through the exact handler table at `0x82818` |
+| `0x82ae0` | runs the `0x81f60` selector first, then gates on `0x503a14 <= g28+31`, `0x5039f4 == 4`, and `0x504dbc < 6`; states below `8` call `0x82db0`, while state `8+` calls `0x81e60` only when `0x504d7c == 5` |
+| `0x82b38` | requires status `0x504d84 == 1`, rejects selectors above `g28+12`, and dispatches through the exact 44-entry table at `0x82b58` |
+| `0x82c08` | handles scheduler selector `6`: writes state `7` when `0x504e1c == 0`, otherwise calls `0x81e60`, then rejoins the common scheduler tail |
+| `0x82c6c` | handles scheduler selector `19`: writes status `2` outside object state `4`; state `4` writes status `8` through the signed `0x504dc0 <= 0x78000` split, or status `3` plus state `28`/`5` based on `0x504e28` |
+| `0x82cc0` | constant scheduler entries write `0x504d98` values `3`, `1`, `13`, `14`, or `15` at targets `0x82cc0`, `0x82cc8`, `0x82cd0`, `0x82cd8`, or `0x82ce0` |
+| `0x82ce8`/`0x82d04` | state-4 scheduler variants: `0x82ce8` writes status `3` plus state `28` for state `4`, otherwise status `2`; `0x82d04` writes status `2` for state `4`, otherwise status `3` |
+| `0x82d18` | writes status `3` and selector `20` for object state `8`; all other states use the shared status-8 path |
+| `0x82db0` | dispatches object states `0..8` through the exact nine-entry table at `0x82dd4`; states above `8` route to `0x82f90` |
+| `0x82e40` | requires random remainder `4 mod 5`, then selects downstream value `2` for object state `3` or `5` otherwise; other remainders use the shared fallback |
+| `0x82ea0` | requires object state `3`; random remainder `4 mod 6` selects downstream value `3`, remainder `5` selects `6`, and all other combinations use the shared fallback |
+| `0x82ed4`/`0x82f10` | modulo-8 service variants: `0x82ed4` accepts state `3` with remainder `<3` → value `3` or any state with remainder `6` → `4`; `0x82f10` accepts state `3` with remainder `4/5` → `3` or `7` → `6` |
+| `0x82f6c` | requires random remainder `4 mod 5` and object state `3`, then selects downstream value `2`; all other combinations use shared dispatch |
+| `0x82f84` | computes signed `random % 7` and passes the remainder to the shared `0x82fac` selector table |
+| `0x82f90` | adjusts negative random values by `3`, forms the `& ~3` remainder, and dispatches unsigned selectors `0..7` through the exact table at `0x82fbc` (nonnegative inputs normalize to `0..3`) |
+| `0x82fac` | shared unsigned selector dispatcher: values `0..7` use the exact table at `0x82fbc`; larger values use the reject path at `0x830a0` |
+| `0x82fdc` | shared handler prefix: selectors `0..3` call `0x79050` and select `30`, selectors `4..6` select `20` with statuses `1/2/3`, selector `7` calls `0x79d60` and selects `30`, and rejection selects `10` |
+| `0x830c0` | rewrites status `9` to `12` for current object state `3`, then lets related state `0` override status/selector to `1/10` and restores caller `g14` to `0x504d94` |
+| `0x83110` | for signed `0x504dc0 <= 149` and related state `19` or `20`, writes caller `g14` to `0x504d98` and returns; other inputs continue into the timing/status path |
+| `0x83310` | sibling early gate with the same signed `0x504dc0 <= 149` and related-state `19/20` predicate, writing caller `g14` to `0x504d98`; other inputs continue into the ratio/status path |
+| `0x83348` | sets `0x504e1c = 1`, compares the converted `0x5042a8/0x5042a2` ratio against `0.9`, clears mode bit `2` above the threshold, and dispatches state `5` through the five-entry table at `0x833c8` |
+| `0x833dc` | ratio-table handlers: selector `0` calls `0x79d60`, selectors `1/2` publish status `28`, selector `3` publishes `26`, and selector `4` publishes `21` |
+| `0x8342c` | remainder/mode handler: remainder `5` → status `21`; remainder `4` with mode bit `1` → `26`; negative remainder with mode bit `2` → `28`; otherwise calls `0x79d60`, then writes `g14`/`15` to `0x504d8c/0x504d90` |
+| `0x83ac0` | early related-state gate writes caller `g14` to `0x504d98`; otherwise sets `0x504e1c = 1`, calls `0x82800` below converted `0x504df8`, selects status `18` for negative timing, and splits state `5` remi-6 handling from the other-state remi-7/mode-bit path |
+| `0x83cc0` | sibling early gate uses the same signed `0x504dc0 <= 149` and related-state `19/20` predicate, writing caller `g14` to `0x504d98`; the continuation loads state `0x504d7c` and branches into distinct state-5 mode/timing versus other-state remainder-18 logic |
+| `0x83f9c` | state-5 branch: mode bit `1` gives status `26` when `0x504e28 == 1`, otherwise `37`; with bit `1` clear, timing above converted `0x504dd8` plus mode bit `2` gives `39`, otherwise `37` |
+| `0x84018` | loads the `0x504d80` quadword, replaces only its first word with the candidate status, preserves the other three words, and writes selector `30` for status `26` or `37`, otherwise selector `15` |
+| `0x84150` | consumes the signed helper from the state-5 random/timing path: helper `< 4` plus mode bit `2` gives `32`; negative helper plus mode bit `1` gives `37`; otherwise status `33` |
+| `0x841ec` | non-state continuation: helper `< 4` plus mode bit `2` gives `32`; positive helper plus mode bit `1` gives `37`; otherwise status `33` before the `g14/15` tail |
+| `0x84240` | installs return trampoline `0x84290`, clears callback `g14`, sets `0x504e1c = 1`, initializes status `43`, selector `15`, `0x504d8c = 0`, and `0x504d9c = 7`, then returns through `bx(g1)` |
+| `0x842d0` | bit 0 of `0x504e50` skips the wrapper; otherwise it calls `0x84330`, `0x85c00`, `0x848d0`, `0x84b10`, and `0x858f0`, then calls `0x85b00` when `(0x5024e8 & 0xff) == 0` |
+| `0x85b00` | loads the six callback accumulators, writes scaled values into the callback frame, ranks the three smallest signed entries, and stores either mode `6` or the lowest entry index at `0x504e48` when the third-minus-lowest spread exceeds `0x1f3` |
+| `0x85c00` | derives the callback table mutator's working scale from object `+0x4a`, object `+0x190`, and related state 11/14 source fields `+0x63c/+0x640`; its following 32-entry mutation loop remains separate |
+| `0x85d04` | in the selected callback-table path, addresses the state/selector row at `0x5050a0 + state*1152 + selector*144 + 0x8e`, adds 30 to one halfword, and caps the paired row at 1000 only when it is above that threshold |
+| `0x85e20` | addresses the sibling state/selector row, subtracts 10 from one halfword, and writes 40 to the paired row when its value is at most 49; larger paired values reject the path |
+| `0x85ef8` | walks 32 object records at `+0x20` strides and fills eligible zero odd-byte map slots with the low nibble of `0x504e42` plus bit 7 when global bit 11 is set |
+| `0x85f8c` | scans the sibling map for bit-6 entries and routes them to `0x86000` when previous bits 9/8/11, current-halfword zero, or object-byte zero holds; otherwise it routes to `0x860a0` |
+| `0x86000` | replaces the selected secondary-map byte with `g14`, rejects original low-nibble collisions, and updates the `0x5074a0` state/selector row with `+30` and a paired-row cap of 1000 |
+| `0x860a0` | requires map bit 6 and either previous-halfword bit 10 or a nonzero `0x85c00` working scale before continuing to the fallback mutation at `0x860d4`; otherwise it exits through `0x86174` |
+| `0x860d4` | subtracts 10 from the selected secondary row, writes paired value 40 for paired values at most 49, and stores callback `g14` into the matching candidate map slot |
+| `0x86174` | replenishes zero odd-byte slots in the `0x509ad0` secondary map from eligible object records at `+0x20` strides when `0x504e42` bit 11 is set |
+| `0x861e0` | saves trampoline `0x86238`, sign-extends callback halfwords into `0x509b94/0x509b98`, clears the second when `0x503b18` is zero, and applies nonzero `0x503b1a` as the final override |
+| `0x865e0` | publishes selected mode thresholds to the previous/current/active groups at `0x509b60/70`, `0x509b20/30`, and `0x509b40/50`, then writes `g14` to latches `0x509b80/84/88` |
+| `0x85c88` | scans 32 odd-byte map entries, applies primary/fallback eligibility gates, replaces a selected entry with callback `g14`, and rejects low-nibble collisions before the row adjustment |
+| `0x84330` | adjusts the stack by `16`; when `(0x5024e8 & 3) == 0`, clears three halfword slots at `0x509a60` using incoming `g14`, then continues into the bitfield setup |
+| `0x84470` | flag finalizer: sets bit `7` when bits `5` and `1` are set; otherwise sets bit `6` for bit `4` with bit `0/1`, or bit `5` with bit `0` |
+| `0x844f4` | uses `(0x5024e8 & 3)` as a slot selector; nonzero slots jump to `0x847b0`, while slot `0` increments `0x509a68` modulo `60` before packet construction |
+| `0x848d0` | increments nonnegative `0x509a6c`, resetting above `120`; negative values return unless `0x503a14 > 239`, which continues into `0x8490c` |
+| `0x84b10` | updates `0x509a70` with a `120` ceiling/reset, derives `0x5074a0 + related_field_64 * 1024`, and enters recovery scanning only when `0x509ac0 == 1`, mode bit `2` is clear, `0x503a14 > 239`, and the updated counter is zero |
+| `0x84bb4` | scans eight recovery records with 136-byte stride at field `+0x86`; target-greater records become selected and replace the working target, while target-less records advance |
+| `0x84c98` | builds a recovery row at `base + index * 144`, copies scalar fields to `0/2/4/6/8/a`, stores `240 - 4*delay` at `+0x84`, copies 60 `+0xc` fields from `(counter + 1) mod 60`, and marks the selected recovery record `+0x86` with `100` |
+| `0x84d60` | stores the recovery flag at `0x509ac0`, copies control-byte bit `3` from `0x504e50` to `0x509b10`, and returns |
+| `0x84d90` | saves/restores `g8` through `fp+0x40`; bit `0` of `0x504e50` returns immediately, otherwise execution continues at `0x84dc4` |
+| `0x84dac` | sets bit `8` in live `g13`, stores it at `0x504e42`, stores caller `g14` at `0x504e44`, and branches to `0x84f10` |
+| `0x85058` | loads matched row `+0x8c`, sets bit `9` in `g13`, stores the result at `0x504e42`, stores the row value at `0x504e44`, restores `g8`, and returns |
+| `0x85080` | saves `g8`/`g12` at `fp+0x50`/`fp+0x60`; control-byte bit `0` restores both and returns, otherwise execution continues at `0x850ac` |
+| `0x850ac` | masks `0x5024e8` to a byte; values above `10` exit to `0x85128`, while `0`–`10` continue into the ratio setup |
+| `0x850c0` | forms object/related first-over-second ratios from signed `+0x1d0/+0x1d8` halfwords; exits on nonnegative object-minus-related difference, otherwise continues at `0x85134` |
+| `0x85134` | selects frame slot `0x5096a0 + slot*16`, table row `0x5074a0 + state*1088`, and upper-halfword targets minus `70`; row field `+0x86 <= 49` exits to `0x853a0`, otherwise scanning continues at `0x851a8` |
+| `0x851a8` | masks selected row field `+0` to 16 bits and compares it with `0x504d68`; equality sets the scan `r7` match flag |
+| `0x851c0` | masks row field `+6`; sets `r5` for values through `frame_upper+70`, bypassing the lower bound when `frame_upper <=69`, otherwise requiring the inclusive +/-70 interval |
+| `0x85204` | masks row field `+4` and frame `g9` low halfword; equal values increment `r5`, then execution reaches the shared `0x847c0` call |
+| `0x8521c` | reloads object `+0x74` into `g0`, passes `fp+0x40`/`fp+0x44` in `g1/g2`, and calls shared handler `0x847c0` |
+| `0x8522c` | masks row field `+6` to a byte and compares it with the value restored from `fp+0x40`; equality increments `r7` |
+| `0x852ac` | exits to `0x853a0` when `r5 <= 2` or `r7 <= 1`; only `r5 >= 3` and `r7 >= 2` continue at `0x852b4` |
+| `0x852b4` | sets status bit `10`, publishes row `+0x84` to `0x504e44`, dispatches selectors `0..6` as statuses `6,5,4,2,3,1,1`, and uses caller `g14` above `6` |
+| `0x853a0` | increments the scan index, advances both row pointers by `0x88`, retries through index `7`, then restores `g8/g12` and returns |
+| `0x853c0` | decodes published status/row values into object `+0xec+0x1c`; bit `8` selects the `0x5050a0` or `0x5074a0` table geometry, packs the selected nibble pair, increments `0x504e44`, and resets `0x504e42` above `239` |
+| `0x8552c` | extracts the selected word high byte and derives callback `g1/g2`, `g3`, and `g13` through the observed bit-pair rules |
+| `0x8558c` | aligns positive `0x504e44` upward and nonpositive values downward to four bytes; `cmpibge 1,delta` selects fallback `g3/g13 = 8` below delta `1` |
+| `0x855b8` | requires `0x503a80 == 0` and `0x504dc0 <= 149`, then admits only target difference `<20` for the object-ratio path |
+| `0x855f8` | admits signed object `+0x1d0 > (+0x1d8 >> 2)`; for timing differences above `45`, remainder `0x5024e8 % 300 > 45` forces dimensions `1/1` |
+| `0x85634` | repeats the `<20` timing-difference gate; remainder `0x5024e8 % 300 <= 90` exits, while values above `90` force dimensions `1/1` |
+| `0x85678` | admits only decoded selector `1` into the selector-1 timing/position path; all other selectors branch to `0x85784` |
+| `0x85784` | selector `2` with `0x504dc0 <= 149`, object ratio `+0x1d0/+0x1d8 > 1.65`, and dimensions `2/2` changes `g1` to `1`; other selectors skip to `0x857e4` |
+| `0x857e4` | selector `3` with `0x504dbc <= 32`, object ratio `+0x1d0/+0x1d8 > 1.65`, and dimensions `2/1` changes `g1` to `1`; other selectors skip to `0x85844` |
+| `0x85844` | converts callback `g1/g2` to dimensions `1/2/4`, sets persistent mode bits `3/4/5` from `g3/g13` and source bit `3`, and stores the two words at `0x504dac/0x504db0` |
+| `0x858f0` | snapshots object `+0x48/+0x4a` at `0x509b8c/0x509b90`; object `+0x190 == 0` with related state `11/14` scales the second value using related `+0x63c/+0x640` divided by `100` |
+| `0x859b8` | masks `0x509b8c` low byte, calls helper `0x86638`, subtracts `1`, exits above normalized index `4`, and dispatches indices `0..4` through the five-entry callback table |
+| `0x859ec`/`0x85a20`/`0x85a54`/`0x85a88`/`0x85abc` | divide `0x509b90` by `0x503a78+1`, add to `0x509b24/28/2c/30/34`, clamp at `10000`, store, and return |
+| `0x8490c` | rejects object `+0x190 != 0`; related state `11/14` selects `+0x63c/+0x640`, divides by `100`, multiplies object `+0x4a`, and sends zero products to `0x84b08` |
+| `0x84994` | scans up to eight 16-byte records at field `+0x8e`; when the working target exceeds a record, that record becomes selected and replaces the working target, while `target <= record` advances without selection |
+| `0x849d0` | converts the `0x8d2a0` result to `result - 1` or fallback `180`, subtracts from `0x509a68`, adds `60` for a negative slot, and scales the slot by `16` for `0x5096a0` |
+| `0x84a34` | writes a packet row at `table_base + index * 144`, copying source fields to offsets `0xa/0xc/0xe/0x10/0x12` and storing `240 - 4*normalized_delay` at offset `0x8c` |
+| `0x84a80` | copies scalar frame fields, copies 60 record `+0xc` halfwords into row offsets starting at `+0x14`, writes `100` at `+0x8e`, and returns through `0x84b08` |
+| `0x82d74` | clears the second word of the `0x504d80` quadword and publishes `0x504d90 = 15` for statuses `0..6` or `8` |
+| `0x82650` | writes status `8` for `(r5,r6)=(0,0)`; for `(0,1)` writes `3` when `0x504d70 <= 4` or `4` above it; all other pairs continue into the descriptor path |
 
 Its tail also exposes the snapshot protocol: the active four-word pair is
 copied to `0x509b40`/`0x509b50`; when the guard at `0x509b80` is exceeded, the
@@ -1030,7 +1155,7 @@ The remaining transition helpers expose these additional literals:
 | `0x810d0`/`0x81120` | gate on `0x509b2c > 0x1f3` and range `0x150000..0x190000`; use float `0x406f4000`, test `0x504e50` bit `3`, and recognize field values `5`, `1`, `6`, and `7` |
 | `0x81610` | chooses `0xffffc000` or `0x4000`, classifies through `0x73508`, indexes `0x72780[g0*4]`, and emits selector `30` |
 | `0x81e60` | requires `0x5039f4 == 4`, `0x503a00 == 10`, and `0x504e42 == 0`; its later dispatch table is selected by object field `0x64` |
-| `0x81f60` | uses state case `6`, float `0x404e0000`, and chooses output states `2` or `3` |
+| `0x81f60` | classifies the state/timing prefix, writes the paired `0x504d78/0x504d7c` selector cells, chooses `2` or `3` for state `6` with negative `0x504d60` timing, and clears `0x504d88` on the fallback arm |
 | `0x82040` | dispatches object field `0x64` through a ten-entry table for values `0..9` |
 
 The first dispatcher bodies make several constants explicit: cases `0`–`3`
@@ -1100,7 +1225,7 @@ The next trace comparison promotes ten routines whose dataflow is bounded:
 | Entry | Confirmed behavior |
 | --- | --- |
 | `0x34c0` | clears the input/timing fields at `0x5024c0–0x5024d2`, then calls `0x22f0` and `0x2330` |
-| `0x3540` | updates the packed state at `0x5023e4` according to bit 3 of `0x502482` |
+| `0x3540` | clears `0x5023f2`, then increments `0x5023e4` through 15 when bit 3 of `0x502482` is set, or resets it to zero otherwise |
 | `0x3a38` | parses one byte, handles zero/underflow cases, and clears a selected bit in `0x502484` |
 | `0x3ae0` | applies the byte parser to the two state bytes at `0x5024cc` and `0x5024d0` |
 | `0x3ba0` | compares controller timing/status registers at `0x1d0002c`, `0x1d00034`, and `0x1d00038` |
@@ -1788,8 +1913,9 @@ the `0x804000` command window.
 `0x27d8` is a small indirect-return trampoline used by the nearby byte-copy
 loops; it restores the local continuation at `0x27e4` and branches through it.
 
-`0x73508` classifies a signed 16-bit geometry difference into six bounded
-ranges (`0–5`), which callers use to select profile/table entries.
+`0x73508` classifies the low halfword of a signed difference into ten bounded
+ranges (`0–9`), which callers use to select match-profile and status-table
+entries.
 
 `0x17c8` selects a startup device mode: it updates the mode mask at
 `0x501cd0`, mirrors it to `0xe80004`, and writes the mode-specific setup value

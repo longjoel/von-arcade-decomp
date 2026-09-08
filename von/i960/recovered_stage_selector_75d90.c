@@ -42,9 +42,9 @@
  *   [0x504d84] = [0x504dac] = [0x504db0] = 1, [0x504db8] = 5.
  *   The [0x504d88] = 30 store is transient (overwritten by g14).
  *
- * NOT modeled: the row-copy tail from 0x75fe4 (72-byte rows at
- * 0x72050 indexed by word[0x64(g0)], copied to 0x504dd4+) and the
- * nested call at 0x76030 -- next slice.
+ * The row-copy tail from 0x75fe4 is modeled by
+ * recovered_object_state_descriptor_75f00.c. The nested call at 0x76030
+ * remains outside this selector slice.
  */
 
 typedef unsigned int u32;

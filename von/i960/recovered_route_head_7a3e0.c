@@ -29,7 +29,8 @@ void recovered_route_plan(u32 own_state, u32 peer_state,
     } else if (peer_state == 0U || peer_state == 3U) {
         plan->outcome = RECOVERED_ROUTE_C;
         plan->mode_value = 9U;
-        plan->callee = 0x0007a9f0U;
+        /* The ratio comparison begins at 0x7a504; 0x7a9f0 is downstream. */
+        plan->callee = 0x0007a504U;
     } else if (own_state == 1U || own_state == 3U || own_state == 4U
             || own_state == 5U) {
         plan->outcome = RECOVERED_ROUTE_RATIO;

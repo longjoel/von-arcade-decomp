@@ -17,7 +17,7 @@ struct geometry_profile_constants
 };
 
 /* Values are preserved as raw IEEE-754 bits, matching lda/stores in the ROM. */
-static const struct geometry_profile_constants profiles[9] = {
+static const struct geometry_profile_constants profiles[10] = {
     { 0x3f000000U, 0x3f4ccccdU, 0x3e4ccccdU },
     { 0x3ee66666U, 0x3f400000U, 0x3e800000U },
     { 0x3ee66666U, 0x3f266666U, 0x3eb33333U },
@@ -27,6 +27,8 @@ static const struct geometry_profile_constants profiles[9] = {
     { 0x3f733333U, 0x3f59999aU, 0x00000000U },
     { 0x3f59999aU, 0x3f59999aU, 0x3d4ccccdU },
     { 0x3f400000U, 0x3f59999aU, 0x3dcccccdU },
+    /* The tenth route only overrides the first word before the default tail. */
+    { 0x3f266666U, 0x3f59999aU, 0x3e19999aU },
 };
 
 /* Returns nonzero only for a direct table entry. */
@@ -40,7 +42,7 @@ int recovered_geometry_profile_constants(u8 backup_value,
     if (backup_value == 0)
         goto default_profile;
     index = (u32)backup_value - 1U;
-    if (index >= 9)
+    if (index >= 10)
     {
 default_profile:
         *first = 0x3f0ccccdU;

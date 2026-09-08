@@ -43,3 +43,27 @@ void recovered_geometry_link_release_plan(u32 source_slot,
     updates[1].value = link14;
     *new_reference_count = reference_count - 1U;
 }
+
+/*
+ * The 0x6fd50 entry first branches through 0x6fb58, which decrements the
+ * 32-entry cursor and returns source_slot to the release pool.  This wrapper
+ * keeps that mutation ordered before the association-repair plan above.
+ */
+void recovered_geometry_link_release_apply(
+    u32 source_slot,
+    u32 link14,
+    u32 link18,
+    u32 reference_count,
+    u32 pool_slots[32],
+    u32 *pool_count,
+    struct recovered_geometry_link_update updates[2],
+    u32 *new_reference_count)
+{
+    u32 count = *pool_count - 1U;
+
+    pool_slots[count] = source_slot;
+    *pool_count = count;
+    recovered_geometry_link_release_plan(source_slot, link14, link18,
+                                          reference_count, updates,
+                                          new_reference_count);
+}

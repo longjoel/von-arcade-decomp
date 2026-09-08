@@ -33,4 +33,26 @@ with tempfile.TemporaryDirectory() as directory:
             assert new_count.value == count - 1
             assert slots[count - 1] == 0xa5000000 | count
 
+    reset = lib.recovered_geometry_pool32_reset
+    reset.restype = None
+    reset.argtypes = [ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(ctypes.c_uint32)]
+    slots = (ctypes.c_uint32 * 32)(*[0xfeed0000 + index for index in range(32)])
+    count = ctypes.c_uint32(31)
+    reset(slots, ctypes.byref(count))
+    assert count.value == 0
+    assert list(slots) == [0] * 32
+
+    reset64 = lib.recovered_geometry_pool64_reset
+    reset64.restype = None
+    reset64.argtypes = [ctypes.POINTER(ctypes.c_uint32),
+                        ctypes.POINTER(ctypes.c_uint32),
+                        ctypes.POINTER(ctypes.c_uint32)]
+    slots64 = (ctypes.c_uint32 * 64)(*[0xbeef0000 + index for index in range(64)])
+    fields64 = (ctypes.c_uint32 * 64)(*[0xcafe0000 + index for index in range(64)])
+    count64 = ctypes.c_uint32(63)
+    reset64(slots64, fields64, ctypes.byref(count64))
+    assert count64.value == 0
+    assert list(slots64) == [0] * 64
+    assert list(fields64) == [0] * 64
+
 print("recovered geometry slot-pool vectors: ok")

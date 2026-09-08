@@ -25,12 +25,12 @@ with tempfile.TemporaryDirectory() as td:
                     "-o", str(so)], check=True)
     lib = ctypes.CDLL(str(so))
     plan_fn = lib.recovered_ratio_duel_plan
-    plan_fn.argtypes = [ctypes.c_int32 * 4, ctypes.c_uint32,
+    plan_fn.argtypes = [ctypes.c_int16 * 4, ctypes.c_uint32,
                         ctypes.c_uint32, ctypes.c_uint32,
                         ctypes.POINTER(Plan)]
 
     def duel(halves, flag, mode, callee):
-        raw = (ctypes.c_int32 * 4)(*halves)
+        raw = (ctypes.c_int16 * 4)(*halves)
         plan = Plan()
         plan_fn(raw, flag, mode, callee, ctypes.byref(plan))
         return plan
@@ -51,5 +51,10 @@ with tempfile.TemporaryDirectory() as td:
     plan = duel([1, 4, 1, 2], 1, 9, 0x7A9F0)
     assert (plan.wins, plan.win_mode, plan.win_callee) == (1, 9, 0x7A9F0)
     assert duel([3, 4, 1, 2], 1, 9, 0x7A9F0).wins == 0
+
+    # The assembly's ldos inputs are sign-extended 16-bit fields.
+    plan = duel([-1, 2, 1, 2], 1, 10, 0x7AD90)
+    assert plan.obj_ratio < 0.0
+    assert plan.wins == 1
 
 print("PASS: 0x7a438 ratio-duel plan")
