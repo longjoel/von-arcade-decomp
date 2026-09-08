@@ -47,20 +47,20 @@ def main() -> int:
     if window.count("stq\tg4,0x884020") != 1:
         raise SystemExit("third opcode-0x09 quadword destination is missing")
 
-    # The neighboring opcode-0x07 paths reuse the same three object lanes.
+    # The neighboring opcode-0x07 paths reuse the same three record quadwords (consecutive quarters of the flat data block, not xyz lanes).
     # This is a field-layout invariant independent of the later transform.
     for start, end in (("420e4:", "42198:"), ("421cc:", "42290:")):
         path = text[text.index(start):text.index(end)]
         if path.count("ldq\t0x8(r4),g4") != 1:
-            raise SystemExit(f"{start} missing first four-word object lane")
+            raise SystemExit(f"{start} missing first four-word record quadword")
         if path.count("ldq\t0x18(r4),g4") != 1:
-            raise SystemExit(f"{start} missing second four-word object lane")
+            raise SystemExit(f"{start} missing second four-word record quadword")
         if path.count("ldq\t0x28(r4),g4") != 1:
-            raise SystemExit(f"{start} missing third four-word object lane")
+            raise SystemExit(f"{start} missing third four-word record quadword")
         if "stq\tg4,0x884000" not in path or "stq\tg4,0x884010" not in path:
-            raise SystemExit(f"{start} missing opcode-0x07 lane destinations")
+            raise SystemExit(f"{start} missing opcode-0x07 quadword destinations")
         if "stq\tg4,0x884020" not in path:
-            raise SystemExit(f"{start} missing third opcode-0x07 lane destination")
+            raise SystemExit(f"{start} missing third opcode-0x07 quadword destination")
 
     # Two object constructors fill the same twelve-word region from the
     # SHARC state-readback request (FIFO command value 17).

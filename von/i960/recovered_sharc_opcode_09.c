@@ -4,9 +4,11 @@
  * (words 3k..3k+2 form vector k), not lane-major regroups. Proven live by
  * the 07->09->1a->11 matrix compose: a cyclic-shift matrix maps the input
  * triplets to shifted triplets in place, which a lane regroup would have
- * scattered. The identified host caller still packs three lane quadwords,
- * so how those lanes map to geometric vectors is open; the SHARC-side
- * contract below is what the hardware executes. */
+ * scattered. The identified host caller packs three quadwords that are
+ * consecutive quarters of its flat twelve-word record block (+0x08..+0x37,
+ * filled word-by-word from 0x11 streams), so the chunking is transport,
+ * not xyz lanes; the SHARC-side contract below is what the hardware
+ * executes. */
 #include <stdint.h>
 
 /* Interpret one of the four vectors consumed by the handler: three

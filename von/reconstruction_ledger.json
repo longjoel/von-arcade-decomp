@@ -1192,11 +1192,11 @@
           ],
           "symbol": "sharc_opcode_09_matrix_state_service",
           "modeling": {
-            "boundary": "Models the opcode-0x09 four-vector matrix service: consume twelve lane-major FIFO words as four (x,y,z) triplets, apply the persistent row-major matrix column-dot transform to each, and store twelve derived words at offsets 0x00..0x0b, while preserving the identified main-CPU caller packet and its opcode-05 selection/0x3a/0x06 continuation ordering.",
+            "boundary": "Models the opcode-0x09 four-vector matrix service: consume twelve FIFO words as four consecutive (x,y,z) triplets, apply the persistent row-major matrix column-dot transform to each, and store twelve derived words at offsets 0x00..0x0b, while preserving the identified main-CPU caller packet and its opcode-05 selection/0x3a/0x06 continuation ordering.",
             "test": "von/tools/test_recovered_sharc_opcode_09_caller.py",
             "unresolved_behavior": "SHARC FIFO production and floating-point rounding, persistent matrix/state ownership and address semantics, exact delayed-store timing, lane semantic names, and downstream geometry interpretation remain outside this bounded transform/caller model."
           },
-          "notes": "Static listing and the reusable model recover twelve FIFO inputs in four groups of three, nine coefficient words through the DM 0x30101 state pointer, and twelve derived stores at offsets 0x00..0x0b. Each input triplet (x,y,z) maps to (x*s0+y*s3+z*s6, x*s1+y*s4+z*s7, x*s2+y*s5+z*s8), matching the established column-dot ordering and excluding the translation tail. The final two stores are delayed-return slots. Main-CPU listing 0x41fbc..0x41ff4 identifies a direct caller: opcode 0x05 selects/advances the state window, opcode 0x09 follows, and three quadwords from host offsets +0x08/+0x18/+0x28 provide the twelve inputs. Their lane-major order is [x0..x3,y0..y3,z0..z3]. Grouping correction: live 07->09->1a->11 compose execution proves the SHARC dots four consecutive triplets (words 3k..3k+2 form vector k) with the record matrix columns, not lane regroups -- a cyclic-shift matrix shifts each input triplet in place, which lane regrouping would have scattered, and the fourth vector excludes the translation tail. The earlier lane-regroup software model and its test encoded the wrong grouping and are corrected. How the caller lanes map to geometric vectors is now open; lane semantic names remain open. This establishes a twelve-word derived state block associated with one host record."
+          "notes": "Static listing and the reusable model recover twelve FIFO inputs in four groups of three, nine coefficient words through the DM 0x30101 state pointer, and twelve derived stores at offsets 0x00..0x0b. Each input triplet (x,y,z) maps to (x*s0+y*s3+z*s6, x*s1+y*s4+z*s7, x*s2+y*s5+z*s8), matching the established column-dot ordering and excluding the translation tail. The final two stores are delayed-return slots. Main-CPU listing 0x41fbc..0x41ff4 identifies a direct caller: opcode 0x05 selects/advances the state window, opcode 0x09 follows, and three quadwords from host offsets +0x08/+0x18/+0x28 provide the twelve inputs. Call-site assembly: those quadwords are consecutive quarters of the host record's flat twelve-word data block (+0x08..+0x37, filled by single-word stores in the 0x3f600/0x3f6e0 constructors from 0x11-readback streams), so the quadword chunking is 4-word ldq/stq transport, not xyz lanes -- there is no lane-major producer anywhere in the pipeline. Grouping correction: live 07->09->1a->11 compose execution proves the SHARC dots four consecutive triplets (words 3k..3k+2 form vector k) with the record matrix columns -- a cyclic-shift matrix shifts each input triplet in place, which lane regrouping would have scattered, and the fourth vector excludes the translation tail. The earlier lane-regroup software model and its test encoded the wrong grouping and are corrected. Per-site dance is 05 select, 09/07 plus twelve record words, 0x3a table-copy-output, host response read stashed to 0x804000+, then 06 rewind; the record header is flags/counter/table-pointer at +0x00/+0x02/+0x04. This establishes a twelve-word derived state block associated with one host record."
         },
         {
           "id": "maincpu.opcode-0a-two-input-angle-service",
@@ -15030,6 +15030,34 @@
             "unresolved_behavior": "The 0x72780 table contents and 0x814b4 fallback body remain outside this special-case model."
           },
           "notes": "The three comparisons are conjunctive: state 2, related +0x172 equal to 24, and related +0x17e equal to zero are all required for the 0x72780 path."
+        },
+        {
+          "id": "maincpu.transition-secondary-fallback-814b4",
+          "name": "transition_secondary_fallback_814b4",
+          "classification": "code",
+          "stage": "modeled",
+          "sources": [
+            "von/i960/recovered_transition_secondary_fallback_814b4.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/disassembly-annotations.md",
+            "von/i960/recovered_transition_secondary_fallback_814b4.c",
+            "von/tools/test_recovered_transition_secondary_fallback_814b4.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000814b4",
+              "end": "0x00081528"
+            }
+          ],
+          "symbol": "recovered_transition_secondary_fallback_814b4",
+          "modeling": {
+            "boundary": "Models fallback result publication, control-1 admission, status-23 write, 0x504d60 < 0x40690000 timing split, state-1 publication, and status-8 fallback.",
+            "test": "von/tools/test_recovered_transition_secondary_fallback_814b4.py",
+            "unresolved_behavior": "The 0x728a0 table contents and common 0x815e0 tail remain outside this fallback model."
+          },
+          "notes": "Status 23 is written before the timing branch; timing pass preserves status 23 and writes state 1, while timing fail overwrites the result slot with status 8."
         },
         {
           "id": "maincpu.transition-mode-route-810d0",

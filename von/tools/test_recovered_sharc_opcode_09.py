@@ -6,9 +6,9 @@ triplets (words 3k..3k+2 form vector k) with the record matrix columns.
 An earlier revision regrouped lane-major (x0,y0,z0)..; the 07->09->1a->11
 matrix compose refutes that: a cyclic-shift matrix maps each input triplet
 to its shifted self in place, which a lane regroup would have scattered.
-The identified main-CPU caller still packs three lane quadwords, so how
-those lanes map to geometric vectors stays open (see the 09 ledger unit);
-only the SHARC-side grouping below is pinned.
+Call-site review closed the host side too: the three quadwords are
+consecutive quarters of the record's flat data block (+0x08..+0x37, filled
+word-by-word from 0x11 streams), so no lane-major producer exists anywhere.
 """
 
 from __future__ import annotations
