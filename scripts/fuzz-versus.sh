@@ -8,6 +8,7 @@
 #   VON_FUZZVERSUS_OUT        output dir (default von/fuzz-versus/<stamp>)
 #   VON_FUZZVERSUS_SECONDS    seconds budget (default 240)
 #   VON_FUZZ_T0               coin frame anchor (default 7200; 3600 fast path)
+#   VON_FUZZVERSUS_BATTLE     first fuzz frame (default T0+2200)
 #   VON_FUZZVERSUS_OSLOG      set to -oslog to capture geometry logerror lines
 #   VON_FUZZ_SELECT_STEPS     versus cursor right-presses (default 0)
 #   VON_FUZZ_SELECT_DOWN      versus cursor down-presses first (default 0)
@@ -46,7 +47,7 @@ VON_FUZZ_SELECT_FRAME=$((T0 + 950)) \
 VON_FUZZ_SELECT_STEPS="${VON_FUZZ_SELECT_STEPS:-0}" \
 VON_FUZZ_SELECT_DOWN="${VON_FUZZ_SELECT_DOWN:-0}" \
 VON_FUZZ_SELECT_SEQ="${VON_FUZZ_SELECT_SEQ:-}" \
-VON_FUZZ_BATTLE=$((T0 + 2200)) \
+VON_FUZZ_BATTLE="${VON_FUZZVERSUS_BATTLE:-$((T0 + 2200))}" \
 VON_FUZZ_HOLD="${VON_FUZZ_HOLD:-45}" VON_FUZZ_SETTLE="${VON_FUZZ_SETTLE:-45}" \
 VON_FUZZ_ONLY="${VON_FUZZ_ONLY:-}" \
 VON_FUZZ_TELEMETRY="${VON_FUZZ_TELEMETRY:-}" \
