@@ -62,6 +62,13 @@ local HOLD = tonumber(os.getenv("VON_FUZZ_HOLD") or "45")
 local SETTLE = tonumber(os.getenv("VON_FUZZ_SETTLE") or "45")
 local IDLE = os.getenv("VON_FUZZ_IDLE") == "1"
 local SECONDS = tonumber(os.getenv("VON_FUZZ_SECONDS") or "150")
+-- Round-timer freeze: VON_FUZZ_FREEZE=1 vetoes writes to the 0x500554 timer
+-- window (returns the pre-write value), so the bout never times out
+-- mid-battery. Same mechanism as sandbox_versus.lua.
+local FREEZE = os.getenv("VON_FUZZ_FREEZE") == "1"
+local TIMER_BASE = 0x500554
+local TIMER_LEN = 4
+local timer_vetoes = 0
 
 local REGIONS = {
     { 0x515000, 0x4000 },  -- 64 x 256B object slots
@@ -81,6 +88,8 @@ local INPUTS = {
     "right+r_left+left_shot",
     -- true dashes need a direction held with the dash button.
     "up+left_dash", "left+left_dash", "up+right_dash",
+    "right+left_dash", "down+left_dash",
+    "left+right_dash", "right+right_dash", "down+right_dash",
 }
 
 -- Optional subset: VON_FUZZ_ONLY="left_dash,right_dash" runs just those.
@@ -239,6 +248,32 @@ local function install_taps()
     end
 end
 
+local function install_timer_freeze()
+    if not space or not FREEZE then return end
+    local ok, tap = pcall(function()
+        return space:install_write_tap(TIMER_BASE, TIMER_BASE + TIMER_LEN - 1,
+            "fuzztimer",
+            function(offset, data, mask)
+                local cur = data
+                local okr, v = pcall(function()
+                    if mask == 0xff then
+                        return space:read_u8(offset)
+                    else
+                        return space:read_u32(offset & 0xfffffffc)
+                    end
+                end)
+                if okr and type(v) == "number" then cur = v end
+                timer_vetoes = timer_vetoes + 1
+                return cur
+            end)
+    end)
+    if ok and tap then
+        log("fuzz: timer freeze tap installed")
+    else
+        log("fuzz: WARNING timer freeze tap failed")
+    end
+end
+
 local function remove_taps(tag)
     for addr, tap in pairs(active_taps) do
         pcall(function() space:uninstall_read_tap(tap) end)
@@ -392,6 +427,7 @@ emu.register_periodic(function()
 
     if frame == BATTLE_FRAME then
         snapshot("battle-entry")
+        install_timer_freeze()
     end
 
     if frame >= BATTLE_FRAME then
@@ -469,7 +505,7 @@ emu.register_periodic(function()
     end
 
     if frame >= SECONDS * 60 then
-        log("fuzz: session complete")
+        log(string.format("fuzz: session complete (timer vetoes=%d)", timer_vetoes))
         manager.machine:exit()
     end
 end)
