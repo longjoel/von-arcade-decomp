@@ -17,3 +17,5 @@
 /snap/
 __pycache__/
 *.py[cod]
+/von/sandbox/
+/von/fuzz-versus/

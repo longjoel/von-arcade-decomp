@@ -29,6 +29,12 @@ local COIN_FRAME = tonumber(os.getenv("VON_FUZZ_COIN") or "900")
 local START_FRAME = tonumber(os.getenv("VON_FUZZ_START") or "1500")
 local START2_FRAME = tonumber(os.getenv("VON_FUZZ_START2") or "0")
 local NO_START = os.getenv("VON_FUZZ_NO_START") == "1"
+-- Single-cabinet 2P versus: a second credit (default off). Versus select
+-- cursor: VON_FUZZ_SELECT_STEPS right-presses from the default, starting at
+-- VON_FUZZ_SELECT_FRAME; confirmation is by timeout (auto-confirm).
+local COIN2_FRAME = tonumber(os.getenv("VON_FUZZ_COIN2") or "0")
+local SELECT_FRAME = tonumber(os.getenv("VON_FUZZ_SELECT_FRAME") or "0")
+local SELECT_STEPS = tonumber(os.getenv("VON_FUZZ_SELECT_STEPS") or "0")
 -- Force the game's link role: the comm firmware reads shared[1]
 -- (0x01=master, 0x02=slave) with fallback to the fg bit. The service
 -- menu normally sources this; forcing overrides whatever it holds.
@@ -55,7 +61,7 @@ local INPUTS = {
     "left_shot", "right_shot", "left_dash", "right_dash",
     -- combos (plus-separated keys): both triggers = center weapon,
     -- outward sticks = jump, inward sticks = guard/crouch, dash+shot.
-    "left_shot+right_shot", "left+r_right", "right+r_left",
+    "left_shot+right_shot", "left+r_right", "right+r_left", "up+r_up",
     "left_dash+left_shot", "right_dash+right_shot",
     "right+r_left+left_shot",
     -- true dashes need a direction held with the dash button.
@@ -312,6 +318,11 @@ emu.register_periodic(function()
         log("fuzz: coin")
     elseif frame == COIN_FRAME + 8 then
         fields.coin:clear_value()
+    elseif COIN2_FRAME > 0 and frame == COIN2_FRAME then
+        fields.coin:set_value(1)
+        log("fuzz: coin2")
+    elseif COIN2_FRAME > 0 and frame == COIN2_FRAME + 8 then
+        fields.coin:clear_value()
     elseif frame == START_FRAME and not NO_START then
         fields.start:set_value(1)
         log("fuzz: start")
@@ -329,6 +340,26 @@ emu.register_periodic(function()
         end
     elseif START2_FRAME > 0 and frame == START2_FRAME + 8 then
         if fields.start2 then fields.start2:clear_value() end
+    end
+
+    -- Versus select cursor walk: one 6-frame right-press per 36-frame slot.
+    if SELECT_FRAME > 0 and SELECT_STEPS > 0 and fields.right then
+        local rel = frame - SELECT_FRAME
+        if rel >= 0 then
+            local slot = math.floor(rel / 36)
+            local ph = rel % 36
+            if slot < SELECT_STEPS then
+                if ph == 0 then
+                    fields.right:set_value(1)
+                    log(string.format("fuzz: select step %d/%d",
+                        slot + 1, SELECT_STEPS))
+                elseif ph == 6 then
+                    fields.right:clear_value()
+                end
+            elseif slot == SELECT_STEPS and ph == 0 then
+                fields.right:clear_value()
+            end
+        end
     end
 
     if frame == BATTLE_FRAME then
