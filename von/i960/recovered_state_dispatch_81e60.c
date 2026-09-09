@@ -8,6 +8,7 @@ struct recovered_state_dispatch_81e60 {
     u32 startup_call_84d90;
     u32 dispatched;
     u32 target;
+    u32 handler_object;
 };
 
 static const u32 targets[10] = {
@@ -18,9 +19,9 @@ static const u32 targets[10] = {
 struct recovered_state_dispatch_81e60
 recovered_state_dispatch_81e60(
     u32 global_5039f4, u32 global_503a00, int16_t mode_504e42,
-    u32 object_state)
+    u32 object_state, u32 object_pointer)
 {
-    struct recovered_state_dispatch_81e60 out = {0U, 0U, 0U};
+    struct recovered_state_dispatch_81e60 out = {0U, 0U, 0U, 0U};
 
     out.startup_call_84d90 = global_5039f4 == 4U &&
                              global_503a00 == 10U && mode_504e42 == 0;
@@ -28,5 +29,6 @@ recovered_state_dispatch_81e60(
         return out;
     out.dispatched = 1U;
     out.target = targets[object_state];
+    out.handler_object = object_pointer;
     return out;
 }

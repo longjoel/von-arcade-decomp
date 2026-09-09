@@ -14,7 +14,9 @@ u32 recovered_text_plane0_fill_cell_plan(u32 column, u32 row,
                                          u32 y, u32 x, u32 fill_value,
                                          struct recovered_text_plane0_fill_cell *plan)
 {
-    if (y >= height || x >= width)
+    /* 0x1df70 skips nonpositive signed dimensions before entering either loop. */
+    if ((int32_t)width <= 0 || (int32_t)height <= 0
+            || y >= height || x >= width)
         return 0U;
     plan->destination_byte_address = 0x01000000U
         + ((((row + y) << 6) + column + x) << 1);

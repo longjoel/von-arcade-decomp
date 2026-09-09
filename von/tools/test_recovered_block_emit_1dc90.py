@@ -45,5 +45,9 @@ with tempfile.TemporaryDirectory() as td:
     assert plan.total_halfwords == 0
     plan_fn(32, 0, 16, 16, ctypes.byref(plan))
     assert plan.total_halfwords == 0
+    plan_fn(0xFFFFFFFF, 1, 16, 16, ctypes.byref(plan))
+    assert plan.total_halfwords == 0
+    plan_fn(1, 0xFFFFFFFF, 16, 16, ctypes.byref(plan))
+    assert plan.total_halfwords == 0
 
 print("PASS: 0x1dc90 block emitter plan")

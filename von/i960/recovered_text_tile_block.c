@@ -18,6 +18,9 @@ void recovered_text_write_tile_block(uint16_t *destination,
     uint32_t y;
     uint32_t x;
 
+    /* 0x1de80's outer and inner cmpi guards are signed. */
+    if ((int32_t)width <= 0 || (int32_t)height <= 0)
+        return;
     for (y = 0U; y < height; ++y) {
         for (x = 0U; x < width; ++x)
             destination[((row + y) << 6) + column + x] = (uint16_t)(source[y * width + x] | 0x8000U);

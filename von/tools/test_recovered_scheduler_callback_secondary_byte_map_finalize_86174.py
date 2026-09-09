@@ -2,6 +2,7 @@
 
 import ctypes
 import pathlib
+import re
 import subprocess
 import tempfile
 from contextlib import contextmanager
@@ -9,6 +10,7 @@ from contextlib import contextmanager
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "i960/recovered_scheduler_callback_secondary_byte_map_finalize_86174.c"
+LISTING = ROOT / "build/disasm/vonj-maincpu.lst"
 
 
 @contextmanager
@@ -34,6 +36,12 @@ def build():
 
 
 def main():
+    listing = LISTING.read_text()
+    for instruction in (r"861a8:.*ldob.*\(r6\)",
+                        r"861b0:.*setbit.*6,g4,g4",
+                        r"861b4:.*stob.*0x1\(g7\)\[g3\]"):
+        assert re.search(instruction, listing)
+
     with build() as function:
         object_bytes = (ctypes.c_uint8 * 32)(*[1] * 32)
         object_words = (ctypes.c_uint16 * 32)(*[1] * 32)
@@ -42,7 +50,7 @@ def main():
         result = function(object_bytes, object_words, byte_map,
                           (1 << 11) | 0x0B)
         assert result.writes == 31
-        assert result.map_after[0] == 0x8B
+        assert result.map_after[0] == 0x4B
         assert result.map_after[8] == 0x44
 
         object_bytes[2] = 0

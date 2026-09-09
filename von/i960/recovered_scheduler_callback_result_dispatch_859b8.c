@@ -4,6 +4,9 @@
 
 typedef uint32_t u32;
 
+/* 0x859b8 calls the entry at 0x86638 with the masked 0x509b8c byte. */
+u32 recovered_stage_bucket_86630_rom(u32 value);
+
 struct recovered_scheduler_callback_result_dispatch_859b8 {
     u32 value_509b8c_low_byte;
     u32 helper_result;
@@ -29,4 +32,12 @@ recovered_scheduler_callback_result_dispatch_859b8(u32 value_509b8c,
     out.target = out.exits_to_85af0 == 0U
         ? recovered_callback_targets[out.normalized_index] : 0U;
     return out;
+}
+
+struct recovered_scheduler_callback_result_dispatch_859b8
+recovered_scheduler_callback_result_dispatch_859b8_from_value(u32 value_509b8c)
+{
+    u32 low_byte = value_509b8c & 0xffU;
+    return recovered_scheduler_callback_result_dispatch_859b8(
+        value_509b8c, recovered_stage_bucket_86630_rom(low_byte));
 }

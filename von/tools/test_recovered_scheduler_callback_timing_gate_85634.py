@@ -17,6 +17,8 @@ class Plan(ctypes.Structure):
                 ("target_difference", ctypes.c_int32),
                 ("value_5024e8", ctypes.c_uint32),
                 ("remainder_300", ctypes.c_uint32),
+                ("early_remainder_checked", ctypes.c_uint32),
+                ("early_forces_dimensions_1_1", ctypes.c_uint32),
                 ("exits_to_85678", ctypes.c_uint32),
                 ("forces_dimensions_1_1", ctypes.c_uint32)]
 
@@ -30,9 +32,14 @@ with tempfile.TemporaryDirectory() as directory:
     result = function(96, 3, 191)
     assert (result.frame_quotient, result.frame_target,
             result.target_difference, result.remainder_300,
-            result.exits_to_85678, result.forces_dimensions_1_1) == (2, 3, 0, 191, 0, 1)
+            result.early_remainder_checked,
+            result.early_forces_dimensions_1_1,
+            result.exits_to_85678, result.forces_dimensions_1_1) == (2, 3, 0, 191, 0, 0, 1, 0)
     assert function(96, 23, 191).exits_to_85678 == 1
     assert function(96, 3, 90).exits_to_85678 == 1
-    assert function(96, 3, 91).forces_dimensions_1_1 == 1
+    assert function(96, 3, 91).forces_dimensions_1_1 == 0
+    assert function(96, 24, 91).forces_dimensions_1_1 == 1
+    assert function(96, 49, 46).early_forces_dimensions_1_1 == 1
+    assert function(96, 49, 46).exits_to_85678 == 0
 
 print("recovered 0x85634 timing-gate vectors: ok")

@@ -6,22 +6,22 @@ typedef uint32_t u32;
 
 struct recovered_scheduler_packet_row_84a34 {
     u32 destination_offset;
-    u32 source_0;
-    u32 source_2;
-    u32 source_4;
-    u32 source_6;
-    u32 source_a;
+    int32_t source_0;
+    int32_t source_2;
+    int32_t source_4;
+    int32_t source_6;
+    int32_t source_a;
     int32_t field_8c;
 };
 
 struct recovered_scheduler_packet_row_84a34
 recovered_scheduler_packet_row_84a34(u32 table_base,
                                      u32 selected_index,
-                                     u32 source_0,
-                                     u32 source_2,
-                                     u32 source_4,
-                                     u32 source_6,
-                                     u32 source_a,
+                                     int32_t source_0,
+                                     int32_t source_2,
+                                     int32_t source_4,
+                                     int32_t source_6,
+                                     int32_t source_a,
                                      int32_t normalized_delay)
 {
     struct recovered_scheduler_packet_row_84a34 out = {

@@ -34,17 +34,19 @@ recovered_scheduler_frame_decode_853c0(u32 value_504e42,
     out.selector = selector;
     out.table_index = value_504e44 >> 2;
     if (out.bit8_mode != 0U) {
-        table_offset = object_state * 1152U + selector * 25U + 20U;
+        /* shlo 3,selector; add selector; shlo 4 => selector * 144. */
+        table_offset = object_state * 1152U + selector * 144U + 20U;
         out.table_address = 0x005050a0U + table_offset
             + out.table_index * 2U;
         out.table_value = mode_a_value;
     } else {
-        table_offset = object_state * 1088U + selector * 17U + 12U;
+        /* shlo 4,selector; add selector; shlo 3 => selector * 136. */
+        table_offset = object_state * 1088U + selector * 136U + 12U;
         out.table_address = 0x005074a0U + table_offset
             + out.table_index * 2U;
         out.table_value = mode_b_value;
     }
-    out.packed_value = ((out.table_value & 0xf0U) << 4)
+    out.packed_value = ((out.table_value & 0xf00U) << 4)
         | (out.table_value & 0xfU);
     out.destination_address = object_field_ec + 0x1cU;
     out.value_504e44 = value_504e44 + 1U;

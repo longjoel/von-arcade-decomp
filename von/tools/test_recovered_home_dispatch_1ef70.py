@@ -42,5 +42,12 @@ with tempfile.TemporaryDirectory() as td:
 
     plan_fn(9, ctypes.byref(plan))
     assert plan.use_fill == 0
+    variant_fn = lib.recovered_home_dispatch_1efc0_plan
+    variant_fn.argtypes = [ctypes.c_uint32, ctypes.POINTER(Plan)]
+    variant_fn(0, ctypes.byref(plan))
+    assert list(plan.home_values) == [16, 16, 2]
+    assert (plan.use_fill, plan.fill_callee, plan.emit_callee) == (1, 0x1DF00, 0x1DC90)
+    variant_fn(9, ctypes.byref(plan))
+    assert plan.use_fill == 0
 
 print("PASS: 0x1ef70 cursor-home dispatch plan")

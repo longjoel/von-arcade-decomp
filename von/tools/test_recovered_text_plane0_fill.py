@@ -29,6 +29,8 @@ def main() -> int:
         assert plan_fn(1, 14, 3, 2, 1, 2, 0xc123, ctypes.byref(plan)) == 1
         assert (plan.destination_byte_address, plan.value) == (0x01000786, 0xc123)
         assert plan_fn(1, 14, 3, 2, 2, 0, 0, ctypes.byref(plan)) == 0
+        assert plan_fn(1, 14, 0xffffffff, 1, 0, 0, 0, ctypes.byref(plan)) == 0
+        assert plan_fn(1, 14, 1, 0xffffffff, 0, 0, 0, ctypes.byref(plan)) == 0
 
     print("PASS: 0x1df70 plain tile-plane fill plan")
     return 0

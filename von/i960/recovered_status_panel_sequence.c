@@ -22,6 +22,7 @@ struct recovered_status_panel_sequence_plan {
 
 void recovered_status_panel_sequence_plan(u32 initial_column, u32 initial_row,
                                           u32 source_mode, u32 fill_mode,
+                                          u32 caller_g24, u32 caller_g3,
                                           struct recovered_status_panel_sequence_plan *plan)
 {
     u32 first_column = initial_column + 2U;
@@ -34,7 +35,7 @@ void recovered_status_panel_sequence_plan(u32 initial_column, u32 initial_row,
     plan->first.fill_value = 0U;
     plan->first.column = first_column;
     plan->first.row = first_row;
-    plan->first.width = 55U;
+    plan->first.width = caller_g24 + 31U;
     plan->first.height = 8U;
 
     plan->second.helper = 0x0001dc10U;
@@ -42,7 +43,7 @@ void recovered_status_panel_sequence_plan(u32 initial_column, u32 initial_row,
     plan->second.fill_value = 0U;
     plan->second.column = second_column;
     plan->second.row = second_row;
-    plan->second.width = 34U;
+    plan->second.width = caller_g3 + 31U;
     plan->second.height = 2U;
 
     plan->third.helper = fill_mode ? 0x0001df00U : 0x0001dc90U;

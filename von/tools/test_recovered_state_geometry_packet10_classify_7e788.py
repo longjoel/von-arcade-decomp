@@ -10,6 +10,15 @@ import tempfile
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "von/i960/recovered_state_geometry_packet10_classify_7e788.c"
 RUNTIME_SOURCE = ROOT / "von/i960/recovered_runtime_math.c"
+LISTING = ROOT / "von/build/disasm/vonj-maincpu.lst"
+
+
+def assert_listing_signed_load():
+    listing = LISTING.read_text(encoding="utf-8")
+    assert any("7e7d4:" in line and "ldos\t0x8(g0),g5" in line
+               for line in listing.splitlines())
+    assert any("7e7d8:" in line and "subo\tg5,g4,g4" in line
+               for line in listing.splitlines())
 
 
 # The packet is an inline three-word array, so provide the ABI layout
@@ -30,6 +39,7 @@ class Plan(ctypes.Structure):
 
 
 with tempfile.TemporaryDirectory() as directory:
+    assert_listing_signed_load()
     library = pathlib.Path(directory) / "libstate-geometry-packet10-classify.so"
     subprocess.run(["cc", "-shared", "-fPIC", "-O2", str(SOURCE),
                     str(RUNTIME_SOURCE),
@@ -56,5 +66,10 @@ with tempfile.TemporaryDirectory() as directory:
     assert plan.response_bit15_set == 0
     assert plan.classifier_input == 0xffffffe0
     assert plan.classifier_band == 9
+
+    plan = Plan()
+    function(0, 0xffff, 0, 0, 0x10, 0, ctypes.byref(plan))
+    assert plan.response_minus_record_08 == 0x11
+    assert plan.response_bit15_set == 0
 
 print("recovered 0x7e788 packet10/classifier vectors: ok")

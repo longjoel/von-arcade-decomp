@@ -53,6 +53,17 @@ with tempfile.TemporaryDirectory() as directory:
     toggle_sign.restype = ctypes.c_uint32
     assert low_halfword(0x1234abcd) == 0xabcd
     assert toggle_sign(0x01234567) == 0x81234567
+    state_values = recovered.recovered_geometry_transform_state_values
+    state_values.argtypes = [ctypes.c_uint32] * 5 + [ctypes.POINTER(ctypes.c_uint32)]
+    values = (ctypes.c_uint32 * 6)()
+    state_values(0x81234567, 0x11111111, 0x22222222,
+                 0x33333333, 0x44444444, values)
+    assert list(values) == [0x81234567, 0, 0, 0x11111111,
+                            0x22222222, 0x33333333]
+    final_state = recovered.recovered_geometry_transform_final_state_value
+    final_state.argtypes = [ctypes.c_uint32]
+    final_state.restype = ctypes.c_uint32
+    assert final_state(0x44444444) == 0x44444444
 
     listing = LISTING.read_text(encoding="utf-8")
     block_start = listing.index("   2d9a0:")

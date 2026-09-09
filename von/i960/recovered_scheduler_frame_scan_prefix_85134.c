@@ -34,7 +34,7 @@ recovered_scheduler_frame_scan_prefix_85134(u32 frame_slot,
     out.frame_upper_g9 = frame_g9 >> 16;
     out.frame_target_g8 = out.frame_upper_g8 - 70U;
     out.frame_target_g9 = out.frame_upper_g9 - 70U;
-    out.field_86 = table_field_86 & 0xffffU;
+    out.field_86 = table_field_86 & out.frame_upper_g8;
     /* cmpo 49,field followed by bge: fields <= 49 skip the scan. */
     out.exits_to_853a0 = out.field_86 <= 49U ? 1U : 0U;
     out.continues_to_851a8 = out.field_86 > 49U ? 1U : 0U;

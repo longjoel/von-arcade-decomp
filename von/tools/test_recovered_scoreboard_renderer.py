@@ -20,6 +20,7 @@ class Plan(ctypes.Structure):
     _fields_ = [("early_return", ctypes.c_uint32),
                 ("normalized_first", ctypes.c_uint32),
                 ("normalized_second", ctypes.c_uint32),
+                ("background", Digit),
                 ("first_tens", Digit), ("first_units", Digit),
                 ("second_tens", Digit), ("second_units", Digit),
                 ("first_separator", Digit), ("second_suffix", Digit)]
@@ -36,15 +37,19 @@ def main() -> int:
         plan = Plan()
         plan_fn(42, 17, 1, 0, ctypes.byref(plan))
         assert (plan.early_return, plan.normalized_first, plan.normalized_second) == (0, 42, 17)
+        assert (plan.background.source, plan.background.helper, plan.background.column,
+                plan.background.row, plan.background.width, plan.background.height) == (
+                    0x2FE14FE, 0x1DC10, 15, 18, 31, 2)
         assert (plan.first_tens.source, plan.first_tens.column, plan.first_tens.row,
-                plan.first_tens.table_index) == (0x2EA1E60, 25, 21, 4)
+                plan.first_tens.helper, plan.first_tens.table_index) == (0x2EA1E60, 25, 21,
+                                                                           0x1DC90, 4)
         assert (plan.first_units.source, plan.first_units.column,
                 plan.first_units.table_index) == (0x2EA1E58, 27, 2)
         assert (plan.first_separator.source, plan.first_separator.column,
                 plan.first_separator.row, plan.first_separator.width,
                 plan.first_separator.height) == (0x2FE158A, 29, 22, 1, 1)
         assert (plan.second_tens.table_index, plan.second_tens.column,
-                plan.second_tens.row) == (1, 30, 21)
+                plan.second_tens.row, plan.second_tens.helper) == (1, 30, 21, 0x1DC90)
         assert (plan.second_units.table_index, plan.second_units.column) == (7, 32)
         assert (plan.second_suffix.source, plan.second_suffix.column,
                 plan.second_suffix.row, plan.second_suffix.width,

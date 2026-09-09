@@ -2,6 +2,7 @@
 
 import ctypes
 import pathlib
+import re
 import subprocess
 import tempfile
 from contextlib import contextmanager
@@ -9,6 +10,7 @@ from contextlib import contextmanager
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "i960/recovered_stage_mode_publication_865e0.c"
+LISTING = ROOT / "build/disasm/vonj-maincpu.lst"
 
 
 @contextmanager
@@ -40,6 +42,14 @@ def build():
 
 
 def main():
+    listing = LISTING.read_text()
+    for instruction in (r"865e0:.*stq.*0x509b60",
+                        r"865e8:.*stl.*0x509b70",
+                        r"865f8:.*stq.*0x509b40",
+                        r"86608:.*st.*0x509b80",
+                        r"86618:.*st.*0x509b88"):
+        assert re.search(instruction, listing)
+
     with build() as function:
         words = (ctypes.c_uint32 * 4)(1, 2, 3, 4)
         pair = (ctypes.c_uint32 * 2)(5, 6)

@@ -9,7 +9,9 @@ import tempfile
 class Status(ctypes.Structure):
     _fields_ = [(name, ctypes.c_uint32) for name in (
         "mode_byte", "state_flag", "status_service_result",
-        "service_gate_open", "state_service_calls")]
+        "service_gate_open", "state_service_calls", "status_address",
+        "state_address", "flag_address", "status_service_call",
+        "state_service_call", "loop_first_index", "loop_last_index")]
 
 
 root = pathlib.Path(__file__).parents[2]
@@ -36,5 +38,10 @@ with tempfile.TemporaryDirectory() as td:
                           expected_calls if result == 0 else 0)
                 if actual != wanted:
                     raise SystemExit("0x18a10 status helper mismatch")
+                assert (out.status_address, out.state_address, out.flag_address,
+                        out.status_service_call, out.state_service_call,
+                        out.loop_first_index, out.loop_last_index) == (
+                            0x1D00028, 0x5770B1, 0x503A08, 0xC5870,
+                            0x18AB0, 0, 0x77)
 
 print("PASS: 0x18a10 startup status helper")

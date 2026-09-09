@@ -1,9 +1,9 @@
 # Attract Reconstruction Worklist
 
 - Observed entry-point units: 262
-- Modeled integration queue: 198
-- Integrated or validated: 30
-- Untriaged: 34
+- Modeled integration queue: 231
+- Integrated or validated: 31
+- Untriaged: 0
 
 | Entry | Edges | Triage | Work unit |
 | --- | ---: | --- | --- |
@@ -54,7 +54,6 @@
 | `0x0001d880` | 2 | modeled-integration-queue | maincpu.text-status-string-bridge-1d880 |
 | `0x0001d9e0` | 4 | modeled-integration-queue | maincpu.text-alternate-string-font-mode |
 | `0x0001dc10` | 1 | modeled-integration-queue | maincpu.text-plane-block-bridges-1dc10 |
-| `0x0001dc90` | 1 | modeled-integration-queue | maincpu.text-plane-block-bridges-1dc10 |
 | `0x0001dd10` | 1 | modeled-integration-queue | maincpu.text-render-bridge-1dd10-1f0d0 |
 | `0x0001de80` | 4 | modeled-integration-queue | maincpu.text-tile-block-writer |
 | `0x0001df00` | 1 | modeled-integration-queue | maincpu.block-fill-1df00 |
@@ -129,6 +128,9 @@
 | `0x00075d90` | 1 | modeled-integration-queue | maincpu.stage-selector-75d90 |
 | `0x000761b0` | 2 | modeled-integration-queue | maincpu.object-threshold-constant-761b0 |
 | `0x00076590` | 1 | modeled-integration-queue | maincpu.geometry-object-band-pair-76590 |
+| `0x00076b00` | 1 | modeled-integration-queue | maincpu.match-geometry-state-gate-76b00 |
+| `0x00077470` | 1 | modeled-integration-queue | maincpu.match-geometry-profile-dispatch-77470 |
+| `0x000778b0` | 2 | modeled-integration-queue | maincpu.match-profile-result-select-778b0 |
 | `0x00077c40` | 1 | modeled-integration-queue | maincpu.record-flag-scan-77c40 |
 | `0x00077de0` | 1 | modeled-integration-queue | maincpu.state-shift-77e20 |
 | `0x00077e20` | 2 | modeled-integration-queue | maincpu.state-shift-77e20 |
@@ -143,6 +145,7 @@
 | `0x00078dd0` | 1 | modeled-integration-queue | maincpu.geometry-entry-gate-78dd0 |
 | `0x00079050` | 11 | modeled-integration-queue | maincpu.shared-object-state-transition |
 | `0x00079630` | 1 | modeled-integration-queue | maincpu.transition-post-threshold-79630 |
+| `0x00079c10` | 1 | modeled-integration-queue | maincpu.transition-timing-window-79c10 |
 | `0x00079d60` | 5 | modeled-integration-queue | maincpu.secondary-object-state-transition |
 | `0x0007a318` | 1 | modeled-integration-queue | maincpu.transition-setup-7a318 |
 | `0x0007a3e0` | 2 | modeled-integration-queue | maincpu.route-head-7a3e0 |
@@ -156,10 +159,13 @@
 | `0x0007ea10` | 1 | modeled-integration-queue | maincpu.state31-initializer-7ea10 |
 | `0x0007f4d0` | 1 | modeled-integration-queue | maincpu.transition-scan-7f4d0 |
 | `0x0007fca0` | 1 | modeled-integration-queue | maincpu.transition-precondition-7fca0 |
+| `0x0007ff40` | 1 | modeled-integration-queue | maincpu.geometry-command-prefix-7ff40 |
 | `0x00080710` | 1 | modeled-integration-queue | maincpu.transition-route-80710 |
 | `0x000807d0` | 1 | modeled-integration-queue | maincpu.transition-route-80710 |
 | `0x000810d0` | 1 | modeled-integration-queue | maincpu.transition-mode-route-810d0 |
 | `0x00081120` | 1 | modeled-integration-queue | maincpu.transition-mode-route-810d0 |
+| `0x00081610` | 1 | modeled-integration-queue | maincpu.transition-offset-classifier-81610 |
+| `0x00081b30` | 1 | modeled-integration-queue | maincpu.geometry-candidate-packet-81b30 |
 | `0x00081e60` | 2 | modeled-integration-queue | maincpu.state-dispatch-81e60 |
 | `0x00081f60` | 1 | modeled-integration-queue | maincpu.timing-selector-81f60 |
 | `0x00082040` | 1 | modeled-integration-queue | maincpu.state-action-dispatch-82040 |
@@ -170,13 +176,34 @@
 | `0x00083ac0` | 1 | modeled-integration-queue | maincpu.state-scheduler-dispatch-83ac0 |
 | `0x00086240` | 1 | modeled-integration-queue | maincpu.stage-post-setup-86240 |
 | `0x000866c0` | 1 | modeled-integration-queue | maincpu.stage-record-tables-866c0 |
+| `0x000881b8` | 1 | modeled-integration-queue | maincpu.stage-slot-update-881b8 |
+| `0x0008d400` | 1 | modeled-integration-queue | maincpu.geometry-batch-packet-8d400 |
+| `0x0008d5d0` | 1 | modeled-integration-queue | maincpu.geometry-indexed-packet-8d5d0 |
+| `0x0008dd40` | 2 | modeled-integration-queue | maincpu.geometry-object-packet-8dd40 |
+| `0x0008dfc0` | 2 | modeled-integration-queue | maincpu.geometry-first-entry-gate-8dfc0 |
+| `0x0009b288` | 1 | modeled-integration-queue | maincpu.command-record-write-9b288 |
+| `0x0009b308` | 1 | modeled-integration-queue | maincpu.shared-abi-tail-return-trampoline |
+| `0x0009b320` | 1 | modeled-integration-queue | maincpu.command-record-scan-9b320 |
+| `0x0009b498` | 1 | modeled-integration-queue | maincpu.command-record-pool-clear-9b498 |
+| `0x0009c050` | 1 | modeled-integration-queue | maincpu.geometry-descriptor-select-9c050 |
 | `0x0009de50` | 3 | modeled-integration-queue | maincpu.geometry-result-builder-entry-9de50 |
 | `0x0009e050` | 6 | modeled-integration-queue | maincpu.geometry-result-builder |
 | `0x0009e250` | 3 | modeled-integration-queue | maincpu.geometry-result-builder-entry-9e250 |
 | `0x0009e650` | 1 | modeled-integration-queue | maincpu.geometry-result-builder-entry-9e450 |
 | `0x0009e880` | 1 | modeled-integration-queue | maincpu.geometry-result-builder-entry-9e880 |
 | `0x0009eab0` | 1 | modeled-integration-queue | maincpu.geometry-result-builder-entry-9eab0 |
+| `0x000bd5a8` | 1 | modeled-integration-queue | maincpu.startup-table-copy-bd5a8 |
+| `0x000bd6b8` | 1 | modeled-integration-queue | maincpu.object-table-reset-bd6b8 |
+| `0x000bd730` | 1 | modeled-integration-queue | maincpu.object-dispatch-prelude-bd730 |
+| `0x000bd810` | 1 | modeled-integration-queue | maincpu.object-dispatch-prelude-bd810 |
+| `0x000bd8e0` | 1 | modeled-integration-queue | maincpu.object-dual-admission-bd8e0 |
+| `0x000be1f0` | 1 | modeled-integration-queue | maincpu.object-service-prelude-be1f0 |
+| `0x000bece0` | 1 | modeled-integration-queue | maincpu.object-pair-scan-bece0 |
+| `0x000bedf0` | 1 | modeled-integration-queue | maincpu.geometry-table-selector-be |
+| `0x000beee0` | 1 | modeled-integration-queue | maincpu.geometry-table-selector-be |
+| `0x000befd0` | 1 | modeled-integration-queue | maincpu.geometry-table-selector-be |
 | `0x000bf0c0` | 15 | modeled-integration-queue | maincpu.fixed-record-last-nonempty-scan |
+| `0x000bf2f0` | 1 | modeled-integration-queue | maincpu.geometry-constant-packet-bf2f0 |
 | `0x000c5130` | 4 | modeled-integration-queue | maincpu.object-pool-create |
 | `0x000c5240` | 1 | modeled-integration-queue | maincpu.object-pool-create-constant-variant |
 | `0x000c5310` | 2 | modeled-integration-queue | maincpu.object-pool-create-rebased-variant |
@@ -189,17 +216,23 @@
 | `0x000c8f10` | 1 | modeled-integration-queue | maincpu.command-profile-dispatch-wrapper |
 | `0x000c8f60` | 1 | modeled-integration-queue | maincpu.command-profile-advance-wrapper |
 | `0x000c8fa0` | 1 | modeled-integration-queue | maincpu.command-profile-initializer |
+| `0x000de670` | 1 | modeled-integration-queue | maincpu.startup-geometry-workspace-init-de670 |
+| `0x000de990` | 1 | modeled-integration-queue | maincpu.startup-status-workspace-reset-de990 |
+| `0x000df070` | 2 | modeled-integration-queue | maincpu.geometry-transform-payload-select-df070 |
 | `0x000e1e08` | 1 | modeled-integration-queue | maincpu.video-palette-lookup-initialize |
 | `0x000e1f20` | 14 | modeled-integration-queue | maincpu.video-tile-expand |
 | `0x000e2040` | 7 | modeled-integration-queue | maincpu.video-tile-expand-mirrored |
 | `0x000e2120` | 4 | modeled-integration-queue | maincpu.video-tile-expand-index-wrapper |
 | `0x000e2130` | 1 | modeled-integration-queue | maincpu.video-asset-setup |
 | `0x000e2330` | 1 | modeled-integration-queue | maincpu.video-dispatch-prefix |
+| `0x000e37f0` | 1 | modeled-integration-queue | maincpu.startup-device-table-copy-e37f0 |
 | `0x000e3830` | 1 | modeled-integration-queue | maincpu.decimal-emit-e3830 |
 | `0x000e39c0` | 2 | modeled-integration-queue | maincpu.rank-string-e39c0 |
 | `0x000e39f0` | 2 | modeled-integration-queue | maincpu.results-alias-thunks |
 | `0x000e3a10` | 6 | modeled-integration-queue | maincpu.text-two-digit-formatter |
 | `0x000e3a70` | 2 | modeled-integration-queue | maincpu.tribyte-emit-e3a70 |
+| `0x000e5d30` | 1 | modeled-integration-queue | maincpu.status-service-state-dispatch-e5d30 |
+| `0x000e5da0` | 1 | modeled-integration-queue | maincpu.status-transition-gateway-prefix-e5da0 |
 | `0x000f5058` | 28 | modeled-integration-queue | maincpu.runtime-random-step |
 | `0x000f50a8` | 1 | modeled-integration-queue | maincpu.runtime-random-seed |
 | `0x000f5100` | 9 | modeled-integration-queue | maincpu.text-general-formatter-boundary |
@@ -214,12 +247,13 @@
 | `0x0001c220` | 2 | integrated-validation-queue | maincpu.video-control-bootstrap-plan |
 | `0x0001c618` | 8 | integrated-validation-queue | maincpu.text-video-initialize |
 | `0x0001c730` | 1 | integrated-validation-queue | maincpu.video-byte-lane-expand |
-| `0x0001cac8` | 23 | integrated-validation-queue | maincpu.text-position-state |
+| `0x0001cac8` | 23 | integrated-validation-queue | maincpu.ui-text-state-helper |
 | `0x0001cc40` | 2 | integrated-validation-queue | maincpu.text-character-output |
 | `0x0001ccf8` | 7 | integrated-validation-queue | maincpu.text-tile-control-write |
 | `0x0001d1b0` | 4 | integrated-validation-queue | maincpu.text-string-byte-dispatch |
 | `0x0001d310` | 5 | integrated-validation-queue | maincpu.text-glyph-address-plan |
 | `0x0001da90` | 4 | integrated-validation-queue | maincpu.text-string-font-mode |
+| `0x0001dc90` | 1 | integrated-validation-queue | maincpu.block-emit-1dc90 |
 | `0x00027e50` | 3 | integrated-validation-queue | maincpu.texture-decompressor |
 | `0x00028120` | 1 | integrated-validation-queue | maincpu.texture-loader-profile-setup |
 | `0x000282e0` | 1 | integrated-validation-queue | maincpu.sharc-bootstrap-upload |
@@ -235,37 +269,3 @@
 | `0x00029d50` | 1 | integrated-validation-queue | maincpu.upload-select-29d50 |
 | `0x0002a8a0` | 1 | integrated-validation-queue | maincpu.audio-scsp-queue-initialize |
 | `0x000f5d40` | 10 | integrated-validation-queue | maincpu.memory-copy-forward |
-| `0x00076b00` | 1 | untriaged |  |
-| `0x00077470` | 1 | untriaged |  |
-| `0x000778b0` | 2 | untriaged |  |
-| `0x00079c10` | 1 | untriaged |  |
-| `0x0007ff40` | 1 | untriaged |  |
-| `0x00081610` | 1 | untriaged |  |
-| `0x00081b30` | 1 | untriaged |  |
-| `0x000881b8` | 1 | untriaged |  |
-| `0x0008d400` | 1 | untriaged |  |
-| `0x0008d5d0` | 1 | untriaged |  |
-| `0x0008dd40` | 2 | untriaged |  |
-| `0x0008dfc0` | 2 | untriaged |  |
-| `0x0009b288` | 1 | untriaged |  |
-| `0x0009b308` | 1 | untriaged |  |
-| `0x0009b320` | 1 | untriaged |  |
-| `0x0009b498` | 1 | untriaged |  |
-| `0x0009c050` | 1 | untriaged |  |
-| `0x000bd5a8` | 1 | untriaged |  |
-| `0x000bd6b8` | 1 | untriaged |  |
-| `0x000bd730` | 1 | untriaged |  |
-| `0x000bd810` | 1 | untriaged |  |
-| `0x000bd8e0` | 1 | untriaged |  |
-| `0x000be1f0` | 1 | untriaged |  |
-| `0x000bece0` | 1 | untriaged |  |
-| `0x000bedf0` | 1 | untriaged |  |
-| `0x000beee0` | 1 | untriaged |  |
-| `0x000befd0` | 1 | untriaged |  |
-| `0x000bf2f0` | 1 | untriaged |  |
-| `0x000de670` | 1 | untriaged |  |
-| `0x000de990` | 1 | untriaged |  |
-| `0x000df070` | 2 | untriaged |  |
-| `0x000e37f0` | 1 | untriaged |  |
-| `0x000e5d30` | 1 | untriaged |  |
-| `0x000e5da0` | 1 | untriaged |  |

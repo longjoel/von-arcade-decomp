@@ -13,6 +13,7 @@ enum recovered_state_scheduler_gate_82ae0_route {
 struct recovered_state_scheduler_gate_82ae0 {
     enum recovered_state_scheduler_gate_82ae0_route route;
     u32 ran_timing_selector;
+    u32 target;
 };
 
 struct recovered_state_scheduler_gate_82ae0
@@ -24,7 +25,7 @@ recovered_state_scheduler_gate_82ae0(u32 helper_value_503a14,
                                      u32 global_504d7c)
 {
     struct recovered_state_scheduler_gate_82ae0 plan = {
-        RECOVERED_SCHEDULER_CONTINUE, 1U
+        RECOVERED_SCHEDULER_CONTINUE, 1U, 0U
     };
 
     /* 0x81f60 runs before any of these branches. */
@@ -34,9 +35,14 @@ recovered_state_scheduler_gate_82ae0(u32 helper_value_503a14,
         return plan;
     if (threshold_504dbc >= 6U)
         return plan;
-    if (object_state < 8U)
+    /* cmpibl 8,g4 branches around the low-state call only when g4 > 8;
+     * equality still falls through to the 0x82db0 call. */
+    if (object_state <= 8U) {
         plan.route = RECOVERED_SCHEDULER_CALL_82DB0;
-    else if (global_504d7c == 5U)
+        plan.target = 0x00082db0U;
+    } else if (global_504d7c == 5U) {
         plan.route = RECOVERED_SCHEDULER_CALL_81E60;
+        plan.target = 0x00081e60U;
+    }
     return plan;
 }

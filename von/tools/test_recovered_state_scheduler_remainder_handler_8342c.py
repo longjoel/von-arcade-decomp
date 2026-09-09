@@ -31,8 +31,10 @@ with tempfile.TemporaryDirectory() as directory:
     assert (result.route, result.value_504d80,
             result.value_504d8c, result.value_504d90) == (1, 21, 77, 15)
     assert function(4, 0x2, 77).value_504d80 == 26
-    assert function(-1, 0x4, 77).value_504d80 == 28
+    assert function(1, 0x4, 77).value_504d80 == 28
+    assert function(-1, 0x4, 77).route == 0
+    assert function(0, 0x4, 77).route == 0
     assert function(4, 0, 77).route == 0
-    assert function(2, 0x4, 77).route == 0
+    assert function(2, 0, 77).route == 0
 
 print("recovered 0x8342c remainder-handler vectors: ok")

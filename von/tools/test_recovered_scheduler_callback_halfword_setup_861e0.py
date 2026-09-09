@@ -2,6 +2,7 @@
 
 import ctypes
 import pathlib
+import re
 import subprocess
 import tempfile
 from contextlib import contextmanager
@@ -9,6 +10,7 @@ from contextlib import contextmanager
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "i960/recovered_scheduler_callback_halfword_setup_861e0.c"
+LISTING = ROOT / "build/disasm/vonj-maincpu.lst"
 
 
 @contextmanager
@@ -40,6 +42,13 @@ def build():
 
 
 def main():
+    listing = LISTING.read_text()
+    for instruction in (r"861f8:.*shlo.*16,g0,g0",
+                        r"8620c:.*cmpi.*g4,0",
+                        r"86224:.*cmpibe.*0,g4,0x8622c",
+                        r"86234:.*bx.*\(g2\)"):
+        assert re.search(instruction, listing)
+
     with build() as function:
         result = function(-7, 123, 4, 0)
         assert result.stored_509b94 == -7

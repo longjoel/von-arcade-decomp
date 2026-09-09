@@ -13,7 +13,10 @@ SOURCE = ROOT / "von/i960/recovered_state_handler_dispatch_82800.c"
 
 class Plan(ctypes.Structure):
     _fields_ = [("dispatched", ctypes.c_uint32),
-                ("target", ctypes.c_uint32)]
+                ("target", ctypes.c_uint32),
+                ("rejected", ctypes.c_uint32),
+                ("reject_target", ctypes.c_uint32),
+                ("handler_selector", ctypes.c_uint32)]
 
 
 with tempfile.TemporaryDirectory() as directory:
@@ -29,8 +32,13 @@ with tempfile.TemporaryDirectory() as directory:
                 0x828D4, 0x828F0, 0x8293C, 0x828E8, 0x82950]
     for selector, target in enumerate(expected):
         result = function(selector)
-        assert (result.dispatched, result.target) == (1, target)
-    assert function(10).dispatched == 0
-    assert function(0xFFFFFFFF).dispatched == 0
+        assert (result.dispatched, result.target,
+                result.handler_selector) == (1, target, selector)
+    rejected = function(10)
+    assert (rejected.dispatched, rejected.rejected, rejected.reject_target,
+            rejected.handler_selector) == (0, 1, 0x82950, 10)
+    rejected = function(0xFFFFFFFF)
+    assert (rejected.dispatched, rejected.rejected, rejected.reject_target,
+            rejected.handler_selector) == (0, 1, 0x82950, 0xFFFFFFFF)
 
 print("recovered 0x82800 state-handler dispatch vectors: ok")

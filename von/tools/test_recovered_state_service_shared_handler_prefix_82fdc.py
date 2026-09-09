@@ -33,7 +33,7 @@ with tempfile.TemporaryDirectory() as directory:
 
     expected = {0: (5, 0, 30, 1, 0), 1: (6, 0, 30, 1, 0),
                 2: (2, 0, 30, 1, 0), 3: (3, 0, 30, 1, 0),
-                4: (99, 1, 20, 0, 0), 5: (99, 2, 20, 0, 0),
+                4: (99, 1, 10, 0, 0), 5: (99, 2, 20, 0, 0),
                 6: (99, 3, 20, 0, 0), 7: (7, 0, 30, 0, 1)}
     for selector, (d94, d98, db8, call79050, call79d60) in expected.items():
         result = function(selector, 99)

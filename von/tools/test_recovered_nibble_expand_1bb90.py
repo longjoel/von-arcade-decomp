@@ -17,11 +17,12 @@ def oracle(pixel):
     o[0] = i[12]
     o[1], o[2], o[3], o[4] = i[0], i[1], i[2], i[3]
     o[5] = i[13]
-    o[10] = i[8] | i[14]
-    o[11] = i[9] | i[8]
-    o[12] = i[10] | i[9]
-    o[13] = i[11] | i[10]
-    o[14] = i[11]
+    o[10] = i[14]
+    o[11] = i[8]
+    o[12] = i[9]
+    o[13] = i[10]
+    o[14] = i[11] | i[12]
+    o[15] = i[12] | i[13]
     return sum(b << n for n, b in enumerate(o))
 
 
@@ -50,8 +51,9 @@ with tempfile.TemporaryDirectory() as td:
         assert word_fn(pixel) == oracle(pixel), hex(pixel)
 
     # Signed run schedule with 2-byte strides.
-    for count, want in ((-0x80000000, 0), (-1, 0), (0, 0), (1, 1),
-                        (2, 2), (0x100, 0x100), (0x7FFFFFFF, 0x7FFFFFFF)):
+    for count, want in ((-0x80000000, 0), (-1, 0), (0, 0), (1, 16),
+                        (2, 32), (0x100, 0x1000), (0x08000001, 0),
+                        (-0x7FFFFFFF, 16)):
         run = Run()
         run_fn(0x1000, 0x2000, count, ctypes.byref(run))
         assert run.iterations == want, count

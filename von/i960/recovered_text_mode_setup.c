@@ -15,8 +15,8 @@ struct recovered_text_mode_setup_plan {
     u32 timing_ce4;
     u32 helper;
     u32 source;
-    u32 tile;
     u32 width;
+    u32 rows;
 };
 
 void recovered_text_mode_setup_plan(u32 mode, u32 caller_g10, u32 caller_g13,
@@ -25,10 +25,11 @@ void recovered_text_mode_setup_plan(u32 mode, u32 caller_g10, u32 caller_g13,
     plan->timing_cdc = caller_g10 + 31;
     plan->timing_ce0 = caller_g10 + 31;
     plan->timing_ce4 = caller_g13 + 31;
-    /* 0x1df00 is a fill helper: it consumes g0/g1 as dimensions and
-       takes its tile word from preserved g14, not a source pointer. */
+    /* The selected helpers use different ABIs: 0x1dc90 receives width/rows
+       in g1/g2, while 0x1df00 receives them in g0/g1 and takes its tile word
+       from preserved g14 rather than a source pointer. */
     plan->source = mode == 0 ? 0 : 0x02fd0cd4;
-    plan->tile = 19;
-    plan->width = 2;
+    plan->width = 19U;
+    plan->rows = 2U;
     plan->helper = mode == 0 ? 0x0001df00 : 0x0001dc90;
 }

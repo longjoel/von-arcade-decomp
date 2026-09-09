@@ -13,6 +13,11 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "von/i960/recovered_text_alt_string.c"
 
 
+class GlyphStringPlan(ctypes.Structure):
+    _fields_ = [(name, ctypes.c_uint32) for name in
+                ("font_mode", "attributes", "renderer_target", "emits_characters")]
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as directory:
         library = Path(directory) / "libtext_alt_string.so"
@@ -33,7 +38,18 @@ def main() -> int:
             actual = function(text)
             assert actual == expected, (text, actual, expected)
 
-    print("recovered alternate text-mode vectors: ok")
+        connected = api.recovered_text_alt_glyph_string_plan
+        connected.argtypes = [ctypes.c_char_p, ctypes.POINTER(GlyphStringPlan)]
+        for text, expected_mode, expected_emit in (
+                (b"", 3, 0), (b"ABC", 3, 1), (b"AbC", 2, 1),
+                (b"A-z", 2, 1)):
+            plan = GlyphStringPlan()
+            connected(text, ctypes.byref(plan))
+            assert (plan.font_mode, plan.attributes, plan.renderer_target,
+                    plan.emits_characters) == (expected_mode, 0x4000,
+                                               0x1d310, expected_emit)
+
+    print("PASS: 0x1d7d0 alternate mode and renderer connection vectors")
     return 0
 
 

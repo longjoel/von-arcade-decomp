@@ -9,6 +9,7 @@ from contextlib import contextmanager
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "i960/recovered_scheduler_callback_byte_map_scan_85c88.c"
+LISTING = ROOT / "build/disasm/vonj-maincpu.lst"
 
 
 @contextmanager
@@ -43,7 +44,8 @@ def main():
         values[4] = 0xB3
         values[9] = 0x03
         result = function(values, 1 << 10, 7, 0, 0x20)
-        assert result.rejected == 1
+        assert (result.rejected, result.row_adjust_path,
+                result.map_after[9]) == (0, 1, 0x23)
 
         values = (ctypes.c_uint8 * 32)(*[0] * 32)
         values[4] = 0xB3
@@ -62,13 +64,31 @@ def main():
         assert result.candidate_index == 2
         assert result.used_primary_gate == 1
         assert result.candidate_nibble == 1
+        assert result.row_adjust_path == 0
 
         values = (ctypes.c_uint8 * 32)(*[0] * 32)
         values[2] = 0x81
         values[3] = 0x01
         result = function(values, 0, 0, 0, 0x20)
         assert result.rejected == 1
-    print("recovered 0x85c88 byte-map vectors: ok")
+print("recovered 0x85c88 byte-map vectors: ok")
+
+listing = [" ".join(line.split()).lower()
+           for line in LISTING.read_text(encoding="utf-8").splitlines()]
+for address, instruction in (
+    ("85c88:", "ldob 0x1(g3)[r5]"),
+    ("85c90:", "setbit 7,0,r13"),
+    ("85c9c:", "cmpibe 0,g4,0x85d54"),
+    ("85cc8:", "stob g14,0x1(g3)[r5]"),
+    ("85ce8:", "setbit 5,g6,g4"),
+    ("85d00:", "cmpibne 1,g2,0x85ef8"),
+    ("85d54:", "ldob 0x1(g3)[r5]"),
+    ("85e10:", "cmpibe g4,g1,0x85ef8"),
+    ("85e20:", "ld 0x64(g0),g5"),
+):
+    assert any(address in line and instruction in line for line in listing), (address, instruction)
+
+print("recovered 0x85c88 byte-map listing evidence: ok")
 
 
 if __name__ == "__main__":

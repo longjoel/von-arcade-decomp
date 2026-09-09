@@ -7,6 +7,9 @@ typedef uint32_t u32;
 struct recovered_state_handler_dispatch_82800 {
     u32 dispatched;
     u32 target;
+    u32 rejected;
+    u32 reject_target;
+    u32 handler_selector;
 };
 
 static const u32 targets[10] = {
@@ -17,10 +20,14 @@ static const u32 targets[10] = {
 struct recovered_state_handler_dispatch_82800
 recovered_state_handler_dispatch_82800(u32 selector)
 {
-    struct recovered_state_handler_dispatch_82800 out = {0U, 0U};
+    struct recovered_state_handler_dispatch_82800 out = {0U, 0U, 0U,
+                                                         0U, selector};
 
-    if (selector > 9U)
+    if (selector > 9U) {
+        out.rejected = 1U;
+        out.reject_target = 0x00082950U;
         return out;
+    }
     out.dispatched = 1U;
     out.target = targets[selector];
     return out;

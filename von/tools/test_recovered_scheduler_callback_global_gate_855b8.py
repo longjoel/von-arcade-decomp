@@ -28,13 +28,15 @@ with tempfile.TemporaryDirectory() as directory:
     function.argtypes = [ctypes.c_uint32, ctypes.c_int32,
                          ctypes.c_int32, ctypes.c_int32]
     function.restype = Plan
-    result = function(0, 149, 96, 3)
+    result = function(0, 149, 96, 24)
     assert (result.frame_quotient, result.frame_target,
             result.target_difference, result.exits_to_85678,
-            result.continues_to_object_ratio) == (2, 3, 0, 0, 1)
+            result.continues_to_object_ratio) == (2, 3, 21, 0, 1)
     assert function(1, 0, 0, 0).exits_to_85678 == 1
     assert function(0, 150, 0, 0).exits_to_85678 == 1
-    assert function(0, 0, 0, 23).exits_to_85678 == 1
-    assert function(0, 0, 0, 20).continues_to_object_ratio == 1
+    assert function(0, 0, 0, 23).exits_to_85678 == 0
+    assert function(0, 0, 0, 22).exits_to_85678 == 0
+    assert function(0, 0, 0, 21).exits_to_85678 == 1
+    assert function(0, 0, 0, 20).continues_to_object_ratio == 0
 
 print("recovered 0x855b8 global-gate vectors: ok")

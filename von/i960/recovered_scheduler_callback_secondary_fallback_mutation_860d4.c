@@ -13,6 +13,7 @@ struct recovered_scheduler_callback_secondary_fallback_mutation_860d4 {
     s32 current_after;
     s32 paired_before;
     s32 paired_after;
+    u32 matching_entries;
     u32 map_replaced;
     uint8_t map_after[32];
 };
@@ -32,13 +33,19 @@ recovered_scheduler_callback_secondary_fallback_mutation_860d4(
     out.current_after = current_value - 10;
     out.paired_before = paired_value;
     out.paired_after = paired_value;
+    out.matching_entries = 0U;
     out.map_replaced = 0U;
     for (index = 0U; index < 32U; ++index)
         out.map_after[index] = map_before[index];
 
     if (paired_value <= 49)
         out.paired_after = 40;
-    out.map_after[candidate_index] = callback_g14;
-    out.map_replaced = 1U;
+    for (index = 0U; index < 32U; ++index) {
+        if ((map_before[index] & 0x0fU) == out.candidate_nibble) {
+            ++out.matching_entries;
+            out.map_after[candidate_index] = callback_g14;
+            out.map_replaced = 1U;
+        }
+    }
     return out;
 }

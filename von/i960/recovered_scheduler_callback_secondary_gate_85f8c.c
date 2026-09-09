@@ -21,37 +21,27 @@ struct recovered_scheduler_callback_secondary_gate_85f8c {
 
 struct recovered_scheduler_callback_secondary_gate_85f8c
 recovered_scheduler_callback_secondary_gate_85f8c(
-    const uint8_t map_bytes[32], const uint16_t previous_words[32],
-    const uint16_t current_words[32], const uint8_t object_bytes[32])
+    u32 candidate_index, uint8_t map_byte, uint16_t previous_word,
+    uint16_t current_word, uint8_t object_byte)
 {
     struct recovered_scheduler_callback_secondary_gate_85f8c out;
-    u32 index;
 
-    out.candidate_index = 32U;
+    out.candidate_index = candidate_index;
     out.route = RECOVERED_SECONDARY_REJECT;
     out.map_bit6 = 0U;
     out.previous_special_bits = 0U;
     out.current_is_zero = 0U;
     out.object_byte_is_zero = 0U;
 
-    for (index = 0U; index < 32U; ++index) {
-        u32 map_bit6 = (map_bytes[index] & (1U << 6)) != 0U;
-        u32 previous_special = (previous_words[index] &
-            ((1U << 9) | (1U << 8) | (1U << 11))) != 0U;
-        u32 current_zero = current_words[index] == 0U;
-        u32 object_zero = object_bytes[index] == 0U;
-
-        if (!map_bit6)
-            continue;
-        out.candidate_index = index;
-        out.map_bit6 = 1U;
-        out.previous_special_bits = previous_special;
-        out.current_is_zero = current_zero;
-        out.object_byte_is_zero = object_zero;
-        out.route = (previous_special || current_zero || object_zero) ?
-            RECOVERED_SECONDARY_PRIMARY_86000 :
-            RECOVERED_SECONDARY_FALLBACK_860a0;
+    out.map_bit6 = (map_byte & (1U << 6)) != 0U;
+    out.previous_special_bits = (previous_word &
+        ((1U << 9) | (1U << 8) | (1U << 11))) != 0U;
+    out.current_is_zero = current_word == 0U;
+    out.object_byte_is_zero = object_byte == 0U;
+    if (!out.map_bit6)
         return out;
-    }
+    out.route = (out.previous_special_bits || out.current_is_zero ||
+        out.object_byte_is_zero) ? RECOVERED_SECONDARY_PRIMARY_86000 :
+        RECOVERED_SECONDARY_FALLBACK_860a0;
     return out;
 }

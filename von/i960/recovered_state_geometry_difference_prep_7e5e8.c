@@ -35,13 +35,14 @@ static u32 subr(u32 source, u32 destination)
 void recovered_state_geometry_difference_prep_7e5e8(
     u32 fifo_response_g4, u32 fifo_response_g5, u32 fifo_response_g13,
     u32 fifo_response_r4, u32 fifo_response_g2, u32 fifo_response_g1,
+    u32 fifo_response_r8, u32 fifo_response_r5,
     u32 object_plus_8, u32 object_plus_10, u32 descriptor_field_10,
     u32 descriptor_field_18,
     struct recovered_state_geometry_difference_prep_7e5e8_plan *plan)
 {
     u32 g1 = fifo_response_g1;
     u32 g2 = fifo_response_g2;
-    u32 g3 = descriptor_field_10;
+    u32 g3 = subr(fifo_response_r5, descriptor_field_10);
     u32 g4 = fifo_response_g4;
     u32 g5;
     u32 g6 = object_plus_10;
@@ -49,13 +50,14 @@ void recovered_state_geometry_difference_prep_7e5e8(
     u32 g8;
     u32 r4;
     u32 g13 = fifo_response_g13 + descriptor_field_18;
+    u32 r6 = subr(fifo_response_r8, descriptor_field_10);
 
-    /* 0x7e5f8-0x7e624: first response/object differences. */
+    /* 0x7e5e8-0x7e624: response/object differences and frame-slot value. */
+    g2 += descriptor_field_18;
     g5 = subr(fifo_response_g5, g3);
     g1 += g2;
-    g8 = subr(descriptor_field_10, descriptor_field_10);
-    /* r6 is the same descriptor +0x10 value loaded at 0x7e480. */
-    r4 = subr(fifo_response_r4, descriptor_field_10);
+    g8 = subr(r6, g3);
+    r4 = subr(fifo_response_r4, r6);
 
     plan->r11 = subr(g13, g2);
     plan->r10 = descriptor_field_18;
@@ -64,12 +66,12 @@ void recovered_state_geometry_difference_prep_7e5e8(
     plan->frame_plus_60 = g8;
 
     /* 0x7e63c-0x7e660: post-command-10 difference preparation. */
-    plan->r12 = subr(descriptor_field_10, g7);
+    plan->r12 = subr(r6, g7);
     g4 += g13;
     plan->command10_payload = g4;
     plan->r7 = subr(g13, g6);
-    g3 = subr(g7, g3);
-    g2 = subr(fifo_response_g2, g6);
+    g3 = subr(g3, g7);
+    g2 = subr(g2, g6);
     plan->r13 = subr(g5, g7);
     plan->r5 = subr(g1, g6);
     g7 = subr(r4, g7);

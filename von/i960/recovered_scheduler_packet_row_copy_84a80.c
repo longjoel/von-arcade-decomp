@@ -5,22 +5,22 @@
 typedef uint32_t u32;
 
 struct recovered_scheduler_packet_row_copy_84a80 {
-    u32 field_0;
-    u32 field_2;
-    u32 field_4;
-    u32 field_6;
-    u32 field_a;
+    int32_t field_0;
+    int32_t field_2;
+    int32_t field_4;
+    int32_t field_6;
+    int32_t field_a;
     u32 field_8e;
     u32 copied_count;
     uint16_t field_c[60];
 };
 
 struct recovered_scheduler_packet_row_copy_84a80
-recovered_scheduler_packet_row_copy_84a80(u32 field_0,
-                                          u32 field_2,
-                                          u32 field_4,
-                                          u32 field_6,
-                                          u32 field_a,
+recovered_scheduler_packet_row_copy_84a80(int32_t field_0,
+                                          int32_t field_2,
+                                          int32_t field_4,
+                                          int32_t field_6,
+                                          int32_t field_a,
                                           const uint16_t source_field_c[60])
 {
     struct recovered_scheduler_packet_row_copy_84a80 out = {

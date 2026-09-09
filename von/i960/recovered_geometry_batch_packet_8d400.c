@@ -9,7 +9,9 @@
 struct recovered_geometry_batch_packet_8d400_input {
     recovered_u32 record_word;
     recovered_u32 record_word4;
-    recovered_u32 parameter_word;
+    recovered_u32 record_halfword6;
+    /* Value loaded from the computed source-table entry at g3. */
+    recovered_u32 source_table_word;
     recovered_u32 coordinate_2;
     recovered_u32 coordinate_0;
     recovered_u32 coordinate_4;
@@ -48,7 +50,7 @@ void recovered_geometry_batch_packet_8d400(
     plan->fifo_word[7] = 21U;
     plan->fifo_word[8] = input->coordinate_0 & 0xffffU;
     plan->fifo_word[9] = 20U;
-    plan->fifo_word[10] = input->parameter_word & 0xffffU;
+    plan->fifo_word[10] = input->source_table_word & 0xffffU;
     plan->fifo_word[11] = 58U;
     plan->fifo_word[12] = input->readback_word;
     plan->fifo_count = 13U;
@@ -61,7 +63,9 @@ void recovered_geometry_batch_packet_8d400(
     plan->window_address[3] = 0x0080400cU;
     plan->window_word[0] = input->record_word;
     plan->window_word[1] = input->record_word4;
-    plan->window_word[2] = input->coordinate_6 & 0xffffU;
+    /* 0x8d540 stores the sign-extended ldos at record + 0x6. */
+    plan->window_word[2] = (recovered_u32)(int32_t)(int16_t)
+        (input->record_halfword6 & 0xffffU);
     plan->window_word[3] = 0U;
     plan->completion_word = 6U;
     plan->fifo_read_address = 0x00884000U;

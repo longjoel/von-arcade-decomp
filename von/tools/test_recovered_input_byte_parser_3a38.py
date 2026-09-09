@@ -36,7 +36,11 @@ with tempfile.TemporaryDirectory() as directory:
 
     state = State(0, 9, 4, 0)
     assert function(ctypes.byref(state), 2) == 1
-    assert (state.first, state.second, state.count, state.status_mask) == (255, 9, 4, 0)
+    assert (state.first, state.second, state.count, state.status_mask) == (255, 8, 4, 0)
+
+    state = State(0, 1, 4, 0)
+    assert function(ctypes.byref(state), 2) == 1
+    assert (state.first, state.second, state.count, state.status_mask) == (255, 0, 4, 0)
 
     state = State(1, 9, 4, 0xffffffff)
     assert function(ctypes.byref(state), 7) == 2

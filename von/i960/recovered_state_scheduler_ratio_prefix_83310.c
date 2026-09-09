@@ -21,7 +21,7 @@ struct recovered_state_scheduler_ratio_prefix_83310
 recovered_state_scheduler_ratio_prefix_83310(double ratio,
                                              u32 mode_504e30,
                                              u32 state_504d7c,
-                                             u32 random_remainder_5)
+                                             int32_t random_remainder_5)
 {
     struct recovered_state_scheduler_ratio_prefix_83310 out = {
         1U, mode_504e30, 0U, 0U, 0U
@@ -35,7 +35,14 @@ recovered_state_scheduler_ratio_prefix_83310(double ratio,
     }
     if (state_504d7c != 5U)
         return out;
-    out.random_table_dispatch = 1U;
-    out.random_table_target = random_targets[random_remainder_5 % 5U];
+    {
+        const int32_t remainder = random_remainder_5 % 5;
+
+        /* cmpobl 4,g0 rejects unsigned negative remainders as well as >4. */
+        if (remainder < 0)
+            return out;
+        out.random_table_dispatch = 1U;
+        out.random_table_target = random_targets[(uint32_t)remainder];
+    }
     return out;
 }

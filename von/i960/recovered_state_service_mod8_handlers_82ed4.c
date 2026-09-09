@@ -17,7 +17,7 @@ struct recovered_state_service_mod8_plan {
 };
 
 struct recovered_state_service_mod8_plan
-recovered_state_service_mod8_handler(u32 entry, u32 remainder_8,
+recovered_state_service_mod8_handler(u32 entry, int32_t remainder_8,
                                      u32 object_state)
 {
     struct recovered_state_service_mod8_plan out = {
@@ -25,7 +25,7 @@ recovered_state_service_mod8_handler(u32 entry, u32 remainder_8,
     };
 
     if (entry == 0x82ed4U) {
-        if (remainder_8 < 3U && object_state == 3U) {
+        if (remainder_8 < 3 && object_state == 3U) {
             out.route = RECOVERED_SERVICE_MOD8_VALUE_3;
             out.downstream_value = 3U;
         } else if (remainder_8 == 6U) {

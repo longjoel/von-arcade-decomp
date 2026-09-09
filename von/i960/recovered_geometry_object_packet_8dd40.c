@@ -18,6 +18,10 @@ struct recovered_geometry_object_packet_8dd40_input {
     recovered_u32 output_high;
     recovered_u32 frame_readback;
     recovered_u32 table_index;
+    /* True only when the 0x8df64 table arm survives its upstream gates. */
+    recovered_u32 table_arm_active;
+    /* Incoming g6 tested at 0x8ded0; separate from FIFO readback g4. */
+    recovered_u32 selection_flag;
 };
 
 struct recovered_geometry_object_packet_8dd40_plan {
@@ -40,6 +44,12 @@ struct recovered_geometry_object_packet_8dd40_plan {
     recovered_u32 table_address;
 };
 
+static recovered_u32 recovered_geometry_object_sign_extend_halfword(
+    recovered_u32 value)
+{
+    return (recovered_u32)(int32_t)(int16_t)(value & 0xffffU);
+}
+
 void recovered_geometry_object_packet_8dd40(
     const struct recovered_geometry_object_packet_8dd40_input *input,
     struct recovered_geometry_object_packet_8dd40_plan *plan)
@@ -50,11 +60,14 @@ void recovered_geometry_object_packet_8dd40(
     plan->fifo_word[3] = input->coordinate_8 & 0xffffU;
     plan->fifo_word[4] = input->coordinate_10 & 0xffffU;
     plan->fifo_word[5] = 22U;
-    plan->fifo_word[6] = input->coordinate_4 & 0xffffU;
+    plan->fifo_word[6] = recovered_geometry_object_sign_extend_halfword(
+        input->coordinate_4);
     plan->fifo_word[7] = 21U;
-    plan->fifo_word[8] = input->coordinate_2 & 0xffffU;
+    plan->fifo_word[8] = recovered_geometry_object_sign_extend_halfword(
+        input->coordinate_2);
     plan->fifo_word[9] = 20U;
-    plan->fifo_word[10] = input->coordinate_0 & 0xffffU;
+    plan->fifo_word[10] = recovered_geometry_object_sign_extend_halfword(
+        input->coordinate_0);
     plan->fifo_word[11] = 58U;
     plan->fifo_word[12] = input->frame_readback;
     plan->fifo_count = 13U;
@@ -67,16 +80,18 @@ void recovered_geometry_object_packet_8dd40(
     plan->window_address[2] = 0x00804008U;
     plan->window_address[3] = 0x0080400cU;
     plan->window_word[0] = input->object_word;
-    plan->window_word[1] = input->fifo_read_value ? input->selected_word8 : input->selected_word4;
+    plan->window_word[1] = input->selection_flag ? input->selected_word8 : input->selected_word4;
     plan->window_word[2] = input->object_word_c;
     plan->window_word[3] = 0U;
     plan->completion_word = 6U;
-    plan->selected_field_offset = input->fifo_read_value ? 8U : 4U;
-    plan->selected_field_value = input->fifo_read_value ? input->selected_word8 : input->selected_word4;
+    plan->selected_field_offset = input->selection_flag ? 8U : 4U;
+    plan->selected_field_value = input->selection_flag ? input->selected_word8 : input->selected_word4;
     plan->output_address_low = 0x174U;
     plan->output_address_high = 0x17cU;
     plan->output_low = input->output_low;
     plan->output_high = input->output_high;
-    plan->table_write = (input->table_index < 5U);
+    /* cmpobl 5,index is literal-first: indices 0 through 5 reach the
+     * table store; only values above 5 take the skip branch. */
+    plan->table_write = input->table_arm_active && (input->table_index <= 5U);
     plan->table_address = 0x562430U + input->table_index * 12U;
 }

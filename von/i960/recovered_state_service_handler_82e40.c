@@ -16,14 +16,16 @@ struct recovered_state_service_handler_82e40 {
 };
 
 struct recovered_state_service_handler_82e40
-recovered_state_service_handler_82e40(u32 random_remainder_5,
+recovered_state_service_handler_82e40(int32_t random_remainder_5,
                                       u32 object_state)
 {
     struct recovered_state_service_handler_82e40 out = {
         RECOVERED_SERVICE_82E40_SHARED_FALLBACK, 0U
     };
 
-    if (random_remainder_5 != 4U)
+    /* The caller supplies the signed result of remi 5; this handler only
+     * tests equality, so negative remainders use the shared fallback. */
+    if (random_remainder_5 != 4)
         return out;
     if (object_state == 3U) {
         out.route = RECOVERED_SERVICE_82E40_VALUE_2;

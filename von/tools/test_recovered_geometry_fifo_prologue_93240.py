@@ -73,8 +73,9 @@ def main() -> int:
         assert lib.fadd_bits(0, NEG30) == NEG30, "0 + -30"
         assert lib.fadd_bits(fbits(1.0), 10) == fbits(1.0), "absorbs"
 
-        for g0, g1, g2 in ((0x00000000, 0x41B40000, 0xC195999A),
-                           (0x00000000, 0x41B4CCCD, 0xC19A6666)):
+        for g0, g1, g2 in ((0x00000000, 0x41B40000, 0xC195999A), # 0x969a4
+                           (0x00000000, 0x41B4CCCD, 0xC19A6666), # 0x97150
+                           (0x00000000, 0x41B4CCCD, 0xC19A6666)): # 0x97210
             cell = lib.prologue_cell(fbits(31.0), 1)
             assert cell == NEG30
             words = (ctypes.c_uint32 * 12)()
@@ -100,7 +101,7 @@ def main() -> int:
                                21, 0, 19, F, F, F, 6]
         assert (composed.a0, composed.a1, composed.a2) == (
             0x02B4B652, (0x02B4B652 + 0x97512) & 0xFFFFFFFF, 17)
-        print("PASS: prologue legs, fadd, packet x2, tail args")
+        print("PASS: prologue legs, fadd, packet x3 callers, tail args")
     return 0
 
 

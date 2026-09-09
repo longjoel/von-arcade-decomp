@@ -23,6 +23,9 @@ SOURCE = ROOT / "von/i960/recovered_geometry_fifo_packet_stateful_92730.c"
 CALLERS = [
     (0xC12CCCCD, 0x4227999A, 0x3F800000, 0x1500, 0x1500),
     (0xC1066666, 0x42293333, 0x3FE66666, 0xFFFFA000, 0xA000),
+    (0xC0C00000, 0x42206666, 0xBE99999A, 0xFFFFA000, 0xA000), # 0x96f24
+    (0xC0C00000, 0x42040000, 0xC0800000, 0x00000000, 0x0000), # 0x97780
+    (0xC0E66666, 0x4224CCCD, 0x3ECCCCCD, 0xFFFFEF00, 0xEF00), # 0x99298
 ]
 
 
@@ -72,7 +75,7 @@ def main() -> int:
         lib.fifo_packet_stateful_call_args(1, 0x44, ctypes.byref(args))
         assert args.a0 == (0x02B53CA2 + 0xFFFFBC7E) & 0xFFFFFFFF, "F set"
         assert (args.a1, args.a2) == (0x02BE2B64, 0x44), "a1/a2"
-        print("PASS: 13-word packet x2, toggle table, call args")
+        print("PASS: 13-word packet x5, toggle table, call args")
     return 0
 
 

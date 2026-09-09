@@ -22,15 +22,18 @@ static const u32 targets[44] = {
 };
 
 struct recovered_state_scheduler_dispatch_82b4c
-recovered_state_scheduler_dispatch_82b4c(u32 status,
-                                          u32 max_selector,
-                                          u32 selector)
+recovered_state_scheduler_dispatch_82b4c(u32 low_status_504d80,
+                                          u32 max_status,
+                                          u32 high_selector_504d84)
 {
     struct recovered_state_scheduler_dispatch_82b4c out = {0U, 0U};
 
-    if (status != 1U || selector > max_selector || selector >= 44U)
+    /* ldl 0x504d80 loads the low status into g4 and the high selector into
+     * g5; cmpibne gates g5 before cmpobg bounds and indexes g4. */
+    if (high_selector_504d84 != 1U || low_status_504d80 > max_status ||
+        low_status_504d80 >= 44U)
         return out;
     out.dispatched = 1U;
-    out.target = targets[selector];
+    out.target = targets[low_status_504d80];
     return out;
 }

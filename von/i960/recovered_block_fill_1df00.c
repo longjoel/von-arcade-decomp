@@ -26,6 +26,10 @@ void recovered_block_fill_plan(u32 width, u32 rows, u32 column, u32 row,
     plan->row_stride_slots = 64U;
     plan->width = width;
     plan->rows = rows;
-    plan->total_tiles = width * rows;
+    /* The ROM tests both dimensions as signed values before entering the
+       nested loops; sign-bit-wrapped inputs therefore fill no cells. */
+    plan->total_tiles = ((int32_t)width <= 0 || (int32_t)rows <= 0)
+                            ? 0U
+                            : width * rows;
     plan->start_slot = row * 64U + column;
 }

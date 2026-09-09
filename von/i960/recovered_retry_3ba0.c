@@ -19,9 +19,9 @@ void recovered_retry_plan(s32 counter, u32 limit, u32 mode_byte,
     u32 stepped = (u32)(counter + 1);
     u32 use_check;
 
-    /* cmpobl compares literal-order unsigned: the check path runs when
-     * the limit does not exceed the stepped counter. */
-    if (limit > stepped) {
+    /* cmpobl branches only for limit < stepped; equality follows the
+     * non-branch path at 0x3bc0. */
+    if (limit >= stepped) {
         /* A nonzero mode byte rejoins the check path; zero advances. */
         use_check = mode_byte != 0U ? 1U : 0U;
     } else {
@@ -40,8 +40,9 @@ void recovered_retry_plan(s32 counter, u32 limit, u32 mode_byte,
         }
     }
     plan->outcome = 1U;
-    /* Only a zero mode byte rewinds the limit through 0x2330 first. */
-    plan->calls_copy = mode_byte == 0U ? 1U : 0U;
+    /* The bne at 0x3c04 skips 0x2330 for ordinary steps; only the
+     * sign-extended 0xffff counter wrapping to zero reaches the copy. */
+    plan->calls_copy = mode_byte == 0U && stepped == 0U ? 1U : 0U;
     plan->copy_adjust = plan->calls_copy ? limit - stepped : 0U;
     plan->service_arg = 0x111cU;
     plan->calls_service = 1U;

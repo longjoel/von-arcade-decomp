@@ -18,7 +18,7 @@ void recovered_geometry_packet_tail_8e310(const struct recovered_geometry_packet
     p->fifo_word[5]=i->byte_m2&0xffU;
     p->fifo_word[6]=i->byte_m1&0xffU;
     p->fifo_word[7]=i->byte_0&0xffU;
-    p->fifo_word[8]=0x1fU;
+    p->fifo_word[8]=58U; /* 31 + 27 */
     p->fifo_word[9]=i->frame_readback;
     p->fifo_count=10U;
 }

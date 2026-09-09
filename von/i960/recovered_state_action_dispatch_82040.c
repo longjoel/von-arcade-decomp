@@ -7,6 +7,9 @@ typedef uint32_t u32;
 struct recovered_state_action_dispatch_82040 {
     u32 dispatched;
     u32 target;
+    u32 rejected;
+    u32 reject_target;
+    u32 handler_object;
 };
 
 static const u32 targets[10] = {
@@ -15,13 +18,17 @@ static const u32 targets[10] = {
 };
 
 struct recovered_state_action_dispatch_82040
-recovered_state_action_dispatch_82040(u32 object_state)
+recovered_state_action_dispatch_82040(u32 object_state, u32 object_pointer)
 {
-    struct recovered_state_action_dispatch_82040 out = {0U, 0U};
+    struct recovered_state_action_dispatch_82040 out = {0U, 0U, 0U, 0U, 0U};
 
-    if (object_state > 9U)
+    if (object_state > 9U) {
+        out.rejected = 1U;
+        out.reject_target = 0x000825d0U;
         return out;
+    }
     out.dispatched = 1U;
     out.target = targets[object_state];
+    out.handler_object = object_pointer;
     return out;
 }

@@ -9,6 +9,9 @@ struct recovered_continued_renderer_plan {
     u32 text_helper;
     u32 column;
     u32 row;
+    u32 column_address;
+    u32 origin_address;
+    u32 row_address;
     u32 writes_position;
 };
 
@@ -19,5 +22,8 @@ void recovered_continued_renderer_plan(u32 caller_g14,
     plan->text_helper = 0x0001da90U;
     plan->column = caller_g14;
     plan->row = 20U;
+    plan->column_address = 0x00504cdcU;
+    plan->origin_address = 0x00504ce0U;
+    plan->row_address = 0x00504ce4U;
     plan->writes_position = 1U;
 }

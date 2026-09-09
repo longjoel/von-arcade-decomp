@@ -9,6 +9,7 @@ from contextlib import contextmanager
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "i960/recovered_scheduler_callback_frame_build_85b00.c"
+LISTING = ROOT / "build/disasm/vonj-maincpu.lst"
 
 
 @contextmanager
@@ -70,7 +71,27 @@ def main():
         result = function(values)
         assert result.lowest_index == 6
         assert result.selected_504e48 == 6
+
+        values = (ctypes.c_int32 * 6)(100, 1, 2, 3, 4, 5)
+        result = function(values)
+        assert list(result.frame) == [100, 1, 4, 5, 5, 8]
+        assert result.lowest_index == 6
     print("recovered 0x85b00 callback-frame vectors: ok")
+
+    listing = [" ".join(line.split()).lower()
+               for line in LISTING.read_text(encoding="utf-8").splitlines()]
+    for address, instruction in (
+        ("85b4c:", "st r4,(g5)"),
+        ("85b50:", "shlo 1,r6,g4"),
+        ("85b60:", "st g6,0xc(g5)"),
+        ("85b6c:", "st g1,(g3)"),
+        ("85b70:", "st g2,0x4(g5)"),
+        ("85b74:", "st g0,0x4(g3)"),
+        ("85b78:", "ld 0x40(fp)[g6*4],g4"),
+        ("85bd0:", "cmpibge 5,g6,0x85b78"),
+    ):
+        assert any(address in line and instruction in line for line in listing), (address, instruction)
+    print("recovered 0x85b00 callback-frame listing evidence: ok")
 
 
 if __name__ == "__main__":

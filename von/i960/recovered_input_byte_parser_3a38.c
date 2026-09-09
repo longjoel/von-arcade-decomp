@@ -31,8 +31,10 @@ uint32_t recovered_input_byte_parser_3a38(
     }
 
     state->first = (uint8_t)(old_first - 1U);
-    if (old_first == 0U)
+    if (old_first == 0U) {
+        state->second = (uint8_t)(state->second - 1U);
         return 1U;
+    }
     if (old_first == 1U) {
         if (bit < 32U)
             state->status_mask &= ~((uint32_t)1U << bit);

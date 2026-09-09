@@ -15,7 +15,9 @@ u32 recovered_text_plane0_attributed_cell_plan(u32 column, u32 row,
                                                u32 y, u32 x, u32 source_word,
                                                struct recovered_text_attributed_cell *plan)
 {
-    if (y >= height || x >= width)
+    /* The 0x1dd10 entry uses the same signed dimension guards. */
+    if ((int32_t)width <= 0 || (int32_t)height <= 0
+            || y >= height || x >= width)
         return 0U;
     plan->source_byte_offset = ((y * width) + x) << 1;
     plan->destination_byte_address = 0x01000000U

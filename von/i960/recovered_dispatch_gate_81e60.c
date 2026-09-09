@@ -19,7 +19,8 @@ static const u32 recovered_dispatch_targets[10] = {
     0x00081f18U, 0x00081f24U, 0x00081f30U, 0x00081f3cU, 0x00081f48U
 };
 
-void recovered_dispatch_gate_plan(u32 mode, u32 sub_mode, u32 flag,
+void recovered_dispatch_gate_plan(u32 global_5039f4, u32 global_503a00,
+                                  int16_t mode_504e42,
                                   u32 state,
                                   struct recovered_dispatch_gate_plan *plan)
 {
@@ -30,14 +31,14 @@ void recovered_dispatch_gate_plan(u32 mode, u32 sub_mode, u32 flag,
     plan->pre_call = 0x00084d90U;
     /* Only the 0x84d90 pre-call is mode-gated; the table dispatch below
      * depends solely on the flag and the state bound. */
-    plan->calls_pre = (mode == plan->mode_match
-        && sub_mode == plan->sub_mode_match && flag != 0U) ? 1U : 0U;
+    plan->calls_pre = (global_5039f4 == plan->mode_match
+        && global_503a00 == plan->sub_mode_match && mode_504e42 == 0) ? 1U : 0U;
     plan->state_max = 9U;
     plan->table_base = 0x00081eb4U;
     for (index = 0U; index < 10U; ++index)
         plan->table_targets[index] = recovered_dispatch_targets[index];
     /* cmpobl compares literal-first, so states above 9 exit while 0-9
      * index the table; r4 still holds the entry object for the target. */
-    plan->target = (flag != 0U && state <= plan->state_max)
+    plan->target = (mode_504e42 == 0 && state <= plan->state_max)
         ? recovered_dispatch_targets[state] : 0U;
 }

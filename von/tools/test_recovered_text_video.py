@@ -120,6 +120,15 @@ def main() -> int:
             ctypes.c_void_p, ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32
         ]
         recovered.recovered_text_expand_video_blocks.restype = None
+        recovered.recovered_text_expand_video_paired_blocks.argtypes = [
+            ctypes.c_void_p, ctypes.c_void_p, ctypes.c_uint32,
+            ctypes.c_uint32, ctypes.c_uint32
+        ]
+        recovered.recovered_text_expand_video_paired_blocks.restype = None
+        recovered.recovered_text_reduce_packed_halfwords.argtypes = [
+            ctypes.c_void_p, ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32
+        ]
+        recovered.recovered_text_reduce_packed_halfwords.restype = None
         recovered.recovered_text_voltage_warning_plan.argtypes = [
             ctypes.c_uint32,
             ctypes.POINTER(ctypes.c_uint32),
@@ -228,16 +237,32 @@ def main() -> int:
                     )
                 copy_vectors += 1
 
+        source = (ctypes.c_ubyte * 4)(1, 2, 3, 4)
+        destination = (ctypes.c_ubyte * 0x80)(*([0xA5] * 0x80))
+        recovered.recovered_text_video_copy_rows(
+            source, destination, 2, ctypes.c_uint32(-1).value
+        )
+        if bytes(destination) != b"\xA5" * 0x80:
+            raise SystemExit("negative signed row count was not rejected")
+
+        source = (ctypes.c_uint16 * 1)(0x1234)
+        destination = (ctypes.c_uint16 * 1)(0xA5A5)
+        recovered.recovered_word_expand_blocks(
+            destination, source, ctypes.c_uint32(-1).value
+        )
+        if destination[0] != 0xA5A5:
+            raise SystemExit("wrapped signed block count was not rejected")
+
         word_vectors = 0
         for value in range(0x10000):
             expected = (
                 ((value & 0x000F) << 1)
                 | ((value & 0x1000) >> 12)
-                | ((value & 0x00F0) << 2)
                 | ((value & 0x2000) >> 8)
-                | ((value & 0x0F00) << 3)
+                | ((value & 0xF000) << 2)
+                | ((value & 0xFF00) << 3)
                 | ((value & 0x4000) >> 4)
-            )
+            ) & 0xFFFF
             actual = recovered.recovered_word_expand(value)
             if actual != expected:
                 raise SystemExit(
@@ -259,11 +284,11 @@ def main() -> int:
                 expected = (
                     ((value & 0x000F) << 1)
                     | ((value & 0x1000) >> 12)
-                    | ((value & 0x00F0) << 2)
                     | ((value & 0x2000) >> 8)
-                    | ((value & 0x0F00) << 3)
+                    | ((value & 0xF000) << 2)
+                    | ((value & 0xFF00) << 3)
                     | ((value & 0x4000) >> 4)
-                )
+                ) & 0xFFFF
                 if destination[index] != expected:
                     raise SystemExit(
                         f"block expand mismatch blocks={blocks} index={index}"
@@ -299,6 +324,14 @@ def main() -> int:
                         f"halfword swap copy mismatch count={halfwords} index={index}"
                     )
                 swap_block_vectors += 1
+
+        source = (ctypes.c_uint16 * 1)(0x1234)
+        destination = (ctypes.c_uint16 * 1)(0xA5A5)
+        recovered.recovered_halfword_byte_swap_copy(
+            destination, source, ctypes.c_uint32(-1).value
+        )
+        if destination[0] != 0xA5A5:
+            raise SystemExit("negative signed halfword count was not rejected")
 
         startup_expected = {
             0: (
@@ -440,6 +473,77 @@ def main() -> int:
                         f"video block expand mismatch blocks={blocks} index={index}"
                     )
                 video_block_vectors += 1
+
+        def paired_oracle(source_values, blocks, color_a, color_b):
+            output = []
+            carry = 0
+            a = color_a & 0xff
+            b = color_b & 0xff
+            for value in source_values[:blocks * 8]:
+                pattern = 0
+                for bit in range(8):
+                    pattern = ((pattern << 4) & 0xffffffff)
+                    if value & (0x80 >> bit):
+                        pattern = (pattern + a) & 0xffffffff
+                packed = (pattern << 4) & 0xffffffff
+                if packed == pattern:
+                    packed |= carry & 1
+                output.append(((packed << 16) | (packed >> 16)) & 0xffffffff)
+                carry = ((pattern * b) & 0xffffffff) >> 4
+            return output
+
+        paired_source_values = [
+            0x00, 0x80, 0x01, 0xff, 0x10, 0x00, 0x7f, 0x40,
+            0x00, 0x00, 0x80, 0x00, 0xff, 0x02, 0x20, 0x08,
+        ]
+        paired_source = (ctypes.c_ubyte * len(paired_source_values))(
+            *paired_source_values
+        )
+        paired_destination = (ctypes.c_uint32 * len(paired_source_values))(
+            *([0xdeadbeef] * len(paired_source_values))
+        )
+        recovered.recovered_text_expand_video_paired_blocks(
+            paired_destination, paired_source, 2, 0x0b, 0x07
+        )
+        expected_paired = paired_oracle(paired_source_values, 2, 0x0b, 0x07)
+        if list(paired_destination) != expected_paired:
+            raise SystemExit(
+                f"paired video expansion mismatch: {list(paired_destination)!r}"
+            )
+        zero_destination = (ctypes.c_uint32 * 1)(0xdeadbeef)
+        recovered.recovered_text_expand_video_paired_blocks(
+            zero_destination, paired_source, 0, 0x0b, 0x07
+        )
+        if zero_destination[0] != 0xdeadbeef:
+            raise SystemExit("zero paired block count was not empty")
+
+        def reducer_oracle(value, lookup):
+            lookup &= 0x0f0f0f0f
+            return sum(
+                (lookup >> ((((value >> (14 - field * 2)) & 3) * 8))) & 0xf
+                for field in range(8)
+            )
+
+        reducer_source_values = [0x0000, 0xffff, 0x5555, 0xaaaa, 0x1234, 0xc001]
+        reducer_source = (ctypes.c_uint16 * len(reducer_source_values))(
+            *reducer_source_values
+        )
+        reducer_destination = (ctypes.c_uint32 * len(reducer_source_values))(
+            *([0xdeadbeef] * len(reducer_source_values))
+        )
+        reducer_lookup = 0x12345678
+        recovered.recovered_text_reduce_packed_halfwords(
+            reducer_destination, reducer_source, len(reducer_source_values),
+            reducer_lookup
+        )
+        expected_reducer = [
+            reducer_oracle(value, reducer_lookup)
+            for value in reducer_source_values
+        ]
+        if list(reducer_destination) != expected_reducer:
+            raise SystemExit(
+                f"packed reducer mismatch: {list(reducer_destination)!r}"
+            )
 
         warning_expected = (
             (4, 16, 0x000012E0),

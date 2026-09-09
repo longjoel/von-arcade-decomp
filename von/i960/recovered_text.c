@@ -6,6 +6,8 @@
  * Callers here provide only static strings without format directives.
  */
 
+#include <stdint.h>
+
 typedef unsigned int u32;
 typedef unsigned short u16;
 typedef unsigned char u8;
@@ -13,6 +15,7 @@ typedef unsigned char u8;
 #define TEXT_STATE_ORIGIN ((volatile u32 *)0x00504cdc)
 #define TEXT_STATE_COLUMN ((volatile u32 *)0x00504ce0)
 #define TEXT_STATE_ROW    ((volatile u32 *)0x00504ce4)
+#define TEXT_STATE_ATTRIBUTES ((volatile u32 *)0x00504cf4)
 #define TILE_RAM          ((volatile u16 *)0x01000000)
 #define TILE_CONTROL      (*(volatile u32 *)0x01800000)
 #define VIDEO_STATE       ((volatile u16 *)0x00504d24)
@@ -82,15 +85,43 @@ void recovered_text_set_position(u32 column, u32 row)
         TEXT_STATE_ORIGIN, TEXT_STATE_COLUMN, TEXT_STATE_ROW, column, row);
 }
 
-u32 recovered_text_emit_char_plan(u32 character,
-                                  u32 origin,
-                                  u32 column,
-                                  u32 row,
-                                  u32 *tile_index,
-                                  u32 *tile_value,
-                                  u32 *next_column,
-                                  u32 *next_row)
+/* Describe the shared 0x1cac8 UI-state helper without issuing mapped writes.
+ * The assembly stores g0 at both origin slots, stores g1 at the row slot, and
+ * returns through the caller link saved in g14. */
+u32 recovered_text_ui_state_helper_plan(
+    u32 first_value,
+    u32 second_value,
+    u32 return_link,
+    u32 *first_address,
+    u32 *first_stored,
+    u32 *second_address,
+    u32 *second_stored,
+    u32 *row_address,
+    u32 *row_stored,
+    u32 *return_target)
 {
+    *first_address = 0x00504cdcU;
+    *first_stored = first_value;
+    *second_address = 0x00504ce0U;
+    *second_stored = first_value;
+    *row_address = 0x00504ce4U;
+    *row_stored = second_value;
+    *return_target = return_link;
+    return 1U;
+}
+
+u32 recovered_text_emit_char_plan_with_attributes(u32 character,
+                                                   u32 origin,
+                                                   u32 column,
+                                                   u32 row,
+                                                   u32 attributes,
+                                                   u32 *tile_index,
+                                                   u32 *tile_value,
+                                                   u32 *next_column,
+                                                   u32 *next_row)
+{
+    /* 0x1cc44/0x1cc48/0x1cc4c retain only the incoming byte. */
+    character &= 0xffU;
     *tile_index = 0;
     *tile_value = 0;
     *next_column = column;
@@ -98,7 +129,7 @@ u32 recovered_text_emit_char_plan(u32 character,
 
     if (character > 31U) {
         *tile_index = (row << 6) + column;
-        *tile_value = 0x8000U | character;
+        *tile_value = (0x8000U | character | (attributes & 0xffffU)) & 0xffffU;
         if (column <= 61U)
             *next_column = column + 1U;
         return 1U;
@@ -121,13 +152,30 @@ u32 recovered_text_emit_char_plan(u32 character,
     return 0U;
 }
 
+/* Compatibility form for callers that model the default, zero-attribute path. */
+u32 recovered_text_emit_char_plan(u32 character,
+                                  u32 origin,
+                                  u32 column,
+                                  u32 row,
+                                  u32 *tile_index,
+                                  u32 *tile_value,
+                                  u32 *next_column,
+                                  u32 *next_row)
+{
+    return recovered_text_emit_char_plan_with_attributes(
+        character, origin, column, row, 0U, tile_index, tile_value,
+        next_column, next_row);
+}
+
 void recovered_text_emit_char(u8 character)
 {
     u32 column = *TEXT_STATE_COLUMN;
     u32 row = *TEXT_STATE_ROW;
 
+    character = (u8)(character & 0xffU);
     if (character > 31U) {
-        TILE_RAM[(row << 6) + column] = (u16)(0x8000U | character);
+        TILE_RAM[(row << 6) + column] =
+            (u16)(0x8000U | character | (*TEXT_STATE_ATTRIBUTES & 0xffffU));
         if (column <= 61U)
             *TEXT_STATE_COLUMN = column + 1U;
         return;
@@ -225,7 +273,8 @@ u32 recovered_text_video_row_transfer_plan(
 {
     u32 row_bytes;
 
-    if (row >= rows)
+    if ((int32_t)rows <= 0 || (int32_t)row < 0 ||
+        (int32_t)row >= (int32_t)rows)
         return 0U;
     row_bytes = halfwords << 1;
     *call_source = source + row * row_bytes;
@@ -243,6 +292,9 @@ void recovered_text_video_copy_rows(volatile u8 *source,
     u32 row;
     u32 row_bytes = halfwords << 1;
 
+    /* The assembly's initial ble is a signed count guard. */
+    if ((int32_t)rows <= 0)
+        return;
     for (row = 0U; row < rows; ++row) {
         recovered_memory_copy_forward(destination, source, row_bytes);
         source += row_bytes;
@@ -269,12 +321,12 @@ u32 recovered_text_video_upload_plan(u32 *source,
 u32 recovered_word_expand(u32 value)
 {
     value &= 0xffffU;
-    return ((value & 0x000fU) << 1)
+    return (((value & 0x000fU) << 1)
         | ((value & 0x1000U) >> 12)
-        | ((value & 0x00f0U) << 2)
         | ((value & 0x2000U) >> 8)
-        | ((value & 0x0f00U) << 3)
-        | ((value & 0x4000U) >> 4);
+        | ((value & 0xf000U) << 2)
+        | ((value & 0xff00U) << 3)
+        | ((value & 0x4000U) >> 4)) & 0xffffU;
 }
 
 /* Recovered 16-word-block converter at i960 0x0001bb90. */
@@ -285,6 +337,9 @@ void recovered_word_expand_blocks(volatile u16 *destination,
     u32 index;
     u32 words = blocks << 4;
 
+    /* 0x1bb90 compares the scaled word count as a signed value. */
+    if ((int32_t)words <= 0)
+        return;
     for (index = 0U; index < words; ++index)
         destination[index] = (u16)recovered_word_expand(source[index]);
 }
@@ -302,6 +357,9 @@ void recovered_halfword_byte_swap_copy(volatile u16 *destination,
 {
     u32 index;
 
+    /* The 0x1bc20 entry uses signed cmpi/ble on the halfword count. */
+    if ((int32_t)halfwords <= 0)
+        return;
     for (index = 0U; index < halfwords; ++index)
         destination[index] = (u16)recovered_halfword_byte_swap(source[index]);
 }
@@ -586,6 +644,76 @@ void recovered_text_expand_video_blocks(volatile u32 *destination,
 
     for (index = 0U; index < values; ++index)
         destination[index] = recovered_text_expand_video_byte(source[index], color);
+}
+
+/*
+ * Recover the paired-color packed-byte converter at i960 0x1c7d0.  The
+ * source is consumed eight bytes per block; each byte becomes one packed
+ * word whose eight nibbles are either zero or color_a.  The product with
+ * color_b is used only for the one-bit carry that is consumed by the next
+ * all-zero byte, and the packed output is halfword-rotated before storage.
+ */
+void recovered_text_expand_video_paired_blocks(
+    volatile u32 *destination,
+    volatile const u8 *source,
+    u32 blocks,
+    u32 color_a,
+    u32 color_b)
+{
+    u32 block;
+    u32 carry = 0U;
+    u32 a = color_a & 0xffU;
+    u32 b = color_b & 0xffU;
+
+    for (block = 0U; block < blocks; ++block) {
+        u32 byte_index;
+        for (byte_index = 0U; byte_index < 8U; ++byte_index) {
+            u32 bit;
+            u32 pattern = 0U;
+            u32 product;
+            u32 packed;
+
+            for (bit = 0U; bit < 8U; ++bit) {
+                pattern <<= 4U;
+                if ((source[0] & (0x80U >> bit)) != 0U)
+                    pattern += a;
+            }
+            ++source;
+            packed = pattern << 4U;
+            if (packed == pattern)
+                packed |= carry & 1U;
+            product = pattern * b;
+            destination[0] = (packed << 16U) | (packed >> 16U);
+            ++destination;
+            carry = product >> 4U;
+        }
+    }
+}
+
+/* Recover the packed-halfword reducer at i960 0x1c890.  Each source
+ * halfword contributes eight two-bit selectors; each selector chooses one
+ * byte of the masked lookup word, and the low nibble from that byte is added
+ * to the output accumulator. */
+void recovered_text_reduce_packed_halfwords(
+    volatile u32 *destination,
+    volatile const u16 *source,
+    u32 count,
+    u32 lookup_word)
+{
+    u32 index;
+    u32 lookup = lookup_word & 0x0f0f0f0fU;
+
+    for (index = 0U; index < count; ++index) {
+        u32 field;
+        u32 value = source[index];
+        u32 sum = 0U;
+
+        for (field = 0U; field < 8U; ++field) {
+            u32 selector = (value >> (14U - field * 2U)) & 3U;
+            sum += (lookup >> (selector * 8U)) & 0x0fU;
+        }
+        destination[index] = sum;
+    }
 }
 
 /*

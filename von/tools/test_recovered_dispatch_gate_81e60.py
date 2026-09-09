@@ -31,11 +31,12 @@ with tempfile.TemporaryDirectory() as td:
                     "-o", str(so)], check=True)
     lib = ctypes.CDLL(str(so))
     plan_fn = lib.recovered_dispatch_gate_plan
-    plan_fn.argtypes = [ctypes.c_uint32] * 4 + [ctypes.POINTER(Plan)]
+    plan_fn.argtypes = [ctypes.c_uint32, ctypes.c_uint32, ctypes.c_int16,
+                        ctypes.c_uint32, ctypes.POINTER(Plan)]
 
-    # Full gate: mode 4, sub-mode 10, live flag, state 3.
+    # Full gate: globals 4/10, mode 0, state 3.
     plan = Plan()
-    plan_fn(4, 10, 1, 3, ctypes.byref(plan))
+    plan_fn(4, 10, 0, 3, ctypes.byref(plan))
     assert (plan.mode_match, plan.sub_mode_match, plan.pre_call,
             plan.calls_pre, plan.state_max, plan.table_base) == (
         4, 10, 0x84D90, 1, 9, 0x81EB4
@@ -43,16 +44,16 @@ with tempfile.TemporaryDirectory() as td:
     assert list(plan.table_targets) == list(TARGETS)
     assert plan.target == 0x81F00
 
-    # The pre-call needs all three conditions; the table needs flag+bound.
-    plan_fn(4, 10, 0, 3, ctypes.byref(plan))
+    # The pre-call needs all three conditions; the table needs mode-zero+bound.
+    plan_fn(4, 10, 1, 3, ctypes.byref(plan))
     assert (plan.calls_pre, plan.target) == (0, 0)
-    plan_fn(4, 9, 5, 0, ctypes.byref(plan))
+    plan_fn(4, 9, 0, 0, ctypes.byref(plan))
     assert (plan.calls_pre, plan.target) == (0, TARGETS[0])
-    plan_fn(0, 0, 7, 9, ctypes.byref(plan))
-    assert (plan.calls_pre, plan.target) == (0, TARGETS[9])
+    plan_fn(0, 0, 1, 9, ctypes.byref(plan))
+    assert (plan.calls_pre, plan.target) == (0, 0)
 
     # States above 9 exit through the shared return.
-    plan_fn(4, 10, 1, 10, ctypes.byref(plan))
+    plan_fn(4, 10, 0, 10, ctypes.byref(plan))
     assert (plan.calls_pre, plan.target) == (1, 0)
 
 print("PASS: 0x81e60 dispatch-gate plan")

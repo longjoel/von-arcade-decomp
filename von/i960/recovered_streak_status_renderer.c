@@ -48,7 +48,7 @@ void recovered_streak_plan(int32_t value, u32 caller_g11, u32 caller_g14,
     plan->second_tile_width = 1U;
     plan->second_tile_height = 2U;
 
-    if (value <= 99) {
+    if (value > 99) {
         plan->route = RECOVERED_STREAK_MESSAGE;
     } else if (value <= 1) {
         plan->route = RECOVERED_STREAK_CLEAR;

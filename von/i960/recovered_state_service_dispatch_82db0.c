@@ -12,6 +12,8 @@ enum recovered_state_service_dispatch_82db0_route {
 struct recovered_state_service_dispatch_82db0 {
     enum recovered_state_service_dispatch_82db0_route route;
     u32 target;
+    u32 handler_value_74;
+    u32 handler_object_pointer;
 };
 
 static const u32 targets[9] = {
@@ -20,10 +22,12 @@ static const u32 targets[9] = {
 };
 
 struct recovered_state_service_dispatch_82db0
-recovered_state_service_dispatch_82db0(u32 object_state)
+recovered_state_service_dispatch_82db0(u32 object_state, u32 object_value_74,
+                                        u32 object_pointer)
 {
     struct recovered_state_service_dispatch_82db0 out = {
-        RECOVERED_STATE_SERVICE_HIGH_STATE, 0x82f90U
+        RECOVERED_STATE_SERVICE_HIGH_STATE, 0x82f90U, object_value_74,
+        object_pointer
     };
 
     if (object_state <= 8U) {

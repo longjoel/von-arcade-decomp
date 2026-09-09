@@ -36,6 +36,9 @@ def main() -> int:
             ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32,
             *pointers]
         recovered.recovered_text_emit_char_plan.restype = ctypes.c_uint32
+        plan_with_attributes = recovered.recovered_text_emit_char_plan_with_attributes
+        plan_with_attributes.argtypes = [ctypes.c_uint32] * 5 + pointers
+        plan_with_attributes.restype = ctypes.c_uint32
 
         vectors = 0
         for character in range(256):
@@ -74,6 +77,25 @@ def main() -> int:
                     if (next_column.value, next_row.value) != (expected_column, expected_row):
                         raise SystemExit("text state transition mismatch")
                     vectors += 1
+
+        for character, attributes in ((0x41, 0x0000), (0x80, 0x4000),
+                                      (0x1ff, 0xffff), (0x09, 0x1234)):
+            tile_index = ctypes.c_uint32()
+            tile_value = ctypes.c_uint32()
+            next_column = ctypes.c_uint32()
+            next_row = ctypes.c_uint32()
+            emitted = plan_with_attributes(
+                character, 2, 7, 4, attributes,
+                ctypes.byref(tile_index), ctypes.byref(tile_value),
+                ctypes.byref(next_column), ctypes.byref(next_row))
+            normalized = character & 0xff
+            if normalized > 31:
+                expected_value = (0x8000 | normalized | (attributes & 0xffff)) & 0xffff
+                if (emitted, tile_index.value, tile_value.value) != (1, 263, expected_value):
+                    raise SystemExit("attribute-aware printable plan mismatch")
+            elif emitted != 0 or tile_value.value != 0:
+                raise SystemExit("attribute-aware control plan mismatch")
+            vectors += 1
 
     print(f"PASS: {vectors:,} text-character transition vectors")
     return 0

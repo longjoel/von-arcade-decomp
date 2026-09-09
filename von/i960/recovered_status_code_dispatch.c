@@ -15,6 +15,7 @@ struct recovered_status_code_dispatch_plan {
     struct recovered_status_code_block blanking_block;
     struct recovered_status_code_block selected_block;
     u32 selected_message;
+    u32 message_helper;
     u32 selected_case;
     u32 text_column;
     u32 text_row;
@@ -34,6 +35,7 @@ void recovered_status_code_dispatch_plan(u32 selector, u32 caller_g3,
 
     plan->selected_case = selector <= 7U ? selector : 8U;
     plan->selected_message = 0x0001f680U + (plan->selected_case << 4);
+    plan->message_helper = 0x0001d210U;
     plan->selected_block.helper = 0x0001df00U;
     plan->selected_block.source = 0U;
     plan->selected_block.width = caller_g7 + 31U;

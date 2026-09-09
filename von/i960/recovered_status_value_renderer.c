@@ -53,7 +53,9 @@ void recovered_status_value_plan(int32_t value,
         plan->block_height = 3U;
         plan->block_uses_current_position = 1U;
         plan->column_advance = 21U;
-        plan->glyph_helper = 0x0001dc10U;
+        /* 0x1e7c0 selects the table entry and delegates the 4x3 transfer
+           to 0x1dc10. */
+        plan->glyph_helper = 0x0001e7c0U;
         plan->glyph_source_table = 0x02ea1fd0U;
         plan->glyph_index = ((u32)value - 0x30U) & 15U;
         plan->glyph_width = 4U;

@@ -45,7 +45,7 @@ recovered_state_service_shared_handler_prefix_82fdc(u32 selector, u32 g14)
         break;
     case 4U:
         out.write_504d98 = 1U; out.value_504d98 = 1U;
-        out.write_504db8 = 1U; out.value_504db8 = 20U;
+        out.write_504db8 = 1U; out.value_504db8 = 10U;
         out.write_504d94 = 1U; out.value_504d94 = g14;
         break;
     case 5U:

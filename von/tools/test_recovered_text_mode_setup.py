@@ -21,8 +21,8 @@ class SetupPlan(ctypes.Structure):
         ("timing_ce4", ctypes.c_uint32),
         ("helper", ctypes.c_uint32),
         ("source", ctypes.c_uint32),
-        ("tile", ctypes.c_uint32),
         ("width", ctypes.c_uint32),
+        ("rows", ctypes.c_uint32),
     ]
 
 
@@ -40,7 +40,7 @@ def main() -> int:
         plan = SetupPlan()
         setup(1, 4, 12, ctypes.byref(plan))
         if (plan.timing_cdc, plan.timing_ce0, plan.timing_ce4, plan.helper,
-                plan.source, plan.tile, plan.width) != (35, 35, 43, 0x1DC90, 0x2FD0CD4, 19, 2):
+                plan.source, plan.width, plan.rows) != (35, 35, 43, 0x1DC90, 0x2FD0CD4, 19, 2):
             raise SystemExit("nonzero text-mode setup mismatch")
         setup(0, 0xFFFFFFFF, 0xFFFFFFFE, ctypes.byref(plan))
         if (plan.timing_cdc, plan.timing_ce0, plan.timing_ce4, plan.helper, plan.source) != (30, 30, 29, 0x1DF00, 0):

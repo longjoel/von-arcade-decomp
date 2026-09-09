@@ -34,7 +34,7 @@ recovered_scheduler_callback_global_gate_855b8(u32 global_flag,
     out.target_difference = value_503a18 - out.frame_target;
     out.exits_to_85678 = (global_flag != 0U
         || value_504dc0 > 149
-        || out.target_difference >= 20) ? 1U : 0U;
+        || out.target_difference <= 20) ? 1U : 0U;
     out.continues_to_object_ratio = out.exits_to_85678 == 0U ? 1U : 0U;
     return out;
 }

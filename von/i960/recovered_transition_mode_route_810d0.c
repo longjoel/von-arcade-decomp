@@ -12,6 +12,8 @@ struct recovered_transition_mode_route_810d0 {
     u32 status_504d9c;
     u32 value_504da0;
     u32 secondary_dispatch;
+    u32 callback_target;
+    u32 return_value;
 };
 
 /* Models the complete successful prefix; the dispatcher call is represented
@@ -22,11 +24,11 @@ recovered_transition_mode_route_810d0(
     u32 mode_504e50, u32 object_state, u32 related_state)
 {
     struct recovered_transition_mode_route_810d0 out = {
-        0U, 0U, 0U, 0U, 0U, 0U, 0U
+        0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U
     };
     const u32 normalized_172 = (u32)related_172 << 16;
 
-    if (counter_509b2c <= 0x1f3 || normalized_172 < 0x150000U ||
+    if (counter_509b2c <= 0x1f3 || normalized_172 <= 0x150000U ||
         normalized_172 > 0x190000U)
         return out;
     if (current_timing <= 0.0f) {
@@ -44,5 +46,7 @@ recovered_transition_mode_route_810d0(
     out.status_504d9c = 2U;
     out.value_504da0 = 0x64U;
     out.secondary_dispatch = 1U;
+    out.callback_target = 0x00079d60U;
+    out.return_value = 0U;
     return out;
 }

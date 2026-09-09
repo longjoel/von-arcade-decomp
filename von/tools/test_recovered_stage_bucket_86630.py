@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
 import ctypes
 import os
+import re
 import subprocess
 import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+LISTING = ROOT / "von/build/disasm/vonj-maincpu.lst"
 
 
 def main():
+    listing = LISTING.read_text()
+    for instruction in (r"86650:.*remi.*6",
+                        r"86658:.*ld.*0x86664",
+                        r"866a0:.*divi.*6",
+                        r"866a4:.*ldob.*0x842a0"):
+        assert re.search(instruction, listing)
+
     with tempfile.TemporaryDirectory(prefix="von-stage-bucket-") as d:
         so = Path(d) / "stage-bucket.so"
         subprocess.run([os.environ.get("CC", "cc"), "-shared", "-fPIC", "-O2",

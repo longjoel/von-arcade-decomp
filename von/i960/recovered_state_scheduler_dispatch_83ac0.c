@@ -13,7 +13,8 @@ enum recovered_state_scheduler_dispatch_83ac0_route {
     RECOVERED_83AC0_STATE26 = 5,
     RECOVERED_83AC0_STATE21 = 6,
     RECOVERED_83AC0_STATE28_MODE = 7,
-    RECOVERED_83AC0_STATE21_DEFAULT = 8
+    RECOVERED_83AC0_STATE21_DEFAULT = 8,
+    RECOVERED_83AC0_STATE5_TABLE_REJECT = 9
 };
 
 struct recovered_state_scheduler_dispatch_83ac0 {
@@ -64,20 +65,21 @@ recovered_state_scheduler_dispatch_83ac0(int32_t value_504dc0,
     }
     if (state_504d7c == 5U) {
         remainder = random_value % 6;
-        if (remainder == 0 || remainder == 1) {
-            out.route = remainder == 0 ? RECOVERED_83AC0_CALL_79D60
-                                       : RECOVERED_83AC0_CALL_79D60;
+        if (remainder < 0 || remainder > 5) {
+            out.route = RECOVERED_83AC0_STATE5_TABLE_REJECT;
             return out;
         }
-        if (remainder == 2) {
+        if (remainder <= 1) {
+            out.route = RECOVERED_83AC0_CALL_79D60;
+        } else if (remainder == 2 || remainder == 3) {
             out.route = RECOVERED_83AC0_STATE28;
             out.write_504d80 = 1U;
             out.value_504d80 = 28U;
-        } else if (remainder == 3) {
+        } else if (remainder == 4) {
             out.route = RECOVERED_83AC0_STATE26;
             out.write_504d80 = 1U;
             out.value_504d80 = 26U;
-        } else if (remainder == 4) {
+        } else {
             out.route = RECOVERED_83AC0_STATE21;
             out.write_504d80 = 1U;
             out.value_504d80 = 21U;
@@ -85,13 +87,15 @@ recovered_state_scheduler_dispatch_83ac0(int32_t value_504dc0,
         return out;
     }
     remainder = random_value % 7;
-    if (remainder < 4 && remainder >= 0) {
+    /* cmpibge 4,g0 branches only for signed remainders >= 4; all lower
+     * results, including negative remi-7 values, call 0x79d60. */
+    if (remainder <= 4 && remainder != 4) {
         out.route = RECOVERED_83AC0_CALL_79D60;
     } else if (remainder == 4 && (mode_504e30 & 0x2U) != 0U) {
         out.route = RECOVERED_83AC0_STATE26;
         out.write_504d80 = 1U;
         out.value_504d80 = 26U;
-    } else if (remainder < 0 && (mode_504e30 & 0x4U) != 0U) {
+    } else if (remainder > 0 && (mode_504e30 & 0x4U) != 0U) {
         out.route = RECOVERED_83AC0_STATE28_MODE;
         out.write_504d80 = 1U;
         out.value_504d80 = 28U;

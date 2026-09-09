@@ -13,7 +13,8 @@ SOURCE = ROOT / "von/i960/recovered_continued_renderer.c"
 
 class Plan(ctypes.Structure):
     _fields_ = [(name, ctypes.c_uint32) for name in
-                ("message", "text_helper", "column", "row", "writes_position")]
+                ("message", "text_helper", "column", "row", "column_address",
+                 "origin_address", "row_address", "writes_position")]
 
 
 def main() -> int:
@@ -26,7 +27,9 @@ def main() -> int:
         plan = Plan()
         plan_fn(0x12, ctypes.byref(plan))
         assert (plan.message, plan.text_helper, plan.column, plan.row,
-                plan.writes_position) == (0x1F9E0, 0x1DA90, 0x12, 20, 1)
+                plan.column_address, plan.origin_address, plan.row_address,
+                plan.writes_position) == (0x1F9E0, 0x1DA90, 0x12, 20,
+                                           0x504CDC, 0x504CE0, 0x504CE4, 1)
 
         plan_fn(0xFFFFFFFF, ctypes.byref(plan))
         assert plan.column == 0xFFFFFFFF

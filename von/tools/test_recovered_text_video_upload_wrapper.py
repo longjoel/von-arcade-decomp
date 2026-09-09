@@ -13,7 +13,8 @@ SOURCE = ROOT / "von/i960/recovered_text_video_upload_wrapper.c"
 
 class Plan(ctypes.Structure):
     _fields_ = [(name, ctypes.c_uint32) for name in
-                ("source", "destination", "halfwords_per_row", "rows")]
+                ("source", "destination", "upload_helper",
+                 "halfwords_per_row", "rows")]
 
 
 def main() -> int:
@@ -25,7 +26,9 @@ def main() -> int:
         plan_fn.argtypes = [ctypes.c_uint32, ctypes.POINTER(Plan)]
         plan = Plan()
         plan_fn(4, ctypes.byref(plan))
-        assert (plan.source, plan.destination, plan.halfwords_per_row, plan.rows) == (0x01004000, 0x02FD2520, 0x40, 35)
+        assert (plan.source, plan.destination, plan.upload_helper,
+                plan.halfwords_per_row, plan.rows) == (0x01004000, 0x02FD2520,
+                                                        0x1BC90, 0x40, 35)
         plan_fn(0xFFFFFFFF, ctypes.byref(plan))
         assert plan.rows == 30
 

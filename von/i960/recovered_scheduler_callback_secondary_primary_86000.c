@@ -8,11 +8,13 @@ typedef int32_t s32;
 struct recovered_scheduler_callback_secondary_primary_86000 {
     u32 candidate_index;
     u32 candidate_nibble;
+    uint8_t candidate_after;
     u32 row_offset;
     s32 current_before;
     s32 current_after;
     s32 paired_before;
     s32 paired_after;
+    u32 candidate_replaced;
     u32 collision;
     u32 exits_without_pair_write;
 };
@@ -27,11 +29,13 @@ recovered_scheduler_callback_secondary_primary_86000(
 
     out.candidate_index = candidate_index;
     out.candidate_nibble = map_before[candidate_index] & 0x0fU;
+    out.candidate_after = callback_g14;
     out.row_offset = state * 1088U + selector * 136U + 0x86U;
     out.current_before = current_value;
     out.current_after = current_value + 30;
     out.paired_before = paired_value;
     out.paired_after = paired_value;
+    out.candidate_replaced = 1U;
     out.collision = 0U;
     out.exits_without_pair_write = 0U;
 

@@ -63,17 +63,21 @@ recovered_scheduler_callback_byte_map_scan_85c88(
         for (scan = 0U; scan < 32U; ++scan) {
             if ((out.map_after[scan] & 0x0fU) == nibble) {
                 duplicate = 1U;
+                if (primary)
+                    out.map_after[scan] |= 1U << 5;
                 break;
             }
         }
-        if (duplicate)
+        /* The primary path uses a duplicate to set bit 5 and continue to
+         * the row adjustment; the fallback path rejects that collision. */
+        if (duplicate && !primary)
             return out;
 
         out.candidate_index = index;
         out.candidate_nibble = nibble;
         out.used_primary_gate = primary;
         out.used_fallback_gate = fallback;
-        out.row_adjust_path = (map_before[index] & 0x20U) != 0U ? 1U : 0U;
+        out.row_adjust_path = primary ? duplicate : 1U;
         out.rejected = 0U;
         return out;
     }

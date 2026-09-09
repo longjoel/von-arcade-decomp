@@ -32,7 +32,8 @@ void recovered_state_geometry_packet10_classify_7e788(
 {
     const u32 signed_record_08 = sign_extend_halfword(record_field_08);
     const u32 signed_object_184 = sign_extend_halfword(object_184);
-    const u32 response_delta = fifo_response - record_field_08;
+    /* The listing loads record +0x08 with ldos before this subtraction. */
+    const u32 response_delta = fifo_response - signed_record_08;
     const u32 bit15 = response_delta & 0x8000U;
     const u32 bias = bit15 != 0U ? 0x504de4U : 0U;
     const u32 signed_bias = bit15 != 0U ? 0x504de4U : 0U;

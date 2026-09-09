@@ -41,9 +41,6 @@ recovered_scheduler_callback_frame_build_85b00(
     u32 lowest_index = 6U;
     u32 index;
 
-    for (index = 0U; index < 6U; ++index)
-        out.frame[index] = accumulator_words[index];
-
     out.scaled_r7 = div3(accumulator_words[3] * 5);
     out.scaled_r5 = div3(accumulator_words[1] * 5);
     out.scaled_g7 = div3(accumulator_words[5] * 5);
@@ -53,6 +50,15 @@ recovered_scheduler_callback_frame_build_85b00(
     out.frame_slot_4c = (accumulator_words[4] * 5) >> 2;
     out.frame_slot_50 = out.scaled_r7;
     out.frame_slot_54 = out.scaled_g7;
+
+    /* The rank loop reads the six values written at fp+0x40, not the raw
+     * accumulator array: [r4, g2, 2*r6, 5*g6/4, g1, g0]. */
+    out.frame[0] = out.frame_slot_40;
+    out.frame[1] = out.frame_slot_44;
+    out.frame[2] = out.frame_slot_48;
+    out.frame[3] = out.frame_slot_4c;
+    out.frame[4] = out.frame_slot_50;
+    out.frame[5] = out.frame_slot_54;
 
     /* 0x85b78-0x85bd0 keeps the three smallest signed frame values. */
     for (index = 0U; index < 6U; ++index) {

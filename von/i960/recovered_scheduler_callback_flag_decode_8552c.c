@@ -20,8 +20,8 @@ recovered_scheduler_callback_flag_decode_8552c(u32 table_word)
     };
     u32 flags = out.flag_byte;
 
-    /* chkbit 4 plus bbc 5: both bits must be set for the first override. */
-    if ((flags & (1U << 4)) != 0U && (flags & (1U << 5)) != 0U) {
+    /* chkbit 4 / bbc 5: clear bit 4 or set bit 5 selects (2,1). */
+    if ((flags & (1U << 4)) == 0U || (flags & (1U << 5)) != 0U) {
         out.value_g1 = 2U;
         out.value_g2 = 1U;
     }

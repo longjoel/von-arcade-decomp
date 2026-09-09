@@ -24,3 +24,21 @@ u32 recovered_text_alt_string_font_mode(const u8 *text)
     }
     return mode;
 }
+
+struct recovered_text_alt_glyph_string_plan {
+    u32 font_mode;
+    u32 attributes;
+    u32 renderer_target;
+    u32 emits_characters;
+};
+
+/* Connect the 0x1d7d0 classifier to its shared 0x1d310 call shape. */
+void recovered_text_alt_glyph_string_plan(
+    const u8 *text,
+    struct recovered_text_alt_glyph_string_plan *plan)
+{
+    plan->font_mode = recovered_text_alt_string_font_mode(text);
+    plan->attributes = 0x4000U;
+    plan->renderer_target = 0x0001d310U;
+    plan->emits_characters = *text != 0U;
+}

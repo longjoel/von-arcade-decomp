@@ -29,11 +29,11 @@ def main() -> int:
         plan_fn.argtypes = [ctypes.c_int32, ctypes.c_uint32, ctypes.c_uint32,
                             ctypes.c_uint32, ctypes.POINTER(Plan)]
         plan = Plan()
-        plan_fn(50, 11, 14, 27, ctypes.byref(plan))
+        plan_fn(150, 11, 14, 27, ctypes.byref(plan))
         assert (plan.route, plan.initial_column, plan.initial_row,
                 plan.initial_clear_width, plan.initial_clear_height,
                 plan.message, plan.message_helper) == (0, 42, 42, 22, 2, 0x20040, 0x1D1F0)
-        plan_fn(150, 11, 14, 27, ctypes.byref(plan))
+        plan_fn(50, 11, 14, 27, ctypes.byref(plan))
         assert (plan.route, plan.digit_helper, plan.first_tile_source,
                 plan.first_tile_column_from_g14, plan.first_tile_width,
                 plan.first_tile_height, plan.second_tile_source,
@@ -41,6 +41,10 @@ def main() -> int:
                 plan.second_tile_height) == (2, 0x1FF50, 0x2FDFC00, 45, 13, 2,
                                               0x2FDFBFC, 58, 1, 2)
         plan_fn(1, 11, 14, 27, ctypes.byref(plan))
+        assert plan.route == 1
+        plan_fn(99, 11, 14, 27, ctypes.byref(plan))
+        assert plan.route == 2
+        plan_fn(100, 11, 14, 27, ctypes.byref(plan))
         assert plan.route == 0
 
     print("PASS: 0x20060 streak-status renderer")

@@ -30,3 +30,24 @@ void recovered_text_status_string_plan(const u8 *text,
     if (has_lowercase)
         plan->font_mode = 0U;
 }
+
+struct recovered_text_status_attributed_plan {
+    u32 font_mode;
+    u32 attributes;
+    u32 renderer_target;
+    u32 emits_characters;
+};
+
+/* Connect the 0x1d930 sibling to the shared attributed glyph renderer. */
+void recovered_text_status_attributed_plan(
+    const u8 *text,
+    struct recovered_text_status_attributed_plan *plan)
+{
+    struct recovered_status_string_plan classifier;
+
+    recovered_text_status_string_plan(text, &classifier);
+    plan->font_mode = classifier.font_mode;
+    plan->attributes = 0x4000U;
+    plan->renderer_target = 0x0001d310U;
+    plan->emits_characters = classifier.emits_characters;
+}

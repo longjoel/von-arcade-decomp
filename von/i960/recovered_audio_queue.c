@@ -200,6 +200,32 @@ void recovered_audio_service_pending(void)
 }
 
 /* Recovered host service request at i960 0x00001348-0x00001370. */
+struct recovered_host_service_request_plan
+{
+    u32 callback_target;
+    u32 g14_after;
+    u32 control_before;
+    u32 control_after;
+    u32 control_address;
+    u32 control_mmio_address;
+};
+
+u32 recovered_host_service_request_plan(u32 control_before,
+                                        struct recovered_host_service_request_plan *plan)
+{
+    struct recovered_host_service_request_plan local;
+
+    local.callback_target = 0x00001370U;
+    local.g14_after = 0U;
+    local.control_before = control_before;
+    local.control_after = control_before | AUDIO_SERVICE_BIT;
+    local.control_address = 0x00501cd0U;
+    local.control_mmio_address = 0x00e80004U;
+    if (plan != (void *)0)
+        *plan = local;
+    return 1U;
+}
+
 void recovered_host_service_request(void)
 {
     u32 control = IRQ_CONTROL | AUDIO_SERVICE_BIT;

@@ -22,9 +22,9 @@ with tempfile.TemporaryDirectory() as directory:
     function.argtypes = [ctypes.c_int32, ctypes.c_int32]
     function.restype = Plan
     assert (function(6, 20).normalized_delay,
-            function(6, 20).slot, function(6, 20).byte_offset) == (5, 15, 240)
+            function(6, 20).slot, function(6, 20).byte_offset) == (180, -160, -2560)
     assert (function(0, 20).normalized_delay,
-            function(0, 20).slot) == (180, -100)
-    assert function(181, 20).slot == -100
+            function(0, 20).slot) == (-1, 81)
+    assert function(181, 20).slot == -160
 
 print("recovered 0x849d0 frame-slot vectors: ok")

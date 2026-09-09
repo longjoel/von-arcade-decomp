@@ -33,7 +33,7 @@ recovered_state_scheduler_remainder_handler_8342c(int32_t remainder_6,
     } else if (remainder_6 == 4 && (mode_504e30 & 0x2U) != 0U) {
         out.route = RECOVERED_REMAINDER_8342C_VALUE_26;
         out.value_504d80 = 26U;
-    } else if (remainder_6 < 0 && (mode_504e30 & 0x4U) != 0U) {
+    } else if (remainder_6 > 0 && (mode_504e30 & 0x4U) != 0U) {
         out.route = RECOVERED_REMAINDER_8342C_VALUE_28;
         out.value_504d80 = 28U;
     }

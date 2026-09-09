@@ -13,7 +13,8 @@ SOURCE = ROOT / "von/i960/recovered_state_scheduler_gate_82ae0.c"
 
 class Plan(ctypes.Structure):
     _fields_ = [("route", ctypes.c_uint32),
-                ("ran_timing_selector", ctypes.c_uint32)]
+                ("ran_timing_selector", ctypes.c_uint32),
+                ("target", ctypes.c_uint32)]
 
 
 with tempfile.TemporaryDirectory() as directory:
@@ -26,12 +27,17 @@ with tempfile.TemporaryDirectory() as directory:
     function.restype = Plan
 
     base = (10, 20, 4, 5, 3, 0)
-    assert (function(*base).route, function(*base).ran_timing_selector) == (1, 1)
+    assert (function(*base).route, function(*base).ran_timing_selector,
+            function(*base).target) == (1, 1, 0x82DB0)
     assert function(21, 20, 4, 5, 3, 0).route == 0
     assert function(10, 20, 3, 5, 3, 0).route == 0
     assert function(10, 20, 4, 6, 3, 0).route == 0
-    assert function(10, 20, 4, 5, 8, 5).route == 2
-    assert function(10, 20, 4, 5, 8, 4).route == 0
-    assert function(10, 20, 4, 5, 7, 5).route == 1
+    assert (function(10, 20, 4, 5, 8, 5).route,
+            function(10, 20, 4, 5, 8, 5).target) == (1, 0x82DB0)
+    assert (function(10, 20, 4, 5, 9, 5).route,
+            function(10, 20, 4, 5, 9, 5).target) == (2, 0x81E60)
+    assert function(10, 20, 4, 5, 9, 4).route == 0
+    assert (function(10, 20, 4, 5, 7, 5).route,
+            function(10, 20, 4, 5, 7, 5).target) == (1, 0x82DB0)
 
 print("recovered 0x82ae0 scheduler-gate vectors: ok")

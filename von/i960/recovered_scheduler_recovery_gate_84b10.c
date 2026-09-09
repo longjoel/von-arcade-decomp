@@ -19,7 +19,7 @@ recovered_scheduler_recovery_gate_84b10(int32_t value_509a70,
                                         int32_t value_503a14)
 {
     struct recovered_scheduler_recovery_gate_84b10 out = {
-        value_509a70, 0U, 0x5074a0U + related_field_64 * 1024U, 0U
+        value_509a70, 0U, 0x5074a0U + related_field_64 * 1088U, 0U
     };
     u32 bit2_set = value_504e50 & (1U << 2);
 

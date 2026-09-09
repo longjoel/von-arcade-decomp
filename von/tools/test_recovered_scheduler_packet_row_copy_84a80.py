@@ -8,13 +8,14 @@ import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "von/i960/recovered_scheduler_packet_row_copy_84a80.c"
+LISTING = ROOT / "von/build/disasm/vonj-maincpu.lst"
 
 class Plan(ctypes.Structure):
-    _fields_ = [("field_0", ctypes.c_uint32),
-                ("field_2", ctypes.c_uint32),
-                ("field_4", ctypes.c_uint32),
-                ("field_6", ctypes.c_uint32),
-                ("field_a", ctypes.c_uint32),
+    _fields_ = [("field_0", ctypes.c_int32),
+                ("field_2", ctypes.c_int32),
+                ("field_4", ctypes.c_int32),
+                ("field_6", ctypes.c_int32),
+                ("field_a", ctypes.c_int32),
                 ("field_8e", ctypes.c_uint32),
                 ("copied_count", ctypes.c_uint32),
                 ("field_c", ctypes.c_uint16 * 60)]
@@ -24,8 +25,8 @@ with tempfile.TemporaryDirectory() as directory:
     subprocess.run(["cc", "-shared", "-fPIC", "-O2", str(SOURCE), "-o", str(library)], check=True)
     api = ctypes.CDLL(str(library))
     function = api.recovered_scheduler_packet_row_copy_84a80
-    function.argtypes = [ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32,
-                         ctypes.c_uint32, ctypes.c_uint32,
+    function.argtypes = [ctypes.c_int32, ctypes.c_int32, ctypes.c_int32,
+                         ctypes.c_int32, ctypes.c_int32,
                          ctypes.POINTER(ctypes.c_uint16)]
     function.restype = Plan
     source = (ctypes.c_uint16 * 60)(*range(60))
@@ -34,5 +35,21 @@ with tempfile.TemporaryDirectory() as directory:
             result.field_6, result.field_a, result.field_8e,
             result.copied_count) == (1, 2, 3, 4, 5, 100, 60)
     assert (result.field_c[0], result.field_c[59]) == (0, 59)
+    signed = function(-1, -2, -3, -4, -5, source)
+    assert (signed.field_0, signed.field_a) == (-1, -5)
 
 print("recovered 0x84a80 packet-row-copy vectors: ok")
+
+listing = [" ".join(line.split()).lower()
+           for line in LISTING.read_text(encoding="utf-8").splitlines()]
+for address, instruction in (
+    ("84a80:", "ldos 0x5096a0(g4),g5"),
+    ("84a88:", "ldos 0x2(g4)[r4],g6"),
+    ("84aa0:", "ldos 0xa(g4)[r4],g4"),
+    ("84aa8:", "stos g5,(g2)"),
+    ("84af0:", "cmpible g6,r5,0x84acc"),
+    ("84b00:", "stos r8,0x8e(r7)[g4*16]"),
+):
+    assert any(address in line and instruction in line for line in listing), (address, instruction)
+
+print("recovered 0x84a80 packet-row-copy listing evidence: ok")

@@ -6,6 +6,8 @@ typedef uint32_t u32;
 struct recovered_status_upper_latch_plan {
     u32 render_selected;
     u32 clear_selected;
+    u32 downstream_selected;
+    u32 state_update_selected;
     u32 masked_generator_0;
     u32 state_504d28_after;
     u32 state_504d30_after;
@@ -29,11 +31,15 @@ void recovered_status_upper_latch_plan(
     };
     u32 first = generator_0 & 0x1ffU;
 
-    plan->render_selected = latch >= 21 && latch <= 95 ? 1U : 0U;
-    plan->clear_selected = latch > 95 ? 1U : 0U;
+    plan->render_selected = latch >= 21 && latch <= 32 ? 1U : 0U;
+    plan->clear_selected = latch == 33 ? 1U : 0U;
+    plan->downstream_selected = latch >= 34 ? 1U : 0U;
+    plan->state_update_selected = plan->render_selected;
     plan->masked_generator_0 = first;
-    plan->state_504d28_after = (state_504d28 + first) & 0x1ffU;
-    plan->state_504d30_after = generator_1 & 0x1ffU;
+    plan->state_504d28_after = plan->state_update_selected
+        ? (state_504d28 + first) & 0x1ffU : state_504d28;
+    plan->state_504d30_after = plan->state_update_selected
+        ? generator_1 & 0x1ffU : generator_1;
     plan->source = 0x02fda1d0U;
     plan->helper = 0x0001dc10U;
     plan->column = 0U;

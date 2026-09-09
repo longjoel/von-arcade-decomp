@@ -14,7 +14,14 @@ struct recovered_transition_route_plan_80710 {
     u32 band_index;
     int32_t adjusted_current;
     int32_t raw_difference;
-    u32 status_504db8;
+    u32 result_table;
+    u32 result_value;
+    u32 result_destination;
+    u32 action_504db8;
+    u32 action_value;
+    u32 action_destination;
+    u32 state_destination;
+    u32 state_call_target;
     u32 threshold_call_82800;
 };
 
@@ -33,10 +40,11 @@ static u32 signed_band(int32_t raw)
 struct recovered_transition_route_plan_80710
 recovered_transition_route_80710(
     int32_t global_504d70, int16_t current_184, int16_t related_184,
-    float threshold_504df8, float current_timing)
+    float threshold_504df8, float current_timing, u32 result_value)
 {
     struct recovered_transition_route_plan_80710 out = {
-        RECOVERED_TRANSITION_ROUTE_80710_REJECT, 0U, 0, 0, 10U, 0U
+        RECOVERED_TRANSITION_ROUTE_80710_REJECT, 0U, 0, 0, 0x72630U,
+        0U, 0U, 10U, 10U, 0x504db8U, 0x504d80U, 0x82800U, 0U
     };
     int32_t adjusted;
 
@@ -51,6 +59,8 @@ recovered_transition_route_80710(
     out.adjusted_current = adjusted;
     out.raw_difference = (int32_t)related_184 - adjusted;
     out.band_index = signed_band(out.raw_difference);
+    out.result_value = result_value;
+    out.result_destination = 0x00504d94U;
     out.threshold_call_82800 = current_timing < threshold_504df8;
     return out;
 }

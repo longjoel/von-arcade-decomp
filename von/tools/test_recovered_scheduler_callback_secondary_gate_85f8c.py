@@ -2,6 +2,7 @@
 
 import ctypes
 import pathlib
+import re
 import subprocess
 import tempfile
 from contextlib import contextmanager
@@ -9,6 +10,7 @@ from contextlib import contextmanager
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "i960/recovered_scheduler_callback_secondary_gate_85f8c.c"
+LISTING = ROOT / "build/disasm/vonj-maincpu.lst"
 
 
 @contextmanager
@@ -30,36 +32,31 @@ def build():
                         ("current_is_zero", ctypes.c_uint32),
                         ("object_byte_is_zero", ctypes.c_uint32)]
         function = loaded.recovered_scheduler_callback_secondary_gate_85f8c
-        array_u8 = ctypes.POINTER(ctypes.c_uint8)
-        array_u16 = ctypes.POINTER(ctypes.c_uint16)
-        function.argtypes = [array_u8, array_u16, array_u16, array_u8]
+        function.argtypes = [ctypes.c_uint32, ctypes.c_uint8,
+                             ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
         function.restype = Result
         yield function
 
 
 def main():
+    listing = LISTING.read_text()
+    for instruction in (r"85f8c:.*ldob.*0x1\(g7\)\[g3\]",
+                        r"85fa0:.*cmpibe.*0x860a0",
+                        r"85ff0:.*cmpibe.*0x86000"):
+        assert re.search(instruction, listing)
+
     with build() as function:
-        maps = (ctypes.c_uint8 * 32)(*[0] * 32)
-        previous = (ctypes.c_uint16 * 32)(*[0] * 32)
-        current = (ctypes.c_uint16 * 32)(*[1] * 32)
-        objects = (ctypes.c_uint8 * 32)(*[1] * 32)
-        result = function(maps, previous, current, objects)
+        result = function(7, 0, 0, 1, 1)
         assert result.route == 0
-        maps[7] = 0x40
-        result = function(maps, previous, current, objects)
+        result = function(7, 0x40, 0, 1, 1)
         assert result.candidate_index == 7
         assert result.route == 2
 
-        previous[7] = 1 << 9
-        result = function(maps, previous, current, objects)
+        result = function(7, 0x40, 1 << 9, 1, 1)
         assert result.route == 1
-        previous[7] = 0
-        current[7] = 0
-        result = function(maps, previous, current, objects)
+        result = function(7, 0x40, 0, 0, 1)
         assert result.route == 1
-        current[7] = 1
-        objects[7] = 0
-        result = function(maps, previous, current, objects)
+        result = function(7, 0x40, 0, 1, 0)
         assert result.route == 1
     print("recovered 0x85f8c secondary-gate vectors: ok")
 

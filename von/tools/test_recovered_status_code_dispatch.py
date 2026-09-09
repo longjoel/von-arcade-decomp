@@ -17,7 +17,9 @@ class Block(ctypes.Structure):
 
 class Plan(ctypes.Structure):
     _fields_ = [("blanking_block", Block), ("selected_block", Block),
-                ("selected_message", ctypes.c_uint32), ("selected_case", ctypes.c_uint32),
+                ("selected_message", ctypes.c_uint32),
+                ("message_helper", ctypes.c_uint32),
+                ("selected_case", ctypes.c_uint32),
                 ("text_column", ctypes.c_uint32), ("text_row", ctypes.c_uint32)]
 
 
@@ -35,7 +37,8 @@ def main() -> int:
                 plan.blanking_block.height) == (0x1DF00, 38, 3)
         assert (plan.selected_case, plan.selected_block.helper, plan.selected_block.source,
                 plan.selected_block.width, plan.selected_block.height,
-                plan.selected_message, plan.text_column, plan.text_row) == (3, 0x1DC90, 0x02FE343C, 36, 3, 0x1F6B0, 8, 14)
+                plan.selected_message, plan.message_helper,
+                plan.text_column, plan.text_row) == (3, 0x1DC90, 0x02FE343C, 36, 3, 0x1F6B0, 0x1D210, 8, 14)
         plan_fn(5, 4, 5, 6, 7, ctypes.byref(plan))
         assert (plan.selected_block.source, plan.selected_block.width,
                 plan.selected_block.height) == (0x02FE33B4, 35, 2)

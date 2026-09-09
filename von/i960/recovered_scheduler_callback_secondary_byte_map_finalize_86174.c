@@ -26,7 +26,7 @@ recovered_scheduler_callback_secondary_byte_map_finalize_86174(
             out.map_after[index] != 0U ||
             (value_504e42 & (1U << 11)) == 0U)
             continue;
-        out.map_after[index] = (uint8_t)((value_504e42 & 0x0fU) | 0x80U);
+        out.map_after[index] = (uint8_t)((value_504e42 & 0x0fU) | 0x40U);
         ++out.writes;
     }
     return out;

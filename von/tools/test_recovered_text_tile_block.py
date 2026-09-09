@@ -37,6 +37,8 @@ def main() -> int:
         empty = (ctypes.c_uint16 * (64 * 2))(*([0x5678] * (64 * 2)))
         function(empty, source, 0, 0, 0, 3)
         function(empty, source, 0, 0, 3, 0)
+        function(empty, source, 0, 0, 0xffffffff, 1)
+        function(empty, source, 0, 0, 1, 0xffffffff)
         assert all(value == 0x5678 for value in empty)
 
     print("recovered text tile-block vectors: ok")

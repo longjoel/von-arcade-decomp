@@ -27,18 +27,21 @@ def main() -> int:
         recovered = ctypes.CDLL(str(library))
         plan_fn = recovered.recovered_status_panel_sequence_plan
         plan_fn.argtypes = [ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32,
-                            ctypes.c_uint32, ctypes.POINTER(Plan)]
+                            ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32,
+                            ctypes.POINTER(Plan)]
         plan = Plan()
-        plan_fn(4, 20, 1, 0, ctypes.byref(plan))
+        plan_fn(4, 20, 1, 0, 24, 3, ctypes.byref(plan))
         assert (plan.first.helper, plan.first.source, plan.first.column,
                 plan.first.row, plan.first.width, plan.first.height) == (0x1DC10, 0x02FDE9D0, 6, 19, 55, 8)
         assert (plan.second.helper, plan.second.source, plan.second.column,
                 plan.second.row, plan.second.width, plan.second.height) == (0x1DC10, 0x02FE1606, 18, 12, 34, 2)
         assert (plan.third.helper, plan.third.source, plan.third.column,
                 plan.third.row, plan.third.width, plan.third.height) == (0x1DC90, 0x02FE158E, 18, 12, 30, 2)
-        plan_fn(0xFFFFFFFF, 0, 0, 1, ctypes.byref(plan))
+        plan_fn(0xFFFFFFFF, 0, 0, 1, 0xFFFFFFFF, 0xFFFFFFFF,
+                ctypes.byref(plan))
         assert (plan.first.column, plan.first.row, plan.second.column,
                 plan.second.row, plan.third.helper, plan.third.source) == (1, 0xFFFFFFFF, 13, 0xFFFFFFF8, 0x1DF00, 0)
+        assert (plan.first.width, plan.second.width) == (30, 30)
 
     print("PASS: 0x1f540 three-stage status-panel sequence")
     return 0

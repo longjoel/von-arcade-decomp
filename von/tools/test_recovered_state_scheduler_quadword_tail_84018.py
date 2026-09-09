@@ -27,7 +27,9 @@ with tempfile.TemporaryDirectory() as directory:
     result = function(26, 0, 2, 3, 4)
     assert (result.value_504d80, result.value_504d84,
             result.value_504d88, result.value_504d8c, result.value_504d90) == (26, 2, 3, 4, 30)
-    assert function(37, 4, 2, 3, 4).value_504d90 == 30
+    assert function(35, 4, 2, 3, 4).value_504d90 == 30
+    assert function(31, 0, 2, 3, 4).value_504d90 == 30
+    assert function(37, 4, 2, 3, 4).value_504d90 == 15
     assert function(36, 4, 2, 3, 4).value_504d90 == 15
     assert function(7, 0, 0xdeadbeef, 9, 11).value_504d84 == 0xdeadbeef
 

@@ -31,6 +31,8 @@ def main() -> int:
         assert (plan.source_byte_offset, plan.destination_byte_address,
                 plan.source_word_or_mask) == (10, 0x01000786, 0xc123)
         assert plan_fn(1, 14, 3, 2, 2, 0, 0, ctypes.byref(plan)) == 0
+        assert plan_fn(1, 14, 0xffffffff, 2, 0, 0, 0, ctypes.byref(plan)) == 0
+        assert plan_fn(1, 14, 3, 0xffffffff, 0, 0, 0, ctypes.byref(plan)) == 0
 
     print("PASS: 0x1dd10 attributed tile-plane block plan")
     return 0

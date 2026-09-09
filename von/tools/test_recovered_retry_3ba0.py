@@ -40,7 +40,11 @@ with tempfile.TemporaryDirectory() as td:
     assert retry(5, 10, 1, 0x00) == (0, 0, 0, 0, 0)
     # Set mode plus flag bit advances straight to the service call.
     assert retry(5, 10, 1, 0x10) == (1, 0, 0, 0x111C, 1)
-    # Zero mode past the counter rewinds the limit first: 10 - 6.
-    assert retry(5, 10, 0, 0x00) == (1, 1, 4, 0x111C, 1)
+    # Equality is not the cmpobl branch: zero mode is accepted at the limit.
+    assert retry(5, 6, 0, 0x00) == (1, 0, 0, 0x111C, 1)
+    # A normal zero-mode step also skips the copy helper.
+    assert retry(5, 10, 0, 0x00) == (1, 0, 0, 0x111C, 1)
+    # Only the sign-extended 0xffff counter wraps to zero and reaches 0x2330.
+    assert retry(-1, 10, 0, 0x00) == (1, 1, 10, 0x111C, 1)
 
 print("PASS: 0x3ba0 retry controller plan")

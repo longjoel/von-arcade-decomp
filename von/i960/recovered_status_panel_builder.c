@@ -18,7 +18,7 @@ struct recovered_status_panel_builder_plan {
     u32 second_height;
 };
 
-void recovered_status_panel_builder_plan(u32 input_pointer,
+void recovered_status_panel_builder_plan(u32 input_pointer, u32 caller_g25,
                                          struct recovered_status_panel_builder_plan *plan)
 {
     u32 adjusted_pointer = input_pointer - 0xd0U;
@@ -26,7 +26,7 @@ void recovered_status_panel_builder_plan(u32 input_pointer,
     plan->first_source = 0x02fe01d4U;
     plan->first_column = 4U;
     plan->first_row = 10U;
-    plan->first_width = 5U;
+    plan->first_width = caller_g25 + 31U;
     plan->first_height = 5U;
     plan->second_selector = adjusted_pointer & 0xfU;
     plan->second_table_entry = 0x02ea2010U + (plan->second_selector << 2);

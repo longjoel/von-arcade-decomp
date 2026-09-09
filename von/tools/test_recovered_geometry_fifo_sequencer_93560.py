@@ -68,6 +68,19 @@ def main() -> int:
         assert prefix[11] == 0xaaaaaaaa
         lib.fifo_seq_packet_complete(prefix)
         assert prefix[11] == 6
+        callers = [
+            (0xc0c66666, 0x41a33333, 0x40900000, 0x00000000), # 0x95f0c
+            (0x40000000, 0x41b4cccd, 0xc18c0000, 0x00004000), # 0x9687c
+            (0xc0200000, 0x41b40000, 0xc195999a, 0x00004000), # 0x97134
+            (0xbf19999a, 0x41b4cccd, 0xc1840000, 0x00004000), # 0x97230
+            (0xbfe872b0, 0x41af3333, 0xc190ced9, 0x00001f80), # 0x97cac
+            (0x3fe66666, 0x41d4cccd, 0x40c9999a, 0xffffa900), # 0x9911c
+        ]
+        for g0, g1, g2, g3 in callers:
+            caller_words = (ctypes.c_uint32 * 12)()
+            lib.fifo_seq_packet_build(g0, g1, g2, g3, caller_words)
+            assert list(caller_words) == [5, 18, g0, g1, g2, 21,
+                                          g3 & 0xffff, 19, F, F, F, 6], hex(g0)
 
         B1, B2, BS, A1 = 0x02B5C3A6, 0x02B60728, 0x02B58024, 0x02BE2B64
         check(lib, 99, 7, 10,
@@ -90,7 +103,7 @@ def main() -> int:
               (0, 3, 143, BS, A1, 119))
         check(lib, 99, 0, 100,
               (0, 0, 101, BS, A1, 77))
-        print("PASS: packet, gated store, mod-120, sequencer edges")
+        print("PASS: packet, six callers, gated store, mod-120, sequencer edges")
     return 0
 
 

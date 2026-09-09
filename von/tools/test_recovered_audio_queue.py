@@ -24,6 +24,15 @@ class EnqueuePlan(ctypes.Structure):
     ]
 
 
+class HostServicePlan(ctypes.Structure):
+    _fields_ = [("callback_target", ctypes.c_uint32),
+                ("g14_after", ctypes.c_uint32),
+                ("control_before", ctypes.c_uint32),
+                ("control_after", ctypes.c_uint32),
+                ("control_address", ctypes.c_uint32),
+                ("control_mmio_address", ctypes.c_uint32)]
+
+
 def expected_bytes(value: int, mode: int, board_status: int) -> bytes:
     value &= 0xFFFF
     if value == 0x00FF:
@@ -77,6 +86,17 @@ def main() -> int:
             ctypes.c_uint32, ctypes.c_uint32, ctypes.POINTER(EnqueuePlan),
         ]
         recovered.recovered_audio_u16_enqueue_plan.restype = ctypes.c_uint32
+        recovered.recovered_host_service_request_plan.argtypes = [
+            ctypes.c_uint32, ctypes.POINTER(HostServicePlan)]
+        recovered.recovered_host_service_request_plan.restype = ctypes.c_uint32
+
+        plan = HostServicePlan()
+        assert recovered.recovered_host_service_request_plan(
+            0x123, ctypes.byref(plan)) == 1
+        assert (plan.callback_target, plan.g14_after,
+                plan.control_before, plan.control_after,
+                plan.control_address, plan.control_mmio_address) == (
+            0x1370, 0, 0x123, 0x523, 0x501CD0, 0xE80004)
 
         if recovered.recovered_audio_short_delay_iterations() != 4:
             raise SystemExit("short delay iteration count mismatch")

@@ -59,6 +59,30 @@ maincpu CURPC at tap time, and distinct writer PCs per window are counted
 Use it to resolve writer PCs for open RAM cells (e.g. 0x503CB8) during
 any capture without touching the trace window or inputs.
 
+Movement sandbox (no human needed): `scripts/sandbox-versus.sh` boots
+single-cabinet 2P versus headless (`-video none -sound none
+-nothrottle`), drives a scripted P1 program, and exits. Design notes:
+
+- P2 NOP: one cabinet exposes no P2 input fields at all (verified by
+  field inventory), so the untouched P2 side is an idle dummy by
+  construction. Behavioral confirmation (projectile absence in a `-log`
+  run) is still open.
+- Timer NOP: `von/tools/sandbox_versus.lua` installs ONE write tap over
+  the aligned window `0x500554-0x500557` (MAME rejects single-byte
+  `[x,x]` ranges: end address needs low bits set). After 8 recon lines
+  (pc + mask reveal the access width), the tap returns the pre-write
+  value: 90,740 writes vetoed in the shakedown, timer frozen (81 at
+  battle start, then 264 for the rest of the run). Recon showed
+  full-word writes from PC `0xbd890` counting up by `0x2c` — an
+  elapsed counter, not a seconds countdown.
+- P1 program (machine frames): strafe-left 9600-9840, dash-right
+  9840-9960, forward 9960-10080, idle to exit at 10300. Watchlist
+  (`0x500554`, `0x503b5c/0x503b68`, `0x504d94`) confirmed live
+  responses: position words 12.58 -> 8.0 -> 12.78 -> 11.98 (IEEE
+  floats), dispatcher visiting `0x0b/0x0a/0x01/0x0c/0x12/0x06`
+  (the last two are new slots).
+- Outputs land in `von/sandbox/sandbox-<UTC>/` (git-ignored).
+
 ## 2. Launch
 
 ./scripts/record-human.sh
