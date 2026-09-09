@@ -8,6 +8,7 @@
 #   VON_FUZZVERSUS_OUT        output dir (default von/fuzz-versus/<stamp>)
 #   VON_FUZZVERSUS_SECONDS    seconds budget (default 240)
 #   VON_FUZZ_SELECT_STEPS     versus cursor right-presses (default 0)
+#   VON_FUZZ_SELECT_DOWN      versus cursor down-presses first (default 0)
 #   VON_FUZZ_ONLY             comma subset of fuzz combos (default all)
 #   VON_FUZZ_HOLD/SETTLE      hold/settle frames (default 45/45)
 #   VON_FUZZ_TELEMETRY        "0xaddr,..." per-frame words during holds
@@ -36,6 +37,7 @@ VON_FUZZ_COIN=7200 VON_FUZZ_COIN2=7260 \
 VON_FUZZ_NO_START=1 VON_FUZZ_START2=7400 \
 VON_FUZZ_SELECT_FRAME=8350 \
 VON_FUZZ_SELECT_STEPS="${VON_FUZZ_SELECT_STEPS:-0}" \
+VON_FUZZ_SELECT_DOWN="${VON_FUZZ_SELECT_DOWN:-0}" \
 VON_FUZZ_BATTLE=9600 \
 VON_FUZZ_HOLD="${VON_FUZZ_HOLD:-45}" VON_FUZZ_SETTLE="${VON_FUZZ_SETTLE:-45}" \
 VON_FUZZ_ONLY="${VON_FUZZ_ONLY:-}" \

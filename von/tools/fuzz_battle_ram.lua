@@ -35,6 +35,9 @@ local NO_START = os.getenv("VON_FUZZ_NO_START") == "1"
 local COIN2_FRAME = tonumber(os.getenv("VON_FUZZ_COIN2") or "0")
 local SELECT_FRAME = tonumber(os.getenv("VON_FUZZ_SELECT_FRAME") or "0")
 local SELECT_STEPS = tonumber(os.getenv("VON_FUZZ_SELECT_STEPS") or "0")
+-- Row-2 picks: VON_FUZZ_SELECT_DOWN down-presses walk the cursor to the
+-- second row first, then SELECT_STEPS right-presses run.
+local SELECT_DOWN = tonumber(os.getenv("VON_FUZZ_SELECT_DOWN") or "0")
 -- Force the game's link role: the comm firmware reads shared[1]
 -- (0x01=master, 0x02=slave) with fallback to the fg bit. The service
 -- menu normally sources this; forcing overrides whatever it holds.
@@ -342,22 +345,26 @@ emu.register_periodic(function()
         if fields.start2 then fields.start2:clear_value() end
     end
 
-    -- Versus select cursor walk: one 6-frame right-press per 36-frame slot.
-    if SELECT_FRAME > 0 and SELECT_STEPS > 0 and fields.right then
+    -- Versus select cursor walk: SELECT_DOWN down-presses (row 2) first,
+    -- then one 6-frame right-press per 36-frame slot.
+    if SELECT_FRAME > 0 and fields.right and fields.down then
+        local total = SELECT_DOWN + SELECT_STEPS
         local rel = frame - SELECT_FRAME
         if rel >= 0 then
             local slot = math.floor(rel / 36)
             local ph = rel % 36
-            if slot < SELECT_STEPS then
+            if slot < total then
+                local key = (slot < SELECT_DOWN) and "down" or "right"
+                local n = (slot < SELECT_DOWN) and (slot + 1) or (slot - SELECT_DOWN + 1)
                 if ph == 0 then
-                    fields.right:set_value(1)
-                    log(string.format("fuzz: select step %d/%d",
-                        slot + 1, SELECT_STEPS))
+                    fields[key]:set_value(1)
+                    log(string.format("fuzz: select %s %d", key, n))
                 elseif ph == 6 then
-                    fields.right:clear_value()
+                    fields[key]:clear_value()
                 end
-            elseif slot == SELECT_STEPS and ph == 0 then
+            elseif slot == total and ph == 0 then
                 fields.right:clear_value()
+                fields.down:clear_value()
             end
         end
     end
