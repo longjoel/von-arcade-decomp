@@ -38,6 +38,18 @@ local SELECT_STEPS = tonumber(os.getenv("VON_FUZZ_SELECT_STEPS") or "0")
 -- Row-2 picks: VON_FUZZ_SELECT_DOWN down-presses walk the cursor to the
 -- second row first, then SELECT_STEPS right-presses run.
 local SELECT_DOWN = tonumber(os.getenv("VON_FUZZ_SELECT_DOWN") or "0")
+-- General cursor path: VON_FUZZ_SELECT_SEQ="down,down,right" overrides the
+-- DOWN/STEPS pair with an explicit per-slot direction list.
+local SELECT_SEQ = {}
+do
+    local raw = os.getenv("VON_FUZZ_SELECT_SEQ") or ""
+    for tok in string.gmatch(raw, "([^,]+)") do
+        local dir = (tok:gsub("%s+", ""))
+        if dir == "up" or dir == "down" or dir == "left" or dir == "right" then
+            SELECT_SEQ[#SELECT_SEQ + 1] = dir
+        end
+    end
+end
 -- Force the game's link role: the comm firmware reads shared[1]
 -- (0x01=master, 0x02=slave) with fallback to the fg bit. The service
 -- menu normally sources this; forcing overrides whatever it holds.
@@ -345,26 +357,35 @@ emu.register_periodic(function()
         if fields.start2 then fields.start2:clear_value() end
     end
 
-    -- Versus select cursor walk: SELECT_DOWN down-presses (row 2) first,
-    -- then one 6-frame right-press per 36-frame slot.
-    if SELECT_FRAME > 0 and fields.right and fields.down then
-        local total = SELECT_DOWN + SELECT_STEPS
+    -- Versus select cursor walk: explicit SELECT_SEQ path wins; otherwise
+    -- SELECT_DOWN down-presses (row 2) first, then SELECT_STEPS right-presses.
+    -- One 6-frame press per 36-frame slot.
+    if SELECT_FRAME > 0 then
+        local path = {}
+        if #SELECT_SEQ > 0 then
+            path = SELECT_SEQ
+        else
+            for _ = 1, SELECT_DOWN do path[#path + 1] = "down" end
+            for _ = 1, SELECT_STEPS do path[#path + 1] = "right" end
+        end
         local rel = frame - SELECT_FRAME
-        if rel >= 0 then
+        if rel >= 0 and #path > 0 then
             local slot = math.floor(rel / 36)
             local ph = rel % 36
-            if slot < total then
-                local key = (slot < SELECT_DOWN) and "down" or "right"
-                local n = (slot < SELECT_DOWN) and (slot + 1) or (slot - SELECT_DOWN + 1)
-                if ph == 0 then
-                    fields[key]:set_value(1)
-                    log(string.format("fuzz: select %s %d", key, n))
-                elseif ph == 6 then
-                    fields[key]:clear_value()
+            if slot < #path then
+                local key = path[slot + 1]
+                if fields[key] then
+                    if ph == 0 then
+                        fields[key]:set_value(1)
+                        log(string.format("fuzz: select %s slot %d", key, slot))
+                    elseif ph == 6 then
+                        fields[key]:clear_value()
+                    end
                 end
-            elseif slot == total and ph == 0 then
-                fields.right:clear_value()
-                fields.down:clear_value()
+            elseif slot == #path and ph == 0 then
+                for _, k in ipairs({"up", "down", "left", "right"}) do
+                    if fields[k] then fields[k]:clear_value() end
+                end
             end
         end
     end
