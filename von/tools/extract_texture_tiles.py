@@ -4,10 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from pathlib import Path
 
 from export_geometry_textured_gltf import texel
+
+from texture_tile_png import indexed_png
 
 
 COMMAND = re.compile(
@@ -27,12 +30,16 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path,
                         default=Path("von/build/disasm/texture-pipeline/tiles"))
     parser.add_argument("--limit", type=int, default=128)
+    parser.add_argument("--format", choices=("pgm", "png"), default="pgm",
+                        help="pgm keeps the legacy grayscale output; png writes "
+                             "4-bit indexed PNGs with von: provenance chunks")
     args = parser.parse_args()
 
     packed = args.bank.read_bytes()
     args.output_dir.mkdir(parents=True, exist_ok=True)
     seen: set[tuple[int, int, int, int, int]] = set()
     rows: list[tuple[str, int, int, int, int, int]] = []
+    manifest: list[dict] = []
 
     for match in COMMAND.finditer(args.trace.read_text()):
         groups = match.groups()
@@ -46,20 +53,40 @@ def main() -> int:
         seen.add(key)
         x0 = (origin_x - 2048) & 2047
         y0 = (origin_y - 1024) & 1023
-        pixels = bytearray(
-            texel(packed, x0 + x, y0 + y)
+        indices = bytes(
+            texel(packed, x0 + x, y0 + y) // 17
             for y in range(height) for x in range(width)
         )
-        name = f"{len(rows):03d}-cb{colorbase:03x}-{width}x{height}-at{x0:04x}_{y0:03x}.pgm"
-        (args.output_dir / name).write_bytes(
-            f"P5\n{width} {height}\n255\n".encode() + pixels)
+        stem = f"{len(rows):03d}-cb{colorbase:03x}-{width}x{height}-at{x0:04x}_{y0:03x}"
+        if args.format == "png":
+            name = stem + ".png"
+            metadata = {
+                "von:header": f"{header:#x}",
+                "von:origin": f"{x0},{y0}",
+                "von:size": f"{width}x{height}",
+                "von:bank": args.bank.name,
+                "von:sheet": str(sheet),
+                "von:colorbase": f"{colorbase:#x}",
+                "von:source": args.trace.name,
+            }
+            (args.output_dir / name).write_bytes(indexed_png(width, height, indices, metadata=metadata))
+        else:
+            name = stem + ".pgm"
+            pixels = bytes(index * 17 for index in indices)
+            (args.output_dir / name).write_bytes(
+                f"P5\n{width} {height}\n255\n".encode() + pixels)
         rows.append((name, colorbase, width, height, x0, y0))
+        manifest.append({"file": name, "header": header, "header_hex": f"{header:#x}",
+                         "x": x0, "y": y0, "width": width, "height": height,
+                         "colorbase": colorbase, "bank": args.bank.name, "sheet": sheet})
         if len(rows) >= args.limit:
             break
 
     (args.output_dir / "index.tsv").write_text(
         "file\tcolorbase\twidth\theight\tx\ty\n" +
         "\n".join("\t".join(map(str, row)) for row in rows) + "\n")
+    (args.output_dir / "tiles.json").write_text(
+        json.dumps({"version": 1, "format": args.format, "tiles": manifest}, indent=2) + "\n")
     print(f"extracted {len(rows)} texture tiles to {args.output_dir}")
     return 0
 
