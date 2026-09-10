@@ -1,0 +1,63 @@
+--- a/src/osd/modules/debugger/debuggdbstub.cpp
++++ b/src/osd/modules/debugger/debuggdbstub.cpp
+@@ -651,6 +651,60 @@
+ };
+
+ //-------------------------------------------------------------------------
++static const gdb_register_map gdb_register_map_i960 =
++{
++	"i960",
++	{
++		{
++			"org.gnu.gdb.i960.core",
++			{
++				{ "pfp", "pfp", true, TYPE_DATA_POINTER },
++				{ "sp",  "sp",  true, TYPE_DATA_POINTER },
++				{ "rip", "rip", true, TYPE_CODE_POINTER },
++				{ "r3",  "r3",  false, TYPE_INT },
++				{ "r4",  "r4",  false, TYPE_INT },
++				{ "r5",  "r5",  false, TYPE_INT },
++				{ "r6",  "r6",  false, TYPE_INT },
++				{ "r7",  "r7",  false, TYPE_INT },
++				{ "r8",  "r8",  false, TYPE_INT },
++				{ "r9",  "r9",  false, TYPE_INT },
++				{ "r10", "r10", false, TYPE_INT },
++				{ "r11", "r11", false, TYPE_INT },
++				{ "r12", "r12", false, TYPE_INT },
++				{ "r13", "r13", false, TYPE_INT },
++				{ "r14", "r14", false, TYPE_INT },
++				{ "r15", "r15", false, TYPE_INT },
++				{ "g0",  "g0",  false, TYPE_INT },
++				{ "g1",  "g1",  false, TYPE_INT },
++				{ "g2",  "g2",  false, TYPE_INT },
++				{ "g3",  "g3",  false, TYPE_INT },
++				{ "g4",  "g4",  false, TYPE_INT },
++				{ "g5",  "g5",  false, TYPE_INT },
++				{ "g6",  "g6",  false, TYPE_INT },
++				{ "g7",  "g7",  false, TYPE_INT },
++				{ "g8",  "g8",  false, TYPE_INT },
++				{ "g9",  "g9",  false, TYPE_INT },
++				{ "g10", "g10", false, TYPE_INT },
++				{ "g11", "g11", false, TYPE_INT },
++				{ "g12", "g12", false, TYPE_INT },
++				{ "g13", "g13", false, TYPE_INT },
++				{ "g14", "g14", false, TYPE_INT },
++				{ "fp",  "fp",  true, TYPE_DATA_POINTER },
++				{ "sat", "sat", false, TYPE_INT },
++				{ "prcb", "prcb", false, TYPE_DATA_POINTER },
++				{ "pc",  "pc",  true, TYPE_CODE_POINTER },
++				{ "ac",  "ac",  false, TYPE_INT },
++				{ "ip",  "ip",  true, TYPE_CODE_POINTER },
++				{ "pip", "pip", true, TYPE_CODE_POINTER },
++			}
++		}
++	}
++};
++
++//-------------------------------------------------------------------------
++	{ "i960",       gdb_register_map_i960 },
++	{ "i80960ka",   gdb_register_map_i960 },
++	{ "i80960kb",   gdb_register_map_i960 },
+ static const std::map<std::string, const gdb_register_map &> gdb_register_maps = {
+ 	{ "i486",       gdb_register_map_i486 },
+ 	{ "arm7_le",    gdb_register_map_arm7 },
