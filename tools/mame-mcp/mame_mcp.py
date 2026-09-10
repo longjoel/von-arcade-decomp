@@ -14,8 +14,10 @@ import select
 import socket
 import subprocess
 import sys
+import threading
 import time
 import xml.etree.ElementTree as ET
+from collections import deque
 from pathlib import Path
 from typing import Any
 
@@ -147,6 +149,10 @@ class MameMcp:
         self.gdb: GdbRemote | None = None
         self.process: subprocess.Popen[bytes] | None = None
         self.target_xml: str | None = None
+        self.output_lines: deque[dict[str, Any]] = deque(maxlen=10_000)
+        self.output_seq = 0
+        self.output_thread: threading.Thread | None = None
+        self.output_file: Any = None
 
     def _require_gdb(self) -> GdbRemote:
         if self.gdb is None or not self.gdb.connected:
@@ -164,6 +170,11 @@ class MameMcp:
         port = int(args.get("port", 23946))
         if not (1 <= port <= 65535):
             raise GdbError("port must be between 1 and 65535")
+        # Selecting the provider is not enough: MAME keeps the debugger
+        # disabled unless -debug is present.  Add it here so every MCP-launched
+        # session reliably reaches the GDB stub's initial stop.
+        if "-debug" not in mame_args and "-nodebug" not in mame_args:
+            mame_args = [*mame_args, "-debug"]
         command = [executable, *mame_args, "-debugger", "gdbstub", "-debugger_host", host, "-debugger_port", str(port)]
         cwd = args.get("cwd")
         env = os.environ.copy()
@@ -174,9 +185,20 @@ class MameMcp:
             env.update(extra_env)
         try:
             self.process = subprocess.Popen(command, cwd=cwd, env=env, stdin=subprocess.DEVNULL,
-                                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         except OSError as exc:
             raise GdbError(f"could not start MAME: {exc}") from exc
+        output_file = args.get("output_file")
+        if output_file:
+            try:
+                self.output_file = Path(str(output_file)).open("w", encoding="utf-8")
+            except OSError as exc:
+                self.process.terminate()
+                raise GdbError(f"could not open output_file: {exc}") from exc
+        self.output_lines.clear()
+        self.output_seq = 0
+        self.output_thread = threading.Thread(target=self._capture_output, args=(self.process,), daemon=True)
+        self.output_thread.start()
         self.gdb = GdbRemote(host, port, float(args.get("timeout", 5.0)))
         try:
             self.gdb.connect(float(args.get("connect_timeout", 10.0)))
@@ -188,7 +210,10 @@ class MameMcp:
 
     @staticmethod
     def _default_mame() -> str:
-        return str(Path(__file__).resolve().parents[2] / "bin" / "von")
+        project_binary = Path(__file__).resolve().parents[2] / "bin" / "von"
+        if project_binary.is_file():
+            return str(project_binary)
+        return os.environ.get("MAME_EXECUTABLE", "mame")
 
     def _connect(self, args: dict[str, Any]) -> dict[str, Any]:
         if self.gdb and self.gdb.connected:
@@ -228,7 +253,31 @@ class MameMcp:
                 self.process.wait(timeout=2)
         code = self.process.poll() if self.process else None
         self.process = None
+        if self.output_file:
+            self.output_file.close()
+            self.output_file = None
         return {"stopped": True, "exit_code": code}
+
+    def _capture_output(self, process: subprocess.Popen[bytes]) -> None:
+        if process.stdout is None:
+            return
+        for raw_line in iter(process.stdout.readline, b""):
+            line = raw_line.decode("utf-8", errors="replace").rstrip("\r\n")
+            if self.output_file:
+                self.output_file.write(line + "\n")
+                self.output_file.flush()
+            self.output_seq += 1
+            self.output_lines.append({"seq": self.output_seq, "time": time.time(), "line": line})
+
+    def _output(self, args: dict[str, Any]) -> dict[str, Any]:
+        since = args.get("since", 0)
+        if not isinstance(since, int) or since < 0:
+            raise GdbError("since must be a non-negative output sequence number")
+        limit = args.get("limit", 200)
+        if not isinstance(limit, int) or not 1 <= limit <= 10_000:
+            raise GdbError("limit must be between 1 and 10000")
+        lines = [item for item in self.output_lines if item["seq"] > since]
+        return {"lines": lines[-limit:], "next_since": self.output_seq, "dropped_before": self.output_lines[0]["seq"] if self.output_lines else self.output_seq + 1}
 
     def _status(self) -> dict[str, Any]:
         return {
@@ -245,6 +294,7 @@ class MameMcp:
         if name == "mame_connect": return self._connect(args)
         if name == "mame_stop": return self._stop()
         if name == "mame_status": return self._status()
+        if name == "mame_output": return self._output(args)
         gdb = self._require_gdb()
         if name == "gdb_raw":
             payload = args.get("packet")
@@ -298,7 +348,63 @@ class MameMcp:
             except ValueError:
                 output = reply
             return {"command": command, "output": output, "raw": reply}
+        if name == "mame_save_state":
+            state = self._state_name(args)
+            return {"state": state, **self._monitor_text(f"statesave {state}")}
+        if name == "mame_load_state":
+            state = self._state_name(args)
+            return {"state": state, **self._monitor_text(f"stateload {state}")}
+        if name == "gdb_run_to_breakpoint":
+            address = self._number(args, "address")
+            kind = self._number(args, "kind", default=1)
+            temporary = bool(args.get("temporary", True))
+            set_reply = gdb.request(f"Z0,{address:x},{kind:x}")
+            stop = gdb.request("c")
+            remove_reply = None
+            if temporary:
+                remove_reply = gdb.request(f"z0,{address:x},{kind:x}")
+            return {"address": address, "stop": stop, "set_reply": set_reply, "remove_reply": remove_reply}
+        if name == "gdb_capture_probe":
+            return self._capture_probe(args)
         raise GdbError(f"unknown tool: {name}")
+
+    def _monitor_text(self, command: str) -> dict[str, str]:
+        reply = self._require_gdb().request(f"qRcmd,{command.encode('utf-8').hex()}")
+        try:
+            output = bytes.fromhex(reply).decode("utf-8", errors="replace")
+        except ValueError:
+            output = reply
+        return {"output": output, "raw": reply}
+
+    @staticmethod
+    def _state_name(args: dict[str, Any]) -> str:
+        state = args.get("name")
+        if not isinstance(state, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+", state):
+            raise GdbError("state name must contain only letters, numbers, '.', '_' or '-'")
+        return state
+
+    def _capture_probe(self, args: dict[str, Any]) -> dict[str, Any]:
+        gdb = self._require_gdb()
+        result: dict[str, Any] = {"output": self._output({"since": args.get("output_since", 0), "limit": args.get("output_limit", 200)})}
+        if args.get("registers", True):
+            raw = gdb.request("g")
+            result["registers"] = {"hex": raw, "decoded": self._decode_registers(raw)}
+        memories = args.get("memory", [])
+        if not isinstance(memories, list):
+            raise GdbError("memory must be a list of {address, length} objects")
+        result["memory"] = []
+        for item in memories:
+            if not isinstance(item, dict):
+                raise GdbError("each memory probe must be an object")
+            address, length = self._address_length(item)
+            raw = gdb.request(f"m{address:x},{length:x}")
+            result["memory"].append({"address": address, "length": length, "hex": raw})
+        monitors = args.get("monitor", [])
+        if not isinstance(monitors, list) or not all(isinstance(command, str) and command for command in monitors):
+            raise GdbError("monitor must be a list of non-empty strings")
+        result["monitor"] = [self._monitor_text(command) for command in monitors]
+        result["captured_at"] = time.time()
+        return result
 
     @staticmethod
     def _number(args: dict[str, Any], key: str, default: int | None = None) -> int:
@@ -336,20 +442,25 @@ class MameMcp:
 
 
 TOOLS = [
-    {"name": "mame_start", "description": "Start MAME with its GDB stub enabled and connect to it.", "inputSchema": {"type": "object", "properties": {"executable": {"type": "string"}, "args": {"type": "array", "items": {"type": "string"}}, "cwd": {"type": "string"}, "host": {"type": "string", "default": "127.0.0.1"}, "port": {"type": "integer", "default": 23946}, "connect_timeout": {"type": "number", "default": 10}}}},
+    {"name": "mame_start", "description": "Start MAME with its GDB stub enabled and connect to it. Optional output_file preserves the complete MAME stdout/stderr stream for trace evidence.", "inputSchema": {"type": "object", "properties": {"executable": {"type": "string"}, "args": {"type": "array", "items": {"type": "string"}}, "cwd": {"type": "string"}, "env": {"type": "object", "additionalProperties": {"type": "string"}}, "output_file": {"type": "string"}, "host": {"type": "string", "default": "127.0.0.1"}, "port": {"type": "integer", "default": 23946}, "timeout": {"type": "number", "default": 5}, "connect_timeout": {"type": "number", "default": 10}}}},
     {"name": "mame_connect", "description": "Connect to an already-running MAME GDB stub.", "inputSchema": {"type": "object", "properties": {"host": {"type": "string", "default": "127.0.0.1"}, "port": {"type": "integer", "default": 23946}, "connect_timeout": {"type": "number"}}}},
     {"name": "mame_stop", "description": "Disconnect and stop a MAME process started by this server.", "inputSchema": {"type": "object", "properties": {}}},
     {"name": "mame_status", "description": "Report MAME process and GDB connection state.", "inputSchema": {"type": "object", "properties": {}}},
+    {"name": "mame_output", "description": "Read recent stdout/stderr captured from a MAME process started by this server.", "inputSchema": {"type": "object", "properties": {"since": {"type": "integer", "default": 0}, "limit": {"type": "integer", "default": 200}}}},
+    {"name": "mame_save_state", "description": "Save the complete paused MAME machine state using the debugger state directory.", "inputSchema": {"type": "object", "required": ["name"], "properties": {"name": {"type": "string"}}}},
+    {"name": "mame_load_state", "description": "Load a previously saved paused MAME machine state.", "inputSchema": {"type": "object", "required": ["name"], "properties": {"name": {"type": "string"}}}},
     {"name": "gdb_read_memory", "description": "Read bytes from the currently selected MAME address space.", "inputSchema": {"type": "object", "required": ["address", "length"], "properties": {"address": {"type": ["integer", "string"]}, "length": {"type": ["integer", "string"]}}}},
     {"name": "gdb_write_memory", "description": "Write hexadecimal bytes to the currently selected MAME address space.", "inputSchema": {"type": "object", "required": ["address", "hex"], "properties": {"address": {"type": ["integer", "string"]}, "hex": {"type": "string"}}}},
     {"name": "gdb_read_registers", "description": "Read all registers and decode names from MAME's target XML.", "inputSchema": {"type": "object", "properties": {}}},
     {"name": "gdb_read_register", "description": "Read one GDB register by numeric index.", "inputSchema": {"type": "object", "required": ["number"], "properties": {"number": {"type": ["integer", "string"]}}}},
     {"name": "gdb_write_register", "description": "Write one GDB register by numeric index using target-endian hexadecimal bytes.", "inputSchema": {"type": "object", "required": ["number", "hex"], "properties": {"number": {"type": ["integer", "string"]}, "hex": {"type": "string"}}}},
     {"name": "gdb_continue", "description": "Continue MAME until the next breakpoint, watchpoint, or stop.", "inputSchema": {"type": "object", "properties": {}}},
+    {"name": "gdb_run_to_breakpoint", "description": "Set a breakpoint, run until it fires, and optionally remove it.", "inputSchema": {"type": "object", "required": ["address"], "properties": {"address": {"type": ["integer", "string"]}, "kind": {"type": ["integer", "string"], "default": 1}, "temporary": {"type": "boolean", "default": True}}}},
     {"name": "gdb_step", "description": "Single-step the selected MAME CPU.", "inputSchema": {"type": "object", "properties": {}}},
     {"name": "gdb_interrupt", "description": "Interrupt a running MAME target.", "inputSchema": {"type": "object", "properties": {}}},
     {"name": "gdb_breakpoint", "description": "Set or remove a software breakpoint.", "inputSchema": {"type": "object", "required": ["address"], "properties": {"address": {"type": ["integer", "string"]}, "kind": {"type": ["integer", "string"], "default": 1}, "remove": {"type": "boolean"}}}},
     {"name": "gdb_monitor", "description": "Run a MAME debugger console command through GDB qRcmd.", "inputSchema": {"type": "object", "required": ["command"], "properties": {"command": {"type": "string"}}}},
+    {"name": "gdb_capture_probe", "description": "Capture registers, selected memory ranges, MAME output, and debugger commands at the current stop.", "inputSchema": {"type": "object", "properties": {"registers": {"type": "boolean", "default": True}, "memory": {"type": "array", "items": {"type": "object"}}, "monitor": {"type": "array", "items": {"type": "string"}}, "output_since": {"type": "integer", "default": 0}, "output_limit": {"type": "integer", "default": 200}}}},
     {"name": "gdb_raw", "description": "Send one printable ASCII GDB remote packet for an unsupported probe.", "inputSchema": {"type": "object", "required": ["packet"], "properties": {"packet": {"type": "string"}}}},
 ]
 

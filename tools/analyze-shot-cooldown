@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+"""Correlate human shot edges with the three player weapon cooldown slots."""
+
+import argparse
+import re
+from pathlib import Path
+
+
+STATE_RE = re.compile(
+    r"fuzz: state f(\d+) @005039c0 ((?:[0-9a-f?]{8} ?)+)$"
+)
+
+
+def byte(words, offset):
+    """Read a little-endian byte from the 0x5039c0-relative state window."""
+    word = words[offset // 4]
+    return (word >> (8 * (offset % 4))) & 0xFF
+
+
+def u16(words, offset):
+    return byte(words, offset) | (byte(words, offset + 1) << 8)
+
+
+def load_rows(path):
+    rows = []
+    for line in path.read_text(errors="replace").splitlines():
+        match = STATE_RE.search(line)
+        if not match:
+            continue
+        words = match.group(2).split()
+        if any("?" in word for word in words):
+            continue
+        rows.append((int(match.group(1)), [int(word, 16) for word in words]))
+    return rows
+
+
+def load_edges(path):
+    edges = []
+    previous = False
+    for line in path.read_text(errors="replace").splitlines():
+        fields = line.split()
+        if len(fields) < 2 or not fields[0].isdigit():
+            continue
+        mask = int(fields[1], 16)
+        active = bool(mask & 1)
+        if active and not previous:
+            edges.append(int(fields[0]))
+        previous = active
+    return edges
+
+
+def nearest(rows, frame):
+    return min(rows, key=lambda row: abs(row[0] - frame))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("record_log", type=Path)
+    parser.add_argument("--macro", type=Path)
+    args = parser.parse_args()
+
+    rows = load_rows(args.record_log)
+    if not rows:
+        raise SystemExit("no @005039c0 state rows found")
+    edges = load_edges(args.macro) if args.macro else []
+
+    print(f"state rows: {len(rows)} frames {rows[0][0]}..{rows[-1][0]}")
+    if edges:
+        print(f"left-shot edges: {len(edges)} {edges}")
+
+    # r4=0x503ad0. These are the three 16-bit cooldown timers at r4+0x1ec,
+    # r4+0x1ea, and r4+0x1ee. Relative to this state window they are 0x2fc,
+    # 0x2fa, and 0x2fe. The adjacent +0x138..+0x13a bytes are input-repeat
+    # counters, not weapon gauges; writer-PC tracing proved that distinction.
+    timer_offsets = (0x2FC, 0x2FA, 0x2FE)
+    # The availability bits used by the launch selector are r4+0x1de,
+    # r4+0x1dd, and r4+0x1df for slots 1, 2, and 3 respectively.
+    # 0x503ad0 + 0x1de = 0x503cae, relative to 0x5039c0: 0x2ee.
+    availability_offsets = (0x2EE, 0x2ED, 0x2EF)
+    histories = []
+    cooldown_starts = []
+    for slot, (timer_offset, availability_offset) in enumerate(
+        zip(timer_offsets, availability_offsets), 1
+    ):
+        values = [
+            (frame, u16(words, timer_offset), byte(words, availability_offset))
+            for frame, words in rows
+        ]
+        histories.append(values)
+        starts = []
+        durations = []
+        previous = 0
+        active_start = None
+        for frame, value, available in values:
+            if value > 0 and previous == 0:
+                starts.append((frame, value, available))
+                active_start = frame
+            elif value == 0 and previous > 0 and active_start is not None:
+                durations.append((active_start, frame, frame - active_start))
+                active_start = None
+            previous = value
+        cooldown_starts.append(starts)
+        transitions = []
+        previous = values[0][2]
+        for frame, value, available in values[1:]:
+            if available != previous:
+                transitions.append((frame, previous, available, value))
+            previous = available
+        print(f"slot {slot}: cooldown starts={starts}")
+        print(f"slot {slot}: cooldown durations={durations}")
+        print(f"slot {slot}: availability transitions={transitions}")
+
+    if edges and len(cooldown_starts) >= 2:
+        # The timer can start after the attack animation/launch path, so retain
+        # a generous window; the exact cooldown duration comes from the timer.
+        matched = []
+        for frame, value, available in cooldown_starts[1]:
+            prior = [edge for edge in edges if edge <= frame]
+            if prior and frame - prior[-1] <= 120:
+                matched.append((prior[-1], frame, frame - prior[-1], value, available))
+        if matched:
+            latencies = [item[2] for item in matched]
+            intervals = [b[0] - a[0] for a, b in zip(matched, matched[1:])]
+            print(f"slot 2 edge-correlated cooldown starts: {matched}")
+            print(f"slot 2 edge-to-cooldown latencies: {latencies}")
+            print(f"slot 2 cooldown-start intervals: {intervals}")
+
+    if edges:
+        print("edge samples:")
+        for edge in edges:
+            frame, words = nearest(rows, edge)
+            timers = [u16(words, offset) for offset in timer_offsets]
+            available = [byte(words, offset) for offset in availability_offsets]
+            print(f"  edge {edge}: sample {frame} timers={timers} available={available}")
+
+
+if __name__ == "__main__":
+    main()

@@ -22,6 +22,9 @@
 --              VON_PROGRESS_SELECT_STEPS (right presses before confirmation)
 --              VON_PROGRESS_AUTO_START (default 1; set 0 for selector-only capture)
 --              VON_PROGRESS_GEOMETRY_STATE_LOG (optional state log path)
+--              VON_PROGRESS_SHOT_PATTERN (alternate, left, or right)
+--              VON_PROGRESS_SHOT_INTERVAL (default 45 frames)
+--              VON_PROGRESS_SHOT_HOLD_FRAMES (default 20)
 
 local SECONDS = tonumber(os.getenv("VON_PROGRESS_SECONDS") or "150")
 local TARGET_FRAMES = SECONDS * 60
@@ -287,7 +290,11 @@ local function press(key, until_frame)
         return
     end
     pressed_until[key] = until_frame
-    f:set_value(1)
+    local mask = f.mask or 1
+    local def = f.defvalue or mask
+    local inactive = def & mask
+    local active = inactive == 0 and mask or 0
+    f:set_value(active)
 end
 
 local function release_expired()
@@ -374,6 +381,9 @@ local COMBAT_ENABLED = os.getenv("VON_PROGRESS_COMBAT") ~= "0"
 local COMBAT_START = tonumber(os.getenv("VON_PROGRESS_COMBAT_START") or "1800")
 local COMBAT_END = 7000
 local DIRECTIONS = { "up", "right", "down", "left" }
+local SHOT_PATTERN = os.getenv("VON_PROGRESS_SHOT_PATTERN") or "alternate"
+local SHOT_INTERVAL = tonumber(os.getenv("VON_PROGRESS_SHOT_INTERVAL") or "45")
+local SHOT_HOLD_FRAMES = tonumber(os.getenv("VON_PROGRESS_SHOT_HOLD_FRAMES") or "20")
 
 emu.register_periodic(function()
     frame = frame + 1
@@ -449,16 +459,25 @@ emu.register_periodic(function()
             log(string.format("progress: frame %d move %s", frame, key))
             press(key, frame + 120)
         end
-        -- Pulse dashes every 180 frames and shots every 45 frames.
+        -- Pulse dashes every 180 frames and shots at a configurable cadence.
         if frame % 180 == 0 then
             local key = (math.floor(frame / 180) % 2) == 0 and "left_dash"
                 or "right_dash"
             press(key, frame + 10)
         end
-        if frame % 45 == 0 then
-            local key = (math.floor(frame / 45) % 2) == 0 and "left_shot"
-                or "right_shot"
-            press(key, frame + 20)
+        if SHOT_INTERVAL > 0 and frame % SHOT_INTERVAL == 0 then
+            local key
+            if SHOT_PATTERN == "left" then
+                key = "left_shot"
+            elseif SHOT_PATTERN == "right" then
+                key = "right_shot"
+            else
+                key = (math.floor(frame / SHOT_INTERVAL) % 2) == 0
+                    and "left_shot" or "right_shot"
+            end
+            log(string.format("progress: frame %d press %s pattern=%s",
+                frame, key, SHOT_PATTERN))
+            press(key, frame + SHOT_HOLD_FRAMES)
         end
     end
 

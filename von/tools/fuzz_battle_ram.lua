@@ -16,6 +16,7 @@
 --   VON_FUZZ_BATTLE     first fuzz frame (default 2400)
 --   VON_FUZZ_HOLD       hold frames per input (default 45)
 --   VON_FUZZ_SETTLE     settle frames after release (default 45)
+--   VON_FUZZ_PULSE_INTERVAL  one-frame shot pulses during a hold (0 = held)
 --   VON_FUZZ_IDLE       if 1, join but never drive combat inputs
 --   VON_FUZZ_SECONDS    total seconds (default 150)
 --
@@ -60,6 +61,7 @@ local BATTLE_FRAME = tonumber(os.getenv("VON_FUZZ_BATTLE") or "2400")
 local CONFIRM_FRAME = tonumber(os.getenv("VON_FUZZ_CONFIRM") or "0")
 local HOLD = tonumber(os.getenv("VON_FUZZ_HOLD") or "45")
 local SETTLE = tonumber(os.getenv("VON_FUZZ_SETTLE") or "45")
+local PULSE_INTERVAL = tonumber(os.getenv("VON_FUZZ_PULSE_INTERVAL") or "0")
 local IDLE = os.getenv("VON_FUZZ_IDLE") == "1"
 local SECONDS = tonumber(os.getenv("VON_FUZZ_SECONDS") or "150")
 -- Round-timer freeze: VON_FUZZ_FREEZE=1 vetoes writes to the 0x500554 timer
@@ -462,6 +464,22 @@ emu.register_periodic(function()
                 fuzz_frame = 0
             end
         elseif fuzz_phase == "hold" then
+            if PULSE_INTERVAL > 0 then
+                local combo = INPUTS[fuzz_index]
+                local pulse_on = (fuzz_frame % PULSE_INTERVAL) == 0
+                for _, key in ipairs(split_keys(combo)) do
+                    if fields[key] then
+                        if pulse_on then
+                            fields[key]:set_value(1)
+                        else
+                            fields[key]:clear_value()
+                        end
+                    end
+                end
+                if pulse_on then
+                    log(string.format("fuzz: frame %d pulse %s", frame, combo))
+                end
+            end
             if #TELEMETRY > 0 and fuzz_frame % 5 == 0 then
                 telemetry(tag_of(INPUTS[fuzz_index]))
             end

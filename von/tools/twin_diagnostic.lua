@@ -16,6 +16,12 @@ local preflight_done = false
 local preflight_failed = false
 local fields_resolved = false
 local completion_frame
+local probe = os.getenv("VON_TWIN_PROBE") == "1"
+local probe_until = 0
+local probe_taps = {}
+local probe_pcs = {}
+local cpu_dev
+local probe_dump = os.getenv("VON_TWIN_PROBE_DUMP") == "1"
 
 local names = {
     coin = { ":IN0", "Coin 1" },
@@ -73,6 +79,7 @@ end
 local function resolve()
     local cpu = manager.machine.devices[":maincpu"]
     if not cpu then return false end
+    cpu_dev = cpu
     space = cpu.spaces[":program"] or cpu.spaces["program"]
     for key, spec in pairs(names) do
         local port = manager.machine.ioport.ports[spec[1]]
@@ -94,6 +101,66 @@ local function hash_tiles()
         hash = ((hash ~ space:read_u16(0x01000000 + i * 2)) * 16777619) % 4294967296
     end
     return hash
+end
+
+local function probe_end(tag)
+    for addr, tap in pairs(probe_taps) do
+        pcall(function() space:uninstall_read_tap(tap) end)
+        local pcs = {}
+        for pc, count in pairs(probe_pcs[addr] or {}) do
+            pcs[#pcs + 1] = string.format("%s(x%d)", pc, count)
+        end
+        table.sort(pcs)
+        write(string.format("twin: probe tap %08x %s readers=%s", addr, tag,
+            table.concat(pcs, " ")))
+    end
+    probe_taps = {}
+    probe_pcs = {}
+end
+
+local function probe_begin()
+    if not probe or not space then return end
+    for _, addr in ipairs({ 0x503c08, 0x503c10, 0x503bbc }) do
+        probe_pcs[addr] = {}
+        local ok, tap = pcall(function()
+            return space:install_read_tap(addr, addr + 3,
+                string.format("twinprobe%08x", addr),
+                function(offset, data, mask)
+                    local pc = "?"
+                    local ok_pc, value = pcall(function()
+                        return cpu_dev.state["CURPC"].value
+                    end)
+                    if ok_pc and type(value) == "number" then
+                        pc = string.format("0x%x", value)
+                    end
+                    local seen = probe_pcs[addr]
+                    seen[pc] = (seen[pc] or 0) + 1
+                    return data
+                end)
+        end)
+        if ok and tap then probe_taps[addr] = tap end
+    end
+end
+
+local function probe_telemetry(tag)
+    if not probe or not space then return end
+    local words = {}
+    for _, addr in ipairs({ 0x503c08, 0x503c0c, 0x503c10, 0x503c14, 0x503bbc }) do
+        words[#words + 1] = string.format("%08x", space:read_u32(addr))
+    end
+    write(string.format("twin: probe tele %s f%d %s", tag, frame,
+        table.concat(words, " ")))
+end
+
+local function probe_snapshot(tag)
+    if not probe_dump or not space then return end
+    local path = string.format("%s.%s.%04d.txt", log_path, tag, frame)
+    local out = assert(io.open(path, "w"))
+    for addr = 0x500000, 0x506000 - 4, 4 do
+        out:write(string.format("%08x %08x\n", addr, space:read_u32(addr)))
+    end
+    out:close()
+    write("twin: probe snapshot " .. tag .. " frame=" .. frame)
 end
 
 emu.register_periodic(function()
@@ -130,7 +197,22 @@ emu.register_periodic(function()
     elseif frame >= battle_frame and frame % 120 == 0 then
         write("twin: battle-input frame=" .. frame)
         pulse(fields.up, 45)
-        if frame % 240 == 0 then pulse(fields.shot, 8) end
+        if frame % 240 == 0 then
+            pulse(fields.shot, 8)
+            if probe then
+                probe_end("pre")
+                probe_snapshot("pre")
+                probe_begin()
+                probe_until = frame + 60
+                write("twin: probe shot frame=" .. frame)
+            end
+        end
+    end
+    if probe and frame >= battle_frame and frame < probe_until and frame % 5 == 0 then
+        probe_telemetry("shot")
+    elseif probe and probe_until > 0 and frame == probe_until then
+        probe_snapshot("post")
+        probe_end("post")
     end
     if frame >= battle_frame and frame % 60 == 0 then
         local current = hash_tiles()
