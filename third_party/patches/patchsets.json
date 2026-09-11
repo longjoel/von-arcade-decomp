@@ -44,7 +44,8 @@
   "0041-von-debug-pc-address-tracking.patch",
     "0042-von-m2comm-diag-logging.patch",
     "0043-von-gdbstub-i960.patch",
-    "0044-von-mcp-state-load.patch"
+    "0044-von-mcp-state-load.patch",
+    "0045-von-scsp-trace.patch"
  ],
  "profiles": {
   "core": [
@@ -55,6 +56,10 @@
       "0042-von-m2comm-diag-logging.patch",
       "0043-von-gdbstub-i960.patch",
       "0044-von-mcp-state-load.patch"
+  ],
+  "audio": [
+   "core",
+   "0045-von-scsp-trace.patch"
   ],
   "link": [
    "core",

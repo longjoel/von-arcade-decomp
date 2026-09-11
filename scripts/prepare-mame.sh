@@ -81,6 +81,8 @@ patch_already_applied() {
             contains_text 'vonj_geometry_parse_trace_count < 4096' "$MAME_DIR/src/mame/sega/model2_v.cpp" ;;
         0038-von-reconstructed-geometry-opcode-tracing.patch)
             contains_text 'machine().time().as_double() > 30.0' "$MAME_DIR/src/mame/sega/model2_v.cpp" ;;
+        0045-von-scsp-trace.patch)
+            contains_text 'von_scsp_trace_file' "$MAME_DIR/src/devices/sound/scsp.cpp" ;;
         *)
             return 1 ;;
     esac

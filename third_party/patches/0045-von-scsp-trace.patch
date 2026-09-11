@@ -1,0 +1,73 @@
+diff --git a/src/devices/sound/scsp.cpp b/src/devices/sound/scsp.cpp
+index 937aa03da3..55d84b88a8 100644
+--- a/src/devices/sound/scsp.cpp
++++ b/src/devices/sound/scsp.cpp
+@@ -579,6 +579,20 @@ void scsp_device::Compute_LFO(SCSP_SLOT *slot)
+ 		LFO_ComputeStep(&(slot->ALFO), LFOF(slot), ALFOWS(slot), ALFOS(slot), 1);
+ }
+ 
++static FILE *von_scsp_trace_file()
++{
++	static FILE *fp = nullptr;
++	static bool tried = false;
++	if (!tried)
++	{
++		tried = true;
++		const char *path = getenv("VON_SCSP_TRACE");
++		if (path)
++			fp = fopen(path, "w");
++	}
++	return fp;
++}
++
+ void scsp_device::StartSlot(SCSP_SLOT *slot)
+ {
+ 	slot->active = 1;
+@@ -593,11 +607,36 @@ void scsp_device::StartSlot(SCSP_SLOT *slot)
+ 
+ 	Compute_LFO(slot);
+ 
++	if (FILE *fp = von_scsp_trace_file())
++		fprintf(fp, "K %.6f %d %x %x %x %d %d\n", machine().time().as_double(),
++			(int)(slot - m_Slots), SA(slot), LSA(slot), LEA(slot), OCT(slot), FNS(slot));
++	{
++		static bool dumped = false;
++		const char *dump_path = getenv("VON_SCSP_RAM_DUMP");
++		if (!dumped && dump_path)
++		{
++			dumped = true;
++			if (FILE *rf = fopen(dump_path, "wb"))
++			{
++				for (int i = 0; i < 0x80000; i += 2)
++				{
++					u16 w = space().read_word(i);
++					fputc((w >> 8) & 0xff, rf);
++					fputc(w & 0xff, rf);
++				}
++				fclose(rf);
++			}
++		}
++	}
++
+ //  printf("StartSlot[%p]: SA %x PCM8B %x LPCTL %x ALFOS %x STWINH %x TL %x EFSDL %x\n", slot, SA(slot), PCM8B(slot), LPCTL(slot), ALFOS(slot), STWINH(slot), TL(slot), EFSDL(slot));
+ }
+ 
+ void scsp_device::StopSlot(SCSP_SLOT *slot,int keyoff)
+ {
++	if (FILE *fp = von_scsp_trace_file())
++		fprintf(fp, "O %.6f %d %d\n", machine().time().as_double(),
++			(int)(slot - m_Slots), keyoff);
+ 	if (keyoff /*&& slot->EG.state!=SCSP_RELEASE*/)
+ 	{
+ 		slot->EG.state = SCSP_RELEASE;
+@@ -1481,6 +1520,10 @@ void scsp_device::write(offs_t offset, u16 data, u16 mem_mask)
+ {
+ 	m_stream->update();
+ 
++	if (FILE *fp = von_scsp_trace_file())
++		fprintf(fp, "W %.6f %x %04x %04x\n", machine().time().as_double(),
++			(unsigned)(offset * 2), (unsigned)data, (unsigned)mem_mask);
++
+ 	u16 tmp = r16(offset * 2);
+ 	COMBINE_DATA(&tmp);
+ 	w16(offset * 2, tmp);
