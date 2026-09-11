@@ -113,6 +113,11 @@
    "texture",
    "sharc-diagnostics",
    "sharc-precision"
+  ],
+  "select-sweep": [
+   "0001-von-mame-support.patch",
+   "0007-von-geometry-object-tracing.patch",
+   "0008-von-geometry-matrix-tracing.patch"
   ]
  },
  "candidates": {

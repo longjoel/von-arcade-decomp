@@ -343,15 +343,16 @@ end
 -- Boot inputs. Defaults preserve the confirmed flow; delayed captures can hold
 -- the attract screen until a requested frame before injecting coin/start.
 local SELECT_STEPS = tonumber(os.getenv("VON_PROGRESS_SELECT_STEPS") or "0")
+local STEP_FRAMES = tonumber(os.getenv("VON_PROGRESS_STEP_FRAMES") or "45")
 local AUTO_START = os.getenv("VON_PROGRESS_AUTO_START") ~= "0"
 local COIN_FRAME = tonumber(os.getenv("VON_PROGRESS_COIN_FRAME") or "900")
 local START_FRAME = tonumber(os.getenv("VON_PROGRESS_START_FRAME") or "1500")
 local schedule = { { frame = COIN_FRAME, key = "coin" } }
 for step = 1, SELECT_STEPS do
-    schedule[#schedule + 1] = { frame = START_FRAME - 420 + step * 45, key = "right" }
+    schedule[#schedule + 1] = { frame = START_FRAME - 420 + step * STEP_FRAMES, key = "right" }
 end
 if AUTO_START then
-    schedule[#schedule + 1] = { frame = START_FRAME + SELECT_STEPS * 45, key = "start" }
+    schedule[#schedule + 1] = { frame = START_FRAME + SELECT_STEPS * STEP_FRAMES, key = "start" }
 end
 -- Late select navigation: cursor moves after the select screen opens
 -- (post-start), then an optional second start press confirms.
