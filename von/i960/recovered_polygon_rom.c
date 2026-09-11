@@ -38,7 +38,10 @@ int recovered_polygon_rom_decode(const u8 *rom, usize bytes, u32 oba,
         if (!(r.attribute & 3U)) break;
         r.vertex_count = (r.attribute & 1U) ? 4U : 3U;
         r.vertex[0] = p0; r.vertex[1] = p1;
-        r.vertex[2] = read_vec3(rom + offset + 16); r.vertex[3] = read_vec3(rom + offset + 28);
+        r.vertex[2] = read_vec3(rom + offset + 16);
+        /* Triangle records still carry a third slot, but the hardware forces
+         * P1(n) := P0(n), so linktype 3 must carry P0(n). */
+        r.vertex[3] = (r.vertex_count == 4U) ? read_vec3(rom + offset + 28) : r.vertex[2];
         if (emit(context, &r)) return -2;
         ++count; if (limit && count >= limit) break;
         link = (r.attribute >> 8) & 3U;

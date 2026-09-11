@@ -147,8 +147,11 @@ def tile_png(bank: bytes, header: tuple[int, int, int, int], palette_state=None)
     return png_rgb(width, height, pixels)
 
 
-def parse_faces(geometry: bytes, texture_data: bytes, oba: int, tpa: int, tha: int):
-    values = words(geometry, oba & 0x3fffff, 0x4000)
+def parse_faces(geometry: bytes, texture_data: bytes, oba: int, tpa: int, tha: int,
+                include_link0: bool = False):
+    # The record list ends at its (attr & 3) == 0 terminator; use a window far
+    # larger than any observed strip instead of a fixed 0x4000-word cap.
+    values = words(geometry, oba & 0x3fffff, 0x40000)
     cursor = 0
     p0, cursor = point(values, cursor)
     p1, cursor = point(values, cursor)
@@ -158,7 +161,12 @@ def parse_faces(geometry: bytes, texture_data: bytes, oba: int, tpa: int, tha: i
     while cursor < len(values):
         attr = values[cursor]
         cursor += 1
-        if (attr & 3) == 0 or cursor + 6 > len(values):
+        if (attr & 3) == 0:
+            break
+        # Every record is 10 words: attr + normal(3) + P0(n)(3) + P1(n)(3).
+        # Triangles still carry the third slot (reserved), so the stride is 9
+        # words after the attribute in all cases.
+        if cursor + 9 > len(values):
             break
         cursor += 3
         p2, cursor = point(values, cursor)
@@ -167,8 +175,11 @@ def parse_faces(geometry: bytes, texture_data: bytes, oba: int, tpa: int, tha: i
             points = raster_vertices((p0, p1, p2, p3))
         else:
             cursor += 3
+            p3 = p2
             points = raster_vertices((p0, p1, p2))
 
+        # Texture points and the header are consumed even when the hardware
+        # culls the polygon (MAME reads them before check_culling).
         uv = []
         for _ in points:
             pv = u16(texture_data, uv_address)
@@ -176,19 +187,23 @@ def parse_faces(geometry: bytes, texture_data: bytes, oba: int, tpa: int, tha: i
             uv.append((pu, pv))
             uv_address += 2
         header = texture_header(texture_data, header_address)
+
+        link = (attr >> 8) & 3
+        # Hardware culls linktype 0 (model2_v.cpp check_culling); keep the carry.
+        if link != 0 or include_link0:
+            faces.append((attr, points, uv, header))
+
         header_offset = (attr >> 12) & 0x1f
         if header_offset & 0x10:
             header_offset -= 32
         header_address += header_offset * 4
 
-        link = (attr >> 8) & 3
-        faces.append((attr, points, uv, header))
         if link in (0, 2):
-            p0, p1 = p2, points[-1]
+            p0, p1 = p2, p3
         elif link == 1:
             p1 = p2
         else:
-            p0 = points[-1]
+            p0 = p3
     return faces
 
 

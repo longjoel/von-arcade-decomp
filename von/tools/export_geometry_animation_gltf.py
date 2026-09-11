@@ -23,7 +23,7 @@ MATRIX = re.compile(
 )
 
 
-def parse_mesh(rom: bytes, oba: int, window: int = 0x4000):
+def parse_mesh(rom: bytes, oba: int, window: int = 0x40000):
     start = (oba & 0x3fffff) * 4
     values = [int.from_bytes(rom[pos:pos + 4], "little")
               for pos in range(start, min(start + window * 4, len(rom)), 4)]
@@ -43,7 +43,10 @@ def parse_mesh(rom: bytes, oba: int, window: int = 0x4000):
     while cursor < len(values):
         attr = values[cursor]
         cursor += 1
-        if not (attr & 3) or cursor + 6 > len(values):
+        if not (attr & 3):
+            break
+        # 10-word records: attr + normal(3) + P0(n)(3) + P1(n)(3).
+        if cursor + 9 > len(values):
             break
         cursor += 3
         p2 = point()
@@ -52,17 +55,16 @@ def parse_mesh(rom: bytes, oba: int, window: int = 0x4000):
         else:
             cursor += 3
             p3 = p2
-        base = len(vertices)
-        vertices.extend((p0, p1, p2, p3))
-        # Model 2 loads the two carried vertices as v1=p0, v0=p1 before
-        # rasterizing.  Retain that front-face order in glTF.  The streamed
-        # quad is a 2x2 grid (p0,p1,p2,p3), with p3 across from p2.
-        if attr & 1:
-            indices.extend((base + 1, base, base + 2,
-                            base + 1, base + 2, base + 3))
-        else:
-            indices.extend((base + 1, base, base + 2))
         link = (attr >> 8) & 3
+        # Hardware raster order is (p1, p0, p2, p3); linktype 0 is culled.
+        if link != 0:
+            base = len(vertices)
+            vertices.extend((p0, p1, p2, p3))
+            if attr & 1:
+                indices.extend((base + 1, base, base + 2,
+                                base + 1, base + 2, base + 3))
+            else:
+                indices.extend((base + 1, base, base + 2))
         if link in (0, 2):
             p0, p1 = p2, p3
         elif link == 1:

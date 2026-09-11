@@ -25,7 +25,9 @@ def main() -> int:
     parser.add_argument("--rom", type=Path,
                         default=Path("von/build/disasm/geometry-rom.bin"))
     parser.add_argument("--oba", type=lambda value: int(value, 0), required=True)
-    parser.add_argument("--words", type=int, default=0x4000)
+    parser.add_argument("--words", type=int, default=0x40000)
+    parser.add_argument("--include-link0", action="store_true",
+                        help="keep linktype-0 records (hardware culls them)")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -39,25 +41,32 @@ def main() -> int:
     while cursor < len(values):
         attr = values[cursor]
         cursor += 1
-        if (attr & 3) == 0 or cursor + 6 > len(values):
+        if (attr & 3) == 0:
+            break
+        # 10-word records: attr + normal(3) + P0(n)(3) + P1(n)(3).
+        if cursor + 9 > len(values):
             break
         cursor += 3  # normal, ignored by mode 3
         p2, cursor = point(values, cursor)
         if attr & 1:
             p3, cursor = point(values, cursor)
         else:
-            cursor += 3  # reserved point for triangle records
+            cursor += 3  # reserved slot for triangle records
             p3 = p2
 
-        start = len(vertices) + 1
-        if attr & 1:
-            vertices.extend((p0, p1, p2, p3))
-            faces.append((attr, [start, start + 1, start + 2, start + 3]))
-        else:
-            vertices.extend((p0, p1, p2))
-            faces.append((attr, [start, start + 1, start + 2]))
-
         link = (attr >> 8) & 3
+        # Hardware raster order is (P1(n-1), P0(n-1), P0(n), P1(n)) and the
+        # quad is fanned (v0,v1,v2),(v0,v2,v3). Linktype 0 is culled.
+        if link != 0 or args.include_link0:
+            start = len(vertices) + 1
+            if attr & 1:
+                vertices.extend((p1, p0, p2, p3))
+                faces.append((attr, [start, start + 1, start + 2]))
+                faces.append((attr, [start, start + 2, start + 3]))
+            else:
+                vertices.extend((p1, p0, p2))
+                faces.append((attr, [start, start + 1, start + 2]))
+
         if link in (0, 2):
             p0, p1 = p2, p3
         elif link == 1:
