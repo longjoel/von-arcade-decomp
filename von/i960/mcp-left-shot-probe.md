@@ -320,10 +320,69 @@ symmetric by construction. Recruitment order is `af` -> `ae` (-> `ad`) with
 nesting: `af` turns on first and off last. Excluded as the condition: dash
 holds, jump takeoffs (deltas 2-100f), held shot inputs, timer values, and
 every word of the `0x5039c0` state window (no >85% correlate). Positions
-were unavailable at the sampled offsets. Still open: the exact condition
-each writer evaluates — disassemble `0x4a640..0x4a700` (reachable through
-the MCP GDB stub) or read-tap their inputs, and catch an `ad`-bit1 episode
-with the wide tap.
+were unavailable at the sampled offsets.
+
+## Bit1 condition verified (probe 2026-09-11)
+
+Disassembled with `unidasm -arch i960` (in-tree MAME build; Ghidra/GDB
+disassembly was unnecessary) and verified live with exact-time Lua write
+taps over `0x503cac..0x503caf` that snapshot writer-time registers and
+memory. 12,907 taps over ~2650 battle frames, from-boot macro replay.
+
+The function at `0x4a500..0x4a6d0` takes `ad` in `g0` plus a bounds-table
+base in `g7`. Three slots (`ae`/`ad`/`af` = bytes `ad+0x1de`/`0x1dd`/
+`0x1df`) share one shape with strided constants:
+
+| slot | byte | phase-1 source | phase-1 range | ptr field | float bound | half bound |
+| ---- | ---- | -------------- | ------------- | --------- | ----------- | ---------- |
+| ae   | +0x1de | [ad+0x1ec] | [g7+0x5d0]..[g7+0x5dc] | [[ad+0x6c]+0x3e4] | [g7+0x5b0] | [g7+0x5bc] |
+| ad   | +0x1dd | [ad+0x1ea] | [g7+0x5d4]..[g7+0x5e0] | [[ad+0x6c]+0x3e8] | [g7+0x5b4] | [g7+0x5be] |
+| af   | +0x1df | [ad+0x1ee] | [g7+0x5d8]..[g7+0x5e4] | [[ad+0x6c]+0x3ec] | [g7+0x5b8] | [g7+0x5c0] |
+
+Phase 1 (`0x4a518..0x4a598`) writes each byte to 0/1: bit0 =
+`signed(low16(source)) <= signed(tbhi - tblo)`. Verified 7949/7949 stores.
+(`ad+0x1ee` is conditionally incremented first when bit `[ad+0x1ad]` is 1.)
+
+A float pre-gate on `float([ad+0x80])` (`cmprl` double-compare idiom
+against `(g2,g3)` = `(0, 0x40220000)/(0, 0xC0220000)`, i.e. +9.0/-9.0)
+skips the writers unless `-9.0 < float([ad+0x80]) < 9.0`.
+
+Phase 2 sets bit1 (`ldob`/`setbit 1`/`stob`, one writer per slot at
+`0x4a648`/`0x4a688`/`0x4a6cc`, observed as next-PC `0x4a650`/`0x4a68c`/
+`0x4a6d0`) iff all of: (i) `float([ad+0x7c]) <= float([g7+bound])`
+(`cmpr`, real compare); (ii) `low16(g6) <= low16([g7+hbound])` where
+`g6 = |low16([ad+0x84]) - low16([ad+0x184])|` (signed abs, confirmed live
+61/61); (iii) `word[[ad+0x6c]+field] != 0`.
+
+Fire-prediction over all 7947 slot-frames (fire iff gate & (i) & (iii);
+(ii) is vacuous in practice — `|Δ|` converges to 0 by write time 61/61
+and half bounds are `>= 0` unsigned): 7947/7947, 0 violations. 61 fired
+(all `af`, one episode); 7886 correctly shut. Fired `w7c/bound` ratios
+span 0.866..0.9997 (fires from below, approaching the bound).
+`w7c`/`bnd`/`fld`/`w80`/`g0`/`g7` are stable between the function's own
+phases 61/61; `h84`/`h184` are live (converge by write time), evidence of
+interleaved writes from the second family below.
+
+A second, structurally identical writer family lives at
+`0x646c0..0x64810` (same slots/constants; phase-1 stores observed at
+`0x646c4`/`0x646f0`/`0x6471c` x1613 frames). Its `ad` writer at `0x64804`
+(observed `0x64810`) fired 17 frames — the run's `ad`-bit1 episode
+(weapon log `03,03,01` x18). Which mode uses `0x4a5xx` (2655 frames) vs
+`0x646xx` (1613 frames) is still open.
+
+Harness lessons (all bitten off in this probe): install taps late
+(frame-1 installs are silently discarded by a boot-time memory
+reconfiguration; frame >= 1400 survives); retain the tap handle at Lua
+script scope or `~tap_helper()` GC-removes the tap after ~50 fires; keep
+taps narrow (a 64 KB `install_write_tap`/`install_read_tap` segfaults
+MAME); read the live PC via state `CURPC`, not `pc`. Wide taps are off
+the table — the `ad`-bit1 catch above came from the narrow slot tap plus
+the weapon log, no wide tap needed.
+
+Still open: live direction of (ii) (only static decode + core source;
+all observed episodes have `g6lo == hblo == 0`); strictness of the float
+`<=` (no equality case observed); which battle mode selects the
+`0x4a5xx` vs `0x646xx` family.
 
 Replay-fidelity notes that cost most of this probe: a checkpoint-load
 replay wedges with a frozen boot screen and zero tap writes (the load does
