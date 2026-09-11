@@ -46,7 +46,8 @@
   "0043-von-gdbstub-i960.patch",
   "0044-von-mcp-state-load.patch",
   "0045-von-scsp-trace.patch",
-  "0046-von-scsp-ram-trace.patch"
+  "0046-von-scsp-ram-trace.patch",
+  "0048-von-geo-command-trace.patch"
  ],
  "profiles": {
   "core": [
@@ -119,7 +120,8 @@
    "0004-von-texture-source-tracing.patch",
    "0005-von-palette-tracing.patch",
    "0007-von-geometry-object-tracing.patch",
-   "0008-von-geometry-matrix-tracing.patch"
+   "0008-von-geometry-matrix-tracing.patch",
+   "0048-von-geo-command-trace.patch"
   ]
  },
  "candidates": {
