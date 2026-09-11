@@ -83,6 +83,8 @@ patch_already_applied() {
             contains_text 'machine().time().as_double() > 30.0' "$MAME_DIR/src/mame/sega/model2_v.cpp" ;;
         0045-von-scsp-trace.patch)
             contains_text 'von_scsp_trace_file' "$MAME_DIR/src/devices/sound/scsp.cpp" ;;
+        0046-von-scsp-ram-trace.patch)
+            contains_text 'VON_SCSP_RAM_TRACE' "$MAME_DIR/src/mame/sega/model2.cpp" ;;
         *)
             return 1 ;;
     esac
@@ -152,6 +154,9 @@ for patch in "${PATCHES[@]}"; do
     elif git -C "$MAME_DIR" apply --recount --check "$patch" >/dev/null 2>&1; then
         git -C "$MAME_DIR" apply --recount "$patch"
         printf 'Applied MAME patch: %s\n' "$(basename "$patch")"
+    elif (cd "$MAME_DIR" && patch -p1 --forward --dry-run < "$patch" >/dev/null 2>&1); then
+        (cd "$MAME_DIR" && patch -p1 --forward < "$patch" >/dev/null)
+        printf 'Applied MAME patch (patch fallback): %s\n' "$(basename "$patch")"
     else
         printf 'error: MAME patch does not apply cleanly: %s\n' "$patch" >&2
         exit 1

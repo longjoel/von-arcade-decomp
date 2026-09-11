@@ -1,0 +1,45 @@
+--- a/src/mame/sega/model2.cpp
++++ b/src/mame/sega/model2.cpp
+@@ -2478,9 +2478,30 @@
+ }
+ 
+ // We assume using the same waitstate weights as Saturn, applied to SCSP area only
++u16 model2_state::soundram_r(offs_t offset)
++{
++	return m_soundram[offset];
++}
++
++void model2_state::soundram_w(offs_t offset, u16 data, u16 mem_mask)
++{
++	static FILE *fp = nullptr;
++	static bool tried = false;
++	if (!tried)
++	{
++		tried = true;
++		const char *path = getenv("VON_SCSP_RAM_TRACE");
++		if (path)
++			fp = fopen(path, "w");
++	}
++	if (fp)
++		fprintf(fp, "R %.6f %x %04x %04x\n", machine().time().as_double(), offset * 2, data, mem_mask);
++	COMBINE_DATA(&m_soundram[offset]);
++}
++
+ void model2_state::model2_snd(address_map &map)
+ {
+-	map(0x000000, 0x07ffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("soundram");
++	map(0x000000, 0x07ffff).before_delay(NAME([](offs_t) { return 1; })).rw(FUNC(model2_state::soundram_r), FUNC(model2_state::soundram_w));
+ 	map(0x100000, 0x100fff).before_delay(NAME([](offs_t) { return 1; })).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
+ 	map(0x400000, 0x400001).w(FUNC(model2_state::model2snd_ctrl));
+ 	map(0x600000, 0x67ffff).rom().region("audiocpu", 0);
+--- a/src/mame/sega/model2.h
++++ b/src/mame/sega/model2.h
+@@ -216,6 +216,8 @@
+ 	void fbvram_bankB_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+ 	void model2_3d_zclip_w(u32 data);
+ 	void model2snd_ctrl(u16 data);
++	u16 soundram_r(offs_t offset);
++	void soundram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+ 	u8 tgpid_r(offs_t offset);
+ 	u32 polygon_count_r();
+ 

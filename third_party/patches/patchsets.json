@@ -42,10 +42,11 @@
   "0039-von-text-tile-control-tracing.patch",
   "0040-von-text-row-transfer-tracing.patch",
   "0041-von-debug-pc-address-tracking.patch",
-    "0042-von-m2comm-diag-logging.patch",
-    "0043-von-gdbstub-i960.patch",
-    "0044-von-mcp-state-load.patch",
-    "0045-von-scsp-trace.patch"
+  "0042-von-m2comm-diag-logging.patch",
+  "0043-von-gdbstub-i960.patch",
+  "0044-von-mcp-state-load.patch",
+  "0045-von-scsp-trace.patch",
+  "0046-von-scsp-ram-trace.patch"
  ],
  "profiles": {
   "core": [
@@ -53,13 +54,14 @@
    "0010-von-communication-diagnostics.patch",
    "0011-mame-lua-pc-coverage.patch",
    "0041-von-debug-pc-address-tracking.patch",
-      "0042-von-m2comm-diag-logging.patch",
-      "0043-von-gdbstub-i960.patch",
-      "0044-von-mcp-state-load.patch"
+   "0042-von-m2comm-diag-logging.patch",
+   "0043-von-gdbstub-i960.patch",
+   "0044-von-mcp-state-load.patch"
   ],
   "audio": [
-   "core",
-   "0045-von-scsp-trace.patch"
+   "0001-von-mame-support.patch",
+   "0045-von-scsp-trace.patch",
+   "0046-von-scsp-ram-trace.patch"
   ],
   "link": [
    "core",
