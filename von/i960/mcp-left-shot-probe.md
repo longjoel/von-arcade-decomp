@@ -298,3 +298,36 @@ starts). It is not held input (no shot bits in the macro during the
 3810-3895 episode) and not timer-driven (slot 3's timer never runs). The
 `VON_SANDBOX_WEAPON_WRITES=1` tap covers `0x503c08..0x503c0b` and can supply
 the writer PCs for these transitions in a future run.
+
+## Bit1 writers (probe 2026-09-10)
+
+A from-boot replay of the human macro (no state load) reproduces the
+slot-2 timer starts within 5 frames (`2685`, `3880`), so combat replays
+without a checkpoint. With an aligned write tap over `0x503cac..0x503caf`
+the per-slot writers separate cleanly (MAME LE lane order: mask bit0 is the
+lowest address, so `00ff0000` is `0x503cae`):
+
+- `0x4a544` refreshes `ae=1` every frame; `0x4a570` refreshes `ad=1` and
+  writes the fresh-fire `0`; `0x4a59c` refreshes `af=1` every frame.
+- `0x4a6d0` writes `af=3` every frame of an episode (162/162 frames for
+  f2610-2771, 1-frame latency to the observed transitions).
+- `0x4a650` writes `ae=3` every frame of an episode (41/41 frames for
+  f2714-2755).
+
+So bit1 is a per-frame evaluated state with a dedicated writer per slot;
+`ad`'s writer was not caught (no `ad`-bit1 episode in range) but is
+symmetric by construction. Recruitment order is `af` -> `ae` (-> `ad`) with
+nesting: `af` turns on first and off last. Excluded as the condition: dash
+holds, jump takeoffs (deltas 2-100f), held shot inputs, timer values, and
+every word of the `0x5039c0` state window (no >85% correlate). Positions
+were unavailable at the sampled offsets. Still open: the exact condition
+each writer evaluates — disassemble `0x4a640..0x4a700` (reachable through
+the MCP GDB stub) or read-tap their inputs, and catch an `ad`-bit1 episode
+with the wide tap.
+
+Replay-fidelity notes that cost most of this probe: a checkpoint-load
+replay wedges with a frozen boot screen and zero tap writes (the load does
+not take effect in this environment), while the from-boot macro replay
+reproduces combat. Also fixed: an MCP-driven load plus `DEFER_AFTER_STATE`
+used to schedule a second recorder load at frame <=2 (double re-arm); the
+post-load notifier now marks `LOAD_STATE_DONE`.

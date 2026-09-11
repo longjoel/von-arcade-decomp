@@ -585,6 +585,7 @@ if LOAD_STATE and MACRO_PLAY_PATH then
             f:close()
         end
         log(string.format("macro: rearmed after state load (%d rows)", #macro_play_rows))
+        LOAD_STATE_DONE = true
         install_watches()
         install_struct_field_watch()
     end)
