@@ -33,9 +33,11 @@ else
 fi
 echo "out: $OUT_DIR  budget: ${SECONDS_TO_RUN}s  trace window: [$TRACE_T0, $TRACE_T1]"
 
-# -log routes the C++ geometry trace (logerror) to ./error.log; run from
-# OUT_DIR so it lands with the capture instead of the repo root. All other
-# paths below are absolute, so only the working directory changes.
+# -log routes the C++ traces (logerror AND osd_printf_verbose) to ./error.log;
+# run from OUT_DIR so it lands with the capture instead of the repo root. All
+# other paths below are absolute, so only the working directory changes.
+# Both -log and -oslog are required: geometry uses verbose, palette uses
+# logerror, and -log sends both to error.log.
 pushd "$OUT_DIR" >/dev/null
 VON_TRACE_T0="$TRACE_T0" VON_TRACE_T1="$TRACE_T1" \
 VON_RECORD_LOG="$OUT_DIR/record.log" \
@@ -45,7 +47,7 @@ VON_RECORD_SNAP_EVERY_S="$SNAP_EVERY_S" \
     "$MAME_BIN" vonj \
     -rompath "$ROM_PATH" \
     -sound auto -skip_gameinfo \
-    -log \
+    -log -oslog \
     -cfg_directory "$OUT_DIR/cfg" -nvram_directory "$OUT_DIR/nvram" \
     -input_directory "$OUT_DIR/inp" -snapshot_directory "$OUT_DIR/snaps" \
     -autoboot_script "$RECORDER" \
