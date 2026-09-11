@@ -116,6 +116,8 @@
   ],
   "select-sweep": [
    "0001-von-mame-support.patch",
+   "0004-von-texture-source-tracing.patch",
+   "0005-von-palette-tracing.patch",
    "0007-von-geometry-object-tracing.patch",
    "0008-von-geometry-matrix-tracing.patch"
   ]
