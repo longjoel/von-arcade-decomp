@@ -1,35 +1,46 @@
 --- a/src/mame/sega/model2.cpp
 +++ b/src/mame/sega/model2.cpp
-@@ -738,6 +738,32 @@
- 			logerror("vonj_geometry_76240_fifo: kind=write pc=%08x data=%08x\n", pc, data);
- 			vonj_geometry_76240_write_trace_count++;
- 		}
-+		// Transform emitter (i960 0x8dd40): the six per-part keyframe words.
-+		// Logs the raw FIFO writes in the emitter body; post-processing groups
-+		// them into one 5,47,c6,c8,c10,22,c4,21,c2,20,c0,58 packet per part,
-+		// which gives the record-index -> part order the clips use.
-+		static unsigned vonj_emitter_trace_count;
-+		static double vonj_emitter_t0 = -1.0, vonj_emitter_t1 = -1.0;
-+		if (vonj_emitter_t0 < 0.0)
-+		{
-+			const char *e0 = getenv("VON_EMITTER_T0");
-+			const char *e1 = getenv("VON_EMITTER_T1");
-+			vonj_emitter_t0 = e0 ? strtod(e0, nullptr) : 0.0;
-+			vonj_emitter_t1 = e1 ? strtod(e1, nullptr) : 1.0e9;
-+		}
-+		if ((machine().system().name == std::string_view("vonj")) &&
-+			(pc >= 0x0008d000) && (pc < 0x0008e400) &&
-+			(machine().time().as_double() >= vonj_emitter_t0) &&
-+			(machine().time().as_double() <= vonj_emitter_t1) &&
-+			(vonj_emitter_trace_count < 40000000))
-+		{
-+			logerror("vonj_emitter: time=%.6f pc=%08x data=%08x r6=%08x g0=%08x g2=%08x\n",
-+				machine().time().as_double(), pc, data,
-+				(u32)m_maincpu->state_int(I960_R6),
-+				(u32)m_maincpu->state_int(I960_G0),
-+				(u32)m_maincpu->state_int(I960_G2));
-+			vonj_emitter_trace_count++;
-+		}
- 		static unsigned vonj_geometry_object_packet_trace_count;
- 		if ((machine().system().name == std::string_view("vonj")) &&
- 			(pc >= 0x0003403c) && (pc < 0x00034ed0) &&
+@@ -671,4 +671,43 @@ void model2b_state::copro_fifo_w(u32 data)
+ void model2b_state::copro_fifo_w(u32 data)
+ {
++	// Geometry FIFO command stream (i960 -> SHARC copro). Logs every
++	// write to the 0x884000 port with the writing PC and i960 R6/G0/G2.
++	// The transform emitters send a per-part opcode packet
++	// `5 47 <off0..2> 22 <rotA> 21 <rotB> 20 <rotC> 58 <read> [6]`
++	// (advance, fixed-point interpolation, Z/Y/X rotation, seeded
++	// output, decrement); the 0x93560 sequencer sends `5 18 ...`. The
++	// PC/time windows are env-tunable (VON_FIFO_T0/T1, VON_FIFO_PC_MIN/
++	// PC_MAX, VON_FIFO_MAX) so the full opcode program is capturable.
++	// Decoded by von/tools/decode_fifo_program.py.
++	static unsigned vonj_emitter_trace_count;
++	static double vonj_emitter_t0 = -1.0, vonj_emitter_t1 = -1.0;
++	static unsigned vonj_fifo_pc_min = 0, vonj_fifo_pc_max = 0xffffffffu;
++	static unsigned long vonj_fifo_max = 0;
++	if (vonj_emitter_t0 < 0.0)
++	{
++		const char *e0 = getenv("VON_FIFO_T0"); if (!e0) e0 = getenv("VON_EMITTER_T0");
++		const char *e1 = getenv("VON_FIFO_T1"); if (!e1) e1 = getenv("VON_EMITTER_T1");
++		const char *p0 = getenv("VON_FIFO_PC_MIN");
++		const char *p1 = getenv("VON_FIFO_PC_MAX");
++		const char *mx = getenv("VON_FIFO_MAX");
++		vonj_emitter_t0 = e0 ? strtod(e0, nullptr) : 0.0;
++		vonj_emitter_t1 = e1 ? strtod(e1, nullptr) : 1.0e9;
++		if (p0) vonj_fifo_pc_min = (unsigned)strtoul(p0, nullptr, 0);
++		if (p1) vonj_fifo_pc_max = (unsigned)strtoul(p1, nullptr, 0);
++		if (mx) vonj_fifo_max = strtoul(mx, nullptr, 0);
++	}
++	if ((machine().system().name == std::string_view("vonj")) &&
++		(m_maincpu->pc() >= vonj_fifo_pc_min) && (m_maincpu->pc() <= vonj_fifo_pc_max) &&
++		(machine().time().as_double() >= vonj_emitter_t0) &&
++		(machine().time().as_double() <= vonj_emitter_t1) &&
++		(vonj_fifo_max == 0 || vonj_emitter_trace_count < vonj_fifo_max))
++	{
++		logerror("vonj_emitter: time=%.6f pc=%08x data=%08x r6=%08x g0=%08x g2=%08x\n",
++			machine().time().as_double(), m_maincpu->pc(), data,
++			(u32)m_maincpu->state_int(I960_R6),
++			(u32)m_maincpu->state_int(I960_G0),
++			(u32)m_maincpu->state_int(I960_G2));
++		vonj_emitter_trace_count++;
++	}
+ 	if (m_coproctl & 0x80000000)
+ 	{
