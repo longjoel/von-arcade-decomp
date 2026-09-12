@@ -180,8 +180,21 @@ local function weapon_log()
             availability[#availability + 1] = string.format("%02x", value)
         end
     end
-    log(string.format("weapon: f%d resources=%s availability=%s", frame,
-        table.concat(resources, ","), table.concat(availability, ",")))
+    local timers = {}
+    for _, addr in ipairs({ 0x503cbc, 0x503cba, 0x503cbe }) do
+        local ok, value = pcall(function() return space:read_u16(addr) end)
+        if not ok then value = 0 end
+        timers[#timers + 1] = string.format("%04x", value)
+    end
+    local hp = {}
+    for _, addr in ipairs({ 0x503ca2, 0x50380a, 0x503ca4, 0x5042a4 }) do
+        local ok, value = pcall(function() return space:read_u16(addr) end)
+        if not ok then value = 0 end
+        hp[#hp + 1] = string.format("%04x", value)
+    end
+    log(string.format("weapon: f%d resources=%s availability=%s timers=%s hp=%s", frame,
+        table.concat(resources, ","), table.concat(availability, ","),
+        table.concat(timers, ","), table.concat(hp, ",")))
 end
 
 local function snapshot(tag)

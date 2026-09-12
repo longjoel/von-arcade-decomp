@@ -216,10 +216,18 @@ local function weapon_log(tag)
         local ok, value = pcall(function() return space:read_u16(addr) end)
         timers[#timers + 1] = ok and string.format("%04x", value) or "??"
     end
+    -- Player/CPU health halfwords plus the beam-budget companions, so a
+    -- landing hit can be read off the log (see replay_input_health.lua).
+    local hp = {}
+    for _, addr in ipairs({ 0x503ca2, 0x50380a, 0x503ca4, 0x5042a4 }) do
+        local ok, value = pcall(function() return space:read_u16(addr) end)
+        hp[#hp + 1] = ok and string.format("%04x", value) or "??"
+    end
     log(string.format(
-        "weapon: f%d %s case=%s resources=%s,%s,%s availability=%s,%s,%s timers=%s,%s,%s",
+        "weapon: f%d %s case=%s resources=%s,%s,%s availability=%s,%s,%s timers=%s,%s,%s hp=%s,%s,%s,%s",
         frame, tag, WEAPON_CASE, values[1], values[2], values[3], values[4],
-        values[5], values[6], timers[1], timers[2], timers[3]))
+        values[5], values[6], timers[1], timers[2], timers[3],
+        hp[1], hp[2], hp[3], hp[4]))
 end
 
 local function watch(tag)
