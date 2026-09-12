@@ -29,6 +29,19 @@ reconstructs `maincpu` and `main_data`, scans each profile for valid headers,
 and emits per-fighter JSON (base64 raw records). Written to the git-ignored
 `von/build/motion-tables/`.
 
+## 1b. Emitter -> part-OBA mapping (`KNOWN`)
+
+Extended trace `0049` logs every copro-FIFO write. Correlating those packets
+with the geometry object submission order shows that **the emitters emit parts
+in the model's submission order**, and that the emitter at i960 `0x8d488`
+carries the part's **OBA in `r6`** (a value in `0x0080_0000..0x00b0_0000`, not
+a pointer). Its 12 tagged OBAs are the 6 animated Temjin limbs
+(`009e55bf/5590/563e/54ec/54bd/556b`) plus 6 from the other mech. The body
+emitters (`0x8d714`/`0x8e164`) do not tag OBA; their `r6` is a source-record
+pointer and the part order matches the geometry order by elimination.
+
+`von/tools/map_emitter_obas.py` extracts the tagged mapping from a trace.
+
 ## 2. Record semantics — six 16-bit words (`KNOWN`)
 
 The emitter packet is a fixed sequence written to the copro FIFO at

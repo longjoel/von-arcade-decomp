@@ -133,8 +133,8 @@ def load_frames(trace: Path, obas: list[int], start: int):
     want = set(obas)
     selected = []
     for t, table in sorted(frames.items()):
-        if want <= set(table):
-            selected.append((t / 60.0, [table[o] for o in obas]))
+        if want & set(table):
+            selected.append((t / 60.0, table))
     # Keep the longest contiguous run (gaps <= 2 frames) for smooth playback.
     if selected:
         idx = [int(round(t * 60.0)) for t, _ in selected]
@@ -161,31 +161,38 @@ def main() -> int:
     args = ap.parse_args()
 
     obas = [int(x, 16) for x in TEMJIN_SLOTS]
-    selected = [(t, w) for t, w in load_frames(args.trace, obas, 6)
+    selected = [(t, tb) for t, tb in load_frames(args.trace, obas, 6)
                 if args.t0 <= t <= args.t1]
     if len(selected) < 2:
-        raise SystemExit(f"only {len(selected)} exact Temjin frames in window")
+        raise SystemExit(f"only {len(selected)} Temjin frames in window")
     print(f"frames: {len(selected)}  t={selected[0][0]:.3f}..{selected[-1][0]:.3f}")
 
     n = len(obas)
     root = TEMJIN_ROOT
-    # per-frame local (pivot translation + rotation) for every part
-    pivots = [None] * n
+    ident = (1., 0., 0., 0., 1., 0., 0., 0., 1., 0., 0., 0.)
+    last = [ident] * n                 # carry-forward for culled parts
+    measured = [0] * n
     trans_sum = [[0.0, 0.0, 0.0] for _ in range(n)]
     quats = [[] for _ in range(n)]
-    for _, world in selected:
-        for i in range(n):
+    for _, table in selected:
+        for i, oba in enumerate(obas):
             parent = TEMJIN_TREE.get(i)
             if i == root or parent is None:
-                local = (1., 0., 0., 0., 1., 0., 0., 0., 1., 0., 0., 0.)
+                local = ident
+            elif oba in table and obas[parent] in table:
+                local = mat_mul3x4(mat_inv3x4(table[obas[parent]]), table[oba])
+                last[i] = local
             else:
-                inv_p = mat_inv3x4(world[parent])
-                local = mat_mul3x4(inv_p, world[i])
-            for k in range(3):
-                trans_sum[i][k] += local[9 + k]
+                local = last[i]     # part culled this frame: hold the last pose
+            if oba in table:
+                measured[i] += 1
+                for k in range(3):
+                    trans_sum[i][k] += local[9 + k]
             quats[i].append(quat_from_mat(orthonormalize(local[:9])))
-    for i in range(n):
-        pivots[i] = [trans_sum[i][k] / len(selected) for k in range(3)]
+    pivots = [[trans_sum[i][k] / measured[i] if measured[i] else 0.0 for k in range(3)]
+              for i in range(n)]
+    present = sum(1 for m in measured if m > 0)
+    print(f"parts present: {present}/{n}")
 
     out = {
         "fighter": args.fighter,
