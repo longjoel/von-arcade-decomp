@@ -45,35 +45,36 @@ the attract capture. `00bb` is an effect family (muzzle/impact), not ordnance.
 
 | cell | role |
 | --- | --- |
-| `0x503ca8` | player **working** health |
-| `0x503ca2` | player health **display** (copied at round transition, `0xe4c54`) |
-| `0x50380a` | opponent side (bout-struct promoted fields `0x503804..0x50381c`) |
+| `0x503ca8` | player health snapshot (only written at round transition) |
+| `0x503ca0` | player secondary (bout-struct `r4+0x1d0`) |
+| `0x503ca2` | player live per-frame health **display** (`r4+0x1d2`) |
+| `0x50380a` | opponent side (bout-struct promoted `0x503804..0x50381c`); churns, not raw HP |
 | `0x5042a8` -> `0x5042a2` | working -> display mirror pair |
 
-Use the working cells for damage; the display cells only update at round
-transitions, so they read equal to each other during a bout.
-
-## Replay harness
-
-`von/tools/record_human_session.lua` replays a captured macro from boot and,
-with `VON_RECORD_WEAPON_LOG=1`, now logs each frame:
+Re-tabulating the 2026-09-09 replay across all six cells:
 
 ```text
-weapon: f<frame> resources=<b0,b1,b2> availability=<b0,b1,b2> timers=<t1,t2,t3> hp=<p,opp,beam,beammirror>
+cell       drops  rises  big(>200)
+w_pl           1      2      2     (round-transition snapshot)
+d0_pl         15      2      5
+disp_pl      158    100      1     (live per-frame -> use this)
+opp          200    205    138     (derived/churn)
+w_mir          1      2      2
+disp_mir      12    108      2
 ```
 
-The 2026-09-09 human macro replays cleanly from boot (fresh NVRAM) and
-reproduces the slot-2 starts within 5 frames. `sandbox_versus.lua` was also
-extended to log health, but its scripted P1 does not produce accepted launches
-(availability stays `01,01,03`), so it is not a damage oracle.
+So `0x503ca2` is the live damage signal; it drops in clean per-hit steps while
+the opponent-side `0x50380a` mixes hits with round-transition copies. Example
+beam drains: `0x5042a2` -8/frame at `f2044..f2047`; `0x503ca2` -9/frame at
+`f2326..f2329`.
 
 ## Damage signatures observed
 
 From the 2026-09-09 replay, damage lands in two shapes:
 
 - Single hits of 30 / 50 / 70 (discrete projectiles).
-- Sustained drains of 9 per frame for ~17 frames (beam-style, e.g.
-  `f3213..f3229`), sometimes 6 per frame.
+- Sustained drains of 8–9 per frame over ~15 frames (beam-style, e.g.
+  `f3213..f3229`).
 
 Large jumps (270/357/420/535/738/750) coincide with round-transition display
 copies, not hits.
@@ -81,7 +82,11 @@ copies, not hits.
 ## Open
 
 - Per-weapon damage tensor `[mech][weapon][hit]` and whether any weapon is
-  hitscan (damage with no travelling effect).
+  hitscan (damage with no travelling effect). The real damage applier is
+  struct-indirect (annotation `0xe4c54 DEMOTED`) and needs a Ghidra backward
+  slice or a debugger-PC capture on the working cell.
 - Which effect OBA family belongs to which weapon/mech, and missile/mine
   semantics (arming, homing, lifetime, multi-hit).
-- Disambiguate the opponent working-health cell from the player display cell.
+- A controlled firing oracle: the scripted sandbox never produces accepted
+  launches, so per-weapon isolation still needs a real joined input (human
+  replay or a validated join path).
