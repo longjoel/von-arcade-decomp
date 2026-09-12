@@ -1,8 +1,10 @@
+diff --git a/src/osd/modules/debugger/debuggdbstub.cpp b/src/osd/modules/debugger/debuggdbstub.cpp
+index fca372b..f72bcaa 100644
 --- a/src/osd/modules/debugger/debuggdbstub.cpp
 +++ b/src/osd/modules/debugger/debuggdbstub.cpp
-@@ -651,6 +651,60 @@
+@@ -651,7 +651,60 @@ static const gdb_register_map gdb_register_map_psxcpu =
  };
-
+ 
  //-------------------------------------------------------------------------
 +static const gdb_register_map gdb_register_map_i960 =
 +{
@@ -54,10 +56,10 @@
 +	}
 +};
 +
-+//-------------------------------------------------------------------------
+ static const std::map<std::string, const gdb_register_map &> gdb_register_maps = {
 +	{ "i960",       gdb_register_map_i960 },
 +	{ "i80960ka",   gdb_register_map_i960 },
 +	{ "i80960kb",   gdb_register_map_i960 },
- static const std::map<std::string, const gdb_register_map &> gdb_register_maps = {
  	{ "i486",       gdb_register_map_i486 },
  	{ "arm7_le",    gdb_register_map_arm7 },
+ 	{ "r4600",      gdb_register_map_r4600 },

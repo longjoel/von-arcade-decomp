@@ -29,18 +29,28 @@ reconstructs `maincpu` and `main_data`, scans each profile for valid headers,
 and emits per-fighter JSON (base64 raw records). Written to the git-ignored
 `von/build/motion-tables/`.
 
-## 1b. Emitter -> part-OBA mapping (`KNOWN`)
+## 1b. Emitter -> part-OBA mapping (`KNOWN`, debugger-confirmed)
 
-Extended trace `0049` logs every copro-FIFO write. Correlating those packets
-with the geometry object submission order shows that **the emitters emit parts
-in the model's submission order**, and that the emitter at i960 `0x8d488`
-carries the part's **OBA in `r6`** (a value in `0x0080_0000..0x00b0_0000`, not
-a pointer). Its 12 tagged OBAs are the 6 animated Temjin limbs
-(`009e55bf/5590/563e/54ec/54bd/556b`) plus 6 from the other mech. The body
-emitters (`0x8d714`/`0x8e164`) do not tag OBA; their `r6` is a source-record
-pointer and the part order matches the geometry order by elimination.
+Extended trace `0049` logs every copro-FIFO write. At the transform emitters
+the i960 holds the part's **OBA**: the body emitter (`0x8e164`) in `g4` (and
+`r10`), the option/limb emitter (`0x8d488`) in `r6` (a value in
+`0x0080_0000..0x00b0_0000`, not a pointer). The body emitters
+(`0x8d714`/`0x8e164`) otherwise carry a source-record pointer in `r6`.
 
-`von/tools/map_emitter_obas.py` extracts the tagged mapping from a trace.
+`von/tools/probe_emitter_obas.py` breaks repeatedly at the emitters over MAME's
+GDB stub and records `(pc, r6, g2, g4)`, emitting the exact `g2 -> OBA` and
+`r6 -> OBA` tables (retained at `von/i960/emitter-g2-oba.json` /
+`emitter-r6-oba.json`). The mapping is consistent (no conflicting `g2`).
+
+Exact Temjin body map (dest record -> OBA): `5046d0->009e410d`,
+`5046dc->009e35b7`, `5046e8->009e2ea2`, `5046f4->009e30ab`, `504700->009e343a`,
+`50470c->009e3588`, `504718->009e3531`, `504724->009e2f5d`, `504730->009e3300`,
+`50473c->009e3054`, `504748->009e332f`, `504754->009e2cb1`; the second mech
+(base `504930`) is the `00a8xxxx` set. Because a FIFO trace records `g2` for
+every packet, each emitted part can now be labelled with its OBA.
+
+The earlier `map_emitter_obas.py` (trace-only) recovers the `r6`-tagged subset
+without the debugger.
 
 ## 2. Record semantics — six 16-bit words (`KNOWN`)
 
