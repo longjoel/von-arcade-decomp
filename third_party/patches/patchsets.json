@@ -47,7 +47,8 @@
   "0044-von-mcp-state-load.patch",
   "0045-von-scsp-trace.patch",
   "0046-von-scsp-ram-trace.patch",
-  "0048-von-geo-command-trace.patch"
+  "0048-von-geo-command-trace.patch",
+  "0049-von-emitter-transform-tracing.patch"
  ],
  "profiles": {
   "core": [
@@ -121,7 +122,8 @@
    "0005-von-palette-tracing.patch",
    "0007-von-geometry-object-tracing.patch",
    "0008-von-geometry-matrix-tracing.patch",
-   "0048-von-geo-command-trace.patch"
+   "0048-von-geo-command-trace.patch",
+   "0049-von-emitter-transform-tracing.patch"
   ]
  },
  "candidates": {
