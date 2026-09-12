@@ -6,6 +6,10 @@ referenced by tracked evidence, tests, or the current motion/rig work.
 
 Generated 2026-09-12T02:13:15Z.
 
+Added after generation: `fifo-program-20260912T` (139M) — attract capture with
+the broadened all-writer SHARC FIFO trace (0049), the evidence for
+`von/i960/parametric-aim-findings.md`.
+
 ## Retained (12)
 
 | capture | size | mtime |
