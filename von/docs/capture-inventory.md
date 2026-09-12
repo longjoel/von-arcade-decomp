@@ -1,0 +1,30 @@
+# Capture inventory
+
+Capture archives are regenerable from their recorded inputs; unreferenced
+archives are pruned to keep the workspace bounded. The retained set is
+referenced by tracked evidence, tests, or the current motion/rig work.
+
+Generated 2026-09-12T02:13:15Z.
+
+## Retained (12)
+
+| capture | size | mtime |
+| --- | --- | --- |
+| `audio-recovery` | 156M | 2026-09-03 |
+| `human-20260909T021757Z` | 269M | 2026-09-09 |
+| `human-20260909T022721Z` | 276M | 2026-09-09 |
+| `human-20260911T201031Z` | 82M | 2026-09-11 |
+| `twin-diagnostic-vonj-20260828T204801Z` | 24M | 2026-08-28 |
+| `twin-vonj-20260901T022433Z` | 454M | 2026-09-01 |
+| `twin-vonj-20260901T052223Z` | 671M | 2026-09-01 |
+| `twin-vonj-20260901T165911Z` | 3.9G | 2026-09-01 |
+| `vonj-20260907T211227Z` | 256K | 2026-09-07 |
+| `walk-20260912T002021Z` | 448M | 2026-09-12 |
+| `walk3-20260912T005527Z` | 512M | 2026-09-12 |
+| `walk4-20260912T010526Z` | 1.3G | 2026-09-12 |
+
+## Pruned (177)
+
+Unreferenced archives removed to reclaim space:
+
+`human-20260909T004642Z`, `human-20260909T005120Z`, `human-20260909T014049Z`, `human-20260909T014203Z`, `human-20260909T014703Z`, `human-20260909T015158Z`, `human-20260909T015432Z`, `match-playthrough-20260908T191841Z`, `single-player-20260902T215533Z`, `single-player-20260902T215634Z`, `single-player-20260902T215909Z`, `single-player-20260902T235829Z`, `sp-selector-0`, `sp-selector-1`, `sp-selector-2`, `sp-selector-3`, `sp-selector-4`, `sp-selector-5`, `sp-selector-6`, `sp-selector-7`, `twin-diagnostic-vonj-20260828T194100Z`, `twin-diagnostic-vonj-20260828T194211Z`, `twin-diagnostic-vonj-20260828T195101Z`, `twin-diagnostic-vonj-20260828T200415Z`, `twin-diagnostic-vonj-20260828T200440Z`, `twin-diagnostic-vonj-20260828T200501Z`, `twin-diagnostic-vonj-20260828T200528Z`, `twin-diagnostic-vonj-20260828T200603Z`, `twin-diagnostic-vonj-20260828T200830Z`, `twin-diagnostic-vonj-20260828T203319Z`, `twin-diagnostic-vonj-20260828T204050Z`, `twin-diagnostic-vonj-20260828T204150Z`, `twin-diagnostic-vonj-20260828T204319Z`, `twin-diagnostic-vonj-20260828T204507Z`, `twin-diagnostic-vonj-20260828T204554Z`, `twin-diagnostic-vonj-20260828T204653Z`, `twin-diagnostic-vonj-20260830T144231Z`, `twin-diagnostic-vonj-20260901T010258Z`, `twin-diagnostic-vonj-20260901T010333Z`, `twin-vonj-20260828T175131Z`, `twin-vonj-20260828T175136Z`, `twin-vonj-20260828T175154Z`, `twin-vonj-20260828T175300Z`, `twin-vonj-20260828T180426Z`, `twin-vonj-20260828T194740Z`, `twin-vonj-20260828T195222Z`, `twin-vonj-20260828T195424Z`, `twin-vonj-20260828T200050Z`, `twin-vonj-20260828T200934Z`, `twin-vonj-20260828T205002Z`, `twin-vonj-20260828T230054Z`, `twin-vonj-20260830T003418Z`, `twin-vonj-20260830T003611Z`, `twin-vonj-20260830T003632Z`, `twin-vonj-20260830T004118Z`, `twin-vonj-20260830T004403Z`, `twin-vonj-20260830T004511Z`, `twin-vonj-20260830T004607Z`, `twin-vonj-20260830T005203Z`, `twin-vonj-20260830T012753Z`, `twin-vonj-20260830T013022Z`, `twin-vonj-20260830T014220Z`, `twin-vonj-20260830T014949Z`, `twin-vonj-20260830T023551Z`, `twin-vonj-20260830T024125Z`, `twin-vonj-20260830T024356Z`, `twin-vonj-20260830T024638Z`, `twin-vonj-20260830T143254Z`, `twin-vonj-20260830T143628Z`, `twin-vonj-20260830T143750Z`, `twin-vonj-20260830T144035Z`, `twin-vonj-20260830T144329Z`, `twin-vonj-20260831T041200Z`, `twin-vonj-20260831T161005Z`, `twin-vonj-20260831T162315Z`, `twin-vonj-20260831T163159Z`, `twin-vonj-20260831T163255Z`, `twin-vonj-20260831T163354Z`, `twin-vonj-20260831T163457Z`, `twin-vonj-20260831T163534Z`, `twin-vonj-20260831T163650Z`, `twin-vonj-20260831T163810Z`, `twin-vonj-20260831T163919Z`, `twin-vonj-20260831T164231Z`, `twin-vonj-20260831T164551Z`, `twin-vonj-20260831T164620Z`, `twin-vonj-20260831T164657Z`, `twin-vonj-20260831T164740Z`, `twin-vonj-20260831T164826Z`, `twin-vonj-20260831T164916Z`, `twin-vonj-20260831T165006Z`, `twin-vonj-20260901T010156Z`, `twin-vonj-20260901T010406Z`, `twin-vonj-20260901T010757Z`, `twin-vonj-20260901T011815Z`, `twin-vonj-20260901T011842Z`, `twin-vonj-20260901T012233Z`, `twin-vonj-20260901T012327Z`, `twin-vonj-20260901T012501Z`, `twin-vonj-20260901T012818Z`, `twin-vonj-20260901T012855Z`, `twin-vonj-20260901T013303Z`, `twin-vonj-20260901T013504Z`, `twin-vonj-20260901T013832Z`, `twin-vonj-20260901T014721Z`, `twin-vonj-20260901T014804Z`, `twin-vonj-20260901T015642Z`, `twin-vonj-20260901T020037Z`, `twin-vonj-20260901T020243Z`, `twin-vonj-20260901T022129Z`, `twin-vonj-20260901T022225Z`, `twin-vonj-20260901T022308Z`, `twin-vonj-20260901T024223Z`, `twin-vonj-20260901T024314Z`, `twin-vonj-20260901T030418Z`, `twin-vonj-20260901T030515Z`, `twin-vonj-20260901T051745Z`, `twin-vonj-20260901T052103Z`, `twin-vonj-20260901T165555Z`, `twin-vonj-20260901T165702Z`, `twin-vonj-20260905T220202Z`, `twin-vonj-20260907T164654Z`, `twin-vonj-20260907T164822Z`, `twin-vonj-20260907T165004Z`, `versus-mirror-probe`, `versus-mirror-vonjdev`, `versus-mirror-window`, `vonj-20260828T174419Z`, `vonj-20260828T175307Z`, `vonj-20260901T110519Z`, `vonj-20260901T110616Z`, `vonj-20260901T110633Z`, `vonj-20260901T110718Z`, `vonj-20260901T110746Z`, `vonj-20260901T110816Z`, `vonj-20260901T111150Z`, `vonj-20260901T111237Z`, `vonj-20260901T111314Z`, `vonj-20260901T111803Z`, `vonj-20260901T111844Z`, `vonj-20260901T111928Z`, `vonj-20260901T112011Z`, `vonj-20260901T112347Z`, `vonj-20260901T112428Z`, `vonj-20260901T112611Z`, `vonj-20260901T112652Z`, `vonj-20260901T112736Z`, `vonj-20260901T112847Z`, `vonj-20260901T113022Z`, `vonj-20260901T113215Z`, `vonj-20260901T113228Z`, `vonj-20260901T113538Z`, `vonj-20260901T113926Z`, `vonj-20260901T114020Z`, `vonj-20260902T101338Z`, `vonj-20260902T101356Z`, `vonj-20260902T101447Z`, `vonj-20260902T101756Z`, `vonj-20260902T102002Z`, `vonj-20260902T102047Z`, `vonj-20260902T102608Z`, `vonj-20260902T103053Z`, `vonj-20260902T103336Z`, `vonj-20260902T103412Z`, `vonj-20260902T104607Z`, `vonj-20260903T004318Z`, `vonj-20260903T022811Z`, `vonj-20260903T032512Z`, `vonj-20260903T041059Z`, `vonj-20260905T010303Z`, `vonj-20260905T235811Z`, `vonj-20260906T175940Z`, `vonj-20260907T012509Z`, `vonj-20260907T013328Z`, `vonj-20260907T015353Z`, `vonj-20260907T164908Z`, `vonj-20260907T210014Z`
