@@ -20,7 +20,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-MAME_BIN="$ROOT_DIR/third_party/mame-master/von"
+MAME_BIN="${VON_MAME_BIN:-$ROOT_DIR/bin/von}"
 ROM_PATH="$ROOT_DIR/von/build/disasm/rompath"
 SCRIPT="$ROOT_DIR/von/tools/fuzz_battle_ram.lua"
 
@@ -53,6 +53,7 @@ VON_FUZZ_ONLY="${VON_FUZZ_ONLY:-}" \
 VON_FUZZ_TELEMETRY="${VON_FUZZ_TELEMETRY:-}" \
 VON_FUZZ_STATELOG="${VON_FUZZ_STATELOG:-}" \
 VON_FUZZ_TAPS="${VON_FUZZ_TAPS:-}" \
+VON_GEOMETRY_OBJECT_MAX="${VON_GEOMETRY_OBJECT_MAX:-8000000}" \
 VON_FUZZ_SECONDS="$SECONDS_TO_RUN" \
     "$MAME_BIN" vonj \
     -rompath "$ROM_PATH" \
