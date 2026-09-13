@@ -1,22 +1,23 @@
 diff --git i/src/emu/debug/points.cpp w/src/emu/debug/points.cpp
-index 17c9f117..0b9bbe6d 100644
+index 17c9f117..b8810eac 100644
 --- i/src/emu/debug/points.cpp
 +++ w/src/emu/debug/points.cpp
-@@ -422,6 +422,17 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
- 			debug.cpu().set_execution_running();
- 			debug.cpu().set_break_cpu(&m_debugInterface->device());
- 		}
-+		{
-+			// Virtual-On probe: log every watchpoint hit with the writer PC so
-+			// scripts can attribute work-RAM writes without a GDB client.
-+			const device_state_interface *wpstate = nullptr;
-+			std::string wp_pc = "?";
-+			if (m_debugInterface->device().interface(wpstate) && wpstate)
-+				wp_pc = wpstate->state_string(STATE_GENPCBASE);
-+			osd_printf_verbose("von_wp: type=%c addr=%08x index=%X pc=%s\n",
-+				(type == read_or_write::READ) ? 'r' : 'w',
-+				(unsigned)address, m_index, wp_pc.c_str());
-+		}
- 		m_debugInterface->set_triggered_watchpoint(this);
- 	}
+@@ -357,6 +357,18 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
+ 	// stash the value that will be written or has just been read
+ 	debug.cpu().set_wpinfo(address, data, size * unit_size);
+ 
++	{
++		// Virtual-On probe: log every watchpoint hit with the writer PC, before
++		// the halt decision, so a "go" action still records the writer.
++		const device_state_interface *wpstate = nullptr;
++		std::string wp_pc = "?";
++		if (m_debugInterface->device().interface(wpstate) && wpstate)
++			wp_pc = wpstate->state_string(STATE_GENPCBASE);
++		osd_printf_verbose("von_wp: type=%c addr=%08x index=%X pc=%s\n",
++			(type == read_or_write::READ) ? 'r' : 'w',
++			(unsigned)address, m_index, wp_pc.c_str());
++	}
++
+ 	// protect against recursion
+ 	debug.cpu().set_within_instruction(true);
  
