@@ -28,16 +28,29 @@ IDENT = (1., 0., 0., 0., 1., 0., 0., 0., 1., 0., 0., 0.)
 
 
 def load_parts(args):
-    """Return [(key, oba), ...] where key is tpa (--match tpa) or oba."""
+    """Return [(key, oba), ...] where key is tpa (--match tpa) or oba.
+
+    Duplicate keys (a shared skeleton part listed twice) collapse to one entry;
+    the model has a single node per OBA, so duplicates would fight over it.
+    """
     if args.obas:
-        vals = [int(x, 16) for x in args.obas.replace(",", " ").split()]
-        return [(v, v) for v in vals]
-    if args.parts:
+        pairs = [(int(x, 16), int(x, 16)) for x in args.obas.replace(",", " ").split()]
+    elif args.parts:
         d = json.loads(Path(args.parts).read_text())
         if args.match == "tpa":
-            return [(p["tpa"], p["oba"]) for p in d]
-        return [(p["oba"], p["oba"]) for p in d]
-    raise SystemExit("provide --parts <Fighter.parts.json> or --obas")
+            pairs = [(p["tpa"], p["oba"]) for p in d]
+        else:
+            pairs = [(p["oba"], p["oba"]) for p in d]
+    else:
+        raise SystemExit("provide --parts <Fighter.parts.json> or --obas")
+    seen = set()
+    out = []
+    for key, oba in pairs:
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append((key, oba))
+    return out
 
 
 def load_frame_tables(trace: Path, match: str):
@@ -70,29 +83,72 @@ def longest_run(keys):
 
 
 def infer_tree(tables, obas):
-    """Kruskal-style parent inference: cheapest parent-relative-translation
-    edges that keep the graph acyclic."""
+    """Single rooted skeleton: cheap candidate edges + guaranteed connectivity.
+
+    Each part proposes its most stable parents (near-constant parent-relative
+    translation), the best edges form a forest, then any stragglers are joined
+    to the nearest component. Replacing the old behavior, which could leave a
+    forest of parentless limbs pinned at the origin (anchoring the mech on an
+    arm). The root is the part nearest the average part position (the torso).
+    """
     n = len(obas)
-    cand = [list() for _ in range(n)]
-    meas = [0] * n
-    for ci, co in enumerate(obas):
-        for pi, po in enumerate(obas):
-            if pi == ci:
+
+    def mean_world(o):
+        vals = [tb[o][9:12] for tb in tables if o in tb]
+        if not vals:
+            return None
+        return [sum(v[k] for v in vals) / len(vals) for k in range(3)]
+
+    means = [mean_world(o) for o in obas]
+    core = [0.0, 0.0, 0.0]
+    count = 0
+    for tb in tables:
+        pts = [tb[o][9:12] for o in obas if o in tb]
+        if len(pts) < 3:
+            continue
+        for p in pts:
+            for k in range(3):
+                core[k] += p[k]
+        count += len(pts)
+    if count:
+        core = [core[k] / count for k in range(3)]
+    root = 0
+    best = None
+    for i, m in enumerate(means):
+        if m is None:
+            continue
+        d = sum((m[k] - core[k]) ** 2 for k in range(3))
+        if best is None or d < best:
+            best = d
+            root = i
+
+    cand = [[] for _ in range(n)]
+    for ci in range(n):
+        for pi in range(n):
+            if ci == pi:
                 continue
             vals = []
             for tb in tables:
-                if co in tb and po in tb:
-                    local = mat_mul3x4(mat_inv3x4(tb[po]), tb[co])
+                if obas[ci] in tb and obas[pi] in tb:
+                    local = mat_mul3x4(mat_inv3x4(tb[obas[pi]]), tb[obas[ci]])
                     vals.append(local[9:12])
-            if len(vals) < 10:
-                continue
-            meas[ci] += len(vals)
-            mean = [sum(v[k] for v in vals) / len(vals) for k in range(3)]
-            rms = math.sqrt(sum(sum((v[k] - mean[k]) ** 2 for k in range(3))
-                                 for v in vals) / len(vals))
+            if len(vals) >= 2:
+                mean = [sum(v[k] for v in vals) / len(vals) for k in range(3)]
+                rms = math.sqrt(sum(sum((v[k] - mean[k]) ** 2 for k in range(3))
+                                     for v in vals) / len(vals))
+            elif means[ci] is not None and means[pi] is not None:
+                rms = math.sqrt(sum((means[ci][k] - means[pi][k]) ** 2 for k in range(3)))
+            else:
+                rms = 1e9
             cand[ci].append((rms, pi))
         cand[ci].sort()
-    parent = [-1] * n
+
+    edges = []
+    for ci in range(n):
+        for rank, (rms, pi) in enumerate(cand[ci][:5]):
+            edges.append((rms + rank * 100.0, ci, pi))
+    edges.sort()
+
     uf = list(range(n))
 
     def find(x):
@@ -101,23 +157,42 @@ def infer_tree(tables, obas):
             x = uf[x]
         return x
 
-    edges = []
-    for ci in range(n):
-        for rank, (rms, pi) in enumerate(cand[ci][:4]):
-            edges.append((rms + rank * 100.0, ci, pi))
-    edges.sort()
-    used = 0
+    adj = [[] for _ in range(n)]
     for _, ci, pi in edges:
-        if parent[ci] != -1:
-            continue
-        if find(ci) == find(pi):
-            continue
-        parent[ci] = pi
-        uf[find(ci)] = find(pi)
-        used += 1
-        if used == n - 1:
+        if find(ci) != find(pi):
+            uf[find(ci)] = find(pi)
+            adj[ci].append(pi)
+            adj[pi].append(ci)
+
+    # Join any remaining components using the cheapest inter-component edge.
+    while True:
+        if len({find(i) for i in range(n)}) == 1:
             break
-    root = next((i for i in range(n) if parent[i] == -1), 0)
+        pick = None
+        for ci in range(n):
+            for rms, pi in cand[ci]:
+                if find(ci) != find(pi):
+                    if pick is None or rms < pick[0] - 1e-9:
+                        pick = (rms, ci, pi)
+        if pick is None:
+            break
+        _, ci, pi = pick
+        uf[find(ci)] = find(pi)
+        adj[ci].append(pi)
+        adj[pi].append(ci)
+
+    parent = [-2] * n
+    parent[root] = -1
+    stack = [root]
+    while stack:
+        u = stack.pop()
+        for v in adj[u]:
+            if parent[v] == -2:
+                parent[v] = u
+                stack.append(v)
+    for i in range(n):
+        if parent[i] == -2:
+            parent[i] = root
     return parent, root
 
 

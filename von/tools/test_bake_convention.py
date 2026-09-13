@@ -70,6 +70,60 @@ def quat_to_mat(q):
             2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)]
 
 
+def _load_bake_fighter():
+    spec = importlib.util.spec_from_file_location(
+        "bake_fighter_animation", _HERE / "bake_fighter_animation.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def check_single_tree() -> None:
+    bake = _load_bake_fighter()
+    obas = [0x10, 0x11, 0x12, 0x13, 0x14]
+    base = [(0.0, 0.0, 0.0), (2.0, 0.0, 0.0), (-2.0, 0.0, 0.0),
+            (0.0, 0.0, 3.0), (0.0, 3.0, 0.0)]
+    tables = []
+    for f in range(30):
+        motion = (0.1 * f, math.sin(0.2 * f), math.cos(0.2 * f))
+        tb = {}
+        for i, oba in enumerate(obas):
+            t = [base[i][k] + motion[k] for k in range(3)]
+            tb[oba] = [1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0] + t
+        tables.append(tb)
+    parent, root = bake.infer_tree(tables, obas)
+    roots = [i for i, p in enumerate(parent) if p < 0]
+    if roots != [root]:
+        raise SystemExit(f"tree must have a single root, got {roots}")
+    seen = {root}
+    stack = [root]
+    while stack:
+        u = stack.pop()
+        for v, p in enumerate(parent):
+            if p == u and v not in seen:
+                seen.add(v)
+                stack.append(v)
+    if len(seen) != len(obas):
+        raise SystemExit(f"tree not connected: {len(seen)}/{len(obas)} reached")
+
+
+def check_dedupe() -> None:
+    bake = _load_bake_fighter()
+    import argparse
+    from pathlib import Path
+    import json
+    import tempfile
+    d = [{"tpa": 1, "oba": 0xAA}, {"tpa": 2, "oba": 0xBB},
+         {"tpa": 1, "oba": 0xAA}]
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "parts.json"
+        p.write_text(json.dumps(d))
+        args = argparse.Namespace(obas="", parts=p, match="oba")
+        pairs = bake.load_parts(args)
+    if pairs != [(0xAA, 0xAA), (0xBB, 0xBB)]:
+        raise SystemExit(f"dedupe failed: {pairs}")
+
+
 def main() -> int:
     bake = _load()
 
@@ -99,6 +153,9 @@ def main() -> int:
     expect_close(err, 0.0, "FK rotation is the inverse", 1e-5)
 
     print("PASS: animation bake matrix convention and FK round-trip")
+    check_single_tree()
+    check_dedupe()
+    print("PASS: single rooted skeleton tree and part dedupe")
     return 0
 
 
