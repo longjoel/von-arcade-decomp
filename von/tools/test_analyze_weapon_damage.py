@@ -102,6 +102,30 @@ def build_new_fixture(path: Path):
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def build_new7_fixture(path: Path):
+    """Seven-cell layout: the opponent working cell carries dealt damage."""
+    working = working_series()
+    live = live_series()
+    lines = []
+    for frame in range(1, 111):
+        timers = [0, 0, 0]
+        if frame == 5:
+            timers[0] = 10
+        elif frame > 5:
+            timers[0] = max(0, 15 - frame)
+        opposing = 500
+        if frame >= 20:
+            opposing = 470
+        snapshot = 200 if frame >= 90 else 100
+        hp = [snapshot, working[frame], live[frame], 500, 500, 500, opposing]
+        lines.append(
+            "weapon: f%d resources=00,00,00 availability=01,01,01 "
+            "timers=%04x,%04x,%04x hp=%s"
+            % (frame, timers[0], timers[1], timers[2], ",".join("%04x" % v for v in hp))
+        )
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def build_legacy_fixture(path: Path):
     live = live_series(40)
     lines = []
@@ -174,6 +198,17 @@ def main() -> int:
         markdown = md_path.read_text(encoding="utf-8")
         assert "| slot | weapon |" in markdown, markdown
         assert "| 1 | right | 1 | 1 | [30]" in markdown, markdown
+
+        new7_log = root / "new7.log"
+        build_new7_fixture(new7_log)
+        new7_json = root / "new7.json"
+        run_tool(new7_log, "--json", str(new7_json))
+        new7 = json.loads(new7_json.read_text(encoding="utf-8"))
+        assert new7["layout"] == "new7", new7["layout"]
+        assert new7["opponent_working_cell"] == 6, new7["opponent_working_cell"]
+        assert new7["per_slot_dealt"]["1"]["hit_sizes"] == [30], new7["per_slot_dealt"]
+        dealt = [e for e in new7["dealt_events"] if e["shape"] != "transition"]
+        assert dealt and dealt[0]["attributed_slot"] == 1, dealt
 
         legacy_log = root / "legacy.log"
         build_legacy_fixture(legacy_log)

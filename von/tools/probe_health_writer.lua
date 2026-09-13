@@ -193,11 +193,14 @@ local function weapon_log()
         timers[#timers + 1] = string.format("%04x", value)
     end
     local hp = {}
-    -- Working + display health cells (see weapon-behavior-findings.md):
-    -- 0x503ca8/0x503ca0 working player, 0x503ca2 display player,
-    -- 0x50380a opponent, 0x5042a8 working mirror, 0x5042a2 display mirror.
+    -- Health cells. The bout struct is symmetric at +0x600:
+    --   0x503ca8/0x503ca0/0x503ca2 = player snapshot/working/display
+    --   0x5042a8/0x5042a0/0x5042a2 = opponent snapshot/working/display
+    -- 0x50380a is the opponent-side derived cell (delayed self-mirror). The
+    -- opponent *working* cell 0x5042a0 is the damage the player deals; the
+    -- round-constant 0x5042a8 is the snapshot.
     for _, addr in ipairs({ 0x503ca8, 0x503ca0, 0x503ca2, 0x50380a,
-                            0x5042a8, 0x5042a2 }) do
+                            0x5042a8, 0x5042a2, 0x5042a0 }) do
         local ok, value = pcall(function() return space:read_u16(addr) end)
         if not ok then value = 0 end
         hp[#hp + 1] = string.format("%04x", value)

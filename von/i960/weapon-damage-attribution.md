@@ -164,6 +164,45 @@ They are **not causally attributable** (see Confounds).
    live-event sequence through frame 6999. Human aim therefore cannot be
    read out of this capture; any "misses" here are not the human's misses.
 
+## Update 2026-09-12: corrected opponent cell and the dealt-damage signal
+
+The "working mirror" cell this report relied on (`0x5042a8`) is the opponent's
+round **snapshot**, not its working HP. The bout struct is symmetric at
+`+0x600`, so the opponent working cell is `0x5042a0` (pair of `0x503ca0`; set
+from `0x51d1b0` with it at `0x87ce8`). `VON_RECORD_WEAPON_LOG` now logs seven
+cells (`...0x5042a8, 0x5042a2, 0x5042a0`) and `analyze-weapon-damage` gained a
+`new7` layout with a **DEALT** section: opponent-working drops paired with the
+player's own attack timers.
+
+**The original human session does show dealt damage.** Its 10 s work-RAM
+snapshots (`von/captures/human-20260909T021757Z/snaps/`), decoded at
+`0x503ca0`/`0x5042a0` vs their snapshots:
+
+| t | pl working | pl snapshot | opp working | opp snapshot |
+| --- | --- | --- | --- | --- |
+| 30 s | 1000 | 1000 | 1000 | 1000 |
+| 40 s | 1000 | 1000 | 480 | 1000 |
+| 50 s | 1000 | 1000 | 0 | 1000 |
+| 60 s | 1000 | 1000 | 520 | 520 |
+| 70 s | 1000 | 1000 | 445 | 520 |
+| 90 s | 795 | 1000 | 177 | 520 |
+| 110 s | 416 | 1000 | 0 | 520 |
+
+The opponent working cell drops while its snapshot holds — exactly the
+damage-dealt signal — and later both sides trade damage. This confirms the
+corrected map against a real joined bout.
+
+**The macro replay still cannot supply it per frame.** A new capture
+(`/home/longjoel/von-scratch/replay-weapons3/record.log`) replays
+`human-20260909T021757Z` with the seven-cell layout. Its bout is the attract
+demo: the timer timeline is byte-identical with the macro and with no macro,
+and unchanged by a scripted coin+start (with either the human capture's
+credited cfg or a fresh NVRAM). The macro does reach the ioports
+(`macroplay ... read=` changes), but P1 is ignored during attract, so the
+opponent working cell never drops. The per-slot damage tensor therefore still
+requires a **joined** per-frame session; the capture/analysis harness is now
+ready for one.
+
 ## Verdict
 
 The reliable deliverable from this data is the **incoming hit-shape catalog**
@@ -176,9 +215,11 @@ change the logged combat. The slot table above is shown only to satisfy the
 requested format and should be read as `confidence = none`.
 
 To close this, a future capture must log the **opponent's** working health
-cell (or both fighters' working cells mapped to side) together with the
-*attacker's* timers, at one frame resolution, from a session whose input
-replay demonstrably changes the logged state.
+cell (now known: `0x5042a0`) together with the *attacker's* timers, at one
+frame resolution, from a **joined** session whose input replay demonstrably
+changes the logged state. The remaining blocker is the join: the saved human
+macros replay into attract mode (see the update above), so a per-frame joined
+capture is still owed.
 
 ## Reproduction
 
@@ -187,9 +228,22 @@ replay demonstrably changes the logged state.
 von/tools/analyze-weapon-damage /home/longjoel/von-scratch/replay-weapons2/record.log \
   --json /tmp/wd-primary.json --markdown /tmp/wd-primary.md
 
+# seven-cell capture (both working cells) and DEALT section
+von/tools/analyze-weapon-damage /home/longjoel/von-scratch/replay-weapons3/record.log
+
 # legacy layout cross-check
 von/tools/analyze-weapon-damage /home/longjoel/von-scratch/replay-weapons/record.log --layout legacy
 
 # regression test
 python3 von/tools/test_analyze_weapon_damage.py
+```
+
+The seven-cell capture was produced with:
+
+```sh
+VON_RECORD_LOG=<out>/record.log VON_RECORD_SNAP_DIR=<out>/snaps \
+VON_RECORD_MACRO_PLAY=von/captures/human-20260909T021757Z/macro.txt \
+VON_RECORD_MACRO_PLAY_PRESERVE_TIMING=1 VON_RECORD_WEAPON_LOG=1 \
+  ./bin/von vonj -rompath von/build/disasm/rompath -video none -sound none \
+  -skip_gameinfo -seconds_to_run 135 -autoboot_script von/tools/record_human_session.lua
 ```

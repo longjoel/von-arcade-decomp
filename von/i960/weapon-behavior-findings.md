@@ -43,13 +43,25 @@ the attract capture. `00bb` is an effect family (muzzle/impact), not ordnance.
 
 ## Health cells (from `disassembly-annotations.md`)
 
+The bout struct is symmetric at `+0x600` (player object `0x503ad0`, mirror
+object `0x5040d0`); health occupies `+0x1d8/+0x1d0/+0x1d2`. So the opponent
+side is the same offset set plus `0x600`:
+
 | cell | role |
 | --- | --- |
-| `0x503ca8` | player health snapshot (only written at round transition) |
-| `0x503ca0` | player secondary (bout-struct `r4+0x1d0`) |
-| `0x503ca2` | player live per-frame health **display** (`r4+0x1d2`) |
+| `0x503ca8` | player health snapshot / round max (only written at round transition) |
+| `0x503ca0` | player per-frame **working** health (`r4+0x1d0`) |
+| `0x503ca2` | player live health **display** (`r4+0x1d2`; eases toward working) |
 | `0x50380a` | opponent side (bout-struct promoted `0x503804..0x50381c`); churns, not raw HP |
-| `0x5042a8` -> `0x5042a2` | working -> display mirror pair |
+| `0x5042a8` | opponent snapshot / round max (`0x5040d0+0x1d8`) |
+| `0x5042a0` | opponent per-frame **working** health (`0x5040d0+0x1d0`) |
+| `0x5042a2` | opponent health **display** (`0x5040d0+0x1d2`) |
+
+Earlier notes mislabelled `0x5042a8` as the "working mirror"; it is the
+round-constant snapshot. The opponent working cell is `0x5042a0`, set from
+`0x51d1b0` alongside `0x503ca0` at `0x87ce8` and written by the same
+`+0x1d0` path. The `0x503ca8 -> 0x503ca2` / `0x5042a8 -> 0x5042a2` copies in
+the round-transition routine are why the snapshot pair does not move on a hit.
 
 Re-tabulating the 2026-09-09 replay across all six cells:
 

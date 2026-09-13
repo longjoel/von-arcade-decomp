@@ -15,21 +15,28 @@ Parses the one-row-per-frame weapon log produced by
     window, and reports the implied opponent fire frames, and
   * aggregates per-slot damage statistics with a small confidence heuristic.
 
-Two hp layouts are supported because the logger changed address order:
+Health layouts (the bout struct is symmetric at +0x600, so cell N on the
+opponent side is cell N-0x600 on the player side):
 
-  new (VON_RECORD_WEAPON_LOG since 2026-09-12), six cells:
-      0x503ca8 snapshot, 0x503ca0 working player, 0x503ca2 live player,
-      0x50380a opponent side, 0x5042a8 working mirror, 0x5042a2 display mirror
+  new7 (VON_RECORD_WEAPON_LOG since the 0x5042a0 fix), seven cells:
+      0x503ca8 player snapshot, 0x503ca0 player working, 0x503ca2 player live,
+      0x50380a opponent derived, 0x5042a8 opponent snapshot,
+      0x5042a2 opponent display, 0x5042a0 opponent working
+  new (2026-09-12, six cells; opponent working omitted):
+      same but without the trailing 0x5042a0
   legacy (``/home/longjoel/von-scratch/replay-weapons/record.log``), four cells:
       0x503ca2 live player, 0x50380a opponent side, 0x503ca4, 0x5042a4
       (working player is not logged; shape disambiguation falls back to the
       live-cell ramp and is marked ``ramp-only``)
 
-The tool is deliberately honest about a signal that the caller may not have:
-player fires are the local fighter's own weapon timers, while live-cell drops
-are damage the local fighter *receives*. They are only causally linked if the
-logged fighter is also the attacker, which is not guaranteed. Every attributed
-event therefore carries its fire latency so callers can judge the association.
+Two causally different signals are reported:
+
+  * **Incoming** (live/working player): damage the logged fighter *receives*.
+    Player fires are the fighter's own timers, so an incoming drop is only
+    loosely linked to a fire; those associations carry a latency and no claim.
+  * **Dealt** (opponent working, ``new7`` only): a drop here is damage the
+    logged fighter *dealt* to the opponent, and the most recent preceding fire
+    is the likely cause. This is the pairing the per-slot damage tensor needs.
 """
 
 from __future__ import annotations
@@ -50,13 +57,16 @@ ROW_RE = re.compile(
     r"hp=(?P<hp>[0-9a-fA-F,]+)"
 )
 
-# hp cell roles per layout: (snapshot, working, live, opponent, mirror_working,
-# mirror_display). ``None`` means the layout does not log that cell.
+# hp cell roles per layout: (player_snapshot, player_working, player_live,
+# opponent_derived, opponent_snapshot, opponent_display, opponent_working).
+# ``None`` means the layout does not log that cell.
 LAYOUTS = {
     # 0x503ca8, 0x503ca0, 0x503ca2, 0x50380a, 0x5042a8, 0x5042a2
-    "new": (0, 1, 2, 3, 4, 5),
+    "new": (0, 1, 2, 3, 4, 5, None),
+    # 0x503ca8, 0x503ca0, 0x503ca2, 0x50380a, 0x5042a8, 0x5042a2, 0x5042a0
+    "new7": (0, 1, 2, 3, 4, 5, 6),
     # 0x503ca2, 0x50380a, 0x503ca4, 0x5042a4
-    "legacy": (None, None, 0, 1, None, None),
+    "legacy": (None, None, 0, 1, None, None, None),
 }
 
 SLOT_NAMES = {1: "right", 2: "left", 3: "both"}
@@ -307,10 +317,19 @@ def build_report(args):
         raise SystemExit(f"no weapon rows found in {args.log}")
     layout = args.layout
     if layout == "auto":
-        layout = "legacy" if len(rows[0]["hp"]) == 4 else "new"
+        cells = len(rows[0]["hp"])
+        layout = {4: "legacy", 7: "new7"}.get(cells, "new")
     if layout not in LAYOUTS:
         raise SystemExit(f"unknown layout: {layout}")
-    snapshot_cell, working_cell, live_cell, opponent_cell, _, _ = LAYOUTS[layout]
+    (
+        snapshot_cell,
+        working_cell,
+        live_cell,
+        opponent_cell,
+        opponent_snapshot_cell,
+        _opponent_display_cell,
+        opponent_working_cell,
+    ) = LAYOUTS[layout]
     if args.live_index is not None:
         live_cell = args.live_index
     if args.working_index is not None:
@@ -344,6 +363,22 @@ def build_report(args):
                 event, rows, None, snapshot_cell, args.transition_drop
             )
 
+    # Damage the logged fighter *dealt*: drops on the opponent's working cell,
+    # paired with the player's own weapon timers. The opponent's snapshot cell
+    # distinguishes a real hit from a round/health-bar transition.
+    dealt_events = []
+    if opponent_working_cell is not None:
+        dealt_events = detect_events(rows, opponent_working_cell)
+        for event in dealt_events:
+            event["shape"] = classify(
+                event,
+                rows,
+                opponent_working_cell,
+                opponent_snapshot_cell,
+                args.transition_drop,
+            )
+        attribute(dealt_events, fires, args.window)
+
     report = {
         "log": str(args.log),
         "layout": layout,
@@ -352,6 +387,7 @@ def build_report(args):
         "live_cell": live_cell,
         "working_cell": working_cell,
         "opponent_cell": opponent_cell,
+        "opponent_working_cell": opponent_working_cell,
         "window": args.window,
         "transition_drop": args.transition_drop,
         "timer_starts": {
@@ -367,11 +403,17 @@ def build_report(args):
         },
         "live_events": live_events,
         "opponent_events": opponent_events,
+        "dealt_events": dealt_events,
         "opponent_implied_fires": infer_opponent_fires(
             rows, opponent_cell, live_events, args.transition_drop
         ),
         "attribution_window_coverage": round(covered / len(rows), 3),
         "per_slot": aggregate(live_events, fires, args.window),
+        "per_slot_dealt": (
+            aggregate(dealt_events, fires, args.window)
+            if opponent_working_cell is not None
+            else None
+        ),
     }
     return report
 
@@ -383,7 +425,8 @@ def print_text(report):
         f"rows: {report['rows']}  frames {report['frame_range'][0]}.."
         f"{report['frame_range'][1]}  layout: {report['layout']}  "
         f"live-cell: {report['live_cell']}  working-cell: {report['working_cell']}  "
-        f"opponent-cell: {report['opponent_cell']}"
+        f"opponent-cell: {report['opponent_cell']}  "
+        f"opponent-working-cell: {report['opponent_working_cell']}"
     )
 
     print("\n-- timer starts (0 -> positive) --")
@@ -430,6 +473,32 @@ def print_text(report):
             f"sizes={stat['hit_sizes']} total={stat['total_damage']} "
             f"lat_mean={stat['latency_mean']} lat_sd={stat['latency_stdev']} "
             f"confidence={stat['confidence']}"
+        )
+
+    if report["per_slot_dealt"] is not None:
+        print(
+            f"\n-- DEALT damage: opponent working cell "
+            f"({report['opponent_working_cell']}) vs player fires --"
+        )
+        for slot, stat in report["per_slot_dealt"].items():
+            print(
+                f"slot {slot} ({stat['name']:5}): fires={stat['fires']:2d} "
+                f"hits={stat['attributed']:2d} misses={stat['fires_without_event']:2d} "
+                f"sizes={stat['hit_sizes']} total={stat['total_damage']} "
+                f"lat_mean={stat['latency_mean']} lat_sd={stat['latency_stdev']} "
+                f"confidence={stat['confidence']}"
+            )
+        dealt_shapes = {}
+        for event in report["dealt_events"]:
+            dealt_shapes[event["shape"]] = dealt_shapes.get(event["shape"], 0) + 1
+        print("dealt-event shapes:", dict(sorted(dealt_shapes.items())))
+        print(
+            "dealt-event sizes (non-transition):",
+            sorted(
+                e["damage"]
+                for e in report["dealt_events"]
+                if e["shape"] != "transition"
+            ),
         )
 
     print(f"\n-- opponent-cell events ({len(report['opponent_events'])}) --")
@@ -489,6 +558,23 @@ def write_markdown(report, path: Path):
                 else ""
             )
         )
+    if report["per_slot_dealt"] is not None:
+        lines += [
+            "",
+            "## Dealt damage (opponent working cell)",
+            "",
+            f"Opponent working cell `{report['opponent_working_cell']}`; drops are "
+            "damage the logged fighter dealt, paired with its own fires.",
+            "",
+            "| slot | weapon | fires | hits | hit sizes | total | latency | confidence |",
+            "| --- | --- | --- | --- | --- | --- | --- | --- |",
+        ]
+        for slot, stat in report["per_slot_dealt"].items():
+            lines.append(
+                f"| {slot} | {stat['name']} | {stat['fires']} | {stat['attributed']} | "
+                f"{stat['hit_sizes']} | {stat['total_damage']} | "
+                f"{stat['latency_mean']}±{stat['latency_stdev']} | {stat['confidence']} |"
+            )
     lines += [
         "",
         "## Live-cell events",
@@ -509,7 +595,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("log", type=Path)
     parser.add_argument(
-        "--layout", choices=("auto", "new", "legacy"), default="auto",
+        "--layout", choices=("auto", "new7", "new", "legacy"), default="auto",
         help="hp cell layout (default: auto-detect by cell count)",
     )
     parser.add_argument("--live-index", type=int, default=None)
