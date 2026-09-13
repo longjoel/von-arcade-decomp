@@ -47,6 +47,52 @@ ordinal. So `stage2_arena.glb` is **AIRPORT (ordinal 1)**, not the first match.
 The kernel's recovered 7-box collision profile moves to ordinal 1 to match; the
 other ordinals keep provisional profiles until their boxes are recovered.
 
+## Recovered collision boxes
+
+The collision boxes are the render AABBs of each arena's solid statics, measured
+at **match start** (`t=33..37s`) so destructible blocks are still present. For
+AIRPORT this reproduces the movement-confirmed set (`recovered_stage_obstacle_boxes.c`);
+for the other measured stages the bounds are render-measured and the kind is
+assumed solid (no box contains a spawn point). GREEN HILLS, RUINS, SECRET BASE
+and NIRVANA keep provisional profiles: no clean low-block set is present at
+match start (their arenas are large structures / morphing).
+
+| ord | banner | boxes | source |
+| --- | --- | --- | --- |
+| 0 | FLOODED CITY | 6 | measured |
+| 1 | AIRPORT | 7 | recovered (movement-confirmed) |
+| 2 | WATERFRONT | 5 | measured |
+| 3 | GREEN HILLS | - | provisional |
+| 4 | RUINS | - | provisional |
+| 5 | SECRET BASE | - | provisional |
+| 6 | SPACE DOCK | 3 | measured |
+| 7 | MOON BASE | 8 | measured |
+| 8 | DEATH TRAP | 2 | measured |
+| 9 | NIRVANA | - | provisional |
+
+Measured boxes `min=(x,y,z) max=(x,y,z)`, kind block unless noted
+(`AIRPORT` pads are the two `z +/-[44,76]` boxes):
+
+```text
+FLOODED CITY : (-197,0,-198)-(-163,18,-162)  (-196,0,164)-(-164,19,196)
+               (-116,0,-36)-(-84,18,36)      (84,0,-36)-(116,18,36)
+               (163,0,-198)-(197,18,-162)    (164,0,164)-(196,19,196)
+WATERFRONT   : (-275,0,45)-(-205,26,75)      (-235,0,70)-(-205,26,115)
+               (-115,0,205)-(-45,25,275)     (-114,0,-114)-(-46,11,-46)
+               (205,0,45)-(275,24,115)
+SPACE DOCK   : (-155,0,-234)-(-85,18,-86)    (-152,0,6)-(-88,18,154)
+               (126,0,-154)-(195,26,72)
+MOON BASE    : (-240,0,-120)-(-200,27,-80)   (-240,0,40)-(-200,20,120)
+               (-120,0,-200)-(-40,20,-160)   (-120,0,160)-(-80,20,200)
+               (40,0,-200)-(120,20,-160)     (80,0,160)-(120,20,200)
+               (200,0,-120)-(240,27,-80)     (200,0,40)-(240,20,120)
+DEATH TRAP   : (-40,0,-40)-(40,20,40)        (-20,0,-20)-(20,20,20)
+```
+
+The kernel embeds these in `RV_ARENAS` (`von-godot/native/kernels/von_recovered_kernel.c`);
+Godot mirrors them in `VonStages` and a test compares box counts against the
+loaded kernel.
+
 ## Reproduction
 
 ```sh
