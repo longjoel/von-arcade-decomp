@@ -124,6 +124,14 @@ identity, the render-measured collision boxes, and the height grid. Sanity
 check: stage 1 reproduces AIRPORT's 7 blocks; stage 4 yields 3 RUINS pillars and
 the bowl heightfield.
 
+All ten stages are dumped this way (17x17 or 33x33 grids); the glTFs are staged
+as `stage_<NN>_arena.gltf` and rendered for every stage. `embed_stage_arenas.py`
+turns the extractor outputs into the kernel's `stage_arenas.h` (box +
+heightfield arrays and the `RV_ARENAS` table) and the Godot mirror
+`von_stage_boxes.gd`. Terrain stages are detected from the heightfield by the
+fraction of cells deviating from the median, so spurious slab/min-max outliers
+do not misclassify flat stages.
+
 ## Movement validation
 
 Forcing a stage and logging the game's fighter positions (attract demo) shows
