@@ -273,6 +273,7 @@ def main() -> int:
     last = [IDENT] * n
     measured = [0] * n
     quats = [[] for _ in range(n)]
+    trans = [[] for _ in range(n)]
     samples = [[] for _ in range(n)]
     for k in keys:
         tb = frames[k]
@@ -288,6 +289,10 @@ def main() -> int:
             if oba in tb:
                 measured[i] += 1
                 samples[i].append(local[9:12])
+            # The ROM animates each part's translation as well as its rotation,
+            # so keep the per-frame translation; averaging it to one pivot
+            # (the old behavior) made telescoping limbs drift.
+            trans[i].append(local[9:12])
             quats[i].append(quat_from_mat(orthonormalize(local[:9])))
     # Median pivot (robust to a shared part momentarily matching the other
     # fighter) with an absolute clamp so a corrupt joint cannot fling a limb.
@@ -313,6 +318,8 @@ def main() -> int:
                    "pivot": [round(v, 5) for v in pivots[i]]}
                   for i in range(n)],
         "quats": [[[round(v, 5) for v in quats[i][f]] for i in range(n)]
+                  for f in range(len(keys))],
+        "trans": [[[round(v, 5) for v in trans[i][f]] for i in range(n)]
                   for f in range(len(keys))],
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
