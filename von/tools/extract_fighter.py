@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
-"""Extract per-fighter attribute JSON directly from the Virtual-On ROMs.
+"""Extract structured per-fighter attribute JSON directly from the Virtual-On ROMs.
 
-No MAME, no traces: this pulls the roster (names + profile pointers), each
-fighter's polygon part list ([tpa, tha, oba]) from the main_data model tables,
-and the per-fighter keyframe motion tables out of the i960 program image. One
-JSON is written per fighter.
+No MAME, no traces. This pulls everything we can currently decode offline and
+writes one richly-structured JSON per fighter.
 
-What is ROM-sourced here:
-  * name, roster index, family prefix                          (maincpu 0x19390)
-  * profile pointer                                            (maincpu 0x19360)
-  * model parts: tpa / tha / oba (+ subgroup markers)          (main_data model tables)
-  * motion clips: header / data / frames / parts / raw records (profile blobs, +0x70 run)
-  * silhouette skeleton override, if authored (von/rigs/*.json)
+Decoded from ROM:
+  identity   roster index, name, family prefix, profile pointer,
+             fighter id (0x19450) and voice/sound id (0x19480)
+  model      polygon parts [tpa, tha, oba] from the main_data model tables,
+             plus the six-slot pose markers that interrupt the table
+  motion     per-fighter keyframe clips (header/data/frames/parts/bytes,
+             optional raw records) scanned from the profile blob at +0x70
+  weapons    the 10-entry weapon record table at 0x20b50 (asset pointer,
+             names, fields, model designation) matched to the fighter id
+  profile    the profile sub-table directory (pointer/count pairs)
 
-What is NOT yet decoded from ROM (left null with a note):
-  * per-fighter gameplay stats (speed, jump, dash, health, weapon tuning)
-  * weapon mounts / effect families (currently trace-derived; see
-    von/i960/weapon-family-map.md)
-  * the animation skeleton parent tree (currently inferred from captures or
-    hand-authored)
+Not yet decoded from ROM (kept as structured `pending` blocks):
+  stats      per-fighter movement/health tuning
+  skeleton   the animation parent tree (the ROM uses a six-bone pose system,
+             not a flat parent array; see von/i960/motion-emitter-findings.md)
 
 Usage:
     python3 von/tools/extract_fighter.py --out-dir von/build/fighters
@@ -39,14 +39,18 @@ from decode_model_part_table import load_main_data, decode_records  # noqa: E402
 from dump_motion_tables import (load_maincpu, motion_header,  # noqa: E402
                                 PROFILE_TABLE, NAME_TABLE, NAME_STRIDE)
 
-# Roster order is the i960 name table order / VonRoster order.
+# Roster order == i960 name table order == VonRoster order.
 ROSTER = [
     ("TEMJIN", 0x9E), ("VIPER2", 0xA1), ("BELGDOR", 0xA4), ("RAIDEN", 0x9F),
     ("DORKAS", 0xA6), ("FEIYEN", 0xA8), ("APHARMD", 0xA7), ("BAL-BAS-BOW", 0xAD),
     ("JAGUARANDI", None), ("Z-GRADT", None),
 ]
 
-# main_data model-table region (see decode_model_part_table.py).
+IDENT_TABLE = 0x19450      # 10 u32 fighter ids, roster order
+SOUND_TABLE = 0x19480      # 8 u16 voice/sound ids
+WEAPON_TABLE = 0x20B50     # 10 x 0x68 weapon records
+WEAPON_STRIDE = 0x68
+WEAPON_COUNT = 10
 MODEL_REGION_START = 0xBED81C
 MODEL_REGION_WORDS = 6000
 
@@ -55,8 +59,12 @@ def is_sep(entry) -> bool:
     return entry[0] == "part" and entry[1] == 0 and entry[2] == 0 and entry[3] == 0xFFFFFFFF
 
 
-def model_tables(main_data: bytes) -> dict[int, list]:
-    """Return {family_prefix: [(tpa, tha, oba), ...]} (largest segment each)."""
+def model_tables(main_data: bytes) -> dict[int, dict]:
+    """Return {family_prefix: {"parts": [...], "markers": [...]}}.
+
+    Keeps the longest segment per family and preserves the marker sequence
+    (the six-slot pose system) with the index of the part that follows it.
+    """
     words = list(struct.unpack_from(f"<{MODEL_REGION_WORDS}I", main_data, MODEL_REGION_START))
     segments, cur = [], []
     for entry in decode_records(words):
@@ -69,15 +77,63 @@ def model_tables(main_data: bytes) -> dict[int, list]:
     if cur:
         segments.append(cur)
 
-    best: dict[int, list] = {}
+    best: dict[int, dict] = {}
     for seg in segments:
         parts = [e[1:] for e in seg if e[0] == "part"]
         if len(parts) < 3:
             continue
         prefix = Counter((p[2] >> 16) & 0xFF for p in parts).most_common(1)[0][0]
-        if prefix not in best or len(parts) > len(best[prefix]):
-            best[prefix] = parts
+        markers = []
+        part_index = 0
+        for entry in seg:
+            if entry[0] == "marker":
+                markers.append({"slot": entry[1], "before_part": part_index})
+            elif entry[0] == "part":
+                part_index += 1
+        if prefix not in best or len(parts) > len(best[prefix]["parts"]):
+            best[prefix] = {"parts": parts, "markers": markers}
     return best
+
+
+def printable_strings(blob: bytes) -> list[str]:
+    out = []
+    for chunk in blob.split(b"\0"):
+        text = chunk.decode("ascii", "replace").strip()
+        if text and all(32 <= ord(c) < 127 for c in text):
+            out.append(text)
+    return out
+
+
+def weapon_records(maincpu: bytes) -> list[dict]:
+    records = []
+    for index in range(WEAPON_COUNT):
+        base = WEAPON_TABLE + index * WEAPON_STRIDE
+        blob = maincpu[base:base + WEAPON_STRIDE]
+        words = list(struct.unpack_from(f"<{WEAPON_STRIDE // 4}I", blob))
+        records.append({
+            "index": index,
+            "asset": f"0x{words[0]:08x}",
+            "names": printable_strings(blob[4:52]),
+            "model": printable_strings(blob[88:104])[0] if printable_strings(blob[88:104]) else None,
+            "fields": words[13:19],
+            "sub_asset": f"0x{words[19]:08x}",
+            "extra": words[20:22],
+            "fighter_id": f"0x{words[25]:04x}",
+        })
+    return records
+
+
+def profile_directory(maincpu: bytes, base: int, ptrs: list) -> list[dict]:
+    higher = [p for p in ptrs + [PROFILE_TABLE] if p > base]
+    limit = min(higher) if higher else PROFILE_TABLE
+    entries = []
+    offset = 0
+    while offset + 8 <= limit - base:
+        pointer, count = struct.unpack_from("<II", maincpu, base + offset)
+        if pointer and count:
+            entries.append({"offset": offset, "pointer": f"0x{pointer:08x}", "count": count})
+        offset += 8
+    return entries
 
 
 def motion_clips(maincpu: bytes, main_data: bytes, base: int, ptrs: list,
@@ -92,8 +148,7 @@ def motion_clips(maincpu: bytes, main_data: bytes, base: int, ptrs: list,
         if found:
             data, frames, parts = found
             clip = {"offset": offset, "header": header, "data": data,
-                    "frames": frames, "parts": parts,
-                    "bytes": frames * parts * 12}
+                    "frames": frames, "parts": parts, "bytes": frames * parts * 12}
             if include_records and len(clips) < record_limit:
                 raw = main_data[data - 0x02000000:data - 0x02000000 + frames * parts * 12]
                 clip["records_b64"] = base64.b64encode(raw).decode("ascii")
@@ -110,45 +165,79 @@ def find_tree(trees_dir: Path, name: str):
     return None
 
 
+def parse_roster(maincpu: bytes) -> list[dict]:
+    ptrs = list(struct.unpack_from("<10I", maincpu, PROFILE_TABLE))
+    out = []
+    for index, (name, prefix) in enumerate(ROSTER):
+        raw = maincpu[NAME_TABLE + index * NAME_STRIDE:NAME_TABLE + (index + 1) * NAME_STRIDE]
+        rom_name = raw.split(b"\0", 1)[0].decode("ascii", "replace")
+        out.append({
+            "index": index,
+            "name": rom_name,
+            "family": f"0x{prefix:04x}" if prefix is not None else None,
+            "profile": ptrs[index],
+            "fighter_id": struct.unpack_from("<I", maincpu, IDENT_TABLE + index * 4)[0],
+        })
+    return out
+
+
 def extract(rom_dir: Path, out_dir: Path, trees_dir: Path,
             include_motion_records: bool = False, record_limit: int = 4) -> list[dict]:
-    """Decode every fighter and write one JSON per fighter. Return the docs."""
     maincpu = load_maincpu(rom_dir)
     main_data = load_main_data(rom_dir)
     ptrs = list(struct.unpack_from("<10I", maincpu, PROFILE_TABLE))
     tables = model_tables(main_data)
+    weapons = weapon_records(maincpu)
+    weapons_by_id = {w["fighter_id"]: w for w in weapons}
+    sounds = [struct.unpack_from("<H", maincpu, SOUND_TABLE + i * 2)[0] for i in range(8)]
     out_dir.mkdir(parents=True, exist_ok=True)
 
     docs = []
-    for index, (name, prefix) in enumerate(ROSTER):
-        raw = maincpu[NAME_TABLE + index * NAME_STRIDE:NAME_TABLE + (index + 1) * NAME_STRIDE]
-        rom_name = raw.split(b"\0", 1)[0].decode("ascii", "replace")
-        parts = tables.get(prefix, []) if prefix is not None else []
+    for entry in parse_roster(maincpu):
+        prefix = int(entry["family"], 16) if entry["family"] else None
+        table = tables.get(prefix, {"parts": [], "markers": []})
+        parts = table["parts"]
+        fid = f"0x{entry['fighter_id']:04x}"
         doc = {
-            "schema": 1,
+            "schema": 2,
             "generator": "extract_fighter.py",
             "source": "ROM (offline)",
-            "index": index,
-            "name": rom_name,
-            "family": f"0x{prefix:04x}" if prefix is not None else None,
-            "profile": f"0x{ptrs[index]:08x}",
-            "parts": [{"tpa": f"0x{p[0]:08x}", "tha": f"0x{p[1]:08x}",
-                       "oba": f"0x{p[2]:08x}"} for p in parts],
-            "skeleton": find_tree(trees_dir, name),
-            "motion": motion_clips(maincpu, main_data, ptrs[index], ptrs,
-                                   include_motion_records, record_limit),
-            "weapons": None,
-            "stats": None,
-            "notes": ("weapons/stats/skeleton are not fully ROM-decoded yet; "
-                      "skeleton here is a hand-authored override when present"),
+            "identity": {
+                "index": entry["index"],
+                "name": entry["name"],
+                "family": entry["family"],
+                "profile": f"0x{entry['profile']:08x}",
+                "fighter_id": fid,
+                "sound_ids": [f"0x{s:04x}" for s in sounds],
+            },
+            "model": {
+                "parts": [{"tpa": f"0x{p[0]:08x}", "tha": f"0x{p[1]:08x}",
+                           "oba": f"0x{p[2]:08x}"} for p in parts],
+                "pose_markers": table["markers"],
+            },
+            "motion": {
+                "clips": motion_clips(maincpu, main_data, entry["profile"], ptrs,
+                                      include_motion_records, record_limit),
+            },
+            "weapons": weapons_by_id.get(fid),
+            "profile": {
+                "subtables": profile_directory(maincpu, entry["profile"], ptrs),
+            },
+            "skeleton": find_tree(trees_dir, entry["name"]),
+            "stats": {"pending": True,
+                      "note": "per-fighter movement/health tuning not yet ROM-decoded"},
+            "skeleton_note": ("ROM uses a six-bone pose system (model markers), "
+                              "not a flat parent array; override used when authored"),
         }
-        out = out_dir / f"{name}.json"
+        doc["motion"]["clip_count"] = len(doc["motion"]["clips"])
+        doc["motion"]["total_frames"] = sum(c["frames"] for c in doc["motion"]["clips"])
+
+        out = out_dir / f"{entry['name']}.json"
         out.write_text(json.dumps(doc, indent=1) + "\n")
-        clips = len(doc["motion"]) if doc["motion"] else 0
-        frames = sum(c["frames"] for c in doc["motion"]) if doc["motion"] else 0
-        print(f"{name:11s} family={doc['family'] or '-':>6s} parts={len(parts):2d} "
-              f"clips={clips:3d} frames={frames:5d} skeleton={'yes' if doc['skeleton'] else 'no '} "
-              f"-> {out.name}")
+        wname = (weapons_by_id.get(fid) or {}).get("names") or []
+        print(f"{entry['name']:11s} family={entry['family'] or '-':>6s} "
+              f"parts={len(parts):2d} markers={len(table['markers'])} "
+              f"clips={doc['motion']['clip_count']:3d} weapon={wname[0] if wname else '-'}")
         docs.append(doc)
     return docs
 

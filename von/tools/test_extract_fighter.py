@@ -29,19 +29,26 @@ def main() -> int:
     extract = _load()
     with tempfile.TemporaryDirectory() as td:
         docs = extract.extract(_ROM, Path(td), _TREES)
-    by_name = {d["name"]: d for d in docs}
+    by_name = {d["identity"]["name"]: d for d in docs}
 
     expect(len(docs) == 10, f"10 fighters, got {len(docs)}")
     temjin = by_name["TEMJIN"]
-    expect(temjin["family"] == "0x009e", f"Temjin family {temjin['family']}")
-    expect(len(temjin["parts"]) >= 15, f"Temjin parts {len(temjin['parts'])}")
-    expect(all(set(p) == {"tpa", "tha", "oba"} for p in temjin["parts"]), "part keys")
-    expect(len(temjin["motion"]) > 0, "Temjin motion clips")
-    expect(all(c["frames"] > 0 and c["parts"] > 0 for c in temjin["motion"]), "clip fields")
+    ident = temjin["identity"]
+    expect(ident["family"] == "0x009e", f"Temjin family {ident['family']}")
+    expect(ident["fighter_id"] == "0x1331", f"Temjin fighter_id {ident['fighter_id']}")
+    expect(temjin["model"]["parts"] and
+           all(set(p) == {"tpa", "tha", "oba"} for p in temjin["model"]["parts"]),
+           "Temjin part keys")
+    expect(len(temjin["model"]["pose_markers"]) > 0, "Temjin pose markers")
+    expect(temjin["motion"]["clip_count"] > 0, "Temjin motion clips")
+    expect(temjin["motion"]["total_frames"] > 1000, "Temjin motion frames")
+
+    weapon = temjin["weapons"]
+    expect(weapon is not None and "BEAM RIFLE" in weapon["names"], f"Temjin weapon {weapon}")
 
     expect(by_name["APHARMD"]["skeleton"] is not None, "Apharmd skeleton override present")
-    expect(by_name["JAGUARANDI"]["family"] is None, "boss family is null")
-    print("PASS: offline fighter extraction (10 fighters, parts, motion, skeleton)")
+    expect(by_name["JAGUARANDI"]["identity"]["family"] is None, "boss family is null")
+    print("PASS: offline fighter extraction (identity, parts, markers, motion, weapons, skeleton)")
     return 0
 
 
