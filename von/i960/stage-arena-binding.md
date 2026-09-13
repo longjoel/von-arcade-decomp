@@ -93,6 +93,27 @@ The kernel embeds these in `RV_ARENAS` (`von-godot/native/kernels/von_recovered_
 Godot mirrors them in `VonStages` and a test compares box counts against the
 loaded kernel.
 
+## Terrain stages
+
+GREEN HILLS (ordinal 3) and RUINS (ordinal 4) are not flat box arenas. GREEN
+HILLS is rolling terrain: many mid-size, non-flat statics (y 0..52 over
+~150-460-unit footprints). `von/tools/extract_stage_heightfield.py` samples the
+top surface onto a 17x17 grid over +/-320; the kernel embeds it
+(`RV_TERRAIN_GREEN_HILLS`) for ground height and the host renders the same grid
+as `assets/generated/arena/stage_03_arena.gltf`. RUINS is a stepped central
+platform (14 -> 7 -> 0) plus thin pillars; its terrain is not modelled yet
+(provisional).
+
+## Movement validation
+
+Forcing a stage and logging the game's fighter positions (attract demo) shows
+the fighter blocked exactly at the edge of AIRPORT box6 and FLOODED CITY box3
+(min distance 0.0, zero penetration), supporting those measured boxes. The
+demo path does not traverse the other boxes, so the rest remain render-measured
+rather than movement-confirmed. The sub-cell work-RAM position words
+(`0x503ad8`) read zero/degenerate in the demo, so a full per-box check needs a
+joined, input-driven bout.
+
 ## Reproduction
 
 ```sh
