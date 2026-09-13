@@ -95,14 +95,34 @@ loaded kernel.
 
 ## Terrain stages
 
-GREEN HILLS (ordinal 3) and RUINS (ordinal 4) are not flat box arenas. GREEN
-HILLS is rolling terrain: many mid-size, non-flat statics (y 0..52 over
-~150-460-unit footprints). `von/tools/extract_stage_heightfield.py` samples the
-top surface onto a 17x17 grid over +/-320; the kernel embeds it
-(`RV_TERRAIN_GREEN_HILLS`) for ground height and the host renders the same grid
-as `assets/generated/arena/stage_03_arena.gltf`. RUINS is a stepped central
-platform (14 -> 7 -> 0) plus thin pillars; its terrain is not modelled yet
-(provisional).
+GREEN HILLS (ordinal 3) and RUINS (ordinal 4) are not flat box arenas.
+
+- GREEN HILLS is rolling terrain (y 0..52 over ~150-460-unit statics).
+- RUINS is a stepped bowl: centre floor 0 -> 7 -> 14 (rim), then a drop to
+  -17.7 and -60 (pit), with three thin central pillars.
+
+Both are dumped by the generic extractor below: a 17x17 top-surface height grid
+the kernel embeds (`RV_TERRAIN_GREEN_HILLS`, `RV_TERRAIN_RUINS`) for ground
+height, and a glTF the host renders (`stage_03_arena.gltf`,
+`stage_04_arena.gltf`). RUINS' three pillars are also collision boxes.
+
+## Generic stage extractor
+
+`von/tools/extract_stage_geometry.py` dumps a stage from a per-ordinal OBA
+manifest:
+
+```sh
+python3 von/tools/extract_stage_geometry.py --stage 4 --output-dir /tmp/stage-4
+# writes stage_04_arena.gltf / _boxes.json / _heightfield.json / _summary.md
+```
+
+Inputs: `von/i960/stage-arena-obas.json` (per-ordinal arena OBA lists generated
+from the binding-probe traces) and the assembled polygon ROM
+(`von/tools/extract_geometry_rom.py`). It classifies every static geometrically
+(ground / block / wall / structure / backdrop), emits the level glTF at
+identity, the render-measured collision boxes, and the height grid. Sanity
+check: stage 1 reproduces AIRPORT's 7 blocks; stage 4 yields 3 RUINS pillars and
+the bowl heightfield.
 
 ## Movement validation
 
