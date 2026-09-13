@@ -48,6 +48,7 @@ ROSTER = [
 
 IDENT_TABLE = 0x19450      # 10 u32 fighter ids, roster order
 SOUND_TABLE = 0x19480      # 8 u16 voice/sound ids
+MODEL_DIRECTORY = 0xC9100  # 10 x 6 u32 model directory entries
 WEAPON_TABLE = 0x20B50     # 10 x 0x68 weapon records
 WEAPON_STRIDE = 0x68
 WEAPON_COUNT = 10
@@ -102,6 +103,44 @@ def printable_strings(blob: bytes) -> list[str]:
         if text and all(32 <= ord(c) < 127 for c in text):
             out.append(text)
     return out
+
+
+def parts_from_range(main_data: bytes, start: int, end: int) -> tuple[list, list]:
+    """Decode the [tpa, tha, oba] parts and markers in a directory range."""
+    offset = start - 0x02000000
+    count = (end - start) // 4
+    words = list(struct.unpack_from(f"<{count}I", main_data, offset))
+    parts, markers = [], []
+    index = 0
+    for entry in decode_records(words):
+        if entry[0] == "marker":
+            markers.append({"slot": entry[1], "before_part": index})
+        elif entry[0] == "part" and not (entry[1] == 0 and entry[2] == 0 and entry[3] == 0xFFFFFFFF):
+            parts.append(entry[1:])
+            index += 1
+    return parts, markers
+
+
+def model_directory(maincpu: bytes) -> list[dict]:
+    """Decode the 10-entry model directory at 0xc9100 (roster order).
+
+    Entry = [range_end, range_start, struct_a, aux0, struct_b, aux1], all
+    0x02xxxxxx main_data pointers. struct_a..aux1 are the per-model asset banks
+    (shared between fighters that use the same body group).
+    """
+    entries = []
+    for index in range(10):
+        base = MODEL_DIRECTORY + index * 24
+        end, start, sa, a0, sb, a1 = struct.unpack_from("<6I", maincpu, base)
+        entries.append({
+            "range_start": f"0x{start:08x}",
+            "range_end": f"0x{end:08x}",
+            "struct_a": f"0x{sa:08x}",
+            "aux0": f"0x{a0:08x}",
+            "struct_b": f"0x{sb:08x}",
+            "aux1": f"0x{a1:08x}",
+        })
+    return entries
 
 
 def weapon_records(maincpu: bytes) -> list[dict]:
@@ -187,6 +226,9 @@ def extract(rom_dir: Path, out_dir: Path, trees_dir: Path,
     main_data = load_main_data(rom_dir)
     ptrs = list(struct.unpack_from("<10I", maincpu, PROFILE_TABLE))
     tables = model_tables(main_data)
+    directory = model_directory(maincpu)
+    directory_raw = [struct.unpack_from("<6I", maincpu, MODEL_DIRECTORY + i * 24)
+                     for i in range(10)]
     weapons = weapon_records(maincpu)
     weapons_by_id = {w["fighter_id"]: w for w in weapons}
     sounds = [struct.unpack_from("<H", maincpu, SOUND_TABLE + i * 2)[0] for i in range(8)]
@@ -198,6 +240,8 @@ def extract(rom_dir: Path, out_dir: Path, trees_dir: Path,
         table = tables.get(prefix, {"parts": [], "markers": []})
         parts = table["parts"]
         fid = f"0x{entry['fighter_id']:04x}"
+        raw_entry = directory_raw[entry["index"]]
+        dir_parts, dir_markers = parts_from_range(main_data, raw_entry[1], raw_entry[0])
         doc = {
             "schema": 2,
             "generator": "extract_fighter.py",
@@ -214,6 +258,10 @@ def extract(rom_dir: Path, out_dir: Path, trees_dir: Path,
                 "parts": [{"tpa": f"0x{p[0]:08x}", "tha": f"0x{p[1]:08x}",
                            "oba": f"0x{p[2]:08x}"} for p in parts],
                 "pose_markers": table["markers"],
+                "directory": directory[entry["index"]],
+                "directory_parts": [{"tpa": f"0x{p[0]:08x}", "tha": f"0x{p[1]:08x}",
+                                     "oba": f"0x{p[2]:08x}"} for p in dir_parts],
+                "directory_pose_markers": dir_markers,
             },
             "motion": {
                 "clips": motion_clips(maincpu, main_data, entry["profile"], ptrs,

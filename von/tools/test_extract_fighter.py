@@ -39,15 +39,19 @@ def main() -> int:
     expect(temjin["model"]["parts"] and
            all(set(p) == {"tpa", "tha", "oba"} for p in temjin["model"]["parts"]),
            "Temjin part keys")
-    expect(len(temjin["model"]["pose_markers"]) > 0, "Temjin pose markers")
+    expect(temjin["model"]["pose_markers"], "Temjin pose markers")
+    expect(temjin["model"]["directory"]["range_start"].startswith("0x"), "Temjin directory range")
+    expect(len(temjin["model"]["directory_parts"]) > 0, "Temjin directory parts")
     expect(temjin["motion"]["clip_count"] > 0, "Temjin motion clips")
     expect(temjin["motion"]["total_frames"] > 1000, "Temjin motion frames")
 
     weapon = temjin["weapons"]
     expect(weapon is not None and "BEAM RIFLE" in weapon["names"], f"Temjin weapon {weapon}")
 
+    # Bosses have no family prefix but do have model-directory parts.
+    boss = by_name["JAGUARANDI"]["model"]["directory_parts"]
+    expect(len(boss) > 0, "Jaguarandi directory parts recovered")
     expect(by_name["APHARMD"]["skeleton"] is not None, "Apharmd skeleton override present")
-    expect(by_name["JAGUARANDI"]["identity"]["family"] is None, "boss family is null")
     print("PASS: offline fighter extraction (identity, parts, markers, motion, weapons, skeleton)")
     return 0
 
