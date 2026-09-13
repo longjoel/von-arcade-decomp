@@ -121,6 +121,45 @@ def parts_from_range(main_data: bytes, start: int, end: int) -> tuple[list, list
     return parts, markers
 
 
+def profile_part_groups(maincpu: bytes, base: int) -> list[dict]:
+    """Decode the profile's part-group sub-tables.
+
+    The profile (i960 program image) holds up to 16 sub-table pointers at
+    +0x00..+0x6c. Part-group sub-tables start with `[0, 0xffffffff]` followed by
+    `(count, pointer)` pairs; each pointer addresses ``count`` four-word records
+    `[tpa, tha, param, oba]` (the ROM's per-part model records with an extra
+    parameter word, e.g. Temjin's 15-part body group).
+    """
+    pointers = []
+    for offset in range(0, 0x70, 8):
+        pointer = struct.unpack_from("<I", maincpu, base + offset)[0]
+        if 0x1000 < pointer < 0x200000:
+            pointers.append(pointer)
+    pointers = sorted(set(pointers))
+
+    groups = []
+    for index, sub in enumerate(pointers):
+        if struct.unpack_from("<I", maincpu, sub)[0] != 0:
+            continue
+        if struct.unpack_from("<I", maincpu, sub + 4)[0] != 0xFFFFFFFF:
+            continue
+        limit = pointers[index + 1] if index + 1 < len(pointers) else sub + 0x100
+        parts = []
+        off = sub + 8
+        while off + 8 <= limit:
+            count, pointer = struct.unpack_from("<II", maincpu, off)
+            if count == 0 or count > 64 or not (0x1000 < pointer < 0x200000):
+                break
+            for i in range(count):
+                tpa, tha, param, oba = struct.unpack_from("<IIII", maincpu, pointer + i * 16)
+                parts.append({"tpa": f"0x{tpa:08x}", "tha": f"0x{tha:08x}",
+                              "param": f"0x{param:08x}", "oba": f"0x{oba:08x}"})
+            off += 8
+        if parts:
+            groups.append({"subtable": f"0x{sub:08x}", "count": len(parts), "parts": parts})
+    return groups
+
+
 def model_directory(maincpu: bytes) -> list[dict]:
     """Decode the 10-entry model directory at 0xc9100 (roster order).
 
@@ -270,6 +309,7 @@ def extract(rom_dir: Path, out_dir: Path, trees_dir: Path,
             "weapons": weapons_by_id.get(fid),
             "profile": {
                 "subtables": profile_directory(maincpu, entry["profile"], ptrs),
+                "part_groups": profile_part_groups(maincpu, entry["profile"]),
             },
             "skeleton": find_tree(trees_dir, entry["name"]),
             "stats": {"pending": True,

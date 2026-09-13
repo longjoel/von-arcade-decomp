@@ -41,7 +41,11 @@ def main() -> int:
            "Temjin part keys")
     expect(temjin["model"]["pose_markers"], "Temjin pose markers")
     expect(temjin["model"]["directory"]["range_start"].startswith("0x"), "Temjin directory range")
-    expect(len(temjin["model"]["directory_parts"]) > 0, "Temjin directory parts")
+    expect(temjin["model"]["directory_parts"], "Temjin directory parts")
+    groups = temjin["profile"]["part_groups"]
+    expect(groups and all(set(p) == {"tpa", "tha", "param", "oba"}
+                          for g in groups for p in g["parts"]),
+           f"Temjin profile part groups {groups}")
     expect(temjin["motion"]["clip_count"] > 0, "Temjin motion clips")
     expect(temjin["motion"]["total_frames"] > 1000, "Temjin motion frames")
 
