@@ -15,7 +15,6 @@ end
 
 local LOG = os.getenv("VON_SHARC_XF_LOG") or "von-sharc-transform.log"
 local INJECT = env("VON_SHARC_XF_INJECT", 1200)
-local READING = INJECT + 60
 
 local c = {}
 for i = 0, 5 do c[i] = env("VON_REC_" .. i, 0) end
@@ -44,6 +43,14 @@ end
 
 local function word(v) space:write_u32(0x00884000, v & 0xffffffff) end
 
+local function dump(tag, base)
+    local vals = {}
+    for i = 0, 11 do
+        vals[i + 1] = string.format("%08x", dspace:read_u32(base + i * 4))
+    end
+    log(string.format("%s base=0x%08x %s", tag, base, table.concat(vals, " ")))
+end
+
 emu.register_periodic(function()
     frame = frame + 1
     if not space then
@@ -71,19 +78,13 @@ emu.register_periodic(function()
         log(string.format("probe: injected c=%d,%d,%d,%d,%d,%d", c[0], c[1], c[2], c[3], c[4], c[5]))
     end
 
-    if frame == READING then
+    if frame >= INJECT and frame <= INJECT + 6 then
         local ptr = dspace:read_u32(0x0030101)
-        log(string.format("probe: matrix ptr now=0x%08x before=0x%08x", ptr, ptr_before))
-        for _, base in ipairs({ ptr, ptr_before, 0x00030200, 0x00030230 }) do
-            if base then
-                log(string.format("probe: --- buffer 0x%08x ---", base))
-                for i = 0, 11 do
-                    log(string.format("probe:   [%02d]=0x%08x (%g)", i,
-                        dspace:read_u32(base + i * 4),
-                        dspace:read_u32(base + i * 4)))
-                end
-            end
-        end
+        log(string.format("probe: frame=%d ptr=0x%08x", frame, ptr))
+        dump("  at_ptr", ptr)
+        dump("  at_30200", 0x00030200)
+    end
+    if frame == INJECT + 7 then
         log("probe: complete")
         log_file:close()
         manager.machine:exit()
