@@ -1,0 +1,536 @@
+#!/usr/bin/env python3
+"""Attribute Virtual-On health drops to weapon-slot fire events.
+
+Parses the one-row-per-frame weapon log produced by
+``VON_RECORD_WEAPON_LOG=1`` in ``von/tools/record_human_session.lua`` and:
+
+  * finds per-slot cooldown-timer start frames (a 0 -> positive transition),
+  * finds health-drop events on the live/display cell, grouping consecutive
+    decreasing frames into one event,
+  * disambiguates a real sustained drain from the display easing of a single
+    discrete hit by checking whether the *working* health cell keeps dropping
+    over the event window,
+  * flags round-transition copies (large jumps / round snapshot changes),
+  * associates every event with the most recent player weapon fire within a
+    window, and reports the implied opponent fire frames, and
+  * aggregates per-slot damage statistics with a small confidence heuristic.
+
+Two hp layouts are supported because the logger changed address order:
+
+  new (VON_RECORD_WEAPON_LOG since 2026-09-12), six cells:
+      0x503ca8 snapshot, 0x503ca0 working player, 0x503ca2 live player,
+      0x50380a opponent side, 0x5042a8 working mirror, 0x5042a2 display mirror
+  legacy (``/home/longjoel/von-scratch/replay-weapons/record.log``), four cells:
+      0x503ca2 live player, 0x50380a opponent side, 0x503ca4, 0x5042a4
+      (working player is not logged; shape disambiguation falls back to the
+      live-cell ramp and is marked ``ramp-only``)
+
+The tool is deliberately honest about a signal that the caller may not have:
+player fires are the local fighter's own weapon timers, while live-cell drops
+are damage the local fighter *receives*. They are only causally linked if the
+logged fighter is also the attacker, which is not guaranteed. Every attributed
+event therefore carries its fire latency so callers can judge the association.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import re
+import statistics
+import sys
+from pathlib import Path
+
+ROW_RE = re.compile(
+    r"weapon:\s+f(?P<frame>\d+)\s+"
+    r"resources=(?P<resources>[0-9a-fA-F,]+)\s+"
+    r"availability=(?P<availability>[0-9a-fA-F,]+)\s+"
+    r"timers=(?P<timers>[0-9a-fA-F,]+)\s+"
+    r"hp=(?P<hp>[0-9a-fA-F,]+)"
+)
+
+# hp cell roles per layout: (snapshot, working, live, opponent, mirror_working,
+# mirror_display). ``None`` means the layout does not log that cell.
+LAYOUTS = {
+    # 0x503ca8, 0x503ca0, 0x503ca2, 0x50380a, 0x5042a8, 0x5042a2
+    "new": (0, 1, 2, 3, 4, 5),
+    # 0x503ca2, 0x50380a, 0x503ca4, 0x5042a4
+    "legacy": (None, None, 0, 1, None, None),
+}
+
+SLOT_NAMES = {1: "right", 2: "left", 3: "both"}
+
+# A drop this large (or larger) in one event, or any event that also rewrites
+# the round snapshot cell, is a round-transition copy rather than a hit. The
+# 2026-09-09 logs contain round copies of 270..750; the largest real per-hit
+# drop seen is 207.
+DEFAULT_TRANSITION_DROP = 250
+# The live display eases toward the working value at ~6..9 units/frame, so a
+# single hit of d damage spans ~d/8 frames. Events that only move the working
+# cell once are discrete; the ramp is an artifact of the display.
+DEFAULT_MAX_DISCRETE_SPAN = 8
+# How far back to look for the player fire that an event could belong to.
+DEFAULT_WINDOW = 180
+
+
+def parse_rows(path: Path):
+    rows = []
+    for line in path.read_text(errors="replace").splitlines():
+        match = ROW_RE.search(line)
+        if not match:
+            continue
+        rows.append(
+            {
+                "frame": int(match.group("frame")),
+                "timers": [int(v, 16) for v in match.group("timers").split(",")],
+                "hp": [int(v, 16) for v in match.group("hp").split(",")],
+            }
+        )
+    return rows
+
+
+def detect_fires(rows):
+    """Return (fresh starts, mid-cooldown refires) per slot index 0..2.
+
+    A fire is a 0 -> positive timer transition. A refire while the timer is
+    already positive appears as a large increase (the human captures stack
+    ~+295); it is recorded separately so it does not masquerade as a hit.
+    """
+    starts = {slot: [] for slot in range(3)}
+    refires = {slot: [] for slot in range(3)}
+    for slot in range(3):
+        previous = rows[0]["timers"][slot]
+        for row in rows[1:]:
+            value = row["timers"][slot]
+            if value > 0 and previous == 0:
+                starts[slot].append({"frame": row["frame"], "timer": value})
+            elif value > previous + 50 and previous > 0:
+                refires[slot].append(
+                    {"frame": row["frame"], "from": previous, "to": value}
+                )
+            previous = value
+    return starts, refires
+
+
+def detect_durations(rows):
+    """Return (active_start, active_end, duration) for each timer run."""
+    durations = {slot: [] for slot in range(3)}
+    for slot in range(3):
+        previous = rows[0]["timers"][slot]
+        active_start = rows[0]["frame"] if previous > 0 else None
+        for row in rows[1:]:
+            value = row["timers"][slot]
+            if previous > 0 and value == 0 and active_start is not None:
+                durations[slot].append(
+                    (active_start, row["frame"], row["frame"] - active_start)
+                )
+                active_start = None
+            elif previous == 0 and value > 0:
+                active_start = row["frame"]
+            previous = value
+        if active_start is not None:
+            durations[slot].append(
+                (active_start, rows[-1]["frame"], rows[-1]["frame"] - active_start)
+            )
+    return durations
+
+
+def detect_events(rows, cell):
+    """Group consecutive-frame decreases of ``hp[cell]`` into drop events."""
+    events = []
+    index = 0
+    while index < len(rows) - 1:
+        previous = rows[index]["hp"][cell]
+        following = rows[index + 1]["hp"][cell]
+        if following >= previous:
+            index += 1
+            continue
+        start = index
+        deltas = []
+        while index < len(rows) - 1:
+            previous = rows[index]["hp"][cell]
+            following = rows[index + 1]["hp"][cell]
+            if following >= previous:
+                break
+            deltas.append(previous - following)
+            index += 1
+        # ``start`` is the last frame at the higher value; the damage lands on
+        # the next frame, which is the event's first frame.
+        events.append(
+            {
+                "start": rows[start + 1]["frame"],
+                "end": rows[index]["frame"],
+                "span": rows[index]["frame"] - rows[start + 1]["frame"] + 1,
+                "damage": sum(deltas),
+                "deltas": deltas,
+                "before": rows[start]["hp"][cell],
+                "after": rows[index]["hp"][cell],
+            }
+        )
+    return events
+
+
+def classify(event, rows, working_cell, snapshot_cell, transition_drop):
+    """Label an event transition / sustained / discrete / tiny."""
+    if event["damage"] >= transition_drop:
+        return "transition"
+    # A round transition also rewrites the snapshot / max-health cell.
+    if snapshot_cell is not None:
+        snapshot_values = {
+            row["hp"][snapshot_cell]
+            for row in rows
+            if event["start"] - 2 <= row["frame"] <= event["end"] + 2
+        }
+        if len(snapshot_values) > 1:
+            return "transition"
+    if event["damage"] < 20:
+        return "tiny"
+    if working_cell is not None:
+        # Count how many frames inside the window actually lowered the working
+        # (instantaneous) cell. One application -> discrete hit; repeated
+        # applications -> sustained drain.
+        drops = 0
+        previous = None
+        for row in rows:
+            if event["start"] <= row["frame"] <= event["end"] + 1:
+                working = row["hp"][working_cell]
+                if previous is not None and working < previous:
+                    drops += 1
+                previous = working
+        if drops >= 2:
+            return "sustained"
+        return "discrete"
+    # No working cell: fall back to the ramp shape.
+    if event["span"] <= DEFAULT_MAX_DISCRETE_SPAN:
+        return "discrete"
+    return "sustained(ramp-only)"
+
+
+def infer_opponent_fires(rows, opponent_cell, events, transition_drop):
+    """Best-effort opponent attack frames.
+
+    The opponent's own timers are not logged, so we infer an implied volley at
+    the first frame of every live-cell event that cannot be explained by a
+    logged player fire. This is a lower bound and is reported as such.
+    """
+    return sorted(
+        {
+            event["start"]
+            for event in events
+            if event["damage"] < transition_drop
+        }
+    )
+
+
+def attribute(events, fires_by_slot, window):
+    """Attach the most recent preceding fire (any slot) to each event."""
+    flat = []
+    for slot, starts in fires_by_slot.items():
+        for start in starts:
+            flat.append((start["frame"], slot + 1))
+    flat.sort()
+    for event in events:
+        prior = [item for item in flat if item[0] <= event["start"]]
+        if not prior:
+            event["attributed_slot"] = None
+            event["attributed_fire"] = None
+            event["latency"] = None
+            continue
+        frame, slot = prior[-1]
+        latency = event["start"] - frame
+        if latency > window:
+            event["attributed_slot"] = None
+            event["attributed_fire"] = frame
+            event["latency"] = latency
+        else:
+            event["attributed_slot"] = slot
+            event["attributed_fire"] = frame
+            event["latency"] = latency
+    return events
+
+
+def confidence(sizes, latencies):
+    if not sizes:
+        return "none"
+    if len(sizes) >= 5 and len(latencies) >= 2 and statistics.pstdev(latencies) <= 15:
+        return "medium"
+    if len(sizes) >= 3 and len(latencies) >= 2 and statistics.pstdev(latencies) <= 30:
+        return "low"
+    return "low"
+
+
+def aggregate(events, fires_by_slot, window):
+    stats = {}
+    for slot in range(3):
+        slot_number = slot + 1
+        # Round-transition copies are not hits and must not enter the stats.
+        attributed = [
+            e
+            for e in events
+            if e.get("attributed_slot") == slot_number and e["shape"] != "transition"
+        ]
+        sizes = sorted(e["damage"] for e in attributed)
+        latencies = [e["latency"] for e in attributed if e["latency"] is not None]
+        fires = fires_by_slot[slot]
+        # A fire is a "miss" when no non-transition event lands in its window.
+        misses = 0
+        for start in fires:
+            if not any(
+                start["frame"] <= e["start"] <= start["frame"] + window
+                and e["shape"] != "transition"
+                for e in events
+            ):
+                misses += 1
+        stats[slot_number] = {
+            "name": SLOT_NAMES[slot_number],
+            "fires": len(fires),
+            "attributed": len(attributed),
+            "hit_sizes": sizes,
+            "total_damage": sum(sizes),
+            "min": min(sizes) if sizes else None,
+            "median": statistics.median(sizes) if sizes else None,
+            "max": max(sizes) if sizes else None,
+            "latency_mean": round(statistics.mean(latencies), 1) if latencies else None,
+            "latency_stdev": (
+                round(statistics.pstdev(latencies), 1) if len(latencies) >= 2 else None
+            ),
+            "fires_without_event": misses,
+            "confidence": confidence(sizes, latencies),
+        }
+    return stats
+
+
+def build_report(args):
+    rows = parse_rows(args.log)
+    if not rows:
+        raise SystemExit(f"no weapon rows found in {args.log}")
+    layout = args.layout
+    if layout == "auto":
+        layout = "legacy" if len(rows[0]["hp"]) == 4 else "new"
+    if layout not in LAYOUTS:
+        raise SystemExit(f"unknown layout: {layout}")
+    snapshot_cell, working_cell, live_cell, opponent_cell, _, _ = LAYOUTS[layout]
+    if args.live_index is not None:
+        live_cell = args.live_index
+    if args.working_index is not None:
+        working_cell = args.working_index
+    if args.opponent_index is not None:
+        opponent_cell = args.opponent_index
+    if live_cell is None:
+        raise SystemExit("layout does not define a live cell; pass --live-index")
+
+    fires, refires = detect_fires(rows)
+    durations = detect_durations(rows)
+    all_fire_frames = sorted(
+        item["frame"] for slot in fires for item in fires[slot]
+    )
+    covered = sum(
+        1
+        for row in rows
+        if any(row["frame"] - args.window <= frame <= row["frame"] for frame in all_fire_frames)
+    )
+    live_events = detect_events(rows, live_cell)
+    for event in live_events:
+        event["shape"] = classify(
+            event, rows, working_cell, snapshot_cell, args.transition_drop
+        )
+    attribute(live_events, fires, args.window)
+    opponent_events = []
+    if opponent_cell is not None:
+        opponent_events = detect_events(rows, opponent_cell)
+        for event in opponent_events:
+            event["shape"] = classify(
+                event, rows, None, snapshot_cell, args.transition_drop
+            )
+
+    report = {
+        "log": str(args.log),
+        "layout": layout,
+        "rows": len(rows),
+        "frame_range": [rows[0]["frame"], rows[-1]["frame"]],
+        "live_cell": live_cell,
+        "working_cell": working_cell,
+        "opponent_cell": opponent_cell,
+        "window": args.window,
+        "transition_drop": args.transition_drop,
+        "timer_starts": {
+            SLOT_NAMES[slot + 1]: [item["frame"] for item in fires[slot]]
+            for slot in range(3)
+        },
+        "timer_refires": {
+            SLOT_NAMES[slot + 1]: [item["frame"] for item in refires[slot]]
+            for slot in range(3)
+        },
+        "timer_durations": {
+            SLOT_NAMES[slot + 1]: durations[slot] for slot in range(3)
+        },
+        "live_events": live_events,
+        "opponent_events": opponent_events,
+        "opponent_implied_fires": infer_opponent_fires(
+            rows, opponent_cell, live_events, args.transition_drop
+        ),
+        "attribution_window_coverage": round(covered / len(rows), 3),
+        "per_slot": aggregate(live_events, fires, args.window),
+    }
+    return report
+
+
+def print_text(report):
+    print("== weapon damage attribution ==")
+    print(
+        f"log: {report['log']}\n"
+        f"rows: {report['rows']}  frames {report['frame_range'][0]}.."
+        f"{report['frame_range'][1]}  layout: {report['layout']}  "
+        f"live-cell: {report['live_cell']}  working-cell: {report['working_cell']}  "
+        f"opponent-cell: {report['opponent_cell']}"
+    )
+
+    print("\n-- timer starts (0 -> positive) --")
+    for name in ("right", "left", "both"):
+        starts = report["timer_starts"][name]
+        print(f"slot {name:5}: {len(starts):2d} fire(s) {starts}")
+    for name in ("right", "left", "both"):
+        durations = report["timer_durations"][name]
+        if durations:
+            print(f"slot {name:5}: cooldown runs (start,end,dur) {durations}")
+    for name in ("right", "left", "both"):
+        refires = report["timer_refires"][name]
+        if refires:
+            print(f"slot {name:5}: {len(refires)} mid-cooldown refire(s) {refires}")
+
+    print("\n-- live-cell drop events --")
+    print(
+        f"{'#':>3} {'frames':>13} {'span':>4} {'dmg':>5}  "
+        f"{'shape':<12} {'slot':>5} {'lat':>5}"
+    )
+    for index, event in enumerate(report["live_events"], 1):
+        slot = event["attributed_slot"]
+        print(
+            f"{index:>3} f{event['start']:>5}-{event['end']:<5} {event['span']:>4} "
+            f"{event['damage']:>5}  {event['shape']:<12} "
+            f"{('' if slot is None else slot):>5} "
+            f"{('' if event['latency'] is None else event['latency']):>5}"
+        )
+    shapes = {}
+    for event in report["live_events"]:
+        shapes[event["shape"]] = shapes.get(event["shape"], 0) + 1
+    print("shape totals:", dict(sorted(shapes.items())))
+
+    print(f"\n-- per-slot attribution (window={report['window']} frames) --")
+    print(
+        "attribution-window coverage: "
+        f"{report['attribution_window_coverage']:.1%} of logged frames lie in a "
+        "forward window after some fire (higher => attribution less informative)"
+    )
+    for slot, stat in report["per_slot"].items():
+        print(
+            f"slot {slot} ({stat['name']:5}): fires={stat['fires']:2d} "
+            f"attributed={stat['attributed']:2d} misses={stat['fires_without_event']:2d} "
+            f"sizes={stat['hit_sizes']} total={stat['total_damage']} "
+            f"lat_mean={stat['latency_mean']} lat_sd={stat['latency_stdev']} "
+            f"confidence={stat['confidence']}"
+        )
+
+    print(f"\n-- opponent-cell events ({len(report['opponent_events'])}) --")
+    n_transition = sum(
+        1 for e in report["opponent_events"] if e["shape"] == "transition"
+    )
+    print(
+        f"transition copies (>= {report['transition_drop']}): {n_transition}; "
+        f"candidate hits: {len(report['opponent_events']) - n_transition}"
+    )
+    print(
+        "implied opponent fires (lower bound):",
+        report["opponent_implied_fires"],
+    )
+
+    print("\n-- observed hit-size catalog (live cell, non-transition) --")
+    catalog = {}
+    for event in report["live_events"]:
+        if event["shape"] == "transition":
+            continue
+        catalog.setdefault(event["damage"], []).append(f"f{event['start']}")
+    for size in sorted(catalog):
+        frames = ", ".join(str(f) for f in catalog[size])
+        print(f"  {size:>5} x{len(catalog[size])}  {frames}")
+
+
+def write_markdown(report, path: Path):
+    lines = [
+        "# Weapon damage attribution (generated)",
+        "",
+        f"Log: `{report['log']}`",
+        f"Rows: {report['rows']} (frames {report['frame_range'][0]}.."
+        f"{report['frame_range'][1]}), layout `{report['layout']}`.",
+        "",
+        "## Per-slot estimates",
+        "",
+        "| slot | weapon | fires | attributed drops | hit sizes | total | latency | confidence |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for slot, stat in report["per_slot"].items():
+        lines.append(
+            f"| {slot} | {stat['name']} | {stat['fires']} | {stat['attributed']} | "
+            f"{stat['hit_sizes']} | {stat['total_damage']} | "
+            f"{stat['latency_mean']}±{stat['latency_stdev']} | {stat['confidence']} |"
+        )
+    lines += [
+        "",
+        "## Timer starts",
+        "",
+    ]
+    for name in ("right", "left", "both"):
+        lines.append(
+            f"- slot {name}: {report['timer_starts'][name]}"
+            + (
+                f" (refires: {report['timer_refires'][name]})"
+                if report["timer_refires"][name]
+                else ""
+            )
+        )
+    lines += [
+        "",
+        "## Live-cell events",
+        "",
+        "| # | frames | span | damage | shape | attributed slot | latency |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for index, event in enumerate(report["live_events"], 1):
+        lines.append(
+            f"| {index} | f{event['start']}-{event['end']} | {event['span']} | "
+            f"{event['damage']} | {event['shape']} | "
+            f"{event['attributed_slot'] or ''} | {event['latency'] if event['latency'] is not None else ''} |"
+        )
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("log", type=Path)
+    parser.add_argument(
+        "--layout", choices=("auto", "new", "legacy"), default="auto",
+        help="hp cell layout (default: auto-detect by cell count)",
+    )
+    parser.add_argument("--live-index", type=int, default=None)
+    parser.add_argument("--working-index", type=int, default=None)
+    parser.add_argument("--opponent-index", type=int, default=None)
+    parser.add_argument("--window", type=int, default=DEFAULT_WINDOW)
+    parser.add_argument("--transition-drop", type=int, default=DEFAULT_TRANSITION_DROP)
+    parser.add_argument("--json", type=Path, default=None)
+    parser.add_argument("--markdown", type=Path, default=None)
+    args = parser.parse_args(argv)
+
+    report = build_report(args)
+    print_text(report)
+    if args.json:
+        args.json.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        print(f"\nwrote JSON: {args.json}")
+    if args.markdown:
+        write_markdown(report, args.markdown)
+        print(f"wrote markdown: {args.markdown}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
