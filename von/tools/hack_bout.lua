@@ -29,6 +29,7 @@ local SNAP_EVERY = tonumber(os.getenv("VON_HACK_SNAP_EVERY") or "0")
 local SNAP_FRAME = tonumber(os.getenv("VON_HACK_SNAP_FRAME") or "0")
 local SNAP_DIR = os.getenv("VON_HACK_SNAP_DIR")
 local MATRIX_BASE = 0x5ff000
+local WP_ACTION = os.getenv("VON_WP_ACTION") or ""
 
 local out = assert(io.open(LOG, "w"))
 local function log(m) out:write(m .. "\n"); out:flush() end
@@ -143,7 +144,7 @@ emu.register_periodic(function()
 	if debug and not installed and frame > 1 then
 		installed = true
 		for _, w in ipairs(watchpoints) do
-			local ok, id = pcall(function() return debug:wpset(space, w.type, w.addr, w.len, "", "go") end)
+			local ok, id = pcall(function() return debug:wpset(space, w.type, w.addr, w.len, "", WP_ACTION) end)
 			log(string.format("wp %08x len %d type %s -> %s", w.addr, w.len, w.type, tostring(ok and id or "fail")))
 		end
 	end

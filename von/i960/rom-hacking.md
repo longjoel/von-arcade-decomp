@@ -67,3 +67,47 @@ candidate cells and observes the diff, then bake the winning cell/branch into a
 ROM patch with `patch_maincpu.py`. The `3.5` word patch above did **not**
 change attract movement, so it was the wrong cell.
 
+
+## Hacking build and tools
+
+Build the instrumented binary (keeps `bin/von` intact):
+
+```sh
+VON_MAME_PATCH_SET=hacking VON_MAME_BIN=$PWD/bin/von-hack scripts/build.sh
+```
+
+The `hacking` profile = `core` (incl. `0043` i960 GDB stub, `0011` debug Lua
+PC tracking, `0041` PC-address tracking, `0044` MCP state load) plus:
+
+- `0050` logs every watchpoint hit (`von_wp: type addr index pc`) to the
+  verbose log, so `device_debug:wpset` yields writer PCs without a GDB client.
+- `0051` mirrors the last `geo_matrix_write` 12 words into i960 work RAM at
+  `0x5ff000`, gated on `VON_MATRIX_SLOT`, so a snapshot can read the transform.
+
+Verified with `bin/von-hack`: the i960 GDB stub listens
+(`gdbstub: listening`), and a Lua write watchpoint on `0x500554` logs writer PCs
+(`von_wp: type=w addr=00500554 index=1 pc=0000272C`).
+
+`von/tools/hack_bout.lua` (+ `scripts/hack-bout.sh`) drives it headless with
+soft video: joins a bout, writes `VON_FORCE="addr=val;..."` every frame, sets
+`VON_WP="addr,len,type;..."` watchpoints (`VON_WP_ACTION=""` halts and logs;
+`go` resumes), mirrors the matrix (`VON_MIRROR`), draws `VON_OVERLAY` values,
+and writes PNG + JSON sidecars (registers, matrix slot, overlay values) to
+`VON_HACK_SNAP_DIR`.
+
+```sh
+VON_FORCE="0x503a80=3" VON_WP="0x503ad8,4,w" VON_MIRROR=15 \
+  VON_HACK_SNAP_EVERY=120 VON_HACK_SECONDS=40 scripts/hack-bout.sh
+```
+
+## Camera notes
+
+MAME's Model 2 geometry command set has no explicit view/projection command:
+`0x0b`/`0x1b` write a 12-word transformation matrix, `0x0c`/`0x1c` a translation
+vector, `0x0a`/`0x1a` a light vector (`src/mame/sega/model2_v.cpp`). So the
+camera is baked into the per-object matrices the i960 sends, not a separate
+register. The matrix slot captures the **last** matrix of each frame; a real
+camera transform likely needs the **first** matrix (or the matrix written just
+before the scene objects). Next probe: set a watchpoint on the i960 cell that
+feeds the geometry matrix and read its value, or capture the first matrix per
+frame (extend `0051` with a per-frame first-matrix slot).

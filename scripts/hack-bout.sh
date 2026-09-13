@@ -39,7 +39,7 @@ VON_HACK_SECONDS="$SECONDS_TO_RUN" \
     -cfg_directory "$OUT/cfg" -nvram_directory "$OUT/nvram" \
     -snapshot_directory "$OUT/snap" \
     -autoboot_script "$SCRIPT" \
-    -seconds_to_run "$SECONDS_TO_RUN" -nothrottle -oslog \
+    -seconds_to_run "$SECONDS_TO_RUN" -nothrottle -oslog -verbose \
     > "$OUT/mame.log" 2>&1
 
 printf 'hack capture: %s\n' "$OUT"
