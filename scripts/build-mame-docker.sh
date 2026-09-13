@@ -23,5 +23,6 @@ make REGENIE=1 TARGET=mame SUBTARGET=von \
     SOURCES=src/mame/sega/model2.cpp \
     USE_QTDEBUG=0 NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 \
     NO_USE_PIPEWIRE=1 NO_USE_PULSEAUDIO=1 \
+    NOWERROR=1 \
     -j"${JOBS:-$(nproc)}"
 '
