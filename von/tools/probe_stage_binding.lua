@@ -13,9 +13,10 @@
 -- the OBA families each stage serves.
 --
 -- Recovered 2026-09-12: ordinal -> banner = [7,0,2,3,4,9,5,6,1,8] over the ROM
--- banner order (AIRPORT..SECRET BASE at 0x21065). Live-confirmed for ordinals
--- 0,1,3,5,8 (ord0->FLOODED CITY, ord1->AIRPORT, ord3->GREEN HILLS,
--- ord5->SECRET BASE, ord8->DEATH TRAP) and by the ord3/ord4 banner warp.
+-- banner order (AIRPORT..SECRET BASE at 0x21065). Live-confirmed for all ten
+-- ordinals. The same runs census each ordinal's arena OBA set and show the
+-- recovered family-0x80 statics belong to ordinal 1 (AIRPORT), not ordinal 0;
+-- see von/i960/stage-arena-binding.md.
 --
 -- Env:
 --   VON_STAGE_LOG          required output path
