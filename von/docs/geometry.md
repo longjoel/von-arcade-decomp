@@ -97,18 +97,15 @@ Persistent arena statics (OBA, local box, submissions in window):
   `0080060e` duplicate. Purpose unknown.
 
 Movement overlay (positions are float bit patterns at 0x00503ad8 /
-0x005040d8): blocks show a solid-until-broken pattern that varies per
-bout, supporting destructible obstacles. In the audio-queue bout S1,
-B1/B2/B3 are approached (15/21/103 margin samples) but never entered
-before break frames ~4377/~3910/~6722, then entered freely after
-(29/22/81 samples); B4/C are never entered there. The complementary
-manual-02 bout shows the mirror image: B1-B3 never entered even with
-margin, while the CPU walks through B4 (f=3575-3616) and the `0080060e`
-arena copy (f=4333-4360) at ground level with no health change either
-side. Either way the blocked region is the full render box plus fighter
-radius -- not a simplified shape. Spawn pads are entered from match
-start as expected. The recovered box table with per-bout timelines is
-`von/i960/recovered_stage_obstacle_boxes.c`.
+0x005040d8): blocks are solid, permanent obstacles; nothing in any map is
+destructible (confirmed on hardware). The audio-queue bout S1 approaches
+B1/B2/B3 (15/21/103 margin samples) and never enters them; the
+complementary manual-02 bout shows the mirror image (B1-B3 never entered
+with margin, while the CPU passes near B4 and the `0080060e` arena copy at
+ground level). The blocked region is the full render box plus fighter
+radius -- not a simplified shape. Spawn pads are entered from match start as
+expected, and obstacle tops are landing surfaces (a fighter can jump onto a
+block). The recovered box table is `von/i960/recovered_stage_obstacle_boxes.c`.
 
 Tall transient family `00943088`-`00945ed1` (~24 OBAs, 276 verts /
 120 tris each, local y-span shrinking 157.8 -> ~131 across the
@@ -121,5 +118,4 @@ Identity and trigger are open -- world placements do not coincide
 with the walked-through blocks, so it is not their break animation.
 
 Open: collision-code site in i960 still unfound; family trigger needs
-input-to-trace time mapping across runs; B1/B2 blocks are unvisited
-(solid vs destroyed-unvisited undecided).
+input-to-trace time mapping across runs.

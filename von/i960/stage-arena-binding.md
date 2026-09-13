@@ -50,7 +50,8 @@ other ordinals keep provisional profiles until their boxes are recovered.
 ## Recovered collision boxes
 
 The collision boxes are the render AABBs of each arena's solid statics, measured
-at **match start** (`t=33..37s`) so destructible blocks are still present. For
+at **match start** (`t=33..37s`). Obstacles are solid and permanent (nothing is
+destructible), and their tops are landing surfaces. For
 AIRPORT this reproduces the movement-confirmed set (`recovered_stage_obstacle_boxes.c`);
 for the other measured stages the bounds are render-measured and the kind is
 assumed solid (no box contains a spawn point). GREEN HILLS, RUINS, SECRET BASE

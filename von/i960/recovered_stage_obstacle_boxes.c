@@ -7,17 +7,12 @@
  * the B5 z minimum, which the export stores as 44.0000038 and is rounded
  * here to 44.
  *
- * Kinds are movement-evidenced, not game truth. Pads (B5/B6) contain the
- * spawn points (0, 0, +/-60) and are entered from the spawn frame in every
- * observed bout. Obstacles B1-B4 and C show a solid-until-broken pattern:
- * in the audio-queue bout S1, fighters approach (15/21/103 margin samples)
- * but never enter before break frames ~3910 (B2), ~4377 (B1), ~6722 (B3),
- * then enter freely after (22/29/81 samples); B4/C are never entered
- * there. The complementary manual-02 bout shows the mirror image: B1-B3
- * never entered even with margin, while the CPU walks through B4
- * (f=3575-3616) and C (f=4333-4360) at ground level with no health
- * change. Both directions support destructible obstacles whose break
- * set varies per bout; the collision-code site itself is still open.
+ * Kinds are movement-evidenced. Pads (B5/B6) contain the spawn points
+ * (0, 0, +/-60) and are entered from the spawn frame in every observed bout.
+ * The other boxes are solid, permanent obstacles: nothing in any map is
+ * destructible (confirmed on hardware), so the earlier "solid-until-broken"
+ * reading was a movement artefact. Obstacle tops are landing surfaces - a
+ * fighter can jump onto an obstacle. The collision-code site is still open.
  */
 
 typedef unsigned int u32;
