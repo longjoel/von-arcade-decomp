@@ -1,0 +1,15 @@
+{
+  "_comment": "Hand-authored Apharmd B skeleton. The walk4 capture only contains the arms (plus a torso hub), and the pose is too rigid for the stability/bind inference to recover the tree, so the kinematic chain is specified from the model's symmetric part pairs. Torso 00a7f3d2 is the root; upper-arm -> forearm -> hand per side.",
+  "root": "00a7f3d2",
+  "parents": {
+    "00a7f9b5": "00a7f3d2",
+    "00a7f213": "00a7f3d2",
+    "00a7fdb6": "00a7f213",
+    "00a7ff90": "00a7fdb6",
+    "008964ba": "00a7ff90",
+    "00a7f9ee": "00a7f3d2",
+    "00a7fcab": "00a7f9ee",
+    "008ad656": "00a7fcab",
+    "00a7fbc8": "00a7fcab"
+  }
+}

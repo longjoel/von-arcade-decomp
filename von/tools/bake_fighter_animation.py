@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import statistics
 from collections import defaultdict
 from pathlib import Path
 
@@ -25,6 +26,7 @@ from bake_family_animation import (mat_inv3x4, mat_mul3x4, orthonormalize,
                                    quat_from_mat, row_major)
 
 IDENT = (1., 0., 0., 0., 1., 0., 0., 0., 1., 0., 0., 0.)
+PIVOT_LIMIT = 60.0
 
 
 def load_parts(args):
@@ -83,15 +85,16 @@ def longest_run(keys):
 
 
 def infer_tree(tables, obas):
-    """Single rooted skeleton: cheap candidate edges + guaranteed connectivity.
+    """Single rooted skeleton: original stable edges + guaranteed connectivity.
 
-    Each part proposes its most stable parents (near-constant parent-relative
-    translation), the best edges form a forest, then any stragglers are joined
-    to the nearest component. Replacing the old behavior, which could leave a
-    forest of parentless limbs pinned at the origin (anchoring the mech on an
-    arm). The root is the part nearest the average part position (the torso).
+    Keeps the historical candidate/rank selection (only pairs co-observed for
+    many frames), which recovered good trees, then joins any leftover
+    components and roots the result at the body core. The old version could
+    leave a forest of parentless limbs pinned at the origin, anchoring the mech
+    on whichever part escaped parenting (e.g. Viper II trailing its arm).
     """
     n = len(obas)
+    min_samples = 10
 
     def mean_world(o):
         vals = [tb[o][9:12] for tb in tables if o in tb]
@@ -122,30 +125,44 @@ def infer_tree(tables, obas):
             best = d
             root = i
 
+    # Edge weight = joint rigidity (RMS of the parent-relative translation) plus
+    # a bind-proximity term. Rigidity alone can prefer a far rigid part (a
+    # weapon welded to a hand) and mis-parent skinned limbs; penalising the
+    # bind distance keeps adjacent bones together, which recovers arm/leg
+    # chains even when a fighter's capture only contains some of its parts.
+    bind_weight = 1.0
+
+    def pair_weight(ci, pi):
+        vals = []
+        for tb in tables:
+            if obas[ci] in tb and obas[pi] in tb:
+                local = mat_mul3x4(mat_inv3x4(tb[obas[pi]]), tb[obas[ci]])
+                vals.append(local[9:12])
+        md = 0.0
+        if means[ci] is not None and means[pi] is not None:
+            md = math.sqrt(sum((means[ci][k] - means[pi][k]) ** 2 for k in range(3)))
+        if len(vals) >= 2:
+            mean = [sum(v[k] for v in vals) / len(vals) for k in range(3)]
+            rms = math.sqrt(sum(sum((v[k] - mean[k]) ** 2 for k in range(3))
+                                 for v in vals) / len(vals))
+            return rms + bind_weight * md, len(vals)
+        if means[ci] is not None and means[pi] is not None:
+            return md * (1.0 + bind_weight), 0
+        return 1e9, 0
+
+    # Main tree edges: original candidate/rank selection.
     cand = [[] for _ in range(n)]
     for ci in range(n):
         for pi in range(n):
             if ci == pi:
                 continue
-            vals = []
-            for tb in tables:
-                if obas[ci] in tb and obas[pi] in tb:
-                    local = mat_mul3x4(mat_inv3x4(tb[obas[pi]]), tb[obas[ci]])
-                    vals.append(local[9:12])
-            if len(vals) >= 2:
-                mean = [sum(v[k] for v in vals) / len(vals) for k in range(3)]
-                rms = math.sqrt(sum(sum((v[k] - mean[k]) ** 2 for k in range(3))
-                                     for v in vals) / len(vals))
-            elif means[ci] is not None and means[pi] is not None:
-                rms = math.sqrt(sum((means[ci][k] - means[pi][k]) ** 2 for k in range(3)))
-            else:
-                rms = 1e9
-            cand[ci].append((rms, pi))
+            rms, samples = pair_weight(ci, pi)
+            if samples >= min_samples:
+                cand[ci].append((rms, pi))
         cand[ci].sort()
-
     edges = []
     for ci in range(n):
-        for rank, (rms, pi) in enumerate(cand[ci][:5]):
+        for rank, (rms, pi) in enumerate(cand[ci][:4]):
             edges.append((rms + rank * 100.0, ci, pi))
     edges.sort()
 
@@ -158,25 +175,34 @@ def infer_tree(tables, obas):
         return x
 
     adj = [[] for _ in range(n)]
+    parent = [-1] * n
     for _, ci, pi in edges:
-        if find(ci) != find(pi):
-            uf[find(ci)] = find(pi)
-            adj[ci].append(pi)
-            adj[pi].append(ci)
+        if parent[ci] != -1:
+            continue
+        if find(ci) == find(pi):
+            continue
+        parent[ci] = pi
+        uf[find(ci)] = find(pi)
+        adj[ci].append(pi)
+        adj[pi].append(ci)
 
-    # Join any remaining components using the cheapest inter-component edge.
-    while True:
-        if len({find(i) for i in range(n)}) == 1:
-            break
+    # Connectivity: attach leftover components with the cheapest available edge.
+    allpairs = []
+    for ci in range(n):
+        for pi in range(ci + 1, n):
+            rms, samples = pair_weight(ci, pi)
+            allpairs.append((rms + (0.0 if samples >= min_samples else 1000.0),
+                             ci, pi))
+    allpairs.sort()
+    while len({find(i) for i in range(n)}) > 1:
         pick = None
-        for ci in range(n):
-            for rms, pi in cand[ci]:
-                if find(ci) != find(pi):
-                    if pick is None or rms < pick[0] - 1e-9:
-                        pick = (rms, ci, pi)
+        for _, ci, pi in allpairs:
+            if find(ci) != find(pi):
+                pick = (ci, pi)
+                break
         if pick is None:
             break
-        _, ci, pi = pick
+        ci, pi = pick
         uf[find(ci)] = find(pi)
         adj[ci].append(pi)
         adj[pi].append(ci)
@@ -208,6 +234,8 @@ def main() -> int:
     ap.add_argument("--t0", type=float, default=0.0)
     ap.add_argument("--t1", type=float, default=1e9)
     ap.add_argument("--min-parts", type=int, default=4)
+    ap.add_argument("--tree", type=Path,
+                    help="optional skeleton override JSON {root, parents:{child:parent}}")
     args = ap.parse_args()
 
     parts_list = load_parts(args)
@@ -225,16 +253,27 @@ def main() -> int:
         raise SystemExit(f"only {len(keys)} frames")
     print(f"frames: {len(keys)}  t={keys[0]/60:.2f}..{keys[-1]/60:.2f}")
 
-    parent, root = infer_tree([frames[k] for k in keys], keys_list)
+    if args.tree:
+        override = json.loads(args.tree.read_text())
+        index_of = {f"{obas_out[i]:08x}": i for i in range(n)}
+        root = index_of.get(str(override["root"]).lower().replace("0x", ""), 0)
+        parent = [-1] * n
+        for child, par in override.get("parents", {}).items():
+            ci = index_of.get(str(child).lower().replace("0x", ""))
+            pi = index_of.get(str(par).lower().replace("0x", ""))
+            if ci is not None and pi is not None:
+                parent[ci] = pi
+    else:
+        parent, root = infer_tree([frames[k] for k in keys], keys_list)
     print(f"root: {keys_list[root]:08x}")
     for i in range(n):
         print(f"  {keys_list[i]:08x} <- {keys_list[parent[i]]:08x}" if parent[i] >= 0
               else f"  {keys_list[i]:08x} (root)")
 
     last = [IDENT] * n
-    tsum = [[0.0, 0.0, 0.0] for _ in range(n)]
     measured = [0] * n
     quats = [[] for _ in range(n)]
+    samples = [[] for _ in range(n)]
     for k in keys:
         tb = frames[k]
         for i, oba in enumerate(keys_list):
@@ -248,11 +287,20 @@ def main() -> int:
                 local = last[i]
             if oba in tb:
                 measured[i] += 1
-                for c in range(3):
-                    tsum[i][c] += local[9 + c]
+                samples[i].append(local[9:12])
             quats[i].append(quat_from_mat(orthonormalize(local[:9])))
-    pivots = [[tsum[i][c] / measured[i] if measured[i] else 0.0 for c in range(3)]
-              for i in range(n)]
+    # Median pivot (robust to a shared part momentarily matching the other
+    # fighter) with an absolute clamp so a corrupt joint cannot fling a limb.
+    pivots = []
+    for i in range(n):
+        if not samples[i]:
+            pivots.append([0.0, 0.0, 0.0])
+            continue
+        cols = list(zip(*samples[i]))
+        piv = [statistics.median(c) for c in cols]
+        if math.sqrt(sum(v * v for v in piv)) > PIVOT_LIMIT:
+            piv = [0.0, 0.0, 0.0]
+        pivots.append(piv)
     print("parts present:", sum(1 for m in measured if m > 0), "/", n)
 
     out = {
