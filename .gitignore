@@ -13,6 +13,7 @@
 /config/remote-build.local.env
 /bin/von
 /bin/von-geometry
+/bin/von-hack
 /cfg/
 /nvram/
 /snap/
