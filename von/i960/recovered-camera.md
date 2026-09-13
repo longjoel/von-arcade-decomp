@@ -1,27 +1,46 @@
 # Recovered camera
 
-> `recovered:<ram-telemetry>`; the camera state was read from live i960 work
-> RAM, not integrated. Open questions are listed at the end.
+> `recovered:<ram-telemetry>`; the camera state and projection were read from
+> live i960 work RAM and the emulated geometry path, not integrated. Open
+> questions are listed at the end.
 
 ## Method
 
 MAME's Model 2 geometry command set has no explicit view/projection command, so
 the camera is baked into the per-object matrices. The camera state is also
-mirrored in i960 work RAM, which is the authoritative source used here.
+mirrored in i960 work RAM, which is the authoritative source for the extrinsics.
 
 ```sh
-# Join the first bout, force AIRPORT (ordinal 1), and drive a turn/move pattern
-# while logging the player object, heading, and camera cells every frame.
-VON_CAMERA_HOLD=":IN1,0x20,2100,4200" \
-VON_CAMERA_STATE="0x503ad8,0x10e0,5" \
+# Join the first bout, force AIRPORT (ordinal 1), drive a scripted input
+# battery, and log the player, opponent, heading, and camera cells.
+VON_CAMERA_SEQ="IN1,0x20,3600,4200;IN2,0x80,4200,4800;..." \
+VON_CAMERA_STATE="0x503ad8,0x1128,2" VON_CAMERA_SECONDS=150 \
   scripts/trace-camera.sh
 ```
 
 `von/tools/probe_camera.lua` drives the twin sticks (`:IN1` left stick,
-`:IN2` right stick) and dumps a float window; `scripts/trace-camera.sh` pairs it
-with the `-oslog` geometry trace. The camera also appears in the trace as the
-matrix reused across the family-`0x80` world statics each frame, but that modal
-extraction is noisy; prefer the RAM cells.
+`:IN2` right stick): `VON_CAMERA_SEQ` runs a list of `port,mask,from,to`
+holds, `VON_CAMERA_HOLD` holds one, and the default is a turn/move pattern.
+`scripts/trace-camera.sh` pairs it with the `-oslog` geometry trace.
+
+## Projection (FOV)
+
+Model 2 command `0x09` sets the focal distance; `apply_focus` multiplies the
+view-space x/y by it before the `1/z` divide (`src/mame/sega/model2_v.cpp`).
+Patch `0052-von-focal-logging.patch` logs it:
+
+```sh
+VON_HACK_OUT=/tmp/focal VON_HACK_SECONDS=45 scripts/hack-bout.sh
+grep vonj_focus /tmp/focal/mame.log   # vonj_focus: ... x=600.000000 y=600.000000
+```
+
+The focal is a constant **600.0 / 600.0**. On the Model 2 viewport
+`(8,90)-(504,474)` = 496x384 the field of view is:
+
+| axis | half-extent | focal | full FOV |
+| --- | --- | --- | --- |
+| horizontal | 248 | 600 | **44.9 deg** |
+| vertical | 192 | 600 | **35.5 deg** |
 
 ## Recovered state cells
 
@@ -37,32 +56,35 @@ extraction is noisy; prefer the RAM cells.
 
 ## Recovered model
 
-- The eye sits at a fixed **world-axis-aligned** offset from the player:
-  `eye = (player.x, 29.445, player.z - 77.2)`.
-- The look target is the player's x/z at height **18.0**:
-  `target = (player.x, 18.0, player.z)`.
-- The resulting pitch is `atan2(29.445 - 18.0, 77.2) = -8.44 deg`.
-- The horizontal eye-to-target distance is a constant **77.2** (nominal cell
-  `0x504bc8` = 78.0).
+- **Target**: the player's x/z at height 18.0 — `0x504bb4` tracks `0x503ad8`.
+- **Distance**: constant **77.2** horizontal eye-to-target in normal play.
+- **Heights**: eye 29.445, target 18.0, pitch `atan2(29.445-18.0, 77.2) =
+  -8.44 deg`.
+- **Yaw**: the eye is placed behind the player along the horizontal
+  player->opponent axis, so the camera faces the enemy. Over 1046 in-play
+  samples the camera-forward angle tracks the player->opponent bearing with
+  mean error **13.5 deg** and 49% within 10 deg, versus mean error 46.5 deg
+  against the player heading. The residual is consistent with a smoothed
+  first-order follow.
 
-The decisive observation: across driven runs the eye stayed at offset
-`(0, -77.2)` while the player's heading swung over roughly `-220..162 deg`
-(and while it strafed across the arena). **The heading does not rotate the
-camera.** This is a world-oriented follow camera, not a heading-locked chase.
+An earlier run looked like a *world-axis-aligned* follow (offset `(0, -77.2)`);
+that run simply had the opponent along +Z, so the enemy axis coincided with
+world -Z. Corrected here.
 
 ## Open questions
 
-- The eye offset was world-fixed in every clean segment, but late in one run it
-  departed `(0, -77.2)` while the player sat against the `-x/-z` arena corner.
-  Whether that is wall avoidance, a target switch to the opponent, or a reset
-  is unresolved; re-probe with a longer in-bounds walk.
-- The projection (focal length / FOV) is not recovered; only the extrinsic
-  transform above.
-- The companion value at `0x504bc8` (78.0) and the `y=1` triple at
-  `0x503b78`/`0x504178` are unclassified.
+- Distance and height were constant in normal play, but the probe's
+  jump/dash/shot segments did not move the mech (the match had not started),
+  so any motion-dependent distance/height change is **not yet measured**.
+  Re-probe with the schedule inside the live match and a stationary opponent.
+- The yaw smoothing time constant is not fitted; only the tracking statistic.
+- Whether the target follows player y during a jump is unmeasured (target y
+  was a constant 18).
+- Late frames with `|eye-target|` far from 77.2 (player parked in a corner) are
+  unclassified: possible wall avoidance, death cam, or a stale cell.
 
 ## Application
 
-`von-godot/scripts/match_view.gd` uses this model directly
-(`CAMERA_DISTANCE = 77.2`, `CAMERA_HEIGHT = 29.445`,
-`CAMERA_LOOK_HEIGHT = 18.0`), replacing the earlier heading-locked heuristic.
+`von-godot/scripts/match_view.gd` uses this model: `CAMERA_DISTANCE = 77.2`,
+`CAMERA_HEIGHT = 29.445`, `CAMERA_LOOK_HEIGHT = 18.0`,
+`CAMERA_FOV = 35.48`, and a smoothed player->opponent yaw.

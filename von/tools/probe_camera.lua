@@ -19,6 +19,19 @@ local SECONDS = tonumber(os.getenv("VON_CAMERA_SECONDS") or "70")
 local FROM = tonumber(os.getenv("VON_CAMERA_FROM") or "1800")
 local STEP = tonumber(os.getenv("VON_CAMERA_STEP") or "90")
 local HOLD = os.getenv("VON_CAMERA_HOLD")
+local SEQUENCE = {}
+do
+	local raw = os.getenv("VON_CAMERA_SEQ") or ""
+	for tok in string.gmatch(raw, "([^;]+)") do
+		local port, mask, from, to = string.match(tok, "([^,]+),([^,]+),([^,]+),([^,]+)")
+		if port then
+			SEQUENCE[#SEQUENCE + 1] = {
+				port = ":" .. port:gsub("^:", ""), mask = tonumber(mask),
+				from = tonumber(from), to = tonumber(to),
+			}
+		end
+	end
+end
 local hold
 local STATE = os.getenv("VON_CAMERA_STATE")
 local state_base, state_len, state_every
@@ -103,11 +116,14 @@ emu.register_periodic(function()
 	if hold then
 		setmask(hold.port, hold.mask, frame >= hold.from and frame < hold.to)
 	end
+	for _, s in ipairs(SEQUENCE) do
+		setmask(s.port, s.mask, frame >= s.from and frame < s.to)
+	end
 	local next_phase = -1
-	if not hold and frame >= FROM then
+	if not hold and #SEQUENCE == 0 and frame >= FROM then
 		next_phase = math.floor((frame - FROM) / STEP) % #PHASES
 	end
-	if not hold and next_phase ~= phase then
+	if not hold and #SEQUENCE == 0 and next_phase ~= phase then
 		phase = next_phase
 		for _, p in ipairs(PHASES) do
 			setmask(p.port, p.mask, false)

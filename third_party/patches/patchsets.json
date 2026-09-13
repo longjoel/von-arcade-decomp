@@ -50,13 +50,15 @@
   "0048-von-geo-command-trace.patch",
   "0049-von-emitter-transform-tracing.patch",
   "0050-von-watchpoint-pc-log.patch",
-  "0051-von-geo-matrix-slot.patch"
+  "0051-von-geo-matrix-slot.patch",
+  "0052-von-focal-logging.patch"
  ],
  "profiles": {
   "hacking": [
    "core",
    "0050-von-watchpoint-pc-log.patch",
-   "0051-von-geo-matrix-slot.patch"
+   "0051-von-geo-matrix-slot.patch",
+   "0052-von-focal-logging.patch"
   ],
   "core": [
    "0001-von-mame-support.patch",
