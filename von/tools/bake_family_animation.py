@@ -112,6 +112,21 @@ def quat_from_mat(r):
     return [x, y, z, w]
 
 
+def row_major(m_values: list[float], t_values) -> tuple[float, ...]:
+    """Re-pack a trace matrix (column-major 3x3 + translation) as row-major.
+
+    The trace stores ``x' = m0*x + m3*y + m6*z + t0`` etc., so the 3x3 is
+    column-major. The helper math (mat_mul3x4/orthonormalize/quat_from_mat)
+    assumes a standard row-major matrix, so transpose the 3x3 here. Without
+    this the extracted quaternion is the inverse rotation while translations
+    still reconstruct, which renders a correctly-jointed but tangled model.
+    """
+    m = [float(x) for x in m_values]
+    t = [float(x) for x in t_values]
+    return (m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8],
+            t[0], t[1], t[2])
+
+
 def load_frames(trace: Path, obas: list[int], start: int):
     """Collect frames where every canonical OBA is present (any submission order)."""
     cur = (1., 0., 0., 0., 1., 0., 0., 0., 1., 0., 0., 0.)
@@ -122,8 +137,7 @@ def load_frames(trace: Path, obas: list[int], start: int):
                 continue
             m = MATRIX.search(line)
             if m:
-                cur = (tuple(float(x) for x in m[2].split(","))
-                       + tuple(float(x) for x in m[3].split(",")))
+                cur = row_major(m[2].split(","), m[3].split(","))
                 continue
             m = OBJECT.search(line)
             if m and int(m[6]) == 3 and m[7] == "polygon-rom":

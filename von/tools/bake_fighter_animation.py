@@ -21,7 +21,8 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from export_geometry_frame_gltf import MATRIX, OBJECT
-from bake_family_animation import mat_inv3x4, mat_mul3x4, orthonormalize, quat_from_mat
+from bake_family_animation import (mat_inv3x4, mat_mul3x4, orthonormalize,
+                                   quat_from_mat, row_major)
 
 IDENT = (1., 0., 0., 0., 1., 0., 0., 0., 1., 0., 0., 0.)
 
@@ -48,8 +49,7 @@ def load_frame_tables(trace: Path, match: str):
                 continue
             m = MATRIX.search(line)
             if m:
-                cur = (tuple(float(x) for x in m[2].split(","))
-                       + tuple(float(x) for x in m[3].split(",")))
+                cur = row_major(m[2].split(","), m[3].split(","))
                 continue
             m = OBJECT.search(line)
             if m and int(m[6]) == 3 and m[7] == "polygon-rom":
