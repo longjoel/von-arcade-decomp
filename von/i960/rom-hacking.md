@@ -46,7 +46,24 @@ boots.
 ## Open
 
 Forcing a match (skip attract, 1P vs Temjin) and locating the movement
-integration need the actual input read / state-machine entry. The reliable way
-to find them is a GDB-stub watchpoint (see `tools/mame-mcp/`) on the state cells
-(`0x500540` select state, `0x500550` mode) during a joined bout, then patching
-the branch. The patcher above is the delivery mechanism once the site is known.
+integration need the actual input read / state-machine entry.
+
+Two blockers found while hunting them:
+
+1. **The GDB stub is unusable in `bin/von`.** Launching with
+   `-debug -debugger gdbstub` fails with
+   `cpuname i80960kb not found in gdb stub descriptions`, so the MCP server
+   (`tools/mame-mcp/`) cannot connect. `mcp-left-shot-probe.md` used a
+   different "core profile" binary that is no longer in the tree; a MAME with
+   i960 stub descriptions would have to be rebuilt.
+2. **Physics constants are shared** with geometry/animation math (e.g. `1.755`
+   and `0.030` appear in SHARC-FIFO feeds at `0x2b2xx`), so grep-locating the
+   movement code by constant is unreliable.
+
+Runtime forcing is available instead: **Lua `space:write_u32` persists in work
+RAM** (verified writing `0x503a88` and reading it back), unlike write *taps*.
+So the practical route to the match/movement sites is a Lua driver that forces
+candidate cells and observes the diff, then bake the winning cell/branch into a
+ROM patch with `patch_maincpu.py`. The `3.5` word patch above did **not**
+change attract movement, so it was the wrong cell.
+
