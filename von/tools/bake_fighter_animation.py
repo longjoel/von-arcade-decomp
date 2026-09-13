@@ -246,9 +246,9 @@ def main() -> int:
     frames = load_frame_tables(args.trace, args.match)
     want = set(keys_list)
     keys = sorted(k for k, tb in frames.items()
-                  if len(want & set(tb)) >= args.min_parts)
+                  if len(want & set(tb)) >= args.min_parts and args.t0 <= k / 60.0 <= args.t1)
     run, s, e = longest_run(keys)
-    keys = [k for k in keys[s:e] if args.t0 <= k / 60.0 <= args.t1]
+    keys = keys[s:e]
     if len(keys) < 2:
         raise SystemExit(f"only {len(keys)} frames")
     print(f"frames: {len(keys)}  t={keys[0]/60:.2f}..{keys[-1]/60:.2f}")

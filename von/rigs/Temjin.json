@@ -1,0 +1,24 @@
+{
+ "_comment": "Authoritative Temjin skeleton recovered in von-runner/docs/temjin-rig-analysis.md (temjin-rig-analysis slot/parent map); root is the pelvis 009e332f.",
+ "root": "009e332f",
+ "parents": {
+  "009e410d": "009e3f80",
+  "009e3f80": "009e3aa7",
+  "009e43a8": "009e2a84",
+  "009e3c34": "009e3aa7",
+  "009e3aa7": "009e3ecf",
+  "009e3ecf": "009e2a84",
+  "009e2a84": "009e2cb1",
+  "009e35b7": "009e3588",
+  "009e2ea2": "009e2cb1",
+  "009e30ab": "008ad656",
+  "009e343a": "009e3588",
+  "009e3588": "008964ba",
+  "008964ba": "009e43a8",
+  "009e2f5d": "009e3300",
+  "009e3300": "009e332f",
+  "008ad656": "009e2f5d",
+  "009e2cb1": "009e36c2",
+  "009e36c2": "009e332f"
+ }
+}
