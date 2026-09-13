@@ -96,7 +96,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--rom-dir", type=Path, default=_ROM_DIR)
     ap.add_argument("--out-dir", type=Path,
-                    default=_HERE.parents[1] / "build" / "motion-tables")
+                    default=_HERE.parent / "build" / "motion-tables")
     ap.add_argument("--summary-only", action="store_true")
     args = ap.parse_args()
 
