@@ -38,7 +38,14 @@ end
 
 local function word(v) space:write_u32(0x00884000, v & 0xffffffff) end
 
+-- Replicate recovered_geometry_batch_packet_8d400: control, record window,
+-- then the 13-word FIFO packet.
 local function inject()
+    space:write_u32(0x00800010, 0x101)
+    space:write_u32(0x00804000, env("VON_REC_W0", 0))
+    space:write_u32(0x00804004, env("VON_REC_W4", 0))
+    space:write_u32(0x00804008, s16(env("VON_REC_H6", 0)) & 0xffffffff)
+    space:write_u32(0x0080400c, 0)
     word(5)
     word(47); word(s16(c[3])); word(s16(c[4])); word(s16(c[5]))
     word(22); word(s16(c[2]))
