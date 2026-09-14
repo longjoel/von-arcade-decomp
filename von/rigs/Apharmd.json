@@ -1,15 +1,22 @@
 {
-  "_comment": "Hand-authored Apharmd B skeleton. The walk4 capture only contains the arms (plus a torso hub), and the pose is too rigid for the stability/bind inference to recover the tree, so the kinematic chain is specified from the model's symmetric part pairs. Torso 00a7f3d2 is the root; upper-arm -> forearm -> hand per side.",
-  "root": "00a7f3d2",
+  "_comment": "Apharmd B skeleton inferred from the walk4 capture. The capture contains the full 17-part model (OBAs span both 0x00a7 and 0x00a8, so the OBA prefix is not a fighter id). The inference recovers a single rooted tree: torso 00a7f213 is the root, with the a80xxx leg chains and the a7fxxx arm chains hanging off it. Superseded the earlier 8-part hands-only override.",
+  "root": "00a7f213",
   "parents": {
-    "00a7f9b5": "00a7f3d2",
-    "00a7f213": "00a7f3d2",
+    "008964ba": "008ad656",
+    "008ad656": "00a8009b",
+    "00a7f3d2": "00a7fdb6",
+    "00a7f9b5": "00a7ff90",
+    "00a7f9ee": "00a7f3d2",
+    "00a7fbc8": "00a7f9ee",
+    "00a7fcab": "00a7f9ee",
     "00a7fdb6": "00a7f213",
     "00a7ff90": "00a7fdb6",
-    "008964ba": "00a7ff90",
-    "00a7f9ee": "00a7f3d2",
-    "00a7fcab": "00a7f9ee",
-    "008ad656": "00a7fcab",
-    "00a7fbc8": "00a7fcab"
+    "00a8009b": "00a7f9b5",
+    "00a803e0": "00a80736",
+    "00a80559": "00a803e0",
+    "00a80736": "00a7f213",
+    "00a80819": "00a80b83",
+    "00a809a6": "00a80819",
+    "00a80b83": "00a7f213"
   }
 }
