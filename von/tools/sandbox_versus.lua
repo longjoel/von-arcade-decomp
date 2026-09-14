@@ -63,6 +63,11 @@ end
 
 local F = {}
 local pressed_until = {}
+-- Logical P1 actions asserted this frame, for the telemetry action mask.
+-- Bit order: up,down,left,right,dash,shot,right_shot.
+local p1_actions = {}
+local ACTION_BIT = { up = 1, down = 2, left = 4, right = 8,
+                     dash = 16, shot = 32, right_shot = 64 }
 
 local function set_pressed(name, pressed)
     local f = F[name]
@@ -99,6 +104,8 @@ local function hold_only(names)
         if not keep then release(name) end
     end
     for _, want in ipairs(names) do press(want, 1000000) end
+    p1_actions = {}
+    for _, want in ipairs(names) do p1_actions[want] = true end
 end
 
 -- Timer veto tap: ONE tap over the aligned [TIMER_BASE, TIMER_BASE+3]
@@ -247,7 +254,7 @@ local TELEMETRY = os.getenv("VON_SANDBOX_TELEMETRY")
 local telemetry_file = nil
 if TELEMETRY then
     telemetry_file = assert(io.open(TELEMETRY, "w"))
-    telemetry_file:write("frame,p1x,p1y,p1z,p1yaw,p2x,p2y,p2z,p1hp,p2hp,t0,t1,t2,state,round\n")
+    telemetry_file:write("frame,p1mask,p1x,p1y,p1z,p1yaw,p2x,p2y,p2z,p1hp,p2hp,t0,t1,t2,state,round\n")
     telemetry_file:flush()
 end
 
@@ -259,9 +266,13 @@ end
 
 local function telemetry()
     if not telemetry_file or not space then return end
+    local action_mask = 0
+    for name, _ in pairs(p1_actions) do
+        action_mask = action_mask | (ACTION_BIT[name] or 0)
+    end
     telemetry_file:write(string.format(
-        "%d,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%d,%d,%d,%d,%d,%d,%d\n",
-        frame,
+        "%d,%d,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%d,%d,%d,%d,%d,%d,%d\n",
+        frame, action_mask,
         read_f32(0x503ad8), read_f32(0x503adc), read_f32(0x503ae0),
         read_f32(0x503c28),
         read_f32(0x5040d8), read_f32(0x5040dc), read_f32(0x5040e0),
@@ -382,11 +393,17 @@ emu.register_periodic(function()
         end
         if shot_phase and (F.shot or F.right_shot) and SHOT_INTERVAL > 0 then
             if ((frame - 9600) % SHOT_INTERVAL) == 0 then
-                set_pressed("shot", WEAPON_CASE == "left" or WEAPON_CASE == "both")
-                set_pressed("right_shot", WEAPON_CASE == "right" or WEAPON_CASE == "both")
+                local left_on = WEAPON_CASE == "left" or WEAPON_CASE == "both"
+                local right_on = WEAPON_CASE == "right" or WEAPON_CASE == "both"
+                set_pressed("shot", left_on)
+                set_pressed("right_shot", right_on)
+                p1_actions.shot = left_on or nil
+                p1_actions.right_shot = right_on or nil
             else
                 set_pressed("shot", false)
                 set_pressed("right_shot", false)
+                p1_actions.shot = nil
+                p1_actions.right_shot = nil
             end
             weapon_log("shot")
         end
