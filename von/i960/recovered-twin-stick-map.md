@@ -61,8 +61,15 @@ kernel owns the strafe/dash/deflection shaping.
 
 ## Open items
 
-- **Wall-contact fault.** A sustained hold that pins P1 against the ±320 arena
-  wall trips a MAME i960 fault (`Unhandled ff`/`00`); keep probe holds short.
+- **Wall-contact fault (`KNOWN`, MAME i960 emulation gap).** A sustained hold
+  that pins P1 against the ±320 arena wall makes the i960 fetch an invalid
+  instruction at a data address (`fatalerror("I960: %x: Unhandled %02x")`,
+  `i960.cpp:2201`; seen as `1100001c: Unhandled ff` and `59a50901: Unhandled
+  00`). gdb on `bin/von` catches it in `i960_cpu_device::execute_op` ->
+  `emu_fatalerror` via `execute_run`/`timeslice` — i.e. the emulated CPU's PC
+  derails into ROM/data during the wall-pinned state. It is **not** in our
+  reimplemented kernel and does not affect normal captures. Mitigation: keep
+  scripted holds short / avoid sustained wall pinning (probes use <150 frames).
 - `dyaw` on strafe mixes the player's passive auto-face (the mech keeps facing
   the opponent) with stick twist; the turn rate stays the recovered
   `RV_TURN_RATE = 0.01321 rad/f` until separated cleanly.
