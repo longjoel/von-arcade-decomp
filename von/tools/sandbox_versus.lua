@@ -292,21 +292,21 @@ local PARITY_BASE = 9600
 -- Translational phases are kept short (< ~90 frames) so the mech does not
 -- grind into the +/-320 arena wall for a sustained period, which trips an
 -- i960 emulation fault in MAME.
+-- NOTE (open blocker): this program currently trips a MAME i960 emulation gap
+-- ~562 frames after battle start (`Unhandled ff` at PC 0x1100001c, reproducibly
+-- at frame 10062 for every parity variant, including one limited to the default
+-- program's own input set). Disabling the round-timer freeze avoids the fault
+-- but then P1 stops translating entirely. Until the gap is root-caused (MAME
+-- MCP probe at the fault PC), fixtures come from the default program; treat
+-- VON_SANDBOX_PROGRAM=parity as experimental.
 local PARITY = {
     { label = "idle",        dur = 120, hold = {} },
-    { label = "walk-fwd",    dur = 84,  hold = { "up", "up2" } },
-    { label = "walk-back",   dur = 84,  hold = { "down", "down2" } },
-    { label = "strafe-left", dur = 84,  hold = { "left", "left2" } },
-    { label = "strafe-right",dur = 84,  hold = { "right", "right2" } },
     { label = "twist-right", dur = 120, hold = { "up" } },
-    { label = "twist-left",  dur = 120, hold = { "down" } },
-    { label = "guard",       dur = 120, hold = { "right", "left2" } },
-    { label = "jump",        dur = 180, hold = {},
-      pulse = { set = { "left", "right2" }, period = 60, width = 8 } },
-    { label = "dash-fwd",    dur = 120, hold = { "up", "up2", "dash" } },
-    { label = "fire-left",   dur = 300, hold = {},
+    { label = "walk-fwd",    dur = 120, hold = { "up", "up2" } },
+    { label = "dash-fwd",    dur = 180, hold = { "up", "up2", "dash" } },
+    { label = "fire-left",   dur = 240, hold = {},
       pulse = { set = { "shot" }, period = 20, width = 2 } },
-    { label = "fire-right",  dur = 300, hold = {},
+    { label = "fire-right",  dur = 240, hold = {},
       pulse = { set = { "right_shot" }, period = 20, width = 2 } },
 }
 local parity_starts = {}
