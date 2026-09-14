@@ -83,6 +83,44 @@ def translation_tail(translation: list[float], matrix: list[float]) -> list[floa
     return tail
 
 
+def fixed_to_float(word: int) -> float:
+    """Service 0x2f translation word -> float.
+
+    The handler builds a float from the 16-bit word with the masks at DM
+    0x30141 (0x807FFFFF / 0x7C000000 / 0x07800000 / 0x3F800000 / 0x7F800000):
+    a 5-bit exponent (bias 15, from word bits 10-14) and a 10-bit mantissa
+    (word bits 0-9). value = 2**(e-15) * (1 + m/1024).
+    """
+    w = word & 0xFFFF
+    sign = (w >> 15) & 1
+    exponent = 112 + ((w >> 10) & 0x1F)
+    mantissa = (w & 0x3FF) << 13
+    bits = (sign << 31) | ((exponent & 0xFF) << 23) | mantissa
+    return f32(struct.unpack("<f", struct.pack("<I", bits & 0xFFFFFFFF))[0])
+
+
+def compose_motion_record(record: list[int], prior: list[float] | None = None
+                          ) -> tuple[list[float], list[float]]:
+    """Run one motion-record packet body.
+
+    Packet: 5,47,tx,ty,tz,22,zAngle,21,yAngle,20,xAngle,58. The translation
+    words are fixed-point (service 0x2f); the three angles are signed-16 with
+    unit pi/32768. `prior` is the pushed cumulative 3x3.
+    """
+    tx, ty, tz, z_angle, y_angle, x_angle = record
+    base = list(prior) if prior is not None else [1.0, 0.0, 0.0,
+                                                  0.0, 1.0, 0.0,
+                                                  0.0, 0.0, 1.0]
+    v = [f32(fixed_to_float(tx)), f32(fixed_to_float(ty)), f32(fixed_to_float(tz))]
+    tail = translation_tail(v, base)
+    z_sin, z_cos = _sincos(z_angle)
+    y_sin, y_cos = _sincos(y_angle)
+    x_sin, x_cos = _sincos(x_angle)
+    matrix = rotate_x(rotate_y(rotate_z(base, z_sin, z_cos), y_sin, y_cos),
+                      x_sin, x_cos)
+    return matrix, tail
+
+
 def compose_record(record: list[int], prior: list[float] | None = None
                    ) -> tuple[list[float], list[float]]:
     """Run one 6-word record through the recovered packet program.
@@ -120,7 +158,18 @@ def main() -> int:
     # A quarter turn rotates a unit axis (magnitude preserved).
     matrix, _ = compose_record([0x4000, 0, 0, 0, 0, 0])
     assert abs(math.hypot(matrix[2], matrix[8]) - 1.0) < 1e-3, matrix
-    print("PASS: self-contained SHARC transform emulation (opcodes 0x14/0x15/0x16/0x2f)")
+
+    # Service-0x2f fixed-point translation word -> float.
+    assert abs(fixed_to_float(0x51E1) - 47.0312) < 0.01, fixed_to_float(0x51E1)
+    # The encoding has no zero: the minimum word maps to 2**-15.
+    assert abs(fixed_to_float(0x0000) - 2.0 ** -15) < 1e-9
+
+    # Motion packet body: translation (47) then Z/Y/X rotation (22/21/20).
+    m, t = compose_motion_record([0x51E1, 0, 0, 0, 0, 0])
+    assert abs(t[0] - 47.0312) < 0.01 and abs(t[1] - 2.0 ** -15) < 1e-9, t
+    identity = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+    assert m == identity, m
+    print("PASS: self-contained SHARC transform emulation (opcodes 0x14/0x15/0x16/0x2f) + motion record")
     return 0
 
 
