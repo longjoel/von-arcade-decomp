@@ -43,13 +43,26 @@ The translation is the **sum** of the two sticks and the twist is their
 **difference**; sticks together = guard, apart = jump. This is exactly the
 `VonInputReader.from_sticks` derivation in `von-godot`.
 
+## Calibration (applied to `von_recovered_kernel.c`)
+
+Per-frame steady speeds (150-frame holds): forward ≈ **3.03**, strafe ≈ **1.77**
+(≈ 0.58 × forward), single stick ≈ ½ of its axis, and a **half-deflection dash
+still reaches the full dash distance** (~318 ≈ recovered 4.2 u/f × 69f).
+
+- `RV_STRAFE_FACTOR = 0.58` scales the lateral component, so strafe is slower
+  than forward (`test_strafe_factor`).
+- Dash direction is normalized at latch time, so a partial-deflection dash is a
+  full burst (`test_dash_full_deflection`).
+- Deflection now scales walk **linearly** (the old `* mag` squared it); the
+  recovered "analog partial ≈ 2.9 vs cap 3.5" supports a near-linear response.
+
+`VonInputReader.from_sticks` already produces the sum/difference input; the
+kernel owns the strafe/dash/deflection shaping.
+
 ## Open items
 
-- **Magnitudes.** Single-stick holds translate ~½ of the two-stick holds, but a
-  single stick **plus dash** reaches the full dash distance (~318 ≈ the recovered
-  4.2 u/f × 69f). So dash uses full stick deflection while walk combines both
-  sticks; the walk/dash magnitude normalization still needs fitting.
 - **Wall-contact fault.** A sustained hold that pins P1 against the ±320 arena
   wall trips a MAME i960 fault (`Unhandled ff`/`00`); keep probe holds short.
 - `dyaw` on strafe mixes the player's passive auto-face (the mech keeps facing
-  the opponent) with stick twist; separate them before fitting turn rates.
+  the opponent) with stick twist; the turn rate stays the recovered
+  `RV_TURN_RATE = 0.01321 rad/f` until separated cleanly.
