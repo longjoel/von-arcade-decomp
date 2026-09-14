@@ -138,18 +138,34 @@ The decisive hardware calibration was attempted and **does not yet land**:
   (`0x800010=0x101`, `0x804000..c`) prepended. The live-injection handshake is
   the same unresolved blocker noted elsewhere.
 
-**Opcode-context conflict.** The recovered opcode models do not match this
-note's packet reading: `recovered_sharc_opcode_22.c` is a **projection/affine**
-service and `recovered_sharc_opcode_47.c` is a **geometry predicate**, not a
-rotation/translation. SHARC opcode numbers are positions in a *per-task
-uploaded program*, so the same number means different things in the geometry
-transform program vs the projection/aim program. The animation decode therefore
-cannot be validated against the `0x14/0x15/0x16/0x30` models until the uploaded
-program that consumes the motion-record packets is identified.
+**Cross-checks (2026-09-14).**
 
-Next: either land the FIFO injection (recover the i960->SHARC arm handshake) to
-read the hardware matrix directly, or dump the uploaded SHARC program active
-during animation and decode its `20/21/22/47/58` handlers in that context.
+1. **The uploaded program is constant.** Hashing the live SHARC program space
+   at frames 300/600/900/1800/3600/7200 (boot -> select -> match) gives the
+   **same** hash `76efddc5` every time. So opcode semantics are **not**
+   context-dependent: there is one program and one dispatch.
+2. **The packet structure is confirmed.** A live emitter capture
+   (`bin/von -log -oslog`, `VON_EMITTER`) shows a real record at PC `0x8de14`,
+   `g2=0x5046d0` (a Temjin body slot):
+   `5, 47, 49020, 15664, 18331, 22, 80, 21, 574, 20, 12, 58` — i.e. the
+   `47/22/21/20` packet this note describes, not the `2f/16/15/14` geometry
+   packet that `sharc_transform.py` models.
+3. **Injection still does not land.** Re-injecting that exact packet with the
+   identity reset + tap + batch handshake still produces **no** handler writes;
+   only the reset writes (PC `0x20dd8`) appear. The FIFO arm/handshake remains
+   the blocker.
+
+**Opcode conflict to resolve.** Since the program is fixed, service `22` cannot
+be both this note's Z-rotation and the `recovered_sharc_opcode_22.c`
+projection/affine service. Either the recovered opcode models are ADSP
+*instruction* semantics (from the SHARC CPU core) rather than FIFO *service*
+handlers, or the service dispatch table is not indexed the way the note
+assumes. Resolving it needs the SHARC program disassembled (its dispatch and
+the `20/21/22/47/58` handlers), which is blocked on building MAME `unidasm`
+(the local tree has no generated tools project).
+
+Next: build `unidasm` (or otherwise obtain the listing) and decode the upload's
+dispatch, and/or land the injection to read the hardware matrix directly.
 
 ## 6. What this unlocks
 
