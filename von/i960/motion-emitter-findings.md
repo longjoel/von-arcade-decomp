@@ -223,6 +223,24 @@ remaining question for the rig is the exact relation between this SHARC
 cumulative matrix and the geometry parser's world matrix `W` (the ~27 deg
 composition floor).
 
+**Translation words are fixed-point, not floats.** Service `0x2f` does not use
+the three words as float translations. It builds a float from each 16-bit word
+with IEEE bit-masks held at DM `0x30141`:
+
+```
+0x30141 0x807FFFFF   0x30142 0x7C000000   0x30143 0x07800000
+0x30144 0x3F800000   0x30145 0x7F800000
+```
+
+(shift/and/sub/add/or exponent reconstruction), then `t += M * v` on the tail.
+`sharc_transform.compose_record` treats `(a,b,c)` as float translations, so it
+produces `t ≈ ±16000` where the hardware produces `≈ 50` — the model's
+translation path is wrong and needs this fixed-point→float conversion. A
+simulation of the 340-packet stream against the 348 geometry world matrices
+(`m=`/`t=` in `vonj_geometry_matrix`) is set up in the local analysis, but the
+matrix stack (service `0x05` push / commit) and the translation conversion must
+be modelled before the composition can close.
+
 ## 6. What this unlocks
 
 - **Per-part animation from ROM data**, provenance-gated: the motion tables are
