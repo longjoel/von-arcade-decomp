@@ -240,6 +240,36 @@ local function watch(tag)
     log(string.format("watch: f%d %s %s", frame, tag, table.concat(cells, " ")))
 end
 
+-- Per-frame parity telemetry (gameplay fixtures for the Godot replay-diff).
+-- Addresses are the recovered work-RAM cells; see von/i960/recovered-camera.md
+-- and von/i960/weapon-damage-attribution.md.
+local TELEMETRY = os.getenv("VON_SANDBOX_TELEMETRY")
+local telemetry_file = nil
+if TELEMETRY then
+    telemetry_file = assert(io.open(TELEMETRY, "w"))
+    telemetry_file:write("frame,p1x,p1y,p1z,p1yaw,p2x,p2y,p2z,p1hp,p2hp,t0,t1,t2,state,round\n")
+    telemetry_file:flush()
+end
+
+local function read_f32(addr)
+    local w = read_u32(addr)
+    if w == nil then return 0.0 end
+    return (string.unpack("<f", string.pack("<I", w)))
+end
+
+local function telemetry()
+    if not telemetry_file or not space then return end
+    telemetry_file:write(string.format(
+        "%d,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%d,%d,%d,%d,%d,%d,%d\n",
+        frame,
+        read_f32(0x503ad8), read_f32(0x503adc), read_f32(0x503ae0),
+        read_f32(0x503c28),
+        read_f32(0x5040d8), read_f32(0x5040dc), read_f32(0x5040e0),
+        read_u16(0x503ca0) or 0, read_u16(0x5042a0) or 0,
+        read_u16(0x503cba) or 0, read_u16(0x503cbc) or 0, read_u16(0x503cbe) or 0,
+        read_u16(0x503a98) or 0, read_u16(0x503a80) or 0))
+end
+
 emu.register_periodic(function()
     frame = frame + 1
     for name, until_frame in pairs(pressed_until) do
@@ -361,12 +391,14 @@ emu.register_periodic(function()
             weapon_log("shot")
         end
         if frame % 120 == 0 then watch("periodic") end
+        telemetry()
     end
 
     if frame >= 10300 then
         watch("session-end")
         log(string.format("sandbox: complete (timer vetoes=%d)", timer_vetoes))
         hold_only({})
+        if telemetry_file then telemetry_file:close() end
         manager.machine:exit()
     end
 end)
