@@ -15,7 +15,8 @@ Opcode semantics (each recovered and golden-tested against MAME):
     0x30/0x2f  tail = v^T * R (translation), then a scaled-Z rebuild
     0x3a  commit 12 matrix words + tail
 
-The angle unit is `word * pi/32767` (recovered opcode-0x30 model).
+The angle unit is `word * pi/32768` (SHARC service 0x14/0x15/0x16 constant
+0x38C9116D; see von/i960/motion-emitter-findings.md section 5c).
 """
 from __future__ import annotations
 
@@ -33,7 +34,7 @@ def s16(word: int) -> int:
 
 
 def angle_radians(word: int) -> float:
-    return s16(word) * math.pi / 32767.0
+    return s16(word) * math.pi / 32768.0
 
 
 def _sincos(word: int) -> tuple[float, float]:

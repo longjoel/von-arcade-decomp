@@ -194,19 +194,34 @@ The main FIFO loop at PM `0x2011E`:
 
 So a leading word whose **low byte is `8`** starts a command, the next word is
 the **service index**, and `DM(0x30000 + index)` holds the handler PM address.
-The table has **20 entries** (`0x00`..`0x13` -> `0x20133`..`0x20cca`); handler 0
-(`0x20133`) is `F0 = F0 + F1` (add), i.e. these are arithmetic/math services.
-Retained as `von/i960/sharc-service-dispatch.json`.
+DM is **word-addressed** (stride 1): the table has **78 entries**
+(`0x00`..`0x4d` -> `0x20133`..`0x20cf8`), retained as
+`von/i960/sharc-service-dispatch.json` (an earlier dump used stride 4 and
+under-read it to 20 entries).
 
-**Consequence for the animation decode.** The motion packet's numbers
-`20/21/22/47/58` are **outside** the 20-entry service table, so they are not
-dispatch indices for this table. Combined with the constant program hash
-(§5b) and the recovered models, the likely reading is that
-`recovered_sharc_opcode_*.c` are MAME **ADSP instruction** semantics (the SHARC
-CPU core opcode switch), not FIFO service handlers, and the transform is
-composed *inside* one of the 20 service handlers (rotation/subroutine code the
-handlers call). §2's "opcode 20/21/22 rotate the matrix" therefore needs
-re-checking against the handler bodies, not the instruction models.
+**Decoded handler semantics (`KNOWN`).** The 12-word `3x4` the services mutate
+sits at `DM(0x30101)` (`I7`) and is a **cumulative** transform:
+
+| service | handler | semantics |
+| --- | --- | --- |
+| `0x05` | `0x2016d` | **push**: `++DM(0x30100)` (depth cap 7), copy the 12-word matrix as this part's base |
+| `0x2f` | `0x206e1` | **translate**: `t += M * v` (accumulate tail words 9-11) |
+| `0x16` | `0x2032e` | **rotate Z**: row0/row1 mix (in place) |
+| `0x15` | `0x20312` | **rotate Y**: row0/row2 mix (in place) |
+| `0x14` | `0x202f6` | **rotate X**: `row1' = c*row1 - s*row2`, `row2' = s*row1 + c*row2` (in place) |
+| `0x3a` | `0x209ac` | **commit**: write the 12-word matrix to `0x01400000 + (word>>2)` |
+
+The angle word is signed-16 scaled by the constant `0x38C9116D = pi/32768`
+(= `2*pi/65536`), matching §2. **This confirms §2's packet reading
+(`47/22/21/20/58` = translate, then Z/Y/X rotate, then commit) and the
+`recovered_sharc_opcode_14/15/16` row-rotation models.** (The earlier
+"opcode-context conflict" in §5b was the stride bug above, now retracted.)
+
+Because the pushed matrix is cumulative and the rotations are applied
+**pre-multiplied** (`M' = R * M`) while the translate accumulates `M * v`, the
+remaining question for the rig is the exact relation between this SHARC
+cumulative matrix and the geometry parser's world matrix `W` (the ~27 deg
+composition floor).
 
 ## 6. What this unlocks
 
