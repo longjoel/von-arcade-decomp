@@ -15,6 +15,12 @@ end
 
 local LOG = os.getenv("VON_SHARC_XF_LOG") or "von-sharc-transform.log"
 local INJECT = env("VON_SHARC_XF_INJECT", 1200)
+-- RESET writes an identity 3x4 to 0x30200 and points DM(0x30101) there before
+-- injecting, so the packet's pure rotation is observable (the motion packet
+-- pre-multiplies the existing matrix, otherwise contaminated by game state).
+local RESET = os.getenv("VON_SHARC_XF_RESET") == "1"
+local MATRIX_PTR = 0x0030101
+local MATRIX_BASE = 0x00030200
 
 local c = {}
 for i = 0, 5 do c[i] = env("VON_REC_" .. i, 0) end
@@ -66,9 +72,38 @@ emu.register_periodic(function()
     end
     if not (space and dspace) then return end
 
+    if frame == INJECT - 1 and os.getenv("VON_SHARC_XF_TAP") == "1" then
+        pcall(function()
+            dspace:install_write_tap(MATRIX_BASE, MATRIX_BASE + 0x2c, "xftap",
+                function(offset, data, mask)
+                    local pc = sharc.state["PC"] and sharc.state["PC"].value
+                    log(string.format("tap f=%d pc=%s off=%08x data=%08x mask=%08x",
+                        frame, pc and string.format("0x%x", pc) or "?",
+                        offset, data, mask))
+                    return data
+                end)
+            log("probe: matrix write tap installed")
+        end)
+    end
+
     if frame == INJECT then
+        if RESET then
+            local id = { 0x3f800000, 0, 0, 0, 0x3f800000, 0, 0, 0, 0x3f800000, 0, 0, 0 }
+            for i = 0, 11 do
+                dspace:write_u32(MATRIX_BASE + i * 4, id[i + 1])
+            end
+            dspace:write_u32(MATRIX_PTR, MATRIX_BASE)
+            log(string.format("probe: reset matrix->identity at 0x%08x", MATRIX_BASE))
+        end
         ptr_before = dspace:read_u32(0x0030101)
         log(string.format("probe: ptr before=0x%08x", ptr_before))
+        -- Recovered batch-packet handshake (recovered_geometry_batch_packet_8d400):
+        -- control, record window, then the FIFO packet.
+        space:write_u32(0x00800010, 0x101)
+        space:write_u32(0x00804000, 0)
+        space:write_u32(0x00804004, 0)
+        space:write_u32(0x00804008, 0)
+        space:write_u32(0x0080400c, 0)
         word(5)
         word(47); word(c[3]); word(c[4]); word(c[5])
         word(22); word(s16(c[2]))

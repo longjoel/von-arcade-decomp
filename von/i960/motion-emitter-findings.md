@@ -125,6 +125,32 @@ finds the SHARC (`adsp21062(:copro_adsp)`), injects the packet, and reads the
 hardware matrix pins the true relationship without any inference. Then the
 parent tree follows from `inv(W_parent)*W_child = M_child`.
 
+## 5b. SHARC probe attempt (`probe_sharc_transform.lua`, 2026-09-14)
+
+The decisive hardware calibration was attempted and **does not yet land**:
+
+- With `VON_SHARC_XF_RESET=1` the probe writes an identity 3x4 to `0x30200`
+  and points `DM(0x30101)` there in the inject frame; a readback confirms the
+  identity is present for that frame.
+- A write tap over `0x30200..0x3022c` (`VON_SHARC_XF_TAP=1`) records **only**
+  the reset writes (PC `0x20126`); the injected packet produces **no** handler
+  writes, even with the recovered batch handshake
+  (`0x800010=0x101`, `0x804000..c`) prepended. The live-injection handshake is
+  the same unresolved blocker noted elsewhere.
+
+**Opcode-context conflict.** The recovered opcode models do not match this
+note's packet reading: `recovered_sharc_opcode_22.c` is a **projection/affine**
+service and `recovered_sharc_opcode_47.c` is a **geometry predicate**, not a
+rotation/translation. SHARC opcode numbers are positions in a *per-task
+uploaded program*, so the same number means different things in the geometry
+transform program vs the projection/aim program. The animation decode therefore
+cannot be validated against the `0x14/0x15/0x16/0x30` models until the uploaded
+program that consumes the motion-record packets is identified.
+
+Next: either land the FIFO injection (recover the i960->SHARC arm handshake) to
+read the hardware matrix directly, or dump the uploaded SHARC program active
+during animation and decode its `20/21/22/47/58` handlers in that context.
+
 ## 6. What this unlocks
 
 - **Per-part animation from ROM data**, provenance-gated: the motion tables are
