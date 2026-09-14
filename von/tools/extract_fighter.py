@@ -54,46 +54,91 @@ WEAPON_STRIDE = 0x68
 WEAPON_COUNT = 10
 MODEL_REGION_START = 0xBED81C
 MODEL_REGION_WORDS = 6000
+SHARED_PREFIXES = {0x86, 0x89, 0x8A, 0x8C, 0x8D}  # skeleton parts reused by all
 
 
 def is_sep(entry) -> bool:
     return entry[0] == "part" and entry[1] == 0 and entry[2] == 0 and entry[3] == 0xFFFFFFFF
 
 
-def model_tables(main_data: bytes) -> dict[int, dict]:
-    """Return {family_prefix: {"parts": [...], "markers": [...]}}.
+def model_segments(main_data: bytes) -> list[dict]:
+    """Decode every part group in the model region.
 
-    Keeps the longest segment per family and preserves the marker sequence
-    (the six-slot pose system) with the index of the part that follows it.
+    The region is a run of groups separated by `[0, 0, 0xffffffff]`, each with
+    a dominant OBA prefix, its own `tpa` span, and the six-slot pose markers.
+    A fighter does not map 1:1 to an OBA prefix: Apharmd's leg chain carries the
+    neighbouring `0xa8` prefix and Dorkas has two groups, so groups are assigned
+    to fighters by `tpa` proximity (see `segments_by_fighter`).
     """
     words = list(struct.unpack_from(f"<{MODEL_REGION_WORDS}I", main_data, MODEL_REGION_START))
-    segments, cur = [], []
+    raw, cur = [], []
     for entry in decode_records(words):
         if is_sep(entry):
             if cur:
-                segments.append(cur)
+                raw.append(cur)
             cur = []
         else:
             cur.append(entry)
     if cur:
-        segments.append(cur)
+        raw.append(cur)
 
-    best: dict[int, dict] = {}
-    for seg in segments:
+    segments = []
+    for seg in raw:
         parts = [e[1:] for e in seg if e[0] == "part"]
         if len(parts) < 3:
             continue
         prefix = Counter((p[2] >> 16) & 0xFF for p in parts).most_common(1)[0][0]
-        markers = []
-        part_index = 0
+        markers, index = [], 0
         for entry in seg:
             if entry[0] == "marker":
-                markers.append({"slot": entry[1], "before_part": part_index})
+                markers.append({"slot": entry[1], "before_part": index})
             elif entry[0] == "part":
-                part_index += 1
-        if prefix not in best or len(parts) > len(best[prefix]["parts"]):
-            best[prefix] = {"parts": parts, "markers": markers}
-    return best
+                index += 1
+        tpas = [p[0] for p in parts if (p[2] >> 16) not in SHARED_PREFIXES]
+        segments.append({"parts": parts, "markers": markers, "prefix": prefix,
+                         "tpa": (min(tpas), max(tpas)) if tpas else None})
+    return segments
+
+
+def segments_by_fighter(segments: list[dict], families: list[int],
+                        threshold: float = 0x8000) -> dict[int, dict]:
+    """Assign each group to the fighter whose anchor group is nearest in tpa.
+
+    An anchor is the largest group carrying a fighter's OBA prefix. Groups are
+    matched to the closest anchor centre within `threshold` so continuation
+    groups (which may carry a different prefix) land with the right fighter,
+    while the region's junk tail (prefix 0) and distant groups are ignored. The
+    anchor's markers become the fighter's pose markers.
+    """
+    usable = [s for s in segments if s["tpa"] and s["prefix"] != 0]
+    anchors = {}
+    for family in families:
+        own = [s for s in usable if s["prefix"] == family]
+        if own:
+            anchors[family] = max(own, key=lambda s: len(s["parts"]))
+
+    def centre(segment: dict) -> float:
+        low, high = segment["tpa"]
+        return (low + high) / 2
+
+    out: dict[int, dict] = {}
+    for family, anchor in anchors.items():
+        parts, seen = [], set()
+        for segment in usable:
+            target = centre(segment)
+            best, distance = None, None
+            for candidate, candidate_anchor in anchors.items():
+                delta = abs(target - centre(candidate_anchor))
+                if distance is None or delta < distance:
+                    best, distance = candidate, delta
+            if best != family or distance > threshold:
+                continue
+            for part in segment["parts"]:
+                if part[2] not in seen:
+                    seen.add(part[2])
+                    parts.append(part)
+        out[family] = {"parts": parts, "markers": anchor["markers"]}
+    return out
 
 
 def printable_strings(blob: bytes) -> list[str]:
@@ -264,7 +309,8 @@ def extract(rom_dir: Path, out_dir: Path, trees_dir: Path,
     maincpu = load_maincpu(rom_dir)
     main_data = load_main_data(rom_dir)
     ptrs = list(struct.unpack_from("<10I", maincpu, PROFILE_TABLE))
-    tables = model_tables(main_data)
+    families = [int(e["family"], 16) for e in parse_roster(maincpu) if e["family"]]
+    tables = segments_by_fighter(model_segments(main_data), families)
     directory = model_directory(maincpu)
     directory_raw = [struct.unpack_from("<6I", maincpu, MODEL_DIRECTORY + i * 24)
                      for i in range(10)]
@@ -277,10 +323,15 @@ def extract(rom_dir: Path, out_dir: Path, trees_dir: Path,
     for entry in parse_roster(maincpu):
         prefix = int(entry["family"], 16) if entry["family"] else None
         table = tables.get(prefix, {"parts": [], "markers": []})
-        parts = table["parts"]
         fid = f"0x{entry['fighter_id']:04x}"
         raw_entry = directory_raw[entry["index"]]
         dir_parts, dir_markers = parts_from_range(main_data, raw_entry[1], raw_entry[0])
+        profile_groups = profile_part_groups(maincpu, entry["profile"])
+
+        # The model groups are the authoritative part list; fighters without a
+        # family prefix (the bosses) fall back to their directory range. The
+        # directory range and profile groups are kept alongside as evidence.
+        parts = [tuple(p) for p in table["parts"]] or list(dir_parts)
         doc = {
             "schema": 2,
             "generator": "extract_fighter.py",
@@ -309,7 +360,7 @@ def extract(rom_dir: Path, out_dir: Path, trees_dir: Path,
             "weapons": weapons_by_id.get(fid),
             "profile": {
                 "subtables": profile_directory(maincpu, entry["profile"], ptrs),
-                "part_groups": profile_part_groups(maincpu, entry["profile"]),
+                "part_groups": profile_groups,
             },
             "skeleton": find_tree(trees_dir, entry["name"]),
             "stats": {"pending": True,

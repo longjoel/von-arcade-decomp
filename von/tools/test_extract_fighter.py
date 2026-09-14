@@ -56,6 +56,11 @@ def main() -> int:
     boss = by_name["JAGUARANDI"]["model"]["directory_parts"]
     expect(len(boss) > 0, "Jaguarandi directory parts recovered")
     expect(by_name["APHARMD"]["skeleton"] is not None, "Apharmd skeleton override present")
+    # The model groups merge a fighter's primary group with its tpa-adjacent
+    # continuation groups (Apharmd's arms + leg chain, Dorkas's two groups).
+    expect(len(by_name["APHARMD"]["model"]["parts"]) == 17, "Apharmd 17-part model")
+    expect(len(by_name["DORKAS"]["model"]["parts"]) == 15, "Dorkas 15-part model")
+    expect(len(temjin["model"]["parts"]) == 19, "Temjin 19-part model")
     print("PASS: offline fighter extraction (identity, parts, markers, motion, weapons, skeleton)")
     return 0
 
