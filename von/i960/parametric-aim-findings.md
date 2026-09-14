@@ -69,6 +69,34 @@ rotations (`0x8e164` slots) is weak (max `r ≈ 0.34`), so the head/torso are
 **not** among the body-emitter slots measured. The aiming joints are driven
 elsewhere (a different emitter or the pose-slot consumer).
 
+## The tracking gate (`KNOWN`, from the i960 listing)
+
+The look-at is not free-running: a per-action **tracking flag byte** selects
+whether the turret aims at the target or holds a default angle. In the
+result-builder bodies (`0x9de50`/`0x9e250`/`0x9e450`/`0x9e880`/`0x9eab0`, the
+emitter table at `0xbcf78`) the branch is `ldob 0xa0(g0)` (`0x9e4e0`,
+`0x9dee0`, `0x9e0e0`, `0x9e2e0`, `0x9e6e8`, `0x9e918`, `0x9eb50`):
+
+- **nonzero** → compute `target - source` from the object (`0x74(g0)` →
+  `+0x14/+0x18/+0x1c`) and the pose, issue the SHARC angular projection
+  (`addo 31,6,r4` = request `0x25` at `0x9e508`), clamp the returned yaw/pitch
+  toward it at the per-model rates (`0x562cb0`/`0x562cbc`/`0x562cbe`), write the
+  turret slots (`0x6`/`0x8(g1)`, `0x6`/`0xc`/`0xe(g2)`), then `setbit 13` of the
+  per-part emitter flags at `0x2(g1)` — "turret is tracking".
+- **zero** → load the model's default turret angle (`0x562cde`) and store it
+  with no look-at.
+
+The emitter `0x9ece0` guards its own re-aim with `bbc 13` on `0x2(g1)`, so bit 13
+is the remembered "was tracking" state the emitter consults.
+
+The `+0xa0`/`+0xa1` pair (two targets) is **cleared at the start of the
+per-action setup** (`stob g14,0xa0(g0)` at `0x237a0`, `0x23ac0`, `0x23cb0`), and
+toggled by the VS mode dispatcher at `0xd5dac` from the mode word at
+`0x503a98` (cleared in mode 6, set otherwise). So tracking is a *soft, per-action*
+flag rather than a hard toggle: an action resets it and the aim re-establishes it
+when the action allows. This matches the arcade feel that lock-on is passive
+(the body faces the opponent) except while a dash or jump owns the body.
+
 ## Status and next steps
 
 - Parametric aim is **structurally confirmed**: the game computes a
