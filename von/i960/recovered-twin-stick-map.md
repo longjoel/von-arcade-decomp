@@ -66,3 +66,12 @@ kernel owns the strafe/dash/deflection shaping.
 - `dyaw` on strafe mixes the player's passive auto-face (the mech keeps facing
   the opponent) with stick twist; the turn rate stays the recovered
   `RV_TURN_RATE = 0.01321 rad/f` until separated cleanly.
+
+## Turn rate (steady-state dyaw, 150-frame holds)
+
+The pure opposed twist (`up,down2`, zero translation) turns at a steady
+**~0.83 deg/frame**, and a single stick (`right`) at **~0.81 deg/frame** — both
+matching the recovered `RV_TURN_RATE` (0.757 deg/f). So the turn **saturates**
+at one full rate: opposed sticks are *not* 2x a single stick. `von-godot`
+accordingly clamps the derived twist to `MAX_TWIST = 1.0` (the earlier 2x
+differential was too fast).
