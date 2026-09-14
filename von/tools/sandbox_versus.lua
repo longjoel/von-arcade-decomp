@@ -252,11 +252,14 @@ end
 -- Per-frame parity telemetry (gameplay fixtures for the Godot replay-diff).
 -- Addresses are the recovered work-RAM cells; see von/i960/recovered-camera.md
 -- and von/i960/weapon-damage-attribution.md.
+-- Reading the ioports every frame perturbs the bout (Model 2 input latches),
+-- so raw port columns are opt-in and default to zero.
+local RAW_PORTS = os.getenv("VON_SANDBOX_RAW_PORTS") == "1"
 local TELEMETRY = os.getenv("VON_SANDBOX_TELEMETRY")
 local telemetry_file = nil
 if TELEMETRY then
     telemetry_file = assert(io.open(TELEMETRY, "w"))
-    telemetry_file:write("frame,p1mask,p1x,p1y,p1z,p1yaw,p2x,p2y,p2z,p1hp,p2hp,t0,t1,t2,state,round\n")
+    telemetry_file:write("frame,p1mask,in1,in2,p1x,p1y,p1z,p1yaw,p2x,p2y,p2z,p1hp,p2hp,t0,t1,t2,state,round\n")
     telemetry_file:flush()
 end
 
@@ -266,6 +269,13 @@ local function read_f32(addr)
     return (string.unpack("<f", string.pack("<I", w)))
 end
 
+local function port_byte(name)
+    local p = manager.machine.ioport.ports[name]
+    if not p then return 0 end
+    local ok, v = pcall(function() return p:read() end)
+    return (ok and type(v) == "number") and (v & 0xff) or 0
+end
+
 local function telemetry()
     if not telemetry_file or not space then return end
     local action_mask = 0
@@ -273,8 +283,9 @@ local function telemetry()
         action_mask = action_mask | (ACTION_BIT[name] or 0)
     end
     telemetry_file:write(string.format(
-        "%d,%d,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%d,%d,%d,%d,%d,%d,%d\n",
+        "%d,%d,%d,%d,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%d,%d,%d,%d,%d,%d,%d\n",
         frame, action_mask,
+        RAW_PORTS and port_byte(":IN1") or 0, RAW_PORTS and port_byte(":IN2") or 0,
         read_f32(0x503ad8), read_f32(0x503adc), read_f32(0x503ae0),
         read_f32(0x503c28),
         read_f32(0x5040d8), read_f32(0x5040dc), read_f32(0x5040e0),
@@ -288,6 +299,11 @@ end
 -- so the Godot replay-diff can attribute divergence to a single input mode.
 -- Selected with VON_SANDBOX_PROGRAM=parity; the default program is untouched.
 local PROGRAM = os.getenv("VON_SANDBOX_PROGRAM") or "default"
+-- Single-phase probe: hold VON_SANDBOX_PROBE actions from VON_SANDBOX_PROBE_BASE
+-- for VON_SANDBOX_PROBE_FRAMES, then idle. Used to sweep the stick map.
+local PROBE_HOLD = os.getenv("VON_SANDBOX_PROBE") or ""
+local PROBE_BASE = tonumber(os.getenv("VON_SANDBOX_PROBE_BASE") or "9600") or 9600
+local PROBE_DUR = tonumber(os.getenv("VON_SANDBOX_PROBE_FRAMES") or "180") or 180
 local PARITY_BASE = 9600
 -- Translational phases are kept short (< ~90 frames) so the mech does not
 -- grind into the +/-320 arena wall for a sustained period, which trips an
@@ -319,7 +335,9 @@ do
     parity_end = at
 end
 local END_FRAME = tonumber(os.getenv("VON_SANDBOX_END_FRAME")
-    or (PROGRAM == "parity" and tostring(parity_end + 60) or "10300")) or 10300
+    or (PROGRAM == "parity" and tostring(parity_end + 60)
+        or (PROGRAM == "probe" and tostring(PROBE_BASE + PROBE_DUR + 120)
+            or "10300"))) or 10300
 local parity_phase = -1
 
 local function step_parity_program()
@@ -425,6 +443,15 @@ emu.register_periodic(function()
             log(string.format(
                 "sandbox: fields resolved; weapon case=%s; P2 has no input fields on this cabinet (idle dummy by construction)",
                 WEAPON_CASE))
+            for _, n in ipairs({"left", "right", "up", "down", "dash", "shot",
+                                "up2", "down2", "left2", "right2",
+                                "right_dash", "right_shot", "coin", "start2"}) do
+                local f = F[n]
+                if f then
+                    log(string.format("field %-10s mask=0x%x def=0x%x", n,
+                        f.mask or 0, f.defvalue or 0))
+                end
+            end
         end
         return
     end
@@ -450,13 +477,23 @@ emu.register_periodic(function()
     end
 
     if battle then
-        if PROGRAM == "parity" then
+        if PROGRAM == "probe" then
+            if frame == PROBE_BASE then
+                local names = {}
+                for n in string.gmatch(PROBE_HOLD, "([^,]+)") do names[#names + 1] = n end
+                hold_only(names)
+                log(string.format("input: probe hold=[%s] f%d-%d",
+                    PROBE_HOLD, PROBE_BASE, PROBE_BASE + PROBE_DUR))
+                watch("phase-edge")
+            end
+        elseif PROGRAM == "parity" then
             step_parity_program()
         elseif frame == 9600 then
-            hold_only({})
-            shot_phase = true
-            log(string.format("input: phase %s-shot pulses f9600-9840 interval=%d",
-                WEAPON_CASE, SHOT_INTERVAL))
+            -- Hold the (left) shot so the game fires at its own cadence; a
+            -- 1-in-6 pulse is shorter than the input poll and reads as a tap.
+            hold_only({ "shot" })
+            shot_phase = false
+            log("input: phase left-shot-held f9600-9840")
             watch("phase-edge")
             weapon_log("shot-start")
         elseif frame == 9840 then
