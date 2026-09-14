@@ -67,7 +67,9 @@ local pressed_until = {}
 -- Bit order: up,down,left,right,dash,shot,right_shot.
 local p1_actions = {}
 local ACTION_BIT = { up = 1, down = 2, left = 4, right = 8,
-                     dash = 16, shot = 32, right_shot = 64 }
+                     dash = 16, shot = 32, right_shot = 64,
+                     up2 = 128, down2 = 256, left2 = 512, right2 = 1024,
+                     right_dash = 2048 }
 
 local function set_pressed(name, pressed)
     local f = F[name]
@@ -281,6 +283,77 @@ local function telemetry()
         read_u16(0x503a98) or 0, read_u16(0x503a80) or 0))
 end
 
+-- Parity program: a longer, labeled P1 schedule for gameplay fixtures. Every
+-- phase isolates one axis (walk, strafe, twist, guard, jump, dash, each shot)
+-- so the Godot replay-diff can attribute divergence to a single input mode.
+-- Selected with VON_SANDBOX_PROGRAM=parity; the default program is untouched.
+local PROGRAM = os.getenv("VON_SANDBOX_PROGRAM") or "default"
+local PARITY_BASE = 9600
+-- Translational phases are kept short (< ~90 frames) so the mech does not
+-- grind into the +/-320 arena wall for a sustained period, which trips an
+-- i960 emulation fault in MAME.
+local PARITY = {
+    { label = "idle",        dur = 120, hold = {} },
+    { label = "walk-fwd",    dur = 84,  hold = { "up", "up2" } },
+    { label = "walk-back",   dur = 84,  hold = { "down", "down2" } },
+    { label = "strafe-left", dur = 84,  hold = { "left", "left2" } },
+    { label = "strafe-right",dur = 84,  hold = { "right", "right2" } },
+    { label = "twist-right", dur = 120, hold = { "up" } },
+    { label = "twist-left",  dur = 120, hold = { "down" } },
+    { label = "guard",       dur = 120, hold = { "right", "left2" } },
+    { label = "jump",        dur = 180, hold = {},
+      pulse = { set = { "left", "right2" }, period = 60, width = 8 } },
+    { label = "dash-fwd",    dur = 120, hold = { "up", "up2", "dash" } },
+    { label = "fire-left",   dur = 300, hold = {},
+      pulse = { set = { "shot" }, period = 20, width = 2 } },
+    { label = "fire-right",  dur = 300, hold = {},
+      pulse = { set = { "right_shot" }, period = 20, width = 2 } },
+}
+local parity_starts = {}
+do
+    local at = PARITY_BASE
+    for i, ph in ipairs(PARITY) do
+        parity_starts[i] = at
+        at = at + ph.dur
+    end
+    parity_end = at
+end
+local END_FRAME = tonumber(os.getenv("VON_SANDBOX_END_FRAME")
+    or (PROGRAM == "parity" and tostring(parity_end + 60) or "10300")) or 10300
+local parity_phase = -1
+
+local function step_parity_program()
+    local idx = -1
+    for i, ph in ipairs(PARITY) do
+        if frame >= parity_starts[i] and frame < parity_starts[i] + ph.dur then
+            idx = i
+            break
+        end
+    end
+    if idx ~= parity_phase then
+        parity_phase = idx
+        if idx > 0 then
+            hold_only(PARITY[idx].hold)
+            log(string.format("input: parity %s f%d-%d", PARITY[idx].label,
+                parity_starts[idx], parity_starts[idx] + PARITY[idx].dur))
+            watch("phase-edge")
+            weapon_log("phase")
+        end
+    end
+    if idx > 0 then
+        local ph = PARITY[idx]
+        if ph.pulse then
+            hold_only(ph.hold)
+            if ((frame - parity_starts[idx]) % ph.pulse.period) < ph.pulse.width then
+                for _, n in ipairs(ph.pulse.set) do
+                    press(n, 1000000)
+                    p1_actions[n] = true
+                end
+            end
+        end
+    end
+end
+
 emu.register_periodic(function()
     frame = frame + 1
     for name, until_frame in pairs(pressed_until) do
@@ -322,8 +395,14 @@ emu.register_periodic(function()
             F.left = field(":IN1", "P1 Left Stick/Left")
             F.right = field(":IN1", "P1 Left Stick/Right")
             F.up = field(":IN1", "P1 Left Stick/Up")
+            F.down = field(":IN1", "P1 Left Stick/Down")
             F.dash = field(":IN1", "P1 Left Dash")
             F.shot = field(":IN1", "P1 Left Shot")
+            F.up2 = field(":IN2", "P1 Right Stick/Up")
+            F.down2 = field(":IN2", "P1 Right Stick/Down")
+            F.left2 = field(":IN2", "P1 Right Stick/Left")
+            F.right2 = field(":IN2", "P1 Right Stick/Right")
+            F.right_dash = field(":IN2", "P1 Right Dash")
             F.right_shot = field(":IN2", "P1 Right Shot")
             local missing = {}
             local required = SINGLE_PLAYER and {"coin", "start1"} or
@@ -336,7 +415,9 @@ emu.register_periodic(function()
                 manager.machine:exit()
                 return
             end
-            for _, n in ipairs({"left", "right", "up", "dash", "shot", "right_shot"}) do
+            for _, n in ipairs({"left", "right", "up", "down", "dash", "shot",
+                                "up2", "down2", "left2", "right2",
+                                "right_dash", "right_shot"}) do
                 if not F[n] then
                     log("sandbox: WARNING missing P1 field: " .. n)
                 end
@@ -369,7 +450,9 @@ emu.register_periodic(function()
     end
 
     if battle then
-        if frame == 9600 then
+        if PROGRAM == "parity" then
+            step_parity_program()
+        elseif frame == 9600 then
             hold_only({})
             shot_phase = true
             log(string.format("input: phase %s-shot pulses f9600-9840 interval=%d",
@@ -411,7 +494,7 @@ emu.register_periodic(function()
         telemetry()
     end
 
-    if frame >= 10300 then
+    if frame >= END_FRAME then
         watch("session-end")
         log(string.format("sandbox: complete (timer vetoes=%d)", timer_vetoes))
         hold_only({})
