@@ -241,6 +241,38 @@ simulation of the 340-packet stream against the 348 geometry world matrices
 matrix stack (service `0x05` push / commit) and the translation conversion must
 be modelled before the composition can close.
 
+## 5d. Composition validated against the geometry world matrices (2026-09-14)
+
+A joint capture (`VON_TRACE` geometry + `VON_EMITTER`) decodes the per-part
+packet protocol exactly:
+
+```
+push(5) -> translate(2f)+3 -> rotate Z(16)+1 -> rotate Y(15)+1 -> rotate X(14)+1
+        -> commit(3a)+dest -> pop(6)
+```
+
+so each part's transform is applied to the **pushed parent matrix** and the
+commit writes the resulting world `3x4`. Simulating the model
+(`sharc_transform.compose_motion_record`) and comparing `W_parent * L_child`
+against the logged `vonj_geometry_matrix` (paired by OBA via
+`emitter-g2-oba.json`):
+
+- **Rotation composes to ~2 deg** for the best parent/child pairs
+  (`W[504754]*L[504748]` -> 1.97 deg). This confirms the transform math
+  (fixed-point translation + `pi/32768` angles + Z/Y/X pre-multiply).
+- Translation still differs by ~19 units on those pairs because the **parent
+  base is not yet identified** (the emitted parts are emitted in a
+  depth-first order with push/pop, so a child's base is its parent's committed
+  matrix, not the previous packet). The best-rotation pairs are near-coincident
+  joints, so the pairing must come from the model part tree (`rigs/*.json`),
+  not from geometry distance.
+
+The transform is therefore **pinned**: the remaining exact placement needs the
+per-part parent tree, which is exactly what `bake_fighter_animation.py` infers
+and `rig_to_header_multi.py` bakes. The earlier ~27 deg "composition floor" is
+resolved — it was the wrong record decode (instruction vs service opcodes, the
+wrong angle unit, and the fixed-point translation).
+
 ## 6. What this unlocks
 
 - **Per-part animation from ROM data**, provenance-gated: the motion tables are
