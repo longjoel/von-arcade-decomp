@@ -523,7 +523,7 @@ The first audio promotion target should be a small descriptor-validated sample
 set, not a complete song. It gives the pack and viewer a rigorous audio path
 without pretending the sequencer and DSP are solved.
 
-## 13. Make `von-viewer` an evidence showcase
+## 13. Make `von-data-tool` an evidence showcase
 
 Keep its folder-backed loose-file mode for inspection, but add a distinct
 pack mode. Loose files always begin as `legacy-unreviewed` or `candidate`.
@@ -609,7 +609,7 @@ same verified pack and payload hashes.
 - Extract the exact sample window and verify PCM/WAV hashes and metadata.
 - Package the descriptor, WAV, event excerpt, and verifier result.
 
-Exit condition: `von-viewer` plays the sample and shows why its descriptor and
+Exit condition: `von-data-tool` plays the sample and shows why its descriptor and
 bytes are validated, without claiming a semantic name or complete music path.
 
 ### Milestone E: viewer pack mode

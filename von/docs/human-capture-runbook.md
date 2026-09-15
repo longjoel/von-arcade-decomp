@@ -7,7 +7,7 @@ playback with inputs ignored past the latch).
 
 ## 0. What changed in MAME
 
-`third_party/mame-master/src/mame/sega/model2_v.cpp` (native incremental
+`mame/src/mame/sega/model2_v.cpp` (native incremental
 rebuild done 2026-09-08, binary refreshed): the geometry trace window is no
 longer hardcoded 138-172. `VON_TRACE_T0`/`VON_TRACE_T1` (machine seconds,
 defaults 138/172) gate object + matrix logging, and the count caps are

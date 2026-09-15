@@ -1,11 +1,14 @@
 # Phase 0 ROM Inventory
 
+> **Archived.** This records the Phase 0 state and is retained for history only.
+> Current totals and stages come from `./scripts/status.sh`.
+
 This is a historical inventory snapshot. Lifecycle labels below have been
 updated to schema-v2 terminology; current totals and stages come from
 `./scripts/status.sh`.
 
-Inventory completed against the `vonj` ROM definition in
-`third_party/patches/0001-von-mame-support.patch`.
+Inventory completed against the `vonj` ROM definition in the `longjoel/mame-von`
+fork (`mame/src/mame/sega/model2.cpp`).
 
 ## Audit result
 

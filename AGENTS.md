@@ -1,5 +1,21 @@
 # Agent instructions
 
+## Harness
+
+Use `./bin/vonctl` for build, run, trace, capture, export, and test work; run
+`./bin/vonctl --help` for the command map. The `scripts/*.sh` wrappers are
+one-line shims onto the harness, so either name works. The only shell script
+that is not a shim is `i960-build-inner.sh`, which executes inside the pinned
+i960 compiler container.
+
+## MAME source
+
+`mame/` is a git submodule for the `longjoel/mame-von` fork: MAME 0.289 with
+the Virtual-On driver, SHARC, and debugger fixes committed on `von-0.289`.
+There is no patch stack; the submodule commit is the build input. Do not add
+C++ instrumentation for new investigations; prefer Lua probes against the
+engine's Lua API. Run `git submodule update --init mame` after cloning.
+
 ## MAME MCP probing
 
 This project includes a dependency-free MCP server at
@@ -9,7 +25,7 @@ GDB remote stub over TCP.
 Use it when an investigation needs an interactive, instruction-level probe:
 
 1. Select the target project's MAME executable; for this repository prefer the
-   instrumented binary at `bin/von`.
+   built binary at `bin/von` (rebuild with `./bin/vonctl build mame`).
 2. Call `mame_start` with the target machine, ROM path, and runtime arguments.
    The server appends
    `-debugger gdbstub -debugger_host 127.0.0.1 -debugger_port 23946`.

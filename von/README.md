@@ -48,36 +48,39 @@ The files may pass integrity checks while the set identity remains
 
 ## Quick start
 
-Prepare or build the reduced MAME target, then run the original `vonj` set:
+The `vonctl` harness (`./bin/vonctl`) is the single entry point; the
+`scripts/*.sh` wrappers are one-line shims onto it.
+
+Build the reduced MAME target, then run the original `vonj` set:
 
 ```sh
-./scripts/prepare-mame.sh
-./scripts/remote-build.sh
-./scripts/run.sh
+./bin/vonctl build mame      # or: ./bin/vonctl build remote
+./bin/vonctl run
 ```
 
 Run the core verification path with:
 
 ```sh
-./scripts/test.sh
-./scripts/e2e.sh
-./scripts/status.sh
+./bin/vonctl test
+./bin/vonctl e2e
+./bin/vonctl status
 ```
 
 Run the generated i960 image with:
 
 ```sh
-./scripts/remote-i960-build.sh
-./scripts/run-i960-reconstructed.sh \
+./bin/vonctl build i960-remote
+./bin/vonctl i960 reconstructed \
   -video none -sound none -oslog -seconds_to_run 1 -skip_gameinfo
 ```
 
-Complete command groups and patch-profile guidance are in
+Complete command groups are in
 [operations.md](docs/operations.md).
 
 ## Repository boundaries
 
-The workspace has three cooperating repositories:
+The workspace has four cooperating repositories. `von-discovery` is an archive
+of superseded scripts and is not part of the live pipeline.
 
 ```text
 von-arcade-decomp
@@ -86,14 +89,17 @@ von-arcade-decomp
           +--> von-runner
           |      native kernel boundary and provenance-gated extraction
           |
-          +--> von-viewer
-                 folder inspection and future validated evidence-pack showcase
+          +--> von-godot
+          |      Godot presentation host
+          |
+          +--> von-data-tool
+                 ROM forensics, model/audio/texture browser, clip labeler
 ```
 
-`von-runner` and `von-viewer` are separate repositories and may be modified
-concurrently. This repository must not write into them implicitly. Transfers
-between projects should be explicit, reproducible commands that carry hashes
-and evidence metadata.
+Each repository may be modified concurrently with the others. This repository
+must not write into them implicitly. Transfers between projects should be
+explicit, reproducible commands that carry hashes and evidence metadata. The
+retired `von-viewer` browser has been folded into `von-data-tool`.
 
 ## Hardware and reconstruction boundaries
 
@@ -104,8 +110,9 @@ and evidence metadata.
   evidence and licensing is preserved.
 - Virtual-On's uploaded SHARC semantics must be derived from ROM behavior, not
   inferred from plausible rendering.
-- Temporary MAME tracing patches are evidence tools, not automatically
-  upstream-ready changes.
+- New instrumentation belongs in the engine's Lua API, not in additional C++
+  tracing patches. The `mame/` submodule is the `longjoel/mame-von` fork; its
+  driver and debugger fixes are committed there.
 - Geometry data, runtime transforms, textures, animation, identity, and audio
   semantics are separate validation claims.
 
@@ -125,7 +132,7 @@ VON_TWIN_MATRIX=targeted ./scripts/test-twin.sh
 
 One cabinet must be configured as Master and the other as Slave. Each run must
 use isolated state directories. The retained findings and limitations are in
-[versus-link-findings.md](versus-link-findings.md).
+[versus-link-findings.md](docs/versus-link-findings.md).
 
 ## Evidence rule
 

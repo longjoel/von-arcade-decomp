@@ -9,7 +9,7 @@ notebooks remain at their established paths.
 | Document | Purpose |
 | --- | --- |
 | [Reconstruction](reconstruction.md) | Active objective, scope, lifecycle, checkpoints, and work-unit routine. |
-| [Evidence and assets plan](evidence-and-assets-plan.md) | Trace methodology, cleanup, evidence packs, and the `von-viewer` showcase plan. |
+| [Evidence and assets plan](evidence-and-assets-plan.md) | Trace methodology, cleanup, evidence packs, and the `von-data-tool` showcase plan. |
 | [Operations](operations.md) | Build, run, trace, test, and deployment commands. |
 | [Geometry](geometry.md) | Current geometry/export boundary and validation status. |
 | [Audio](audio.md) | SCSP captures, sample extraction, reconstruction status, and validation tiers. |
@@ -31,10 +31,10 @@ only when regeneration produces no diff.
 
 ## Hardware and subsystem references
 
-- [Board and ROM chip map](../chip-map.md)
-- [ROM inventory snapshot](../phase0-inventory.md)
-- [Versus/link findings](../versus-link-findings.md)
-- [Communication Z80 notes](../cpu3-disassembly.md)
+- [Board and ROM chip map](chip-map.md)
+- [Communication Z80 notes](cpu3-disassembly.md)
+- [Versus/link findings](versus-link-findings.md)
+- [Phase 0 ROM inventory](phase0-inventory.md) (historical snapshot; not current)
 - [Ghidra workflow](../ghidra/README.md)
 - [i960 build and runtime guide](../i960/README.md)
 - [Intel CTOOLS reproducibility](../i960/ctools-reproducibility.md)

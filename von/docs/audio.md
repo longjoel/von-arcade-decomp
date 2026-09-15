@@ -71,7 +71,7 @@ separate claim from descriptor and byte validation.
 
 Recapture one small SCSP key-on under a canonical scenario. Package its event
 excerpt, complete descriptor, extracted WAV, source hashes, and verifier as the
-first audio evidence pack. Display that in `von-viewer` before attempting to
+first audio evidence pack. Display that in `von-data-tool` before attempting to
 promote a complete song.
 
 The full pack schema, cleanup policy, and viewer rollout are in

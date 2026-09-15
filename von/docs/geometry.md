@@ -64,7 +64,7 @@ reference frame, and package it with explicit claims. Only then expand to a
 fighter assembly.
 
 See [Evidence and assets plan](evidence-and-assets-plan.md) for the pack schema
-and `von-viewer` acceptance criteria.
+and `von-data-tool` acceptance criteria.
 
 ## Stage-2 arena obstacle inventory (manual-02 trace)
 

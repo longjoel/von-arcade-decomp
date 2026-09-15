@@ -221,7 +221,7 @@ totals.
 Before selecting more work, run the live status and regenerate stale reports:
 
 ```sh
-./scripts/status.sh --write-markdown
+./bin/vonctl status --write-markdown
 ```
 
 Treat the generated reports as a snapshot of the machine-readable state, not
