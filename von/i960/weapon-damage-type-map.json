@@ -1,0 +1,31 @@
+{
+ "method": "install_read_tap on the damage table 0x565ed0..+0x334*4; fire one weapon per window; the hit appliers at i960 0xbe0f0/0xbe170 index table[type*16] where type is byte 0 of the projectile record (g1). Player mech base 0x503ad0 (projectile slot = base+0x200+i*0x20), opponent 0x5040d0.",
+ "runtime_table": "0x565ed0 (ROM 0x13a728)",
+ "probes": [
+  "von/tools/probe_weapon_damage_type.lua",
+  "von/tools/probe_ordnance_id.lua"
+ ],
+ "map": {
+  "left": {
+   "action": 2,
+   "type": 1,
+   "evidence": "player shot read with defender g2=0x5040d0 during the left-trigger window"
+  },
+  "right": {
+   "action": 1,
+   "type": 7,
+   "evidence": "player shot read with defender g2=0x5040d0 during the right-trigger window"
+  },
+  "center": {
+   "action": 3,
+   "type": null,
+   "evidence": "object+0x13a (action 3 input) is never set by the MAME `von` player inputs; both-trigger presses select action 1 (right). Center trigger/source unresolved."
+  }
+ },
+ "damage_scaling": {
+  "applier": "i960 0x33334/0x33364 -> 0x33420 -> 0x33838",
+  "model": "applied = object+0x4a (raw table damage) * global(0x503ab4) * distance_factor / 10000, then optionally scaled by the profile percent (+0x63c when object+0x172==11, +0x640 when 0x172==14) / 100, then by a factor selected on 0x503ac0.",
+  "status": "path recovered but not yet reduced to a closed form; not wired into the kernel"
+ },
+ "next": "Resolve the center trigger (cabinet input not exposed by the `von` MAME ports), then reduce the scaling chain to a closed form before wiring damage into von_recovered_kernel.c."
+}
