@@ -1,10 +1,13 @@
--- Does an attack accept movement/turn input while it runs? The kernel freezes
--- horizontal velocity during RV_ST_ATTACK and only re-opens it at recovery, so
--- this checks the arcade against that.
+-- Input-commit audit: does the mech accept movement while an attack runs?
 --
--- Phases: hold forward alone (control), then hold forward + fire (attack), then
--- hold forward + fire while twisting the sticks (turn). Position is player
--- x/z = object+0x08/+0x10; action = object+0x174.
+-- Confirms the fire first (player ordnance slot byte 0 and the left cooldown
+-- timer 0x503cba = object+0x1ea), then logs position through the attack.
+-- Phases:
+--   A stand still + fire left      -> confirms the shot without any stick
+--   B hold forward + fire left     -> movement during the attack
+--   C hold forward alone (control)  -> movement baseline
+--
+-- Player x/z = object+0x08/+0x10, action = object+0x174.
 --
 --   VON_AC_LOG=out.log mame vonj ... -autoboot_script \
 --     von/tools/probe_attack_commit.lua
@@ -47,6 +50,22 @@ local function set_key(key, on)
     if on then f:set_value(1) else f:clear_value() end
 end
 
+local function shots()
+    local n = 0
+    for i = 0, 31 do
+        if space:read_u8(PLAYER + 0x200 + i * 0x20) ~= 0 then n = n + 1 end
+    end
+    return n
+end
+
+-- Walk forward from 9600 (launch + settle), then fire at 9750 to isolate how an
+-- attack changes the horizontal speed.
+local function inputs(f)
+    local fwd = f >= 9600 and f < 10000
+    local fire = f >= 9750 and f < 9754
+    return fwd, fire
+end
+
 emu.register_periodic(function()
     frame = frame + 1
     if not space then
@@ -59,16 +78,14 @@ emu.register_periodic(function()
     if frame == START then set_key("start", true) end
     if frame == START + 8 then set_key("start", false) end
 
-    -- Phase A: forward only (control). Phase B: forward + a fresh shot.
-    local control = frame >= 9600 and frame < 9690
-    local attack = frame >= 9700 and frame < 9790
-    set_key("l_up", control or attack)
-    set_key("r_up", control or attack)
-    set_key("l_shot", attack and frame >= 9702 and frame < 9705)
+    local fwd, fire = inputs(frame)
+    set_key("l_up", fwd)
+    set_key("r_up", fwd)
+    set_key("l_shot", fire)
 
-    if frame >= 9598 and frame <= 9792 then
-        log(string.format("ac: f%d x=0x%08x z=0x%08x act=%d",
+    if frame >= 9600 and frame <= 10020 then
+        log(string.format("ac: f%d x=0x%08x z=0x%08x act=%d cd=0x%04x shots=%d",
             frame, space:read_u32(PLAYER + 0x08), space:read_u32(PLAYER + 0x10),
-            space:read_u8(PLAYER + 0x174)))
+            space:read_u8(PLAYER + 0x174), space:read_u16(PLAYER + 0x1ea), shots()))
     end
 end)
