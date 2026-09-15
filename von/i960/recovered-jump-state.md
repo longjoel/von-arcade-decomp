@@ -49,6 +49,13 @@ So the mech has one ballistic option per airborne frame: it flies the arc it
 was launched with. That matches the arcade feel that you either let the jump
 run to the peak or commit to it; mid-air dash/attack/re-jump are ignored.
 
+## No air-attack window
+
+`probe_air_attack.lua` jumps and taps the left shot every 6 frames through the
+whole airborne phase (a fresh edge each attempt). **Zero** projectiles spawned,
+including taps at the exact apex (y = 52.9-53.1). So there is no apex attack
+window: the jump is fully committed and no attack is possible until landing.
+
 ## Tracking / lock is not apex-gated
 
 The aim-tracking gate `object+0xa0` (see `parametric-aim-findings.md`) is
@@ -59,8 +66,27 @@ tracking whether the opponent is inside the aim arc rather than a fixed
 "lock at the peak".
 
 So the probe does **not** support "you lock on at the peak": the aim gate turns
-on *before* the apex. It also does not contradict it for a *different* signal
-(the turret aim angles or the body auto-face), which were not measured here.
+on *before* the apex, and with `probe_jump_lock.lua` it is actually **off from
+y ~= 44 through the apex and descent** (see below). It also does not contradict
+it for a *different* signal (the turret aim angles or the body auto-face), which
+were not measured here.
+
+## Lock signals through a jump
+
+`probe_jump_lock.lua` logs the candidate signals frame-by-frame (flick f9600):
+
+| signal | ground | ascent | apex (~f9664) | descent |
+| --- | --- | --- | --- | --- |
+| target pointer `object+0x74` | `0x5040d0` | unchanged | unchanged | unchanged |
+| aim gate `object+0xa0` | 0 | **1** (y 13-42) | **0** | 0 |
+| camera yaw (eye->target) | ~180 | 128-148 | ~121 | 121 |
+
+The target pointer is constant (the mech always knows the opponent) and
+`object+0xa1` stays 1. The only signal that moves is the aim gate, and it is
+**off at the apex**, so nothing in these cells locks on at the peak. If the
+arcade does re-aim at the apex it must be the turret joints (the `0x00565xxx`
+look-at slots), which are still unmeasured. The synthetic 2P start has an idle
+opponent, which may not reproduce live CPU behavior.
 
 ## Open
 
