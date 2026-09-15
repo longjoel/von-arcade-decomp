@@ -4,17 +4,25 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import tempfile
 from pathlib import Path
 
 
+def _function_source(path: Path, name: str) -> str:
+    text = path.read_text(encoding="utf-8")
+    match = re.search(rf"^def {re.escape(name)}\(.*?(?=^def |\Z)", text, re.S | re.M)
+    assert match, f"{name} not found in {path}"
+    return match.group(0)
+
+
 def main() -> int:
     root = Path(__file__).resolve().parents[2]
-    runner = (root / "scripts/capture-single-player-original.sh").read_text(encoding="utf-8")
+    runner = _function_source(root / "vonctl/commands/capture.py", "single_player")
     assert "VON_CAPTURE_ENABLE_PC_TRACE" in runner
-    assert "MAME_DEBUG_ARGS=(-debug -debugger none)" in runner
-    assert '"$MAME_BIN" vonj -rompath "$ROM_PATH"' in runner
+    assert '"-debug", "-debugger", "none"' in runner
+    assert '"vonj", "-rompath", str(rom_path)' in runner
     assert "vonjdev" not in runner
     tool = root / "von/tools/finalize_single_player_capture.py"
     with tempfile.TemporaryDirectory(prefix="von-single-player-capture-") as directory:

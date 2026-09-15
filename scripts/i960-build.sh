@@ -1,31 +1,3 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-IMAGE="ghcr.io/nkito/i960_sbc@sha256:c4baf40df8c6db1774e2bb87020824ca0d99201b11fb1944ef3a6d2922bd4b6c"
-
-command -v docker >/dev/null 2>&1 || {
-    printf 'error: docker is required\n' >&2
-    exit 1
-}
-
-if ! docker info >/dev/null 2>&1; then
-    printf 'error: Docker daemon is unavailable or the current user cannot access it; i960 build requires the pinned compiler image\n' >&2
-    exit 1
-fi
-
-mkdir -p "$ROOT_DIR/von/build/i960"
-python3 "$ROOT_DIR/von/tools/extract_maincpu.py" \
-    --output "$ROOT_DIR/von/build/i960/vonj-original-maincpu.bin"
-
-# Run as the invoking user so build artifacts stay user-owned (otherwise a
-# later run cannot overwrite/clean the root-owned objects).
-docker run --rm \
-    --user "$(id -u):$(id -g)" -e HOME=/tmp \
-    -v "$ROOT_DIR:/src" \
-    -w /src/von/i960 \
-    --entrypoint /bin/bash \
-    "$IMAGE" \
-    /src/scripts/i960-build-inner.sh
-
-"$ROOT_DIR/scripts/package-i960-clean.sh"
+#!/usr/bin/env sh
+# Shim: the Virtual-On harness lives in `vonctl/`; see `vonctl --help`.
+exec "$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)/bin/vonctl" build i960 "$@"

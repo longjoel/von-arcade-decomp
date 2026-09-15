@@ -129,7 +129,7 @@ def main() -> int:
     if not actual:
         print(
             f"error: no vonj_texture_write records in {args.write_trace}; "
-            "rebuild MAME with VON_MAME_PATCH_SET=debug",
+            "the texture-write tap has not been reimplemented on the Lua API yet",
             file=sys.stderr,
         )
         return 1

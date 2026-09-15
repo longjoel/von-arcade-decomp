@@ -1,0 +1,4 @@
+[submodule "mame"]
+	path = mame
+	url = https://github.com/longjoel/mame-von.git
+	branch = von-0.289

@@ -5,8 +5,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SHARC = ROOT / "third_party/mame-master/src/devices/cpu/sharc/sharc.cpp"
-DISTATE = ROOT / "third_party/mame-master/src/emu/distate.cpp"
+SHARC = ROOT / "mame/src/devices/cpu/sharc/sharc.cpp"
+DISTATE = ROOT / "mame/src/emu/distate.cpp"
 
 
 def main() -> int:

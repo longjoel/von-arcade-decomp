@@ -6,28 +6,30 @@ import json
 import subprocess
 import tempfile
 
+ROOT = Path(__file__).resolve().parents[2]
+
 
 def main() -> int:
-    script = Path("scripts/audit-i960-clean-runtime.sh").read_text(encoding="utf-8")
-    lua = Path("von/tools/trace_i960_attract_coverage.lua").read_text(encoding="utf-8")
-    capture = Path("scripts/trace-i960-attract-coverage.sh").read_text(encoding="utf-8")
+    checks = (ROOT / "vonctl/commands/checks.py").read_text(encoding="utf-8")
+    trace = (ROOT / "vonctl/commands/trace.py").read_text(encoding="utf-8")
+    lua = (ROOT / "von/tools/trace_i960_attract_coverage.lua").read_text(encoding="utf-8")
     required = (
-        "MAME_STATUS=$?",
-        "AUDIT_STATUS=0",
+        "mame_status = process.run_to_log",
+        "audit_status = 0",
         "audit_clean_i960_coverage.py",
         "MAME produced no i960 PC coverage",
-        'if [[ "$MAME_STATUS" -ne 0 ]]',
-        'RUN_LOG=',
+        "if mame_status != 0",
+        "run_log",
         "Unhandled 00|Unhandled exception|\\[LUA ERROR\\]",
-        'exit "$AUDIT_STATUS"',
+        "return audit_status",
     )
-    missing = [fragment for fragment in required if fragment not in script]
+    missing = [fragment for fragment in required if fragment not in checks]
     if missing:
         raise SystemExit(f"clean runtime audit contract missing: {missing}")
     for fragment in ("capture_manifest.py", "-cfg_directory", "-nvram_directory", "-state_directory"):
-        if fragment not in capture:
+        if fragment not in trace:
             raise SystemExit(f"attract capture provenance contract missing: {fragment}")
-    assert script.index("MAME_STATUS=$?") < script.index("audit_clean_i960_coverage.py")
+    assert checks.index("mame_status = process.run_to_log") < checks.index("audit_clean_i960_coverage.py")
     assert "manager.machine:exit()" in lua
     assert "emu.exit()" not in lua
     with tempfile.TemporaryDirectory() as directory:
@@ -64,8 +66,8 @@ def main() -> int:
             assert (result.returncode == 0) == (error is None), result
             if error:
                 assert error in result.stderr, result.stderr
-    assert 'mktemp -d "$OUT_DIR/run-XXXXXXXX"' in script
-    assert '--expected-seconds "$SECONDS_TO_RUN"' in script
+    assert 'prefix="run-"' in checks
+    assert '"--expected-seconds"' in checks
     assert '# completed_time=%.9f' in lua
     print("PASS: clean runtime always audits PCs before propagating MAME failure")
     return 0

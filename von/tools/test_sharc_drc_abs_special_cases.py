@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / "third_party/mame-master/src/devices/cpu/sharc/sharcdrc.cpp"
+SOURCE = ROOT / "mame/src/devices/cpu/sharc/sharcdrc.cpp"
 
 
 def main() -> int:

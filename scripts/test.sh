@@ -1,6 +1,3 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$ROOT_DIR"
-python3 von/tools/run_tests.py unit contract "$@"
+#!/usr/bin/env sh
+# Shim: the Virtual-On harness lives in `vonctl/`; see `vonctl --help`.
+exec "$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)/bin/vonctl" test "$@"

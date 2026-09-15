@@ -62,10 +62,6 @@
         ],
         [
           "python3",
-          "von/tools/test_patchset_manifest.py"
-        ],
-        [
-          "python3",
           "von/tools/test_project_status.py"
         ],
         [
@@ -163,8 +159,9 @@
           "von/tools/test_sharc_drc_state_export.py"
         ],
         [
-          "bash",
-          "scripts/test-mame-smoke.sh"
+          "./bin/vonctl",
+          "check",
+          "smoke"
         ]
       ]
     },

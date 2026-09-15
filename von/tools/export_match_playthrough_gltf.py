@@ -13,7 +13,7 @@ are known), LINEAR translation/rotation/scale keys, scale-0 hides gaps.
 Usage:
     python3 von/tools/export_match_playthrough_gltf.py --frames /tmp/demo.json \\
         --rom von/build/disasm/geometry-rom.bin --t0 138 --t1 149.5 \\
-        --output von-viewer/public/assets/traced/match-playthrough-bout1.gltf
+        --output von/build/disasm/match-playthrough-bout1.gltf
 """
 from __future__ import annotations
 

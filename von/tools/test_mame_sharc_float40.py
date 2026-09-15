@@ -8,10 +8,10 @@ import tempfile
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-HEADER = ROOT / "third_party/mame-master/src/devices/cpu/sharc/sharcfloat40.h"
-CORE_HEADER = ROOT / "third_party/mame-master/src/devices/cpu/sharc/sharc.h"
-SHARC_CPP = ROOT / "third_party/mame-master/src/devices/cpu/sharc/sharc.cpp"
-SHARC_DRC_CPP = ROOT / "third_party/mame-master/src/devices/cpu/sharc/sharcdrc.cpp"
+HEADER = ROOT / "mame/src/devices/cpu/sharc/sharcfloat40.h"
+CORE_HEADER = ROOT / "mame/src/devices/cpu/sharc/sharc.h"
+SHARC_CPP = ROOT / "mame/src/devices/cpu/sharc/sharc.cpp"
+SHARC_DRC_CPP = ROOT / "mame/src/devices/cpu/sharc/sharcdrc.cpp"
 FIXTURE = ROOT / "von/i960/sharc_precision_fixtures.json"
 
 

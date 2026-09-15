@@ -1,7 +1,4 @@
 # User-supplied ROMs and generated emulator output are never repository data.
-/third_party/*
-!/third_party/patches/
-!/third_party/patches/**
 /von/artifacts/*
 !/von/artifacts/.gitkeep
 /von/captures/

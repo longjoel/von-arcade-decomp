@@ -5,7 +5,7 @@ import pathlib
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-SUBTARGET = ROOT.parent / "scripts/mame-von.lua"
+SUBTARGET = ROOT.parent / "mame/scripts/target/mame/von.lua"
 
 
 def main():

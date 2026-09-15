@@ -98,7 +98,7 @@ def markdown(status: dict) -> str:
         f"- Latest test results: {outcome_text}",
         f"- Evidence: {status['evidence']['canonical']} canonical; {'healthy' if status['evidence']['healthy'] else 'invalid'}",
         "",
-        "Regenerate with `./scripts/status.sh --write-markdown`.", "",
+        "Regenerate with `./bin/vonctl status --write-markdown`.", "",
     ])
 
 
