@@ -118,9 +118,7 @@ def parse_indexed_png(data: bytes) -> dict:
 
 
 def _sheet_xy(x: int, y: int) -> tuple[int, int]:
-    """Mirror of export_geometry_textured_gltf.texture_sheet_xy."""
-    x &= 2047
-    y &= 1023
+    """Mirror of model2_texture.texture_sheet_xy (MAME get_texel fold)."""
     if x >= 1024:
         x -= 1024
         y ^= 1024

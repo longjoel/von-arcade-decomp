@@ -73,6 +73,8 @@ def main() -> int:
         root = Path(directory)
         bank_file = root / "bank0-primary.bin"
         bank_file.write_bytes(bytes(1 << 15))
+        bank1_file = root / "bank1-primary.bin"
+        bank1_file.write_bytes(bytes(1 << 15))
         trace = root / "select.trace"
         trace.write_text(
             "vonj_texture_command: time=1.0 uv=1234 header=40 "
@@ -84,8 +86,8 @@ def main() -> int:
         tiles = root / "tiles"
         run = subprocess.run(
             [sys.executable, "von/tools/extract_texture_tiles.py", "--trace", str(trace),
-             "--bank", str(bank_file), "--output-dir", str(tiles),
-             "--format", "png", "--limit", "4"],
+             "--bank0", str(bank_file), "--bank1", str(bank1_file),
+             "--output-dir", str(tiles), "--format", "png", "--limit", "4"],
             capture_output=True, text=True, cwd=Path.cwd())
         check("extractor png exit", run.returncode == 0)
         names = sorted(p.name for p in tiles.glob("*.png"))

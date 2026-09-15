@@ -11,8 +11,9 @@ from pathlib import Path
 
 from export_geometry_frame_gltf import MATRIX, OBJECT
 from export_geometry_animation_gltf import transform_trs
-from export_geometry_textured_gltf import (parse_faces, texture_sampler,
-                                           texture_size, texture_uv, tile_png)
+from export_geometry_textured_gltf import parse_faces
+from model2_texture import (DEFAULT_BANK0, DEFAULT_BANK1, load_banks,
+                            texture_sampler, texture_size, texture_uv, tile_png)
 from render_texture_palette import parse_trace
 
 
@@ -89,10 +90,10 @@ def main() -> int:
     parser.add_argument("--rom", type=Path, default=Path("von/build/disasm/geometry-rom.bin"))
     parser.add_argument("--texture-rom", type=Path,
                         default=Path("von/build/disasm/texture-pipeline/texture-rom.bin"))
-    parser.add_argument("--bank-primary", type=Path,
-                        default=Path("von/build/disasm/texture-pipeline/bank0-primary.bin"))
-    parser.add_argument("--bank-secondary", type=Path,
-                        default=Path("von/build/disasm/texture-pipeline/bank0-secondary.bin"))
+    parser.add_argument("--bank0", type=Path, default=Path(DEFAULT_BANK0),
+                        help="texture RAM 0 sheet (.bin or MAME .hex dump)")
+    parser.add_argument("--bank1", type=Path, default=Path(DEFAULT_BANK1),
+                        help="texture RAM 1 sheet (.bin or MAME .hex dump)")
     parser.add_argument("--palette-trace", type=Path,
                         help="optional MAME trace containing palette/colorxlat/luma writes")
     parser.add_argument("--output", type=Path, required=True)
@@ -135,8 +136,7 @@ def main() -> int:
         objects, object_slots = filter_obas(objects, object_slots, args.oba)
     geometry = args.rom.read_bytes()
     texture_rom = args.texture_rom.read_bytes()
-    primary = args.bank_primary.read_bytes()
-    secondary = args.bank_secondary.read_bytes()
+    banks = load_banks(args.bank0, args.bank1)
     palette_state = (parse_trace(args.palette_trace, selected_time)
                      if args.palette_trace else None)
 
@@ -168,8 +168,7 @@ def main() -> int:
             return material_by_header[header]
         width, height, origin_x, origin_y, colorbase = texture_size(header)
         textured = bool(((header[0] >> 13) & 3) & 2)
-        bank = secondary if header[2] & 0x1000 else primary
-        image_data = tile_png(bank, header, palette_state) if textured else None
+        image_data = tile_png(header, banks, palette_state) if textured else None
         texture_index = None
         texture_key = (header[0], header[1], header[2], header[3])
         if image_data is not None:
@@ -194,7 +193,8 @@ def main() -> int:
             "name": f"header_{header[0]:04x}_{header[1]:04x}_{header[2]:04x}_{header[3]:04x}",
             "extras": {"texheader": list(header), "width": width,
                        "height": height, "origin": [origin_x, origin_y],
-                       "colorbase": colorbase, "uv_order": ["u", "v"],
+                       "colorbase": colorbase, "bank": (header[2] >> 12) & 1,
+                       "uv_order": ["u", "v"],
                        "uv_units": "1/8 texel", "uv_image_space": "tile-local",
                        "wrap": list(texture_sampler(header))},
         }

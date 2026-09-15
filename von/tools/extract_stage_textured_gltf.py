@@ -23,8 +23,9 @@ import struct
 from pathlib import Path
 
 from export_geometry_animation_gltf import parse_mesh
-from export_geometry_textured_gltf import (parse_faces, texture_sampler,
-                                           texture_size, texture_uv, tile_png)
+from export_geometry_textured_gltf import parse_faces
+from model2_texture import (DEFAULT_BANK0, DEFAULT_BANK1, load_banks,
+                            texture_sampler, texture_size, texture_uv, tile_png)
 from render_texture_palette import parse_trace
 
 
@@ -55,12 +56,10 @@ def harvest_textures(trace: Path, texmap: Path | None) -> dict[int, tuple[int, i
 
 
 def build(stage: int, manifest: Path, rom: Path, texture_rom: Path,
-          primary: Path, secondary: Path, table: dict[int, tuple[int, int]],
-          palette_state, include_untextured: bool, bank_source: str = "primary"):
+          banks: dict[int, bytes], table: dict[int, tuple[int, int]],
+          palette_state, include_untextured: bool):
     geometry = rom.read_bytes()
     texture_data = texture_rom.read_bytes()
-    bank_primary = primary.read_bytes()
-    bank_secondary = secondary.read_bytes()
 
     blob = bytearray()
     views: list[dict] = []
@@ -91,11 +90,7 @@ def build(stage: int, manifest: Path, rom: Path, texture_rom: Path,
             return material_by_header[header]
         width, height, origin_x, origin_y, colorbase = texture_size(header)
         textured = bool(((header[0] >> 13) & 3) & 2)
-        if bank_source == "header":
-            bank = bank_secondary if header[2] & 0x1000 else bank_primary
-        else:
-            bank = bank_primary
-        image_data = tile_png(bank, header, palette_state) if textured else None
+        image_data = tile_png(header, banks, palette_state) if textured else None
         texture_index = None
         if image_data is not None:
             sampler_mode = texture_sampler(header)
@@ -119,6 +114,7 @@ def build(stage: int, manifest: Path, rom: Path, texture_rom: Path,
             "name": f"header_{header[0]:04x}_{header[1]:04x}_{header[2]:04x}_{header[3]:04x}",
             "extras": {"texheader": list(header), "width": width, "height": height,
                        "origin": [origin_x, origin_y], "colorbase": colorbase,
+                       "bank": (header[2] >> 12) & 1,
                        "uv_units": "1/8 texel", "wrap": list(texture_sampler(header))},
         }
         if texture_index is not None:
@@ -226,10 +222,12 @@ def main() -> int:
                         default=Path("von/build/disasm/geometry-rom.bin"))
     parser.add_argument("--texture-rom", type=Path,
                         default=Path("von/build/disasm/texture-pipeline/texture-rom.bin"))
-    parser.add_argument("--bank-primary", type=Path,
-                        default=Path("von/build/disasm/texture-pipeline/bank0-primary.bin"))
-    parser.add_argument("--bank-secondary", type=Path,
-                        default=Path("von/build/disasm/texture-pipeline/bank0-secondary.bin"))
+    parser.add_argument("--bank0", type=Path, default=Path(DEFAULT_BANK0),
+                        help="texture RAM 0 sheet live during the traced frame "
+                             "(.bin or MAME .hex dump)")
+    parser.add_argument("--bank1", type=Path, default=Path(DEFAULT_BANK1),
+                        help="texture RAM 1 sheet live during the traced frame "
+                             "(.bin or MAME .hex dump)")
     parser.add_argument("--trace", type=Path,
                         help="instrumented geometry trace carrying tpa/tha per OBA")
     parser.add_argument("--texmap", type=Path, default=Path("von/oba_texmap.json"))
@@ -238,18 +236,15 @@ def main() -> int:
     parser.add_argument("--textured-only", dest="include_untextured",
                         action="store_false",
                         help="drop faces whose texture header is not textured")
-    parser.add_argument("--bank-source", choices=("primary", "header"), default="primary",
-                        help="arena tiles live in the full primary sheet; 'header' "
-                             "reproduces the header 0x1000 bank bit used for models")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
     table = harvest_textures(args.trace, args.texmap)
     palette_state = parse_trace(args.palette_trace) if args.palette_trace else None
+    banks = load_banks(args.bank0, args.bank1)
     document, stats, missing = build(
-        args.stage, args.manifest, args.rom, args.texture_rom, args.bank_primary,
-        args.bank_secondary, table, palette_state, args.include_untextured,
-        args.bank_source)
+        args.stage, args.manifest, args.rom, args.texture_rom, banks, table,
+        palette_state, args.include_untextured)
     if not document["meshes"]:
         raise SystemExit(f"stage {args.stage}: no texturable statics found")
     args.output.parent.mkdir(parents=True, exist_ok=True)

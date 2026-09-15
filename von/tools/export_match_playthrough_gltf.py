@@ -30,8 +30,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from annotate_bout import destab, estimate_yaw_track
 from export_geometry_animation_gltf import parse_mesh, transform_trs
-from export_geometry_textured_gltf import (parse_faces, texture_sampler,
-                                           texture_size, texture_uv, tile_png)
+from export_geometry_textured_gltf import parse_faces
+from model2_texture import (DEFAULT_BANK0, DEFAULT_BANK1, load_banks,
+                            texture_sampler, texture_size, texture_uv, tile_png)
 
 IDENTITY_ROT = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 
@@ -98,10 +99,10 @@ def main() -> int:
     p.add_argument("--min-fill", type=int, default=5)
     p.add_argument("--texture-rom", type=Path,
                    default=Path("von/build/disasm/texture-pipeline/texture-rom.bin"))
-    p.add_argument("--bank-primary", type=Path,
-                   default=Path("von/build/disasm/texture-pipeline/bank0-primary.bin"))
-    p.add_argument("--bank-secondary", type=Path,
-                   default=Path("von/build/disasm/texture-pipeline/bank0-secondary.bin"))
+    p.add_argument("--bank0", type=Path, default=Path(DEFAULT_BANK0),
+                   help="texture RAM 0 sheet (.bin or MAME .hex dump)")
+    p.add_argument("--bank1", type=Path, default=Path(DEFAULT_BANK1),
+                   help="texture RAM 1 sheet (.bin or MAME .hex dump)")
     p.add_argument("--texmap", type=Path, default=None,
                    help="JSON oba-hex -> [[tpa, tha], ...] fallback texture addresses")
     a = p.parse_args()
@@ -111,8 +112,7 @@ def main() -> int:
     print(f"window: {len(ts)} frames {ts[0]:.2f}-{ts[-1]:.2f}s")
     rom = a.rom.read_bytes()
     texture_rom = a.texture_rom.read_bytes()
-    primary = a.bank_primary.read_bytes()
-    secondary = a.bank_secondary.read_bytes()
+    banks = load_banks(a.bank0, a.bank1)
     texmap = json.loads(a.texmap.read_text()) if a.texmap else {}
 
     def entry_meta(o):
@@ -260,8 +260,7 @@ def main() -> int:
             return material_by_header[header]
         width, height, origin_x, origin_y, colorbase = texture_size(header)
         textured = bool(((header[0] >> 13) & 3) & 2)
-        bank = secondary if header[2] & 0x1000 else primary
-        image_data = tile_png(bank, header, None) if textured else None
+        image_data = tile_png(header, banks, None) if textured else None
         texture_index = None
         if image_data is not None:
             sampler_mode = texture_sampler(header)

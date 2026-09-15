@@ -9,6 +9,10 @@
       "commands": [
         [
           "python3",
+          "von/tools/test_model2_texture_banks.py"
+        ],
+        [
+          "python3",
           "von/tools/test_texture_palette.py"
         ],
         [
@@ -29,7 +33,9 @@
       "exclude": [
         "von/tools/test_recovered_*.py",
         "von/tools/test_*trace*.py",
+        "von/tools/test_model2_texture_banks.py",
         "von/tools/test_texture_palette.py",
+        "von/tools/test_texture_tile_png.py",
         "von/tools/test_texture_uv_mapping.py",
         "von/tools/test_mame_sharc_float40.py",
         "von/tools/test_sharc_drc_abs_special_cases.py",

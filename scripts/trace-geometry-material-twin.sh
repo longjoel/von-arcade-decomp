@@ -6,7 +6,7 @@ SECONDS_TO_RUN="${VON_GEOMETRY_MATERIAL_SECONDS:-35}"
 ROM="${VON_GEOMETRY_ROM:-$ROOT_DIR/von/build/disasm/geometry-rom.bin}"
 TEXTURE_ROM="${VON_GEOMETRY_TEXTURE_ROM:-$ROOT_DIR/von/build/disasm/texture-pipeline/texture-rom.bin}"
 TEXTURE_BANK="${VON_GEOMETRY_TEXTURE_BANK:-$ROOT_DIR/von/build/disasm/texture-pipeline/bank0-primary.bin}"
-TEXTURE_BANK_SECONDARY="${VON_GEOMETRY_TEXTURE_BANK_SECONDARY:-$ROOT_DIR/von/build/disasm/texture-pipeline/bank0-secondary.bin}"
+TEXTURE_BANK1="${VON_GEOMETRY_TEXTURE_BANK1:-$ROOT_DIR/von/build/disasm/texture-pipeline/bank1-primary.bin}"
 OUTPUT_ROOT="${VON_GEOMETRY_MATERIAL_OUTPUT:-$ROOT_DIR/von/build/disasm/first-match-material-twin}"
 SCRIPT="$ROOT_DIR/von/tools/gameplay_progress.lua"
 
@@ -19,7 +19,7 @@ mkdir -p "$ROOT_DIR/von/build/disasm"
 if [[ ! -f "$ROM" ]]; then
     python3 "$ROOT_DIR/von/tools/extract_geometry_rom.py" --output "$ROM"
 fi
-if [[ ! -f "$TEXTURE_ROM" || ! -f "$TEXTURE_BANK" || ! -f "$TEXTURE_BANK_SECONDARY" ]]; then
+if [[ ! -f "$TEXTURE_ROM" || ! -f "$TEXTURE_BANK" || ! -f "$TEXTURE_BANK1" ]]; then
     python3 "$ROOT_DIR/von/tools/extract_texture_pipeline.py" --output-dir "$(dirname "$TEXTURE_BANK")"
 fi
 
@@ -50,7 +50,7 @@ for cabinet in p1 p2; do
     frame_output="$OUTPUT_DIR/$cabinet/first-match-frame-textured.gltf"
     python3 "$ROOT_DIR/von/tools/export_geometry_frame_textured_gltf.py" \
         --trace "$trace" --rom "$ROM" --texture-rom "$TEXTURE_ROM" \
-        --bank-primary "$TEXTURE_BANK" --bank-secondary "$TEXTURE_BANK_SECONDARY" \
+        --bank0 "$TEXTURE_BANK" --bank1 "$TEXTURE_BANK1" \
         --palette-trace "$trace" --output "$frame_output" \
         --max-time 32.8 --min-objects 100
     frame_time="$(python3 - "$frame_output" <<'PY'
@@ -70,7 +70,7 @@ PY
         [[ "$oba" == "oba" || -z "$oba" ]] && continue
         python3 "$ROOT_DIR/von/tools/export_geometry_textured_gltf.py" \
             --rom "$ROM" --texture-rom "$TEXTURE_ROM" \
-            --bank-primary "$TEXTURE_BANK" --bank-secondary "$TEXTURE_BANK_SECONDARY" \
+            --bank0 "$TEXTURE_BANK" --bank1 "$TEXTURE_BANK1" \
             --palette-trace "$trace" --palette-time "$frame_time" \
             --oba "$oba" --tpa "$tpa" --tha "$tha" \
             --output "$textured_objects/oba-${oba#0x}.gltf"
@@ -80,7 +80,7 @@ PY
         --output "$OUTPUT_DIR/$cabinet/first-match-frame.gltf" \
         --max-time 32.8 --min-objects 100
     python3 "$ROOT_DIR/von/tools/extract_texture_tiles.py" \
-        --trace "$trace" --bank "$TEXTURE_BANK" \
+        --trace "$trace" --bank0 "$TEXTURE_BANK" --bank1 "$TEXTURE_BANK1" \
         --output-dir "$OUTPUT_DIR/$cabinet/texture-tiles" --limit 2048
 done
 

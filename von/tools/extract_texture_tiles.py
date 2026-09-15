@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Extract individual 4bpp texture tiles referenced by a MAME trace."""
+"""Extract individual 4bpp texture tiles referenced by a MAME trace.
+
+Each ``vonj_texture_command`` line carries the four texture-header words in
+``tex=`` and the selected texture RAM in ``sheet=`` (0 or 1). Tiles are cropped
+from the header-selected RAM exactly as the hardware ``get_texel`` would.
+"""
 
 from __future__ import annotations
 
@@ -8,7 +13,8 @@ import json
 import re
 from pathlib import Path
 
-from export_geometry_textured_gltf import texel
+from model2_texture import (DEFAULT_BANK0, DEFAULT_BANK1, load_banks,
+                            texture_size, texel_index)
 
 from texture_tile_png import indexed_png
 
@@ -25,8 +31,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--trace", type=Path,
                         default=Path("von/build/disasm/vonj-gameplay-texture.trace"))
-    parser.add_argument("--bank", type=Path,
-                        default=Path("von/build/disasm/texture-pipeline/bank0-primary.bin"))
+    parser.add_argument("--bank0", type=Path, default=Path(DEFAULT_BANK0),
+                        help="texture RAM 0 sheet (.bin or MAME .hex dump)")
+    parser.add_argument("--bank1", type=Path, default=Path(DEFAULT_BANK1),
+                        help="texture RAM 1 sheet (.bin or MAME .hex dump)")
     parser.add_argument("--output-dir", type=Path,
                         default=Path("von/build/disasm/texture-pipeline/tiles"))
     parser.add_argument("--limit", type=int, default=128)
@@ -35,37 +43,40 @@ def main() -> int:
                              "4-bit indexed PNGs with von: provenance chunks")
     args = parser.parse_args()
 
-    packed = args.bank.read_bytes()
+    banks = load_banks(args.bank0, args.bank1)
+    bank_names = {0: args.bank0.name, 1: args.bank1.name}
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    seen: set[tuple[int, int, int, int, int]] = set()
+    seen: set[tuple[int, int, int, int, int, int]] = set()
     rows: list[tuple[str, int, int, int, int, int]] = []
     manifest: list[dict] = []
 
     for match in COMMAND.finditer(args.trace.read_text()):
         groups = match.groups()
-        header = int(groups[1], 16)
+        header = tuple(int(groups[i], 16) for i in (2, 3, 4, 5))
         colorbase = int(groups[7], 16)
-        sheet = int(groups[8])
-        width, height, origin_x, origin_y = map(int, groups[9:13])
-        key = (header, width, height, origin_x, origin_y)
-        if sheet or key in seen or width > 256 or height > 256:
+        bank = int(groups[8])
+        width, height, _, _, _ = texture_size(header)
+        origin_x, origin_y = map(int, groups[11:13])
+        key = (header[0], header[2], width, height, origin_x, origin_y)
+        if key in seen or width > 256 or height > 256 or bank not in banks:
             continue
         seen.add(key)
-        x0 = (origin_x - 2048) & 2047
-        y0 = (origin_y - 1024) & 1023
+        x0 = origin_x & 2047
+        y0 = origin_y & 1023
+        sheet = banks[bank]
         indices = bytes(
-            texel(packed, x0 + x, y0 + y) // 17
+            texel_index(sheet, x0 + x, y0 + y)
             for y in range(height) for x in range(width)
         )
         stem = f"{len(rows):03d}-cb{colorbase:03x}-{width}x{height}-at{x0:04x}_{y0:03x}"
         if args.format == "png":
             name = stem + ".png"
             metadata = {
-                "von:header": f"{header:#x}",
+                "von:header": "0x%04x_%04x_%04x_%04x" % header,
                 "von:origin": f"{x0},{y0}",
                 "von:size": f"{width}x{height}",
-                "von:bank": args.bank.name,
-                "von:sheet": str(sheet),
+                "von:bank": bank_names[bank],
+                "von:sheet": str(bank),
                 "von:colorbase": f"{colorbase:#x}",
                 "von:source": args.trace.name,
             }
@@ -76,9 +87,10 @@ def main() -> int:
             (args.output_dir / name).write_bytes(
                 f"P5\n{width} {height}\n255\n".encode() + pixels)
         rows.append((name, colorbase, width, height, x0, y0))
-        manifest.append({"file": name, "header": header, "header_hex": f"{header:#x}",
+        manifest.append({"file": name, "header": list(header),
+                         "header_hex": "0x%04x_%04x_%04x_%04x" % header,
                          "x": x0, "y": y0, "width": width, "height": height,
-                         "colorbase": colorbase, "bank": args.bank.name, "sheet": sheet})
+                         "colorbase": colorbase, "bank": bank_names[bank], "sheet": bank})
         if len(rows) >= args.limit:
             break
 

@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Export one mode-3 polygon object with recovered UVs and texture tiles."""
+"""Export one mode-3 polygon object with recovered UVs and texture tiles.
+
+The geometry is read from the polygon ROM; each texture is cropped from the
+header-selected Model 2 texture RAM (see ``model2_texture``). Pass the RAM state
+that was live while the geometry was drawn via ``--bank0`` / ``--bank1`` (a raw
+1 MiB ``.bin`` sheet or a MAME ``.hex`` dump).
+"""
 
 from __future__ import annotations
 
@@ -7,11 +13,18 @@ import argparse
 import base64
 import json
 import struct
-import zlib
 from pathlib import Path
 
 from export_geometry_obj import point, words
-from render_texture_palette import palette_rgb, parse_trace
+from model2_texture import (DEFAULT_BANK0, DEFAULT_BANK1, load_banks, texel,
+                            texel_index, texture_sampler, texture_sheet_xy,
+                            texture_size, texture_uv, tile_png)
+from render_texture_palette import parse_trace
+
+__all__ = [
+    "parse_faces", "raster_vertices", "texture_sampler", "texture_size",
+    "texture_uv", "texel", "texel_index", "tile_png",
+]
 
 
 def u16(data: bytes, address: int) -> int:
@@ -25,29 +38,6 @@ def texture_header(data: bytes, address: int) -> tuple[int, int, int, int]:
     return tuple(u16(data, address + index) for index in range(4))
 
 
-def texture_size(header: tuple[int, int, int, int]) -> tuple[int, int, int, int, int]:
-    h0, _, h2, h3 = header
-    width = 32 << (h0 & 7)
-    height = 32 << ((h0 >> 3) & 7)
-    origin_x = 32 * (h2 & 0x3f)
-    origin_y = 32 * ((h2 >> 6) & 0x1f)
-    colorbase = (h3 >> 6) & 0x3ff
-    return width, height, origin_x, origin_y, colorbase
-
-
-def texture_uv(raw_u: int, raw_v: int,
-               header: tuple[int, int, int, int]) -> tuple[float, float]:
-    """Convert Model 2 1/8-texel UVs into tile-local glTF coordinates.
-
-    The renderer reads each texture point as ``pv`` followed by ``pu`` and
-    applies ``1 / 8`` before sampling the tile selected by the header.  The
-    header origin is deliberately not added here: exported images are cropped
-    to that tile, so glTF coordinates are tile-local.
-    """
-    width, height, _, _, _ = texture_size(header)
-    return raw_u / 8.0 / width, raw_v / 8.0 / height
-
-
 def raster_vertices(points: tuple[tuple[float, float, float], ...]
                     ) -> tuple[tuple[float, float, float], ...]:
     """Return vertices in the Model 2 rasterizer order.
@@ -57,94 +47,6 @@ def raster_vertices(points: tuple[tuple[float, float, float], ...]
     is essential to keep positions and UVs paired.
     """
     return (points[1], points[0], *points[2:])
-
-
-def texture_sampler(header: tuple[int, int, int, int]) -> tuple[int, int]:
-    """Return glTF wrap modes matching Model 2's regular-texture flags.
-
-    Header bits 6/7 enable smooth wrapping on the U/V axes.  Bits 8/9 mirror
-    an axis and take precedence over wrapping, matching MAME's renderer.
-    """
-    flags = header[0]
-
-    def axis(wrap_bit: int, mirror_bit: int) -> int:
-        if flags & (1 << mirror_bit):
-            return 33648  # MIRRORED_REPEAT
-        if flags & (1 << wrap_bit):
-            return 10497  # REPEAT
-        return 33071  # CLAMP_TO_EDGE
-
-    return axis(6, 8), axis(7, 9)
-
-
-def png_gray(width: int, height: int, pixels: bytes) -> bytes:
-    def chunk(name: bytes, payload: bytes) -> bytes:
-        return (struct.pack(">I", len(payload)) + name + payload +
-                struct.pack(">I", zlib.crc32(name + payload) & 0xffffffff))
-
-    rows = b"".join(b"\x00" + pixels[row * width:(row + 1) * width]
-                   for row in range(height))
-    return (b"\x89PNG\r\n\x1a\n" +
-            chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 0, 0, 0, 0)) +
-            chunk(b"IDAT", zlib.compress(rows, 9)) + chunk(b"IEND", b""))
-
-
-def png_rgb(width: int, height: int, pixels: bytes) -> bytes:
-    def chunk(name: bytes, payload: bytes) -> bytes:
-        return (struct.pack(">I", len(payload)) + name + payload +
-                struct.pack(">I", zlib.crc32(name + payload) & 0xffffffff))
-
-    row_size = width * 3
-    rows = b"".join(b"\x00" + pixels[row * row_size:(row + 1) * row_size]
-                   for row in range(height))
-    return (b"\x89PNG\r\n\x1a\n" +
-            chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)) +
-            chunk(b"IDAT", zlib.compress(rows, 9)) + chunk(b"IEND", b""))
-
-
-def texture_sheet_xy(x: int, y: int) -> tuple[int, int]:
-    """Map a logical 2048x1024 Model 2 sheet coordinate to RAM storage.
-
-    The sheet's right half is stored as the other 1024x1024 bank with bit 10
-    of Y flipped.  This mirrors ``model2_renderer::get_texel``; treating the
-    dump as a linear 2048x1024 image produces plausible palette colours but
-    the wrong texture regions for tiles at X >= 1024.
-    """
-    x &= 2047
-    y &= 1023
-    if x >= 1024:
-        x -= 1024
-        y ^= 1024
-    return x, y
-
-
-def texel(bank: bytes, x: int, y: int) -> int:
-    local_x, local_y = x & 1, y & 1
-    x, y = texture_sheet_xy(x, y)
-    offset = (y // 2) * 512 + (x // 2)
-    word = int.from_bytes(bank[(offset >> 1) * 4:(offset >> 1) * 4 + 4], "little")
-    if offset & 1:
-        word >>= 16
-    if not local_y:
-        word >>= 8
-    if not local_x:
-        word >>= 4
-    return (word & 0x0f) * 17
-
-
-def tile_png(bank: bytes, header: tuple[int, int, int, int], palette_state=None) -> bytes | None:
-    width, height, origin_x, origin_y, colorbase = texture_size(header)
-    if width > 2048 or height > 1024:
-        return None
-    indices = bytes(texel(bank, origin_x + x, origin_y + y) // 17
-                    for y in range(height) for x in range(width))
-    if palette_state is None:
-        return png_gray(width, height, bytes(index * 17 for index in indices))
-    palette, colorxlat, luma = palette_state
-    pixels = bytes(channel
-                   for index in indices
-                   for channel in palette_rgb(index, colorbase, palette, colorxlat, luma))
-    return png_rgb(width, height, pixels)
 
 
 def parse_faces(geometry: bytes, texture_data: bytes, oba: int, tpa: int, tha: int,
@@ -212,10 +114,10 @@ def main() -> int:
     parser.add_argument("--rom", type=Path, default=Path("von/build/disasm/geometry-rom.bin"))
     parser.add_argument("--texture-rom", type=Path,
                         default=Path("von/build/disasm/texture-pipeline/texture-rom.bin"))
-    parser.add_argument("--bank-primary", type=Path,
-                        default=Path("von/build/disasm/texture-pipeline/bank0-primary.bin"))
-    parser.add_argument("--bank-secondary", type=Path,
-                        default=Path("von/build/disasm/texture-pipeline/bank0-secondary.bin"))
+    parser.add_argument("--bank0", type=Path, default=Path(DEFAULT_BANK0),
+                        help="texture RAM 0 sheet (.bin or MAME .hex dump)")
+    parser.add_argument("--bank1", type=Path, default=Path(DEFAULT_BANK1),
+                        help="texture RAM 1 sheet (.bin or MAME .hex dump)")
     parser.add_argument("--palette-trace", type=Path,
                         help="optional MAME trace containing palette/colorxlat/luma writes")
     parser.add_argument("--palette-time", type=float,
@@ -228,8 +130,7 @@ def main() -> int:
 
     texture_data = args.texture_rom.read_bytes()
     geometry = args.rom.read_bytes()
-    primary = args.bank_primary.read_bytes()
-    secondary = args.bank_secondary.read_bytes()
+    banks = load_banks(args.bank0, args.bank1)
     palette_state = (parse_trace(args.palette_trace, args.palette_time)
                      if args.palette_trace else None)
     faces = parse_faces(geometry, texture_data, args.oba, args.tpa, args.tha)
@@ -246,7 +147,6 @@ def main() -> int:
             triangles = ((0, 1, 2), (0, 2, 3))
         else:
             triangles = ((0, 1, 2),)
-        width, height, _, _, _ = texture_size(header)
         for index in range(len(points)):
             entry["positions"].append(points[index])
             entry["uv"].append(texture_uv(uv[index][0], uv[index][1], header))
@@ -286,8 +186,7 @@ def main() -> int:
         ])
         width, height, origin_x, origin_y, colorbase = texture_size(header)
         textured = ((header[0] >> 13) & 3) & 2
-        bank = secondary if header[2] & 0x1000 else primary
-        image_data = tile_png(bank, header, palette_state) if textured else None
+        image_data = tile_png(header, banks, palette_state) if textured else None
         texture_index = None
         if image_data is not None:
             sampler_mode = texture_sampler(header)
@@ -305,6 +204,7 @@ def main() -> int:
         material = {"name": f"header_{header[0]:04x}_{header[1]:04x}_{header[2]:04x}_{header[3]:04x}",
                     "extras": {"texheader": list(header), "width": width, "height": height,
                                "origin": [origin_x, origin_y], "colorbase": colorbase,
+                               "bank": (header[2] >> 12) & 1,
                                "uv_order": ["u", "v"], "uv_units": "1/8 texel",
                                "uv_image_space": "tile-local",
                                "wrap": list(texture_sampler(header))}}

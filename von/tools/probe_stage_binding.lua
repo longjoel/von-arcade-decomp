@@ -26,6 +26,9 @@
 --   VON_STAGE_FORCE_TO     last forced frame (default 3000); FROM > TO reads
 --                          the natural first match with no forcing
 --   VON_STAGE_SECONDS      run length in emulated seconds (default 50)
+--   VON_STAGE_TEXTURE_DUMP  optional directory to write the two texture RAMs
+--   VON_STAGE_TEXTURE_FRAME frame at which to dump them (default near the end;
+--                           0 dumps at SECONDS*60 - 60)
 
 local LOG = assert(os.getenv("VON_STAGE_LOG"), "VON_STAGE_LOG required")
 local ORD = tonumber(os.getenv("VON_STAGE_ORDINAL") or "0")
@@ -33,6 +36,15 @@ local FORCE_MIRROR = (os.getenv("VON_STAGE_FORCE_MIRROR") or "1") == "1"
 local FROM = tonumber(os.getenv("VON_STAGE_FORCE_FROM") or "1600")
 local TO = tonumber(os.getenv("VON_STAGE_FORCE_TO") or "3000")
 local SECONDS = tonumber(os.getenv("VON_STAGE_SECONDS") or "50")
+local TEXTURE_DUMP = os.getenv("VON_STAGE_TEXTURE_DUMP")
+local TEXTURE_FRAME = tonumber(os.getenv("VON_STAGE_TEXTURE_FRAME") or "0")
+if TEXTURE_FRAME <= 0 then TEXTURE_FRAME = SECONDS * 60 - 60 end
+if TEXTURE_DUMP then os.execute("mkdir -p '" .. TEXTURE_DUMP .. "'") end
+local SNAPSHOT = os.getenv("VON_STAGE_SNAPSHOT")
+local PALETTE_DUMP = os.getenv("VON_STAGE_PALETTE_DUMP")
+local dumped = false
+local snapped = false
+local palette_dumped = false
 local out = assert(io.open(LOG, "w"))
 
 local frame = 0
@@ -59,6 +71,61 @@ local function r(a)
 	return ok and v or -1
 end
 
+-- Dump one 1 MiB texture RAM (the sheet the renderer's get_texel reads) in the
+-- same hex shape as scripts/trace-texture-buffers.sh publishes.
+local function dump_bank(path, address, words)
+	local f = assert(io.open(path, "w"))
+	f:write(string.format("# address=%08x words=%x\n", address, words))
+	for i = 0, words - 1 do
+		f:write(string.format("%06x %04x\n", i, space:read_u16(address + i * 2)))
+	end
+	f:close()
+end
+
+local function dump_textures()
+	if dumped or not TEXTURE_DUMP or not space then return end
+	dumped = true
+	dump_bank(TEXTURE_DUMP .. "/texture-11000000.hex", 0x11000000, 0x80000)
+	dump_bank(TEXTURE_DUMP .. "/texture-11200000.hex", 0x11200000, 0x80000)
+end
+
+local function take_snapshot()
+	if snapped or not SNAPSHOT then return end
+	snapped = true
+	local screen = manager.machine.screens[":screen"]
+	if screen then
+		pcall(function() screen:snapshot(SNAPSHOT) end)
+	end
+end
+
+-- Dump the Model 2 palette pipeline (palette RAM, color-translation table, and
+-- polygon luma RAM) in the same text shape render_texture_palette.parse_trace
+-- reads, so an export can color the stage with the palette live at match time
+-- (the geometry trace's write log caps out during boot).
+local function dump_palette()
+	if palette_dumped or not PALETTE_DUMP or not space then return end
+	palette_dumped = true
+	local f = assert(io.open(PALETTE_DUMP, "w"))
+	for i = 0, 0x1fff do
+		f:write(string.format(
+			"vonj_palette_write: time=0.0 offset=%04x data=%04x mask=ffff value=%04x\n",
+			i, space:read_u16(0x01800000 + i * 2) & 0xffff,
+			space:read_u16(0x01800000 + i * 2) & 0xffff))
+	end
+	for i = 0, 0x5fff do
+		f:write(string.format(
+			"vonj_colorxlat_write: time=0.0 offset=%04x data=%04x mask=ffff value=%04x\n",
+			i, space:read_u16(0x01810000 + i * 2) & 0xffff,
+			space:read_u16(0x01810000 + i * 2) & 0xffff))
+	end
+	for i = 0, 0x1fff do
+		f:write(string.format(
+			"vonj_luma_write: time=0.0 offset=%04x data=%02x\n",
+			i, space:read_u16(0x11400000 + i * 2) & 0xff))
+	end
+	f:close()
+end
+
 emu.register_periodic(function()
 	frame = frame + 1
 	if not space then
@@ -82,7 +149,15 @@ emu.register_periodic(function()
 			r(0x504ca0), r(0x504cb0), r(0x504cc0), r(0x5770f0)))
 		out:flush()
 	end
+	if frame >= TEXTURE_FRAME then
+		dump_textures()
+		dump_palette()
+		take_snapshot()
+	end
 	if frame >= SECONDS * 60 then
+		dump_textures()
+		dump_palette()
+		take_snapshot()
 		out:close()
 		manager.machine:exit()
 	end

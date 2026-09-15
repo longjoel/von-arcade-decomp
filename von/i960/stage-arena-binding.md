@@ -133,6 +133,25 @@ heightfield arrays and the `RV_ARENAS` table) and the Godot mirror
 fraction of cells deviating from the median, so spurious slab/min-max outliers
 do not misclassify flat stages.
 
+### Textured export: scene-sampled banks and palette
+
+`extract_stage_textured_gltf.py` crops each static's texture from the RAM
+selected by `texheader[2] & 0x1000` (see `model2_texture.py`, mirroring MAME
+`model2_v.cpp:590` and `model2rd.ipp` `get_texel`). Both texture RAMs and the
+palette/colorxlat/luma tables are **scene-dependent**, so they must be sampled
+while the stage is live:
+
+```sh
+scripts/capture-stage-banks.sh      # per ordinal: RAM0/1 + palette.trace + snapshot
+scripts/export-stage-arenas-textured.sh   # -> von-godot stage_<NN>_arena.gltf
+```
+
+`probe_stage_binding.lua` dumps RAM0/RAM1 (`VON_STAGE_TEXTURE_DUMP`), the three
+palette tables (`VON_STAGE_PALETTE_DUMP`), and a reference frame
+(`VON_STAGE_SNAPSHOT`) at the match frame. RAM1 carries the stage's tiles and
+RAM0 the shared title/UI atlas; texturing from the boot RAM0 sheet is what
+produced the earlier "random texture / missing skybox" render.
+
 ## Movement validation
 
 Forcing a stage and logging the game's fighter positions (attract demo) shows

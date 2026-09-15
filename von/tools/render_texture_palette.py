@@ -67,22 +67,12 @@ def main() -> int:
                         help="use palette state at or before this emulated timestamp")
     args = parser.parse_args()
 
+    from model2_texture import load_sheet, texel_index
+
     palette, colorxlat, luma = parse_trace(args.trace, args.time)
-    packed = args.bank.read_bytes()
-    pixels = bytearray()
-    for y in range(1024):
-        for x in range(2048):
-            x2 = x
-            y2 = y
-            offset = (y2 // 2) * 512 + (x2 // 2)
-            word = int.from_bytes(packed[(offset >> 1) * 4:(offset >> 1) * 4 + 4], "little")
-            if offset & 1:
-                word >>= 16
-            if (y & 1) == 0:
-                word >>= 8
-            if (x & 1) == 0:
-                word >>= 4
-            pixels.append((word & 0x0f) << 4)
+    sheet = load_sheet(args.bank)
+    pixels = bytearray(texel_index(sheet, x, y) << 4
+                       for y in range(1024) for x in range(2048))
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     for base_text in args.bases.split(","):

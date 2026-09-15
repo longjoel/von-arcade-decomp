@@ -25,9 +25,13 @@ for ord in $ORDINALS; do
         printf 'ord %s: already captured (%s)\n' "$ord" "$trace"
         continue
     fi
+    # Dump the two texture RAMs late in the run so the exporter textures from the
+    # same scene state the geometry was submitted in (bank1 holds the stage).
     VON_STAGE_LOG="$OUT_DIR/ord$ord.lua.log" \
     VON_STAGE_ORDINAL="$ord" \
     VON_STAGE_SECONDS="$RUN_SECONDS" \
+    VON_STAGE_TEXTURE_DUMP="$OUT_DIR/ord$ord-banks" \
+    VON_STAGE_TEXTURE_FRAME="$((RUN_SECONDS * 60 - 120))" \
         "$MAME_BIN" vonj \
         -rompath "$ROM_PATH" \
         -video none -sound none -oslog \
