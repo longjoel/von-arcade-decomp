@@ -156,6 +156,23 @@
       "commands": [
         [
           "python3",
+          "von/tools/test_sharc_drc_abs_special_cases.py"
+        ],
+        [
+          "python3",
+          "von/tools/test_sharc_drc_state_export.py"
+        ],
+        [
+          "bash",
+          "scripts/test-mame-smoke.sh"
+        ]
+      ]
+    },
+    "capture": {
+      "description": "Capture/history-dependent oracles that need their original traces (not reproducible from the current scripts; see docs)",
+      "commands": [
+        [
+          "python3",
           "von/tools/test_geometry_projection_runtime_trace.py"
         ],
         [
@@ -168,19 +185,7 @@
         ],
         [
           "python3",
-          "von/tools/test_sharc_drc_abs_special_cases.py"
-        ],
-        [
-          "python3",
           "von/tools/test_sharc_helper_20de1.py"
-        ],
-        [
-          "python3",
-          "von/tools/test_sharc_drc_state_export.py"
-        ],
-        [
-          "bash",
-          "scripts/test-mame-smoke.sh"
         ]
       ]
     },

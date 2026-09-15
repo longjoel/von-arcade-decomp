@@ -1,7 +1,10 @@
 diff --git a/src/devices/cpu/sharc/sharcinternal.ipp b/src/devices/cpu/sharc/sharcinternal.ipp
+index 5d6d737..f3bcc47 100644
 --- a/src/devices/cpu/sharc/sharcinternal.ipp
 +++ b/src/devices/cpu/sharc/sharcinternal.ipp
-@@ -291,6 +291,16 @@ inline void adsp21062_device::dm_write32(uint32_t address, uint32_t data)
+@@ -280,6 +280,16 @@ inline uint32_t adsp21062_device::dm_read32(uint32_t address)
+ 
+ inline void adsp21062_device::dm_write32(uint32_t address, uint32_t data)
  {
 +	static unsigned vonj_sharc_opcode0c_output_trace_count;
 +	if ((machine().system().name == std::string_view("vonj")) &&
@@ -13,4 +16,6 @@ diff --git a/src/devices/cpu/sharc/sharcinternal.ipp b/src/devices/cpu/sharc/sha
 +			m_core->pc, address, data);
 +		vonj_sharc_opcode0c_output_trace_count++;
 +	}
- 	static unsigned vonj_sharc_opcode24_write_trace_count;
+ 	m_data.write_dword(address, data);
+ }
+ 	static unsigned vonj_sharc_output_trace_count;

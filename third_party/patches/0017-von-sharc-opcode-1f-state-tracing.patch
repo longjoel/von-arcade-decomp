@@ -1,7 +1,9 @@
 diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
+index b33dd73..5815dc0 100644
 --- a/src/devices/cpu/sharc/sharc.cpp
 +++ b/src/devices/cpu/sharc/sharc.cpp
-@@ -1317,6 +1317,14 @@ void adsp21062_device::execute_run()
+@@ -1321,6 +1321,14 @@ void adsp21062_device::execute_run()
+ 					m_core->pc, static_cast<unsigned long long>(m_core->opcode));
  				vonj_sharc_service_trace_count++;
  			}
 +			if ((machine().system().name == std::string_view("vonj")) &&
@@ -12,3 +14,6 @@ diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
 +					m_core->pc, m_core->r[0].r, m_core->r[1].r, m_core->r[2].r,
 +					m_core->r[4].r, m_core->r[8].r, m_core->r[12].r, m_core->r[0].r);
 +			}
+ 			static unsigned vonj_sharc_20de1_step_trace_count;
+ 			if ((machine().system().name == std::string_view("vonj")) &&
+ 				(vonj_sharc_20de1_step_trace_count < 4096) &&

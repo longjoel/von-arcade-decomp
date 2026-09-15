@@ -1,8 +1,11 @@
 diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
+index d7c42fd..6de440e 100644
 --- a/src/devices/cpu/sharc/sharc.cpp
 +++ b/src/devices/cpu/sharc/sharc.cpp
-@@ -1324,1 +1324,16 @@
- 			static unsigned vonj_sharc_4d_compare_trace_count;
+@@ -1322,6 +1322,21 @@ void adsp21062_device::execute_run()
+ 				vonj_sharc_service_trace_count++;
+ 			}
+ 			if ((machine().system().name == std::string_view("vonj")) &&
 +			static unsigned vonj_sharc_22_compare_trace_count;
 +			if ((machine().system().name == std::string_view("vonj")) &&
 +				((m_core->pc == 0x00020453) || (m_core->pc == 0x00020456) ||
@@ -18,6 +21,6 @@ diff --git a/src/devices/cpu/sharc/sharc.cpp b/src/devices/cpu/sharc/sharc.cpp
 +					m_core->r[12].r, m_core->r[13].r, m_core->r[14].r, m_core->r[15].r);
 +				vonj_sharc_22_compare_trace_count++;
 +			}
- 			if ((machine().system().name == std::string_view("vonj")) &&
- 				(m_core->pc == 0x00020d3e) && (vonj_sharc_4d_compare_trace_count < 256))
+ 				((m_core->pc == 0x000203fa) || (m_core->pc == 0x00020408) ||
+ 				 (m_core->pc == 0x00020409)))
  			{
