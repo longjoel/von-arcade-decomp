@@ -22,6 +22,14 @@
    "evidence": "Center is the held left+right chord (per the cabinet control). prob_ordnance_id.lua holding both continuously still only spawns the right projectile (record byte0=7), and prob_weapon_damage_type.lua never sees a third type on the mech hit applier while held. object+0x13a (the action-3 input) is also never written by the MAME `von` ports, so action 3 appears unreachable as a projectile from the exposed inputs; center is likely a melee/contact attack with a separate (non-table) damage path."
   }
  },
+ "applied_damage": {
+  "working_health_cell": "0x5042a0 (opponent), 0..1000",
+  "method": "probe_weapon_damage.lua fires one weapon per window and logs the opponent working cell; clean drops partition the applied damage",
+  "left": 100,
+  "right": null,
+  "center": null,
+  "note": "A left hit moved the opponent working cell by exactly 100, equal to table record 1 (raw 100.0), so the applied scale is 1.0 at the tested range. Right (type 7, raw 175.0) and center were not connected in the run."
+ },
  "damage_scaling": {
   "applier": "i960 0x33334/0x33364 -> 0x33420 -> 0x33838",
   "model": "applied = object+0x4a (raw table damage) * global(0x503ab4) * distance_factor / 10000, then optionally scaled by the profile percent (+0x63c when object+0x172==11, +0x640 when 0x172==14) / 100, then by a factor selected on 0x503ac0.",
