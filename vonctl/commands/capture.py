@@ -62,6 +62,8 @@ def bout(argv: list[str]) -> int:
         "VON_SANDBOX_PROBE_FRAMES": config.env("VON_BOUT_PROBE_FRAMES", "180") or "180",
         "VON_SANDBOX_WEAPON_CASE": config.env("VON_BOUT_WEAPON_CASE", "both") or "both",
         "VON_SANDBOX_TELEMETRY": str(out_dir / "bout.csv"),
+        "VON_SANDBOX_SET": config.env("VON_BOUT_SET", "vonj") or "vonj",
+        "VON_SANDBOX_ROMPATH": config.env("VON_BOUT_ROMPATH", "") or "",
     })
     print(f"bout telemetry: {out_dir / 'bout.csv'}")
     return 0

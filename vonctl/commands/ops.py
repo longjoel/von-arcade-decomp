@@ -25,15 +25,23 @@ def _stage_rom_path() -> Path:
 
 def sandbox(argv: list[str], env: dict[str, str] | None = None) -> int:
     """Movement sandbox, single-cabinet 2P (port of scripts/sandbox-versus.sh)."""
-    mame = config.MAME_DIR / "von"
+    override = env or {}
+
+    def setting(name: str, default: str | None = None) -> str | None:
+        return override.get(name) if name in override else config.env(name, default)
+
+    mame = config.mame_bin()
     config.require_file(mame, "MAME binary")
-    rom_path = _stage_rom_path()
+    set_name = setting("VON_SANDBOX_SET", "vonj") or "vonj"
+    rompath_override = setting("VON_SANDBOX_ROMPATH", "")
+    rom_path = Path(rompath_override) if rompath_override else _stage_rom_path()
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    out_dir = config.env_path("VON_SANDBOX_OUT", config.ROOT / "von" / "sandbox" / f"sandbox-{stamp}")
-    seconds = config.env_int("VON_SANDBOX_SECONDS", 1200)
+    out_override = setting("VON_SANDBOX_OUT", "")
+    out_dir = Path(out_override) if out_override else config.ROOT / "von" / "sandbox" / f"sandbox-{stamp}"
+    seconds = int(setting("VON_SANDBOX_SECONDS", "1200") or "1200")
     for sub in ("cfg", "nvram", "inp"):
         (out_dir / sub).mkdir(parents=True, exist_ok=True)
-    print(f"out: {out_dir}  budget: {seconds}s")
+    print(f"out: {out_dir}  budget: {seconds}s  set: {set_name}")
 
     run_env = {
         "VON_SANDBOX_LOG": str(out_dir / "sandbox.log"),
@@ -45,10 +53,10 @@ def sandbox(argv: list[str], env: dict[str, str] | None = None) -> int:
         "VON_SANDBOX_WEAPON_WRITES": config.env("VON_SANDBOX_WEAPON_WRITES", "0") or "0",
         "VON_SANDBOX_SINGLE_PLAYER": config.env("VON_SANDBOX_SINGLE_PLAYER", "0") or "0",
         "VON_SANDBOX_ACTIVE_LEVELS": config.env("VON_SANDBOX_ACTIVE_LEVELS", "0") or "0",
-        **(env or {}),
+        **override,
     }
     process.run_to_log([
-        str(mame), "vonj", "-rompath", str(rom_path),
+        str(mame), set_name, "-rompath", str(rom_path),
         "-video", "none", "-sound", "none", "-nothrottle", "-skip_gameinfo",
         "-cfg_directory", str(out_dir / "cfg"),
         "-nvram_directory", str(out_dir / "nvram"),
@@ -121,7 +129,7 @@ def _fuzz_versus(argv: list[str]) -> int:
 
 
 def _fuzz_twin(argv: list[str]) -> int:
-    mame = config.env_path("VON_MAME_BIN", config.MAME_DIR / "von")
+    mame = config.env_path("VON_MAME_BIN", config.mame_bin())
     config.require_file(mame, "MAME binary")
     rom_path = _stage_rom_path()
     out = config.env_path("VON_FUZZ_TWIN_OUT", Path("/tmp/fuzztwin"))
