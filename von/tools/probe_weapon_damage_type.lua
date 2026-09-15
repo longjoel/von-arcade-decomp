@@ -100,10 +100,16 @@ emu.register_periodic(function()
     local win = window_for(frame)
     if win then
         active = win
-        -- Tap every 24 frames (3 on / 21 off) so the edge registers.
-        local on = (frame % 24) < 3
-        set_key("left_shot", on and (win == "left" or win == "center"))
-        set_key("right_shot", on and (win == "right" or win == "center"))
+        if win == "center" then
+            -- Center is the held left+right chord, not a tap.
+            set_key("left_shot", true)
+            set_key("right_shot", true)
+        else
+            -- Tap every 24 frames (3 on / 21 off) so the edge registers.
+            local on = (frame % 24) < 3
+            set_key("left_shot", on and win == "left")
+            set_key("right_shot", on and win == "right")
+        end
     elseif frame >= BATTLE then
         active = "wait"
     end

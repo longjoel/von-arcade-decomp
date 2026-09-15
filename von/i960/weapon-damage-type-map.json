@@ -19,7 +19,7 @@
   "center": {
    "action": 3,
    "type": null,
-   "evidence": "object+0x13a (action 3 input) is never set by the MAME `von` player inputs; both-trigger presses select action 1 (right). Center trigger/source unresolved."
+   "evidence": "Center is the held left+right chord (per the cabinet control). prob_ordnance_id.lua holding both continuously still only spawns the right projectile (record byte0=7), and prob_weapon_damage_type.lua never sees a third type on the mech hit applier while held. object+0x13a (the action-3 input) is also never written by the MAME `von` ports, so action 3 appears unreachable as a projectile from the exposed inputs; center is likely a melee/contact attack with a separate (non-table) damage path."
   }
  },
  "damage_scaling": {

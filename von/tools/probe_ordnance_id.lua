@@ -91,9 +91,16 @@ emu.register_periodic(function()
 
     local win = window_for(frame)
     if win then
-        local on = (frame % 24) < 3
-        set_key("left_shot", on and (win == "left" or win == "center"))
-        set_key("right_shot", on and (win == "right" or win == "center"))
+        -- The center weapon is the held left+right chord, so hold both
+        -- continuously there; left/right are tapped so the edge registers.
+        if win == "center" then
+            set_key("left_shot", true)
+            set_key("right_shot", true)
+        else
+            local on = (frame % 24) < 3
+            set_key("left_shot", on and win == "left")
+            set_key("right_shot", on and win == "right")
+        end
         if frame % 6 == 0 then scan(win) end
     end
 end)
