@@ -45,9 +45,11 @@ for probe in "${PROBES[@]}"; do
 done
 wait || true
 
-python3 - "$OUT_ROOT" <<'PY'
+python3 - "$OUT_ROOT" "$FRAMES" <<'PY'
 import csv, math, os, sys
 root = sys.argv[1]
+frames = int(sys.argv[2])
+base = 9600
 print(f"{'probe':22s} {'travel':>8s} {'dx':>8s} {'dz':>8s} {'dyaw':>8s} {'n':>5s}")
 for tag in sorted(os.listdir(root)):
     path = os.path.join(root, tag, "bout.csv")
@@ -59,8 +61,8 @@ for tag in sorted(os.listdir(root)):
     fs = sorted(rows)
     if not fs:
         continue
-    a = 9599
-    b = min(9780, fs[-1])
+    a = base - 1
+    b = min(base + frames - 1, fs[-1])
     if a not in rows or b not in rows:
         continue
     x0, z0 = float(rows[a]["p1x"]), float(rows[a]["p1z"])

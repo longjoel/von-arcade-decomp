@@ -22,15 +22,36 @@
 --              VON_PROGRESS_SELECT_STEPS (right presses before confirmation)
 --              VON_PROGRESS_AUTO_START (default 1; set 0 for selector-only capture)
 --              VON_PROGRESS_GEOMETRY_STATE_LOG (optional state log path)
+--              VON_PROGRESS_MOTION_SELECTOR_LOG (optional object-selector log)
+--              VON_PROGRESS_MOTION_SELECTOR_PC (default 0x3454c)
 --              VON_PROGRESS_SHOT_PATTERN (alternate, left, or right)
 --              VON_PROGRESS_SHOT_INTERVAL (default 45 frames)
 --              VON_PROGRESS_SHOT_HOLD_FRAMES (default 20)
+--              VON_PROGRESS_COMBAT_END (default 7000)
+--              VON_PROGRESS_ACTIVE_LEVELS (1 to use raw electrical polarity)
 
 local SECONDS = tonumber(os.getenv("VON_PROGRESS_SECONDS") or "150")
 local TARGET_FRAMES = SECONDS * 60
 local CAPTURE_START_FRAME = tonumber(os.getenv("VON_PROGRESS_CAPTURE_START_FRAME") or "0")
 local LOG_PATH = os.getenv("VON_PROGRESS_LOG") or "vonj-progress-lua.log"
 local GEOMETRY_STATE_LOG_PATH = os.getenv("VON_PROGRESS_GEOMETRY_STATE_LOG")
+local MOTION_SELECTOR_LOG_PATH = os.getenv("VON_PROGRESS_MOTION_SELECTOR_LOG")
+local MOTION_SELECTOR_PC = tonumber(
+    os.getenv("VON_PROGRESS_MOTION_SELECTOR_PC") or "0x3454c")
+local MOTION_SELECTOR_MAX = tonumber(
+    os.getenv("VON_PROGRESS_MOTION_SELECTOR_MAX") or "20000")
+-- Optional SHARC affine-state trace: taps the copro DSP data space so the
+-- 12-word matrices the services mutate/commit are observable directly, not
+-- only through the geometry board's re-read.  VON_PROGRESS_SHARC_TAP_MIN/MAX
+-- bound the tapped window (default the 0x1400000 commit region); the tap also
+-- logs the working-matrix pointer DM(0x30101) so the push/pop base is visible.
+local SHARC_LOG_PATH = os.getenv("VON_PROGRESS_SHARC_LOG")
+local SHARC_TAP_MIN = tonumber(
+    os.getenv("VON_PROGRESS_SHARC_TAP_MIN") or "0x01400000")
+local SHARC_TAP_MAX = tonumber(
+    os.getenv("VON_PROGRESS_SHARC_TAP_MAX") or "0x01410000")
+local SHARC_MAX = tonumber(os.getenv("VON_PROGRESS_SHARC_MAX") or "40000")
+local ACTIVE_LEVELS = os.getenv("VON_PROGRESS_ACTIVE_LEVELS") == "1"
 local RAM_SNAP_FRAME = tonumber(os.getenv("VON_PROGRESS_RAM_SNAP_FRAME") or "0")
 local RAM_SNAP_PATH = os.getenv("VON_PROGRESS_RAM_SNAP_PATH")
 local RAM_SNAP_BASE = tonumber(os.getenv("VON_PROGRESS_RAM_SNAP_BASE") or "0x00500000")
@@ -50,6 +71,153 @@ if GEOMETRY_STATE_LOG_PATH then
     geometry_state_file:write("geometry-state: session start\n")
     geometry_state_file:flush()
 end
+
+-- The animation selector's active-header load executes at 0x3454c.  At this
+-- point r8 is the object base, while the read is the published header global
+-- 0x51ab08.  r8 is re-used before the later copro-FIFO writes, so this
+-- program-space read tap is deliberately at the load, not at the FIFO port.
+-- Lua exposes both the i960 state entries and address-space taps, letting a
+-- normal autoboot capture establish the object->selector relation without a
+-- MAME source rebuild.
+local motion_selector_file
+local motion_selector_tap
+local motion_selector_cpu
+local motion_selector_events = 0
+local motion_selector_reading = false
+-- Declare these before the closure so it captures the script's live state,
+-- rather than resolving an accidental global named `space`.
+local frame = 0
+local space
+
+local function install_motion_selector_tap()
+    if not MOTION_SELECTOR_LOG_PATH or motion_selector_tap or not space then
+        return
+    end
+    motion_selector_cpu = manager.machine.devices[":maincpu"]
+    if not motion_selector_cpu then
+        return
+    end
+    motion_selector_file = assert(io.open(MOTION_SELECTOR_LOG_PATH, "w"))
+    motion_selector_file:write(string.format(
+        "motion-selector: pc=%08x source=lua-program-read-tap\n",
+        MOTION_SELECTOR_PC))
+    motion_selector_file:flush()
+    -- The selector consumer is in this small published-header block.  A
+    -- 16-byte tap is required for MAME's mapped 32-bit bus handler while
+    -- avoiding an otherwise expensive callback on every work-RAM read.
+    motion_selector_tap = space:install_read_tap(
+        0x0051ab00, 0x0051ab0f, "von-motion-selector",
+        function(address, data, mem_mask)
+            if motion_selector_reading or motion_selector_events >= MOTION_SELECTOR_MAX then
+                return
+            end
+            -- i960 exposes the active instruction address as CURPC (not the
+            -- display-only PC alias used by several other CPU cores).
+            local pc_entry = motion_selector_cpu.state["CURPC"]
+            local r8_entry = motion_selector_cpu.state["r8"]
+            local g0_entry = motion_selector_cpu.state["g0"]
+            if not pc_entry or not r8_entry or not g0_entry then
+                return
+            end
+            local pc = tonumber(pc_entry.value)
+            local object = tonumber(r8_entry.value)
+            local selector_object = tonumber(g0_entry.value)
+            if pc ~= MOTION_SELECTOR_PC then
+                return
+            end
+            -- A broad range reports an absolute address while a local block
+            -- reports its byte offset.  The base header is offset +8.
+            if object < 0x00500000 or object > 0x005fffff
+                or selector_object < 0x00500000 or selector_object > 0x005fffff
+                or (address ~= 0x0051ab08 and address ~= 8) then
+                return
+            end
+            motion_selector_reading = true
+            local ok, selector, state, cursor, body_header = pcall(function()
+                return space:read_u16(selector_object + 0x174),
+                    space:read_u16(selector_object + 0x176),
+                    space:read_u16(selector_object + 0x17a),
+                    space:read_u32(0x0051ab0c)
+            end)
+            motion_selector_reading = false
+            if not ok then
+                return
+            end
+            motion_selector_events = motion_selector_events + 1
+            motion_selector_file:write(string.format(
+                "motion-selector: frame=%d object=%08x g0=%08x header=%08x body_header=%08x sel=%04x state=%04x frame_cursor=%04x\n",
+                frame, object, selector_object, data, body_header, selector, state, cursor))
+            motion_selector_file:flush()
+        end)
+end
+
+-- Raw SHARC affine-state tap.  The recovered service handlers keep the
+-- working 12-word matrix behind the pointer at DM(0x30101) and commit it to
+-- `0x01400000 + (word >> 2)`; service 0x05/0x06 push/pop a copy so a child's
+-- base is the parent state.  Reading the committed words in place settles
+-- whether the board matrix is the cumulative world or the local record,
+-- without inferring it from the geometry parser.
+local sharc_file
+local sharc_tap
+local sharc_device
+local sharc_space
+local sharc_writes = 0
+local sharc_reading = false
+
+local function find_sharc()
+    for _, dev in pairs(manager.machine.devices) do
+        if dev.shortname == "adsp21062" then
+            return dev
+        end
+    end
+    return manager.machine.devices[":copro"]
+end
+
+local function install_sharc_tap()
+    if not SHARC_LOG_PATH or sharc_tap then
+        return
+    end
+    sharc_device = find_sharc()
+    if not sharc_device then
+        return
+    end
+    sharc_space = sharc_device.spaces[":data"] or sharc_device.spaces["data"]
+        or sharc_device.spaces[":program"] or sharc_device.spaces["program"]
+    if not sharc_space then
+        return
+    end
+    sharc_file = assert(io.open(SHARC_LOG_PATH, "w"))
+    sharc_file:write(string.format(
+        "sharc-state: tap=[%08x,%08x] device=%s\n",
+        SHARC_TAP_MIN, SHARC_TAP_MAX, tostring(sharc_device.shortname)))
+    sharc_file:flush()
+    local ok, err = pcall(function()
+        sharc_tap = sharc_space:install_write_tap(
+            SHARC_TAP_MIN, SHARC_TAP_MAX, "von-sharc-state",
+            function(offset, data, mask)
+                if sharc_reading or sharc_writes >= SHARC_MAX then
+                    return data
+                end
+                sharc_reading = true
+                sharc_writes = sharc_writes + 1
+                local ptr = 0
+                pcall(function()
+                    ptr = sharc_space:read_u32(0x0030101)
+                end)
+                sharc_file:write(string.format(
+                    "sharc-write: frame=%d offset=%08x data=%08x mask=%08x ptr=%08x\n",
+                    frame, offset, data, mask, ptr))
+                sharc_file:flush()
+                sharc_reading = false
+                return data
+            end)
+    end)
+    if not ok then
+        sharc_file:write("sharc-state: install failed: " .. tostring(err) .. "\n")
+        sharc_file:flush()
+    end
+end
+
 local function log(message)
     log_file:write(message .. "\n")
     log_file:flush()
@@ -62,8 +230,6 @@ local function log_geometry_state(message)
     end
 end
 
-local frame = 0
-local space
 local fields = {}
 local SNAPSHOT_FRAME = tonumber(os.getenv("VON_PROGRESS_RAM_SNAPSHOT") or "0")
 local SNAPSHOT_PATH = os.getenv("VON_PROGRESS_RAM_SNAPSHOT_PATH")
@@ -281,6 +447,14 @@ local function setup()
             end)
         log(string.format("progress: memtap installed at 0x%x", tap_addr))
     end
+    if MOTION_SELECTOR_LOG_PATH then
+        log("progress: motion-selector log " .. MOTION_SELECTOR_LOG_PATH)
+    end
+    install_motion_selector_tap()
+    if SHARC_LOG_PATH then
+        log("progress: sharc-state log " .. SHARC_LOG_PATH)
+    end
+    install_sharc_tap()
     return true
 end
 
@@ -290,6 +464,12 @@ local function press(key, until_frame)
         return
     end
     pressed_until[key] = until_frame
+    -- MAME's Lua override is logical by default: the verified input mapper
+    -- and battle sandbox use 1/clear_value regardless of port polarity.
+    if not ACTIVE_LEVELS then
+        f:set_value(1)
+        return
+    end
     local mask = f.mask or 1
     local def = f.defvalue or mask
     local inactive = def & mask
@@ -380,7 +560,7 @@ local schedule_index = 1
 -- triggers so movement, targeting, and weapon code paths all execute.
 local COMBAT_ENABLED = os.getenv("VON_PROGRESS_COMBAT") ~= "0"
 local COMBAT_START = tonumber(os.getenv("VON_PROGRESS_COMBAT_START") or "1800")
-local COMBAT_END = 7000
+local COMBAT_END = tonumber(os.getenv("VON_PROGRESS_COMBAT_END") or "7000")
 local DIRECTIONS = { "up", "right", "down", "left" }
 local SHOT_PATTERN = os.getenv("VON_PROGRESS_SHOT_PATTERN") or "alternate"
 local SHOT_INTERVAL = tonumber(os.getenv("VON_PROGRESS_SHOT_INTERVAL") or "45")

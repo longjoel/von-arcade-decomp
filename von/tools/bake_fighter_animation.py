@@ -236,6 +236,11 @@ def main() -> int:
     ap.add_argument("--min-parts", type=int, default=4)
     ap.add_argument("--tree", type=Path,
                     help="optional skeleton override JSON {root, parents:{child:parent}}")
+    ap.add_argument("--observed-only", action="store_true",
+                    help="drop parts the capture never emits and parent each kept "
+                         "part through its nearest observed ancestor, so a limb "
+                         "whose parent is only present in other captures does not "
+                         "collapse onto the torso")
     args = ap.parse_args()
 
     parts_list = load_parts(args)
@@ -270,6 +275,36 @@ def main() -> int:
         print(f"  {keys_list[i]:08x} <- {keys_list[parent[i]]:08x}" if parent[i] >= 0
               else f"  {keys_list[i]:08x} (root)")
 
+    # Which parts this capture actually emits (observed). With --observed-only,
+    # any part never seen is dropped and each kept part is parented through its
+    # nearest observed ancestor, so a limb whose immediate parent lives only in
+    # another capture is still baked from the same relative transform the
+    # runtime will compose (otherwise it collapses onto the torso).
+    present_counts = [sum(1 for k in keys if obas_out[i] in frames[k])
+                      for i in range(n)]
+    if args.observed_only:
+        observed = [c >= 2 for c in present_counts]
+
+        def effective_parent(i):
+            p = parent[i]
+            while p >= 0 and not observed[p]:
+                p = parent[p]
+            return p
+
+        eff = [effective_parent(i) for i in range(n)]
+        kept = [i for i in range(n) if observed[i]]
+        remap = {i: j for j, i in enumerate(kept)}
+        out_parent = [remap[eff[i]] if eff[i] >= 0 else -1 for i in kept]
+        out_root = remap.get(root)
+        if out_root is None:
+            out_root = 0
+        n = len(kept)
+    else:
+        kept = list(range(n))
+        remap = {i: i for i in range(n)}
+        out_parent = list(parent)
+        out_root = root
+
     last = [IDENT] * n
     measured = [0] * n
     quats = [[] for _ in range(n)]
@@ -277,31 +312,33 @@ def main() -> int:
     samples = [[] for _ in range(n)]
     for k in keys:
         tb = frames[k]
-        for i, oba in enumerate(keys_list):
-            p = parent[i]
+        for j, i in enumerate(kept):
+            oba = keys_list[i]
+            p_out = out_parent[j]
+            p = kept[p_out] if p_out >= 0 else -1
             if p < 0:
                 local = IDENT
             elif oba in tb and keys_list[p] in tb:
                 local = mat_mul3x4(mat_inv3x4(tb[keys_list[p]]), tb[oba])
-                last[i] = local
+                last[j] = local
             else:
-                local = last[i]
+                local = last[j]
             if oba in tb:
-                measured[i] += 1
-                samples[i].append(local[9:12])
+                measured[j] += 1
+                samples[j].append(local[9:12])
             # The ROM animates each part's translation as well as its rotation,
             # so keep the per-frame translation; averaging it to one pivot
             # (the old behavior) made telescoping limbs drift.
-            trans[i].append(local[9:12])
-            quats[i].append(quat_from_mat(orthonormalize(local[:9])))
+            trans[j].append(local[9:12])
+            quats[j].append(quat_from_mat(orthonormalize(local[:9])))
     # Median pivot (robust to a shared part momentarily matching the other
     # fighter) with an absolute clamp so a corrupt joint cannot fling a limb.
     pivots = []
-    for i in range(n):
-        if not samples[i]:
+    for j in range(n):
+        if not samples[j]:
             pivots.append([0.0, 0.0, 0.0])
             continue
-        cols = list(zip(*samples[i]))
+        cols = list(zip(*samples[j]))
         piv = [statistics.median(c) for c in cols]
         if math.sqrt(sum(v * v for v in piv)) > PIVOT_LIMIT:
             piv = [0.0, 0.0, 0.0]
@@ -313,13 +350,13 @@ def main() -> int:
         "clip": args.clip,
         "fps": 60.0,
         "frame_count": len(keys),
-        "root": root,
-        "parts": [{"oba": f"{obas_out[i]:08x}", "parent": parent[i],
-                   "pivot": [round(v, 5) for v in pivots[i]]}
-                  for i in range(n)],
-        "quats": [[[round(v, 5) for v in quats[i][f]] for i in range(n)]
+        "root": out_root,
+        "parts": [{"oba": f"{obas_out[kept[j]]:08x}", "parent": out_parent[j],
+                   "pivot": [round(v, 5) for v in pivots[j]]}
+                  for j in range(n)],
+        "quats": [[[round(v, 5) for v in quats[j][f]] for j in range(n)]
                   for f in range(len(keys))],
-        "trans": [[[round(v, 5) for v in trans[i][f]] for i in range(n)]
+        "trans": [[[round(v, 5) for v in trans[j][f]] for j in range(n)]
                   for f in range(len(keys))],
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)

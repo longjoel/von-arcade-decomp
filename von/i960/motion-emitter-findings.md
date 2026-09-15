@@ -29,6 +29,78 @@ reconstructs `maincpu` and `main_data`, scans each profile for valid headers,
 and emits per-fighter JSON (base64 raw records). Written to the git-ignored
 `von/build/motion-tables/`.
 
+### Selector anchor (`KNOWN`, 2026-09-14)
+
+The currently MAME-matched Temjin pair is rooted at the first profile motion
+header: the i960 body path at `0x3454c` executes `ld 0x70(r8),g5` immediately
+before its `0x8d400` packet-builder call. The adjacent paired arm loads the
+next record source at `0x346d0` before `0x8d5d0`. Thus state/clip recovery
+should trace the producer or replacement of `r8` / its profile view, rather
+than treating the later `0x8dd40` and `0x8e120` emitters as selectors. The
+retained `fifo-program-20260912T` capture proves the resulting paired headers
+are Temjin tables 3 (8-part) and 2 (15-part), both at frame 0; the packet
+mapping and 16-frame run are checked by
+`von/tools/test_motion_packet_mapping.py`.
+
+The actual active-pair state is global for the current geometry submission:
+the selector family at `0x2ee04..0x2ef58` writes the two selected header
+pointers to `0x51ab08` / `0x51ab0c` and writes the current frame to the
+halfword at `0x51ab10`. It uses per-object halfwords `+0x174` (selector),
+`+0x176` (state), and `+0x17a` (frame cursor). On a new state it selects a
+header pair, seeds `+0x17a` to zero, and sets `0x51ab10` to zero; while the
+cursor is within the selected header's frame count it publishes the current
+cursor and increments `+0x17a`; at the end it publishes the final frame and
+resets/changes state. This is the direct ROM contract the kernel should mirror
+when its recovered gameplay state can be mapped onto the selector values.
+
+### Lua selector tap (`KNOWN`, 2026-09-14)
+
+`von/tools/gameplay_progress.lua` can now capture this relation without a
+MAME-source trace patch.  Its optional `VON_PROGRESS_MOTION_SELECTOR_LOG`
+program-space read tap samples i960 `CURPC`/`r8` at `0x3454c`.  In the local
+original-ROM 25-second deterministic run, the load reads the published global
+`0x51ab08` while `r8` is still the object base (rather than the later FIFO
+writer's reused register):
+
+```
+frame 1163  object 00503ad0  header 02167ab0  cursor 0001
+frame 1163  object 00503ad0  header 02167ab0  cursor 0002
+frame 1164  object 00503ad0  header 02167ab0  cursor 0003
+```
+
+`0x02167ab0` is the shared header for Temjin motion table 3 (`data=0x021674b0`,
+16 frames, 8 parts); its paired `0x51ab0c` value is `0x02079c7c`, Temjin table
+2 (16 frames, 15 parts). The cursor continues one step per submission through
+the retained `1..10` prefix.  A simultaneous object (`0x005040d0`) changes
+header from `0x0293e72c` to `0x028f66a4` and resets its cursor from 6 to 1,
+providing direct live evidence for the per-object reset contract above.
+
+The same 25-second capture observes the additional complete Temjin pairs
+`1/0` (64 frames) and `83/82` (24 frames).  A controlled 90-second run with
+the scripted movement/shot inputs and a passive run have identical header-pair
+sequences for both observed objects through frame 5400. Thus these particular
+inputs have not yet reached a player-controllable selector path; this is a
+negative control, **not** a semantic assignment of table numbers to idle,
+movement, or attacks.  The current selection fields at `+0x174/+0x176` are
+zero in this choreography path, while `+0x17a` is the verified cursor.
+
+The compact fixture and `von/tools/test_motion_selector_trace.py` verify the
+complete table-3/table-2 header pair plus that cursor prefix.  The raw Lua
+capture stays ignored under `von/build/`; its command is reproducible with
+`scripts/trace-geometry-select.sh` and the optional environment variables.
+
+### Observed selector inventory (`KNOWN`, capture-local)
+
+Matching the leading body-slot packet in `fifo-program-20260912T` against the
+Temjin ROM tables shows these 8-part selections in order during its early
+sequence: table `3` (16 frames), `1` (64), `3` again, `83` (24), then `1`,
+`3`, `15` (32), and later short/hold clips `163` (4), `165` (8), `167` (8),
+and `171` (24). The captured packet stream advances each non-held clip at one
+ROM frame per 60 Hz submission. This is an inventory of observed selections,
+not yet a semantic label map (idle/jump/etc.); it is sufficient to replace the
+kernel's two-slot assumption with selector-keyed raw clips once the object
+selector values are captured.
+
 ## 1b. Emitter -> part-OBA mapping (`KNOWN`, debugger-confirmed)
 
 Extended trace `0049` logs every copro-FIFO write. At the transform emitters

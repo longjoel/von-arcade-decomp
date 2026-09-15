@@ -334,10 +334,17 @@ do
     end
     parity_end = at
 end
+-- Combat calibration: turn to face the dummy, then tap each weapon so the
+-- opponent working HP (0x5042a0) and the three resource timers can be read.
+local COMBAT_TURN = 9600
+local COMBAT_FIRE = 9660
+local COMBAT_DUR = 300
+local COMBAT_END = COMBAT_FIRE + COMBAT_DUR * 4 + 120
 local END_FRAME = tonumber(os.getenv("VON_SANDBOX_END_FRAME")
     or (PROGRAM == "parity" and tostring(parity_end + 60)
         or (PROGRAM == "probe" and tostring(PROBE_BASE + PROBE_DUR + 120)
-            or "10300"))) or 10300
+            or (PROGRAM == "combat" and tostring(COMBAT_END)
+                or "10300")))) or 10300
 local parity_phase = -1
 
 local function step_parity_program()
@@ -369,6 +376,39 @@ local function step_parity_program()
                 end
             end
         end
+    end
+end
+
+-- Combat calibration schedule: hold "both left" (strafe + body turn) to bring
+-- the mech onto the dummy, then tap left / right / both shots in turn with
+-- idle gaps. Telemetry records both working HP cells and the weapon timers.
+local COMBAT_KEYS = {
+    { "shot" }, { "right_shot" }, { "shot", "right_shot" }, {},
+}
+local combat_phase = -1
+local function step_combat_program()
+    if frame < COMBAT_FIRE then
+        if frame == COMBAT_TURN then
+            hold_only({ "left", "left2" })
+            log(string.format("input: combat turn f%d-%d", COMBAT_TURN, COMBAT_FIRE))
+            watch("phase-edge")
+        end
+        return
+    end
+    local phase = math.floor((frame - COMBAT_FIRE) / COMBAT_DUR)
+    local t = (frame - COMBAT_FIRE) % COMBAT_DUR
+    if phase ~= combat_phase then
+        combat_phase = phase
+        log(string.format("input: combat weapon %d f%d+", phase, frame))
+        watch("phase-edge")
+        weapon_log("phase")
+    end
+    local keys = COMBAT_KEYS[math.min(phase + 1, #COMBAT_KEYS)]
+    -- 3-frame press every 24 frames: enough for the edge, below the input poll.
+    if (t % 24) < 3 then
+        hold_only(keys)
+    else
+        hold_only({})
     end
 end
 
@@ -488,6 +528,8 @@ emu.register_periodic(function()
             end
         elseif PROGRAM == "parity" then
             step_parity_program()
+        elseif PROGRAM == "combat" then
+            step_combat_program()
         elseif frame == 9600 then
             -- Hold the (left) shot so the game fires at its own cadence; a
             -- 1-in-6 pulse is shorter than the input poll and reads as a tap.

@@ -1,0 +1,11 @@
+motion-selector: pc=0003454c source=lua-program-read-tap
+motion-selector: frame=1163 object=00503ad0 g0=00503ad0 header=02167ab0 body_header=02079c7c sel=0000 state=0000 frame_cursor=0001
+motion-selector: frame=1163 object=00503ad0 g0=00503ad0 header=02167ab0 body_header=02079c7c sel=0000 state=0000 frame_cursor=0002
+motion-selector: frame=1164 object=00503ad0 g0=00503ad0 header=02167ab0 body_header=02079c7c sel=0000 state=0000 frame_cursor=0003
+motion-selector: frame=1165 object=00503ad0 g0=00503ad0 header=02167ab0 body_header=02079c7c sel=0000 state=0000 frame_cursor=0004
+motion-selector: frame=1166 object=00503ad0 g0=00503ad0 header=02167ab0 body_header=02079c7c sel=0000 state=0000 frame_cursor=0005
+motion-selector: frame=1167 object=00503ad0 g0=00503ad0 header=02167ab0 body_header=02079c7c sel=0000 state=0000 frame_cursor=0006
+motion-selector: frame=1168 object=00503ad0 g0=00503ad0 header=02167ab0 body_header=02079c7c sel=0000 state=0000 frame_cursor=0007
+motion-selector: frame=1169 object=00503ad0 g0=00503ad0 header=02167ab0 body_header=02079c7c sel=0000 state=0000 frame_cursor=0008
+motion-selector: frame=1170 object=00503ad0 g0=00503ad0 header=02167ab0 body_header=02079c7c sel=0000 state=0000 frame_cursor=0009
+motion-selector: frame=1171 object=00503ad0 g0=00503ad0 header=02167ab0 body_header=02079c7c sel=0000 state=0000 frame_cursor=000a

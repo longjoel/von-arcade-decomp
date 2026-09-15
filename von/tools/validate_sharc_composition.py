@@ -30,7 +30,7 @@ import sharc_transform as st  # noqa: E402
 ROOT = Path(__file__).resolve().parents[2]
 G2_OBA = ROOT / "von/i960/emitter-g2-oba.json"
 
-EMIT = re.compile(r"vonj_emitter: time=([\d.]+) pc=(\w+) data=(\w+) r6=(\w+) g0=(\w+) g2=(\w+)")
+EMIT = re.compile(r"vonj_emitter: time=([\d.]+) pc=(\w+) data=(\w+) r6=(\w+)(?: r8=\w+(?: sel=\w+ state=\w+ frame=\w+)?)? g0=(\w+) g2=(\w+)")
 OBJ = re.compile(r"vonj_geometry_object: time=([\d.]+) tpa=(\w+) tha=(\w+) oba=(\w+)")
 MAT = re.compile(r"vonj_geometry_matrix: time=([\d.]+) m=([-\d.,]+) t=([-\d.,]+)")
 
