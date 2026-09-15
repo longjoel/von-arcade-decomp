@@ -18,7 +18,10 @@ mkdir -p "$ROOT_DIR/von/build/i960"
 python3 "$ROOT_DIR/von/tools/extract_maincpu.py" \
     --output "$ROOT_DIR/von/build/i960/vonj-original-maincpu.bin"
 
+# Run as the invoking user so build artifacts stay user-owned (otherwise a
+# later run cannot overwrite/clean the root-owned objects).
 docker run --rm \
+    --user "$(id -u):$(id -g)" -e HOME=/tmp \
     -v "$ROOT_DIR:/src" \
     -w /src/von/i960 \
     --entrypoint /bin/bash \

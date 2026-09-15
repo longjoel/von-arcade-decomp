@@ -123,7 +123,6 @@ void recovered_audio_device_buffer_copy(u32 *destination,
         for (word = 0U; word < 64U; ++word)
             destination[row * 128U + word] = source[row * 128U + word];
 }
-typedef unsigned short u16;
 
 #define AUDIO_READ_INDEX  (*(volatile u32 *)0x0051aa70)
 #define AUDIO_WRITE_INDEX (*(volatile u32 *)0x0051aa74)

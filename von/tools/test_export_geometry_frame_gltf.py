@@ -30,7 +30,7 @@ def main() -> int:
         rom.write_bytes(struct.pack(
             "<6fI3I3f3I",
             0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-            2, 0, 0, 0, 0.0, 1.0, 0.0, 0, 0, 0,
+            0x202, 0, 0, 0, 0.0, 1.0, 0.0, 0, 0, 0,
         ))
         trace.write_text(trace_text)
         subprocess.run([

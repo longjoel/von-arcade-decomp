@@ -72,26 +72,33 @@ def main() -> int:
                    for error in errors)
     # Drift must be synthetic: a clean tree reports no generated errors, so
     # hand the validator a stale status copy instead of depending on live drift.
+    # The real coverage document lives in the ignored build tree, so supply a
+    # synthetic Tier A coverage to keep the freshness check hermetic.
+    coverage = {"schema_version": 1, "tier": "A",
+                "edge_semantics": "possible_static_edges",
+                "observed_entry_points": ["0x100"],
+                "possible_static_edges": [{"target": "0x100"}]}
     with tempfile.TemporaryDirectory(dir=root) as directory:
-        stale_status = Path(directory) / "stale-status.md"
+        temp = Path(directory)
+        coverage_path = temp / "coverage.json"
+        coverage_path.write_text(json.dumps(coverage), encoding="utf-8")
+        stale_status = temp / "stale-status.md"
         stale_status.write_text("# stale\n", encoding="utf-8")
         errors = validate_workflow(
             root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
-            check_generated=True, generated_coverage_path=root / "von/build/attract-coverage/vonj-attract-60s.json",
+            check_generated=True, generated_coverage_path=coverage_path,
             generated_worklist_path=root / "von/attract_worklist.json",
             generated_status_path=stale_status,
         )
         assert any("generated:" in error for error in errors)
-    with tempfile.TemporaryDirectory(dir=root) as directory:
-        comparison = Path(directory) / "comparison.json"
+        comparison = temp / "comparison.json"
         comparison.write_text(json.dumps({"missing_dynamic_edges": [],
                                           "missed_checkpoints": []}), encoding="utf-8")
         # The tracked worklist is Tier A-only; supplying a causal source must
         # therefore make freshness validation reject it rather than ignore it.
         errors = validate_workflow(
             root, root / "von/reconstruction_ledger.json", root / "von/evidence/manifest.json",
-            check_generated=True,
-            generated_coverage_path=root / "von/build/attract-coverage/vonj-attract-60s.json",
+            check_generated=True, generated_coverage_path=coverage_path,
             generated_worklist_path=root / "von/attract_worklist.json",
             generated_status_path=root / "von/generated-status.md",
             generated_comparison_path=comparison,

@@ -38,7 +38,7 @@ def main() -> int:
         rom.write_bytes(struct.pack(
             "<6fI3I3f3I",
             0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-            2, 0, 0, 0, 0.0, 1.0, 0.0, 0, 0, 0,
+            0x202, 0, 0, 0, 0.0, 1.0, 0.0, 0, 0, 0,
         ))
         trace.write_text(trace_text)
         subprocess.run([
@@ -64,7 +64,7 @@ def main() -> int:
         quad = struct.pack(
             "<6fI3I6f",
             1.0, 0.0, 1.0, -1.0, 0.0, 1.0,
-            1, 0, 0, 0, 1.0, 0.0, -1.0, -1.0, 0.0, -1.0,
+            0x201, 0, 0, 0, 1.0, 0.0, -1.0, -1.0, 0.0, -1.0,
         )
         vertices, indices = parse_mesh(quad, 0)
         normals = [normal(*(vertices[index] for index in indices[offset:offset + 3]))

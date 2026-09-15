@@ -12,7 +12,7 @@ TOOL = ROOT / "von/tools/export_geometry_assemblies.py"
 def main():
     with tempfile.TemporaryDirectory() as temp:
         root = Path(temp); rom = root / "rom.bin"; trace = root / "trace.log"; output = root / "out"
-        rom.write_bytes(struct.pack("<6fI3I3f3I", 0,0,0, 1,0,0, 2,0,0,0, 0,1,0, 0,0,0))
+        rom.write_bytes(struct.pack("<6fI3I3f3I", 0,0,0, 1,0,0, 0x202,0,0,0, 0,1,0, 0,0,0))
         lines = []
         for x in (0, 1, 30, 31):
             lines += [f"[:] vonj_geometry_matrix: time=1 m=1,0,0,0,1,0,0,0,1 t={x},0,0",

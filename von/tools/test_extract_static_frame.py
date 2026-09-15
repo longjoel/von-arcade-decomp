@@ -23,11 +23,11 @@ TOOL = Path(__file__).resolve().parent / "extract_static_frame.py"
 
 
 def triangle_words(verts):
-    """One-triangle strip: p0, p1, attr(link 0), skip, p2, skip, end."""
+    """One-triangle strip: p0, p1, attr(link 2), skip, p2, skip, end."""
     words = []
     words.extend(struct.unpack("<III", struct.pack("<3f", *verts[0])))
     words.extend(struct.unpack("<III", struct.pack("<3f", *verts[1])))
-    words.append(0x00000002)
+    words.append(0x00000202)
     words.extend((0xDEAD0001, 0xDEAD0002, 0xDEAD0003))
     words.extend(struct.unpack("<III", struct.pack("<3f", *verts[2])))
     words.extend((0xDEAD0004, 0xDEAD0005, 0xDEAD0006))

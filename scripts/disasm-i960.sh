@@ -15,6 +15,7 @@ python3 "$ROOT_DIR/von/tools/extract_maincpu.py" \
     --output "$ROM_IMAGE"
 
 docker run --rm \
+    --user "$(id -u):$(id -g)" -e HOME=/tmp \
     -v "$ROOT_DIR:/src" \
     -w /src/von/build/disasm \
     --entrypoint /bin/bash \
