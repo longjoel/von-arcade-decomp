@@ -36630,6 +36630,34 @@
             "unresolved_behavior": "The 0x884000 device responses are external board behavior; the driver consumes whatever the FIFO returns. Doubling is integer-only notbit-31 plus exponent+1."
           },
           "notes": "Linked into the reconstructed image (COMMON_OBJECTS) and called before the update backbone so the integrator has velocity. The float-typed pure model maincpu.gameplay-velocity-de990 stays compile-only."
+        },
+        {
+          "id": "maincpu.sharc-upload-28300",
+          "name": "sharc_upload_28300",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_sharc_upload_28300.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/extract_sharc_bootstrap.py",
+            "von/tools/test_recovered_sharc_upload_28300.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00028300",
+              "end": "0x00028410"
+            }
+          ],
+          "symbol": "recovered_sharc_upload_run",
+          "modeling": {
+            "boundary": "Runnable SHARC upload/boot: latch the 0x2b1e word count at 0x503ac4, raise 0x980000 bit31, clear 0x980020, program the 0x8c0000 external-port IOP registers, stream the 0x2b1e 16-bit bootstrap words from 0x16b58c to 0x884000 (external-DMA 16/48 packing), clear 0x980000 to boot, and emit the 8 sync word",
+            "test": "von/tools/test_recovered_sharc_upload_28300.py",
+            "unresolved_behavior": "The 0x28320-0x28344 external-port reset handshake and the 0xf5100 delay services are not reproduced; the upload assumes the copro device accepts the 16/48 packed stream directly"
+          },
+          "notes": "Linked into the reconstructed image (COMMON_OBJECTS) and called from reconstructed_main before the geometry pipeline. Source offset/word count match extract_sharc_bootstrap.py (0x16b58c, 0x2b1e)."
         }
       ]
     }

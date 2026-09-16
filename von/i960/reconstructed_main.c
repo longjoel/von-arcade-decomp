@@ -55,6 +55,7 @@ void recovered_object_initializer_27550_run(volatile unsigned char *object,
     unsigned int related_pointer, unsigned int kind, unsigned int team,
     unsigned int x, unsigned int z, unsigned int facing);
 void recovered_gameplay_velocity_de990_run(void);
+void recovered_sharc_upload_run(void);
 void recovered_text_video_initialize(void);
 void recovered_text_video_control_bootstrap(u32 caller_g14);
 void recovered_text_font_asset_initialize(void);
@@ -152,6 +153,9 @@ void i960_reconstructed_main(void)
 
     recovered_text_startup_asset_transfer(0U);
     state[4] = 0x5452414eUL; /* TRAN */
+    /* Upload and boot the SHARC geometry coprocessor so 0x884000 services
+     * are answered; the bootstrap is embedded in the host image. */
+    recovered_sharc_upload_run();
     recovered_geometry_pipeline_startup_development();
     state[4] = 0x47454f30UL; /* GEO0 */
     /* The SCSP FIFO is part of the board's host-visible audio boundary.  Its
