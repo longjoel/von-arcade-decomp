@@ -36861,6 +36861,34 @@
             "unresolved_behavior": "Only the offsets read by the implemented routines are populated; the full per-kind blocks (0x19360 table) and the remaining fields are not yet carried"
           },
           "notes": "The original config blocks at 0x57d0 and the pointer table at 0x19360 cannot be preserved as approved_data_ranges because they lie inside the generated code span (0..0xb250); carrying the values in the generated image resolves the overlap. The object initializer points +0x6c at this table."
+        },
+        {
+          "id": "maincpu.input-consumer-24fc0",
+          "name": "input_consumer_24fc0",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_input_consumer_24fc0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/input-commit-audit.md",
+            "von/tools/test_recovered_input_consumer_24fc0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00024f80",
+              "end": "0x00025360"
+            }
+          ],
+          "symbol": "recovered_input_consumer_24fc0_run",
+          "modeling": {
+            "boundary": "Per-object input consumer: the 0x24f90-0x25038 reset seeding +0x136/+0x137 to 0xff, the head capturing 0x50249c/0x5024a4 into +0xec/+0xf0 and decoding +0x108 via the 0x3d70/0x3da0 nibble tables, and the sibling counter/action/commit phases",
+            "test": "von/tools/test_recovered_input_consumer_24fc0.py",
+            "unresolved_behavior": "object+0x1b2 has no writer in the sibling; its writers are the 0x2e490..0x32fc0 state handlers and 0x2784c, so the command -> +0x1b2 projection is state-handler-owned and not modelled here"
+          },
+          "notes": "Compile-only for now; the input service does not yet populate 0x50249c/0x5024a4. Important finding: the action field +0x1b2 that the 0x32810 backbone dispatches on is set by the state handlers, so input-driven action requires those handlers."
         }
       ]
     }
