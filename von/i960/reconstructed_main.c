@@ -141,6 +141,78 @@ static void recovered_render_sega_logo(void)
     recovered_sega_logo_tiles();
 }
 
+/* Reconstructed VON_MAIN_LOOP (0x18724, entered from VON_MAIN 0x186f0) mode
+ * dispatch and the runnable modes.
+ *
+ * Mode 3 (0x190d0) is the play-setup arm: it resets the play globals and
+ * advances VON_GAME_MODE to 4. Mode 4 (0x19180) is the gameplay arm: it drives
+ * the SHARC (opcodes 8/16 to 0x884000) and runs the per-object update
+ * VON_FN_OBJECT_UPDATE. The helper calls inside the original arms
+ * (0x2a4e0, 0x1c618, 0x1bda0, 0x295d0) and the other mode handlers are not yet
+ * runnable, so only the state transitions and the gameplay tick are modeled. */
+
+static void reconstructed_gameplay_tick(void)
+{
+    recovered_io_service();
+    recovered_audio_service_pending();
+    /* Read the controller ports, derive the command/MA/MB inputs, then commit
+     * them into the player object's held-action state. */
+    recovered_input_service_run((volatile unsigned char *)VON_PLAYER_OBJECT);
+    recovered_input_commit_run_72ea0((volatile unsigned char *)VON_PLAYER_OBJECT);
+    /* VON_FN_INPUT_CONSUMER (0x25040): decode the packed controller word into
+     * VON_OBJ_COMMAND, VON_OBJ_ACTION_SEL and the counters. */
+    (void)recovered_input_consumer_24fc0_translate(
+        (volatile unsigned char *)VON_PLAYER_OBJECT,
+        *(volatile unsigned int *)(VON_PLAYER_OBJECT + VON_OBJ_INPUT_BASE),
+        *(volatile unsigned int *)(VON_PLAYER_OBJECT + VON_OBJ_INPUT_WORK));
+    /* VON_FN_ACTION_COMMIT (0x36460): a non-0xff latched command forces the
+     * cruise state 31 with the direction tables. */
+    (void)recovered_action_31_run((volatile unsigned char *)VON_PLAYER_OBJECT);
+    /* Velocity producer + prefix + accumulation feed VON_OBJ_VEL_X/VEL_Z. */
+    recovered_gameplay_velocity_de990_run();
+    recovered_object_update_prefix_32810_run((volatile unsigned char *)VON_PLAYER_OBJECT);
+    recovered_velocity_accumulate_358ac_run((volatile unsigned char *)VON_PLAYER_OBJECT);
+    /* VON_FN_BACKBONE (0x32810): dispatch the action/state tables, integrate. */
+    recovered_object_update_32810_run((volatile unsigned char *)VON_PLAYER_OBJECT);
+    recovered_object_update_32810_run((volatile unsigned char *)VON_CPU_OBJECT);
+}
+
+/* Mode 3, 0x190d0-0x19170. */
+static void reconstructed_mode_3(void)
+{
+    *(volatile unsigned short *)0x00504b96U = 1U;
+    *(volatile unsigned int *)0x00503b48U = 0x005046d0U;
+    *(volatile unsigned int *)0x00504148U = 0x00504930U;
+    *(volatile unsigned int *)0x00503a84U = 0U;
+    *(volatile unsigned int *)0x00503a80U = 0U;
+    *(volatile unsigned int *)0x00503a88U = 0U;
+    *(volatile unsigned int *)0x00504c98U = 0U;
+    *(volatile unsigned int *)0x00503a8cU = 0U;
+    *(volatile unsigned int *)0x00503a90U = 0U;
+    *(volatile unsigned int *)0x00503a1cU = 0U;
+    *(volatile unsigned int *)0x00504c90U = 0U;
+    *(volatile unsigned int *)0x00503ac0U = 0U;
+    *(volatile unsigned int *)(VON_GAME_MODE) =
+        *(volatile unsigned int *)(VON_GAME_MODE) + 1U;
+}
+
+/* Mode 4, 0x19180-0x1922c (gameplay arm). */
+static void reconstructed_mode_4(void)
+{
+    reconstructed_gameplay_tick();
+}
+
+static void reconstructed_main_loop(void)
+{
+    unsigned int mode = *(volatile unsigned int *)(VON_GAME_MODE);
+
+    switch (mode & VON_MODE_TABLE_MASK) {
+    case 3U: reconstructed_mode_3(); break;
+    case 4U: reconstructed_mode_4(); break;
+    default: break;
+    }
+}
+
 void i960_reconstructed_main(void)
 {
     /* Byte-relative +0x20: state[12..15] lands on 0x00500050..5c, the
@@ -251,6 +323,11 @@ void i960_reconstructed_main(void)
     *(volatile unsigned short *)(VON_PLAYER_OBJECT + VON_OBJ_STATE) = 16U;         /* input-facing locomotion state */
     *(volatile unsigned short *)(VON_PLAYER_OBJECT + VON_OBJ_TURN_TARGET) = 0U;
 
+    /* Enter the reconstructed root mode loop at mode 3 (play setup), which
+     * advances to mode 4 (gameplay) exactly like the original 0x190d0 arm. */
+    *(volatile unsigned int *)(VON_GAME_MODE) = 3U;
+    *(volatile unsigned int *)(VON_MODE_PHASE) = 0U;
+
     {
         const struct recovered_attract_platform presentation_platform = {
             (void *)state, recovered_i960_present
@@ -258,53 +335,13 @@ void i960_reconstructed_main(void)
 
         /* This loop models VON_MAIN_LOOP (0x18724) of the real root: the
          * original dispatches VON_MODE_TABLE[VON_GAME_MODE & 15] each
-         * iteration. The reconstructed host runs the attract presentation
-         * below and, every 0x1ff iterations, the gameplay tick that the real
-         * modes 3/4 reach through VON_FN_OBJECT_UPDATE (0x26cb8). The mode
-         * handlers themselves are not yet runnable, so the dispatch is
-         * approximated here; see von/i960/symbols.md. */
+         * iteration. Modes 3/4 reach gameplay through VON_FN_OBJECT_UPDATE
+         * (0x26cb8); the other mode handlers are not yet runnable. See
+         * von/i960/symbols.md. */
         for (;;) {
         state[5] = state[5] + 1;
-        /* These are frame-scale services, not inner-loop operations.  The
-         * recovered startup loop advances about 400 iterations per frame;
-         * keep a bounded polling interval so the generated image does not
-         * spend the entire attract run repeating MMIO reads. */
         if ((state[5] & 0x1ffU) == 0U) {
-            recovered_io_service();
-            recovered_audio_service_pending();
-            /* Read the controller ports, derive the command/MA/MB inputs,
-             * then commit them into the player object's held-action state. */
-            recovered_input_service_run((volatile unsigned char *)VON_PLAYER_OBJECT);
-            recovered_input_commit_run_72ea0((volatile unsigned char *)VON_PLAYER_OBJECT);
-            /* Per-object input consumer (VON_FN_INPUT_CONSUMER, 0x25040):
-             * decode the packed controller word into VON_OBJ_COMMAND,
-             * VON_OBJ_ACTION_SEL and the held/edge counters. The packed word
-             * (MA nibble bits 12-15, MB nibble bits 20-23) is produced by the
-             * service into VON_OBJ_INPUT_BASE; VON_OBJ_INPUT_WORK holds MB. */
-            (void)recovered_input_consumer_24fc0_translate(
-                (volatile unsigned char *)VON_PLAYER_OBJECT,
-                *(volatile unsigned int *)(VON_PLAYER_OBJECT + VON_OBJ_INPUT_BASE),
-                *(volatile unsigned int *)(VON_PLAYER_OBJECT + VON_OBJ_INPUT_WORK));
-            /* Committed-action -> locomotion (VON_FN_ACTION_COMMIT, 0x36460,
-             * state 0 of the VON_FRAME_STEP_TABLE): a non-0xff latched command
-             * forces the cruise state 31 with the direction tables. */
-            (void)recovered_action_31_run(
-                (volatile unsigned char *)VON_PLAYER_OBJECT);
-            /* Velocity producer drives the SHARC seek exchange and writes
-             * VON_OBJ_VEL_X/VON_OBJ_VEL_Z; the backbone then integrates. */
-            recovered_gameplay_velocity_de990_run();
-            /* Prefix: packets 31/10 populate VON_OBJ_PACKET31/VON_OBJ_PACKET10
-             * /VON_OBJ_HEIGHT_DELTA before the accumulation clamps against
-             * VON_OBJ_PACKET31. */
-            recovered_object_update_prefix_32810_run((volatile unsigned char *)VON_PLAYER_OBJECT);
-            /* Velocity accumulation: opcode-29/30 sin/cos * speed ->
-             * VON_OBJ_VEL_X/VON_OBJ_VEL_Z. */
-            recovered_velocity_accumulate_358ac_run((volatile unsigned char *)VON_PLAYER_OBJECT);
-            /* Per-object update backbone (VON_FN_BACKBONE, 0x32810): dispatch
-             * the action/state tables and integrate position. Arm bodies and
-             * the geometry projection remain stubbed. */
-            recovered_object_update_32810_run((volatile unsigned char *)VON_PLAYER_OBJECT);
-            recovered_object_update_32810_run((volatile unsigned char *)VON_CPU_OBJECT);
+            reconstructed_main_loop();
         }
         /* The reconstructed host has no vblank callback in this development
          * image. The captured loader loop advances at roughly 400 iterations

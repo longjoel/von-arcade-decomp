@@ -75,9 +75,16 @@ in `state-semantics.md`.
 
 ## Wire-up (current)
 
-The reconstructed image's `_start_ip` (`start_reconstructed.s`) currently calls
-`_i960_reconstructed_main` and never enters `VON_MAIN` / the mode loop. The real
-chain is:
+`_start_ip` (`start_reconstructed.s`) still calls `_i960_reconstructed_main`
+directly, but `i960_reconstructed_main` now enters the reconstructed
+`reconstructed_main_loop`, which mirrors `VON_MAIN_LOOP`: it dispatches
+`VON_MODE_TABLE[VON_GAME_MODE & 15]`. Mode 3 (`reconstructed_mode_3`) resets the
+play globals and advances to mode 4; mode 4 (`reconstructed_mode_4`) runs the
+gameplay tick (the recovered input -> action-commit -> velocity -> backbone
+path). Other mode handlers and the in-arm helper calls (`0x2a4e0`, `0x1c618`,
+`0x1bda0`, `0x295d0`) are not yet runnable.
+
+The original chain, for reference:
 
 ```
 reset VON_RESET_IP -> VON_RUNTIME_INIT -> VON_MAIN
