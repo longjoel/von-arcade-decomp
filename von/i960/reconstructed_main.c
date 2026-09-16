@@ -60,6 +60,7 @@ void recovered_input_service_run(volatile unsigned char *object);
 void recovered_input_commit_run_72ea0(volatile unsigned char *object);
 unsigned int recovered_input_consumer_24fc0_translate(
     volatile unsigned char *object, unsigned int ma, unsigned int mb);
+unsigned int recovered_action_31_run(volatile unsigned char *object);
 void recovered_velocity_accumulate_358ac_run(volatile unsigned char *object);
 void recovered_object_update_prefix_32810_run(volatile unsigned char *object);
 extern const unsigned int recovered_von_config_kind0[];
@@ -273,6 +274,11 @@ void i960_reconstructed_main(void)
                 (volatile unsigned char *)0x00503ad0U,
                 *(volatile unsigned int *)(0x00503ad0U + 0xecU),
                 *(volatile unsigned int *)(0x00503ad0U + 0xf0U));
+            /* Committed-action -> locomotion (0x36460, state-0 handler of the
+             * 0x37130 frame-step table): a non-0xff latched command forces the
+             * cruise state 31 with the direction tables. */
+            (void)recovered_action_31_run(
+                (volatile unsigned char *)0x00503ad0U);
             /* Velocity producer drives the SHARC seek exchange and writes
              * object+0x1c8/+0x1cc; the backbone then integrates position. */
             recovered_gameplay_velocity_de990_run();
