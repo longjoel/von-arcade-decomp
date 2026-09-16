@@ -36,6 +36,23 @@ NAME_STRIDE = 0x10
 MAIN_DATA_BASE = 0x02000000
 MAIN_DATA_END = 0x03000000
 
+# Per-action motion tables referenced directly by the i960 state handlers
+# (recovered from the turnaround/jump/dash/shot arms; see
+# von-godot/native/kernels/von_recovered_kernel.c rv_anim_slot and the probes in
+# von/i960/motion-emitter-findings.md). These sit in main_data outside the
+# fighter profile's pointer run, so the profile scan misses them. Addresses are
+# the raw main_data header pointers (8-part skeleton tables).
+ACTION_HEADERS = {
+    "idle":   0x025F733C,
+    "back":   0x025FD064,
+    "turn_l": 0x0260C0BC,
+    "turn_r": 0x0260BAAC,
+    "dash":   0x0259A3C4,
+    "jump":   0x025D1CFC,
+    "shot_l": 0x025D1E84,
+    "shot_r": 0x025F0BBC,
+}
+
 
 def load_maincpu(rom_dir: Path) -> bytes:
     rom_size = 0x80000
@@ -149,6 +166,26 @@ def main() -> int:
                 "profile_bus": f"0x{base:08x}",
                 "clips": motions,
             }
+            # Action tables (directly referenced by the state handlers). They are
+            # main_data-global, so attach them to the first (Temjin) profile.
+            if i == 0:
+                actions = []
+                for aname, aheader in ACTION_HEADERS.items():
+                    found = motion_header(mc, md, aheader)
+                    if not found:
+                        continue
+                    adata, aframes, aparts = found
+                    araw = extract_records(md, adata, aframes, aparts)
+                    actions.append({
+                        "name": aname,
+                        "header": aheader,
+                        "data": adata,
+                        "frames": aframes,
+                        "parts": aparts,
+                        "records_b64": base64.b64encode(araw).decode("ascii"),
+                    })
+                payload["actions"] = actions
+                print(f"  action tables: {len(actions)}")
             (args.out_dir / f"{name.lower()}.json").write_text(
                 json.dumps(payload, separators=(",", ":")))
 

@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dump_motion_tables import (
-    PROFILE_TABLE, NAME_TABLE, NAME_STRIDE,
+    PROFILE_TABLE, NAME_TABLE, NAME_STRIDE, ACTION_HEADERS,
     load_maincpu, load_main_data, motion_header,
 )
 
@@ -60,6 +60,20 @@ def main():
     # First record decodes as six signed 16-bit words.
     raw = md[data - 0x02000000:data - 0x02000000 + 12]
     assert len(struct.unpack_from("<6h", raw)) == 6
+
+    # Action tables referenced directly by the state handlers (outside the
+    # profile pointer run): 8-part skeleton tables with the expected lengths.
+    actions = {name: motion_header(mc, md, h)
+               for name, h in ACTION_HEADERS.items()}
+    assert all(v is not None for v in actions.values()), actions
+    assert actions["idle"][1:] == (64, 8), actions["idle"]
+    assert actions["back"][1:] == (64, 8), actions["back"]
+    assert actions["turn_l"][1:] == (16, 8), actions["turn_l"]
+    assert actions["turn_r"][1:] == (16, 8), actions["turn_r"]
+    assert actions["dash"][1:] == (8, 8), actions["dash"]
+    assert actions["jump"][1:] == (8, 8), actions["jump"]
+    assert actions["shot_l"][1:] == (4, 8), actions["shot_l"]
+    assert actions["shot_r"][1:] == (33, 8), actions["shot_r"]
 
     print(f"PASS: motion tables ({len(temjin)} Temjin clips, "
           f"{sum(1 for c in temjin if c[4] == 8)} skeleton)")
