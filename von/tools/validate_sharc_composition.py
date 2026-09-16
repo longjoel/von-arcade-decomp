@@ -62,7 +62,7 @@ def main() -> int:
     args = ap.parse_args()
 
     g2oba = json.loads(G2_OBA.read_text())
-    writes, objs, mats = [], [], []
+    writes, seq = [], []
     for line in args.log.open(errors="ignore"):
         if "vonj_emitter" in line:
             m = EMIT.search(line)
@@ -71,12 +71,12 @@ def main() -> int:
         elif "vonj_geometry_object" in line:
             m = OBJ.search(line)
             if m and args.mat_t0 <= float(m.group(1)) <= args.mat_t1:
-                objs.append(m.group(4))
+                seq.append(("obj", m.group(4)))
         elif "vonj_geometry_matrix" in line:
             m = MAT.search(line)
             if m and args.mat_t0 <= float(m.group(1)) <= args.mat_t1:
-                mats.append(([float(x) for x in m.group(2).split(",")],
-                             [float(x) for x in m.group(3).split(",")]))
+                seq.append(("mat", ([float(x) for x in m.group(2).split(",")],
+                                    [float(x) for x in m.group(3).split(",")])))
 
     packets = {}
     i = 0
@@ -90,10 +90,16 @@ def main() -> int:
         else:
             i += 1
 
+    # Each object's world matrix is the matrix line that follows it (the log
+    # interleaves them, not one matrix per object by index).
     world = {}
-    for k, o in enumerate(objs):
-        if k < len(mats) and o not in world:
-            world[o] = mats[k]
+    for i, item in enumerate(seq):
+        if item[0] != "obj":
+            continue
+        for j in range(i + 1, len(seq)):
+            if seq[j][0] == "mat":
+                world.setdefault(item[1], seq[j][1])
+                break
 
     model = {}
     for g2, rec in packets.items():
@@ -102,7 +108,9 @@ def main() -> int:
             model[g2] = st.compose_motion_record(rec, None) + (oba,)
 
     keys = [g for g in model if model[g][2] in world]
-    print(f"packets={len(packets)} objects={len(objs)} matrices={len(mats)} paired={len(keys)}")
+    n_obj = sum(1 for x in seq if x[0] == "obj")
+    n_mat = sum(1 for x in seq if x[0] == "mat")
+    print(f"packets={len(packets)} objects={n_obj} matrices={n_mat} paired={len(keys)}")
     if len(keys) < 2:
         return 1
 
