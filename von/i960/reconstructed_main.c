@@ -12,6 +12,7 @@
 #include "recovered_attract_schedule.h"
 #include "recovered_attract_platform.h"
 #include "recovered_sega_tiles.h"
+#include "von_symbols.h"
 
 
 typedef unsigned long u32;
@@ -230,29 +231,38 @@ void i960_reconstructed_main(void)
 
     /* Seed the two static fighters so the update backbone and the geometry
      * seek exchange have a defined record. Positions are placed apart so the
-     * seek can produce nonzero velocity; callback/config pointers are zero
-     * until the per-kind tables are ported. */
-    /* The ROM config blocks at 0x57d0 are overwritten by the generated image,
-     * so the config lives in the generated image; point both objects at it. */
-    recovered_object_initializer_27550_run((volatile unsigned char *)0x00503ad0U,
-        (unsigned int)(unsigned long)recovered_von_config_kind0, 0U, 0x005040d0U, 0U, 0U, 0x00000000U, 0xc2700000U, 0U);
-    recovered_object_initializer_27550_run((volatile unsigned char *)0x005040d0U,
-        (unsigned int)(unsigned long)recovered_von_config_kind0, 0U, 0x00503ad0U, 0U, 1U, 0x00000000U, 0x42700000U, 0U);
+     * seek can produce nonzero velocity.
+     *
+     * This reproduces the per-kind of the original VON_FN_OBJECT_UPDATE
+     * (0x26cb8) object seed. The ROM config blocks at 0x57d0 are overwritten by
+     * the generated image, so the config lives in the generated image; point
+     * both objects at it. */
+    recovered_object_initializer_27550_run((volatile unsigned char *)VON_PLAYER_OBJECT,
+        (unsigned int)(unsigned long)recovered_von_config_kind0, 0U, VON_CPU_OBJECT, 0U, 0U, 0x00000000U, 0xc2700000U, 0U);
+    recovered_object_initializer_27550_run((volatile unsigned char *)VON_CPU_OBJECT,
+        (unsigned int)(unsigned long)recovered_von_config_kind0, 0U, VON_PLAYER_OBJECT, 0U, 1U, 0x00000000U, 0x42700000U, 0U);
 
     /* Provisional locomotion seed until the state-31/34 arms are ported:
      * facing angle 0 and speed scalar 3.0f feed the velocity accumulation
      * block's opcode-29/30 exchanges. */
-    *(volatile unsigned short *)0x00503c54U = 0U;          /* player +0x184 facing */
-    *(volatile unsigned int *)0x00503c94U = 0x40400000U;   /* player +0x1c4 = 3.0f */
-    *(volatile unsigned int *)0x00503b4cU = 0x42c80000U;   /* player +0x7c = 100.0f speed limit */
-    *(volatile unsigned short *)0x00503c42U = 16U;         /* player +0x172 = input-facing locomotion state */
-    *(volatile unsigned short *)0x00503b0cU = 0U;          /* player +0x3c = heading angle */
+    *(volatile unsigned short *)(VON_PLAYER_OBJECT + VON_OBJ_FACING) = 0U;
+    *(volatile unsigned int *)(VON_PLAYER_OBJECT + VON_OBJ_SPEED) = 0x40400000U;   /* 3.0f */
+    *(volatile unsigned int *)(VON_PLAYER_OBJECT + VON_OBJ_PACKET31) = 0x42c80000U; /* 100.0f limit */
+    *(volatile unsigned short *)(VON_PLAYER_OBJECT + VON_OBJ_STATE) = 16U;         /* input-facing locomotion state */
+    *(volatile unsigned short *)(VON_PLAYER_OBJECT + VON_OBJ_TURN_TARGET) = 0U;
 
     {
         const struct recovered_attract_platform presentation_platform = {
             (void *)state, recovered_i960_present
         };
 
+        /* This loop models VON_MAIN_LOOP (0x18724) of the real root: the
+         * original dispatches VON_MODE_TABLE[VON_GAME_MODE & 15] each
+         * iteration. The reconstructed host runs the attract presentation
+         * below and, every 0x1ff iterations, the gameplay tick that the real
+         * modes 3/4 reach through VON_FN_OBJECT_UPDATE (0x26cb8). The mode
+         * handlers themselves are not yet runnable, so the dispatch is
+         * approximated here; see von/i960/symbols.md. */
         for (;;) {
         state[5] = state[5] + 1;
         /* These are frame-scale services, not inner-loop operations.  The
@@ -264,34 +274,37 @@ void i960_reconstructed_main(void)
             recovered_audio_service_pending();
             /* Read the controller ports, derive the command/MA/MB inputs,
              * then commit them into the player object's held-action state. */
-            recovered_input_service_run((volatile unsigned char *)0x00503ad0U);
-            recovered_input_commit_run_72ea0((volatile unsigned char *)0x00503ad0U);
-            /* Per-object input consumer: decode the packed controller word into
-             * object+0x108, object+0x136 and the held/edge counters. The packed
-             * word (MA nibble bits 12-15, MB nibble bits 20-23) is produced by
-             * the service into object+0xec; object+0xf0 holds the MB lane. */
+            recovered_input_service_run((volatile unsigned char *)VON_PLAYER_OBJECT);
+            recovered_input_commit_run_72ea0((volatile unsigned char *)VON_PLAYER_OBJECT);
+            /* Per-object input consumer (VON_FN_INPUT_CONSUMER, 0x25040):
+             * decode the packed controller word into VON_OBJ_COMMAND,
+             * VON_OBJ_ACTION_SEL and the held/edge counters. The packed word
+             * (MA nibble bits 12-15, MB nibble bits 20-23) is produced by the
+             * service into VON_OBJ_INPUT_BASE; VON_OBJ_INPUT_WORK holds MB. */
             (void)recovered_input_consumer_24fc0_translate(
-                (volatile unsigned char *)0x00503ad0U,
-                *(volatile unsigned int *)(0x00503ad0U + 0xecU),
-                *(volatile unsigned int *)(0x00503ad0U + 0xf0U));
-            /* Committed-action -> locomotion (0x36460, state-0 handler of the
-             * 0x37130 frame-step table): a non-0xff latched command forces the
-             * cruise state 31 with the direction tables. */
+                (volatile unsigned char *)VON_PLAYER_OBJECT,
+                *(volatile unsigned int *)(VON_PLAYER_OBJECT + VON_OBJ_INPUT_BASE),
+                *(volatile unsigned int *)(VON_PLAYER_OBJECT + VON_OBJ_INPUT_WORK));
+            /* Committed-action -> locomotion (VON_FN_ACTION_COMMIT, 0x36460,
+             * state 0 of the VON_FRAME_STEP_TABLE): a non-0xff latched command
+             * forces the cruise state 31 with the direction tables. */
             (void)recovered_action_31_run(
-                (volatile unsigned char *)0x00503ad0U);
+                (volatile unsigned char *)VON_PLAYER_OBJECT);
             /* Velocity producer drives the SHARC seek exchange and writes
-             * object+0x1c8/+0x1cc; the backbone then integrates position. */
+             * VON_OBJ_VEL_X/VON_OBJ_VEL_Z; the backbone then integrates. */
             recovered_gameplay_velocity_de990_run();
-            /* Prefix: packets 31/10 populate +0x7c/+0x84/+0x80 before the
-             * velocity accumulation clamps against +0x7c. */
-            recovered_object_update_prefix_32810_run((volatile unsigned char *)0x00503ad0U);
-            /* Velocity accumulation: opcode-29/30 sin/cos * speed -> +0x1c8/+0x1cc. */
-            recovered_velocity_accumulate_358ac_run((volatile unsigned char *)0x00503ad0U);
-            /* Per-object update backbone: dispatch the action/state tables and
-             * integrate position for the two static fighters. Arm bodies and
+            /* Prefix: packets 31/10 populate VON_OBJ_PACKET31/VON_OBJ_PACKET10
+             * /VON_OBJ_HEIGHT_DELTA before the accumulation clamps against
+             * VON_OBJ_PACKET31. */
+            recovered_object_update_prefix_32810_run((volatile unsigned char *)VON_PLAYER_OBJECT);
+            /* Velocity accumulation: opcode-29/30 sin/cos * speed ->
+             * VON_OBJ_VEL_X/VON_OBJ_VEL_Z. */
+            recovered_velocity_accumulate_358ac_run((volatile unsigned char *)VON_PLAYER_OBJECT);
+            /* Per-object update backbone (VON_FN_BACKBONE, 0x32810): dispatch
+             * the action/state tables and integrate position. Arm bodies and
              * the geometry projection remain stubbed. */
-            recovered_object_update_32810_run((volatile unsigned char *)0x00503ad0U);
-            recovered_object_update_32810_run((volatile unsigned char *)0x005040d0U);
+            recovered_object_update_32810_run((volatile unsigned char *)VON_PLAYER_OBJECT);
+            recovered_object_update_32810_run((volatile unsigned char *)VON_CPU_OBJECT);
         }
         /* The reconstructed host has no vblank callback in this development
          * image. The captured loader loop advances at roughly 400 iterations
