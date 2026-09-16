@@ -85,6 +85,7 @@ COMMON_OBJECTS=(
     /src/von/build/i960/recovered_state_dash_20.o
     /src/von/build/i960/recovered_state_turn_21.o
     /src/von/build/i960/recovered_action_31.o
+    /src/von/build/i960/recovered_text_console.o
     /src/von/build/i960/recovered_von_config_tables.o
 )
 

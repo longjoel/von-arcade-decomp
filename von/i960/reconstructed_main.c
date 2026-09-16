@@ -196,6 +196,62 @@ static void reconstructed_mode_3(void)
         *(volatile unsigned int *)(VON_GAME_MODE) + 1U;
 }
 
+/* Mode 0, 0x3c40-0x3d60: attract/UI.  It initializes the text console, walks
+ * the UI record list in main_data at 0x2ea2918 (each record = u16 x, u16 y, a
+ * NUL-terminated string, then the next record's x/y; a negative x/y word ends
+ * the list), and runs a 0x234-frame countdown that then advances the mode. */
+static void reconstructed_ui_walk(const volatile unsigned char *base)
+{
+    const volatile unsigned char *p = base;
+
+    while ((int)*(const volatile unsigned int *)p >= 0) {
+        unsigned int x = *(const volatile unsigned short *)p;
+        unsigned int y = *(const volatile unsigned short *)(p + 2);
+
+        p += 4;
+        recovered_text_console_set_cursor_run(x, y);
+        while (*p != 0U)
+            recovered_text_console_putc_run((unsigned int)*p++);
+        p += 1U;
+    }
+}
+
+static void reconstructed_mode_0(void)
+{
+    unsigned int phase = *(volatile unsigned int *)(VON_MODE_PHASE);
+
+    /* 0x3c40: hardware init 0x294b0 is not yet runnable; 0x3c54 raises the
+     * SHARC opcode-8 service. */
+    *(volatile unsigned int *)0x00884000U = 8U;
+
+    if (phase == 0U) {
+        recovered_text_console_reset_run();          /* 0x3c60 */
+        recovered_text_console_emit_run(0U);         /* 0x3c68 */
+        *(volatile unsigned int *)0x00503a04U = 0x234U;
+        if (*(volatile unsigned int *)0x005024d4U != 0U) {
+            *(volatile unsigned int *)(VON_MODE_PHASE) = 0U;   /* 0x3cfc */
+            *(volatile unsigned int *)(VON_GAME_MODE) += 1U;
+        } else {
+            reconstructed_ui_walk(
+                (const volatile unsigned char *)0x02ea2918U);  /* 0x3c88 */
+            *(volatile unsigned int *)(VON_MODE_PHASE) += 1U;
+        }
+    }
+
+    /* 0x3d18-0x3d60: 0x503a04 countdown; on underflow force the attract
+     * restart and advance the mode. */
+    {
+        unsigned int timer = *(volatile unsigned int *)0x00503a04U - 1U;
+
+        *(volatile unsigned int *)0x00503a04U = timer;
+        if (timer == 0xffffffffU) {
+            *(volatile unsigned int *)0x005024d4U = 1U;
+            *(volatile unsigned int *)(VON_MODE_PHASE) = 0U;
+            *(volatile unsigned int *)(VON_GAME_MODE) += 1U;
+        }
+    }
+}
+
 /* Mode 2, 0x18650-0x18678: idle advance (calls helper 0x1ccf8, then mode++). */
 static void reconstructed_mode_2(void)
 {
@@ -222,6 +278,7 @@ static void reconstructed_main_loop(void)
     unsigned int mode = *(volatile unsigned int *)(VON_GAME_MODE);
 
     switch (mode & VON_MODE_TABLE_MASK) {
+    case 0U: reconstructed_mode_0(); break;
     case 2U: reconstructed_mode_2(); break;
     case 3U: reconstructed_mode_3(); break;
     case 4U: reconstructed_mode_4(); break;
@@ -341,9 +398,9 @@ void i960_reconstructed_main(void)
     *(volatile unsigned short *)(VON_PLAYER_OBJECT + VON_OBJ_STATE) = 16U;         /* input-facing locomotion state */
     *(volatile unsigned short *)(VON_PLAYER_OBJECT + VON_OBJ_TURN_TARGET) = 0U;
 
-    /* Enter the reconstructed root mode loop at mode 3 (play setup), which
-     * advances to mode 4 (gameplay) exactly like the original 0x190d0 arm. */
-    *(volatile unsigned int *)(VON_GAME_MODE) = 3U;
+    /* Enter the reconstructed root mode loop at mode 0 (attract), which walks
+     * the UI records and advances like the original 0x3c40 arm. */
+    *(volatile unsigned int *)(VON_GAME_MODE) = 0U;
     *(volatile unsigned int *)(VON_MODE_PHASE) = 0U;
 
     {

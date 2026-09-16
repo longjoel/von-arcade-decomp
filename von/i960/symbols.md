@@ -42,8 +42,12 @@ Mode handlers (from `VON_MODE_TABLE`):
 | 7 | `0x0f3d30` | diagnostic |
 | 8, 15 | `0x018620` | reset back to attract (`mode = 0`, `phase = 0`) |
 
-Modes 2, 3, 4 and 8/15 are modeled in `reconstructed_main_loop`; mode 0/1/5/6/7
-are not yet runnable (they need the text helpers and the diagnostic record).
+Modes 0, 2, 3, 4 and 8/15 are modeled in `reconstructed_main_loop`. Mode 0
+(attract) is runnable: it resets the text console, walks the UI record list in
+main_data at `0x2ea2918`, and runs the `0x234`-frame countdown; on the
+reconstructed image this writes the tile nametable (`0x1000000`, the Sega
+System 24 tile device) and advances to mode 1. Mode 1 and the diagnostics
+5/6/7 are not yet runnable.
 
 ## Key functions
 
