@@ -73,6 +73,29 @@ void recovered_state_attack_7_run(volatile unsigned char *object);
 void recovered_state_attack_8_run(volatile unsigned char *object);
 void recovered_state_attack_9_run(volatile unsigned char *object);
 void recovered_state_attack_11_run(volatile unsigned char *object);
+void recovered_state_locomotion_0_run(volatile unsigned char *object);
+void recovered_state_locomotion_1_run(volatile unsigned char *object);
+void recovered_state_locomotion_15_run(volatile unsigned char *object);
+void recovered_state_locomotion_16_run(volatile unsigned char *object);
+void recovered_state_locomotion_17_run(volatile unsigned char *object);
+void recovered_state_locomotion_32_run(volatile unsigned char *object);
+void recovered_state_locomotion_36_run(volatile unsigned char *object);
+
+static void recovered_object_update_32810_state_locomotion(
+    volatile unsigned char *object, u16 state)
+{
+    switch (state)
+    {
+    case 0U: recovered_state_locomotion_0_run(object); break;
+    case 1U: recovered_state_locomotion_1_run(object); break;
+    case 15U: recovered_state_locomotion_15_run(object); break;
+    case 16U: recovered_state_locomotion_16_run(object); break;
+    case 17U: recovered_state_locomotion_17_run(object); break;
+    case 32U: recovered_state_locomotion_32_run(object); break;
+    case 36U: recovered_state_locomotion_36_run(object); break;
+    default: break;
+    }
+}
 
 static void recovered_object_update_32810_state_attack(
     volatile unsigned char *object, u16 state)
@@ -123,6 +146,9 @@ void recovered_object_update_32810_run(volatile unsigned char *object)
             recovered_locomotion_state_34_run(object);
         else if (state >= 2U && state <= 11U)
             recovered_object_update_32810_state_attack(object, state);
+        else if (state == 0U || state == 1U || state == 15U || state == 16U ||
+                 state == 17U || state == 32U || state == 36U)
+            recovered_object_update_32810_state_locomotion(object, state);
         else
             recovered_object_update_32810_states[state](object);
     }

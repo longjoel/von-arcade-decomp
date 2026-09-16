@@ -14,6 +14,7 @@ LOCOMOTION = [
     ROOT / "von/i960/recovered_locomotion_states.c",
     ROOT / "von/i960/recovered_locomotion_actions.c",
     ROOT / "von/i960/recovered_state_attack_arms.c",
+    ROOT / "von/i960/recovered_state_locomotion_arms.c",
 ]
 
 OBJECT_SIZE = 0x600

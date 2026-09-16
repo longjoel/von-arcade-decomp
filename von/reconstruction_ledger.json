@@ -36949,6 +36949,58 @@
             "unresolved_behavior": "The 0x884000 responses and the cfg-resident callbacks remain external; the 0x51ab08..12 publication consumers are outside the model"
           },
           "notes": "Dispatched from the 0x32810 backbone for states 2-9/11. Semantics captured in von/i960/state-semantics.md."
+        },
+        {
+          "id": "maincpu.state-locomotion-arms",
+          "name": "state_locomotion_arms",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_state_locomotion_arms.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/state-semantics.md",
+            "von/tools/test_recovered_state_locomotion_arms.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0002f580",
+              "end": "0x0002f92c"
+            },
+            {
+              "start": "0x0002f930",
+              "end": "0x0002fa14"
+            },
+            {
+              "start": "0x0002fa20",
+              "end": "0x0002fb10"
+            },
+            {
+              "start": "0x0002fb20",
+              "end": "0x0002fd40"
+            },
+            {
+              "start": "0x0002fd50",
+              "end": "0x0002fe24"
+            },
+            {
+              "start": "0x00030c20",
+              "end": "0x00030d38"
+            },
+            {
+              "start": "0x00031210",
+              "end": "0x000313d4"
+            }
+          ],
+          "symbol": "recovered_state_locomotion_0_run",
+          "modeling": {
+            "boundary": "Runnable input-facing locomotion/idle states 0/1/15/16/17/32/36: idle phase machine and facing slew (0), action-class recovery (1), clip players publishing the 0x51ab08/0x51ab0c pair with speed selection from cfg+0x53c..0x568 (15/16/17), locomotion-to-idle (32) and locomotion-to-31 (36)",
+            "test": "von/tools/test_recovered_state_locomotion_arms.py",
+            "unresolved_behavior": "The cfg-resident callbacks and the 0x51ab08..12 publication consumers remain external"
+          },
+          "notes": "Dispatched from the 0x32810 backbone for states 0/1/15/16/17/32/36. This is the input-facing family accepted by the 0x72ea0 commit gate in {15,16,31}."
         }
       ]
     }

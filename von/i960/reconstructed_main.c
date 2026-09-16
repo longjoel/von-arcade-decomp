@@ -242,7 +242,7 @@ void i960_reconstructed_main(void)
     *(volatile unsigned short *)0x00503c54U = 0U;          /* player +0x184 facing */
     *(volatile unsigned int *)0x00503c94U = 0x40400000U;   /* player +0x1c4 = 3.0f */
     *(volatile unsigned int *)0x00503b4cU = 0x42c80000U;   /* player +0x7c = 100.0f speed limit */
-    *(volatile unsigned short *)0x00503c42U = 31U;         /* player +0x172 = locomotion state */
+    *(volatile unsigned short *)0x00503c42U = 16U;         /* player +0x172 = input-facing locomotion state */
     *(volatile unsigned short *)0x00503b0cU = 0U;          /* player +0x3c = heading angle */
 
     {
