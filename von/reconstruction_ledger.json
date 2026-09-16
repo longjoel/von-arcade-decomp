@@ -36658,6 +36658,64 @@
             "unresolved_behavior": "The 0x28320-0x28344 external-port reset handshake and the 0xf5100 delay services are not reproduced; the upload assumes the copro device accepts the 16/48 packed stream directly"
           },
           "notes": "Linked into the reconstructed image (COMMON_OBJECTS) and called from reconstructed_main before the geometry pipeline. Source offset/word count match extract_sharc_bootstrap.py (0x16b58c, 0x2b1e)."
+        },
+        {
+          "id": "maincpu.input-service-run",
+          "name": "input_service_run",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_input_service_run.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "mame/src/mame/sega/model2.cpp",
+            "von/i960/recovered-twin-stick-map.md",
+            "von/tools/test_recovered_input_service_run.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000250f4",
+              "end": "0x00025160"
+            }
+          ],
+          "symbol": "recovered_input_service_run",
+          "modeling": {
+            "boundary": "Runnable input service: fetch the 315-5649 IN1/IN2 bytes, derive the twin-stick sum/difference MA/MB words (0x504dac/0x504db0) and the object+0x108 command code via the 0x3d70/0x3da0 nibble tables; the 0x72ea0 commit call stays with the caller",
+            "test": "von/tools/test_recovered_input_service_run.py",
+            "unresolved_behavior": "Absolute 0x01c00000 bus timing, the 0x50249c/0x5024a4 persistence filter, and the non-default 0x25040 state routes remain outside this derivation"
+          },
+          "notes": "IN1 is 315-5649 port C (register 0x02), IN2 port D (0x03); both active-low with 0x01 shot, 0x02 dash, 0x10 down, 0x20 up, 0x40 right, 0x80 left. The command code is (table[(MA>>4)&15]<<8)|table[(MB>>4)&15]; MA is the stick sum, MB the difference."
+        },
+        {
+          "id": "maincpu.input-commit-72ea0-run",
+          "name": "input_commit_72ea0_run",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_input_commit_run_72ea0.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/input-commit-audit.md",
+            "von/i960/mcp-left-shot-probe.md",
+            "von/tools/test_recovered_input_commit_run_72ea0.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00072ea0",
+              "end": "0x00073480"
+            }
+          ],
+          "symbol": "recovered_input_commit_run_72ea0",
+          "modeling": {
+            "boundary": "Whole standalone commit body 0x72ea0-0x73480: MA/MB record reload and game==12 override; the signed +0x1f0 timer and +0x1e0/+0x1e8 derivation; the g7+0x4c..0x57 repeat/held/edge counters with the 0xfb chord, 0xfd resets and 0xee/0xf5 gates; the object+0x108 command tree writing g7+0x4a; and the latch plus timer advance",
+            "test": "von/tools/test_recovered_input_commit_run_72ea0.py",
+            "unresolved_behavior": "The state==20 lookup helpers 0x882a8/0x88318 and the downstream 0x73490 helper remain outside this bounded body"
+          },
+          "notes": "MA/MB result cells are 0x504dac/0x504db0; the active record is 0x5024f0 + bit0(0x1a14002)*0x700 at +0x514/+0x515. Linked into the image and called after the input service."
         }
       ]
     }

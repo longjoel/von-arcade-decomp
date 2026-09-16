@@ -56,6 +56,8 @@ void recovered_object_initializer_27550_run(volatile unsigned char *object,
     unsigned int x, unsigned int z, unsigned int facing);
 void recovered_gameplay_velocity_de990_run(void);
 void recovered_sharc_upload_run(void);
+void recovered_input_service_run(volatile unsigned char *object);
+void recovered_input_commit_run_72ea0(volatile unsigned char *object);
 void recovered_text_video_initialize(void);
 void recovered_text_video_control_bootstrap(u32 caller_g14);
 void recovered_text_font_asset_initialize(void);
@@ -243,6 +245,10 @@ void i960_reconstructed_main(void)
         if ((state[5] & 0x1ffU) == 0U) {
             recovered_io_service();
             recovered_audio_service_pending();
+            /* Read the controller ports, derive the command/MA/MB inputs,
+             * then commit them into the player object's held-action state. */
+            recovered_input_service_run((volatile unsigned char *)0x00503ad0U);
+            recovered_input_commit_run_72ea0((volatile unsigned char *)0x00503ad0U);
             /* Velocity producer drives the SHARC seek exchange and writes
              * object+0x1c8/+0x1cc; the backbone then integrates position. */
             recovered_gameplay_velocity_de990_run();
