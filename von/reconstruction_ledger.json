@@ -36716,6 +36716,34 @@
             "unresolved_behavior": "The state==20 lookup helpers 0x882a8/0x88318 and the downstream 0x73490 helper remain outside this bounded body"
           },
           "notes": "MA/MB result cells are 0x504dac/0x504db0; the active record is 0x5024f0 + bit0(0x1a14002)*0x700 at +0x514/+0x515. Linked into the image and called after the input service."
+        },
+        {
+          "id": "maincpu.velocity-accumulate-358ac",
+          "name": "velocity_accumulate_358ac",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_velocity_accumulate_358ac.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "mame/src/devices/cpu/i960/i960.cpp",
+            "von/tools/test_recovered_velocity_accumulate_358ac.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000358ac",
+              "end": "0x00035c28"
+            }
+          ],
+          "symbol": "recovered_velocity_accumulate_358ac_run",
+          "modeling": {
+            "boundary": "Freestanding runnable velocity accumulation: service word 6 and +0x2e = +0x184 + 2*+0x186; the +0x30==3 ret; the +0x19c==0 selector; the +0x1c4-to-+0x7c clamp; the opcode-29/30 facing exchanges (multipliers flip31(+0x1c4) then +0x1c4) adding response 29 to +0x1c8 and response 30 to +0x1cc; the state==19/20 and state==31/34 +0x3c arms; the +0x7c<70.0 scale; the state==18 and state==11 extensions",
+            "test": "von/tools/test_recovered_velocity_accumulate_358ac.py",
+            "unresolved_behavior": "The 0x884000 SHARC responses are consumed verbatim; the 0x6f6f0 projection, the service-31/10 continuation, the action/state handlers, and the 0x51ab14 multiplier contents remain outside the bounded model"
+          },
+          "notes": "Linked (COMMON_OBJECTS) and called from reconstructed_main before the update backbone. notbit 31 is src ^ (1<<bit); addr is add-real single; opcode 29 (sin) accumulates into +0x1c8 and 30 (cos) into +0x1cc."
         }
       ]
     }

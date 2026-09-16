@@ -58,6 +58,7 @@ void recovered_gameplay_velocity_de990_run(void);
 void recovered_sharc_upload_run(void);
 void recovered_input_service_run(volatile unsigned char *object);
 void recovered_input_commit_run_72ea0(volatile unsigned char *object);
+void recovered_velocity_accumulate_358ac_run(volatile unsigned char *object);
 void recovered_text_video_initialize(void);
 void recovered_text_video_control_bootstrap(u32 caller_g14);
 void recovered_text_font_asset_initialize(void);
@@ -231,6 +232,13 @@ void i960_reconstructed_main(void)
     recovered_object_initializer_27550_run((volatile unsigned char *)0x005040d0U,
         0U, 0U, 0U, 0U, 1U, 0x00000000U, 0x42700000U, 0U);
 
+    /* Provisional locomotion seed until the state-31/34 arms are ported:
+     * facing angle 0 and speed scalar 3.0f feed the velocity accumulation
+     * block's opcode-29/30 exchanges. */
+    *(volatile unsigned short *)0x00503c54U = 0U;          /* player +0x184 facing */
+    *(volatile unsigned int *)0x00503c94U = 0x40400000U;   /* player +0x1c4 = 3.0f */
+    *(volatile unsigned int *)0x00503b4cU = 0x42c80000U;   /* player +0x7c = 100.0f speed limit */
+
     {
         const struct recovered_attract_platform presentation_platform = {
             (void *)state, recovered_i960_present
@@ -252,6 +260,8 @@ void i960_reconstructed_main(void)
             /* Velocity producer drives the SHARC seek exchange and writes
              * object+0x1c8/+0x1cc; the backbone then integrates position. */
             recovered_gameplay_velocity_de990_run();
+            /* Velocity accumulation: opcode-29/30 sin/cos * speed -> +0x1c8/+0x1cc. */
+            recovered_velocity_accumulate_358ac_run((volatile unsigned char *)0x00503ad0U);
             /* Per-object update backbone: dispatch the action/state tables and
              * integrate position for the two static fighters. Arm bodies and
              * the geometry projection remain stubbed. */
