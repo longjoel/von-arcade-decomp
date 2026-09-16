@@ -28,4 +28,23 @@ const u32 recovered_von_config_kind0[0x200] = {
     [0x590 / 4] = 0x40133333U, /* 2.3f */
     [0x594 / 4] = 0x40200000U, /* 2.5f */
     [0x598 / 4] = 0x3fd9999aU, /* 1.7f */
+    /* Per-state locomotion callbacks (original kind-0 config function
+     * pointers, maincpu addresses 0x4a780-0x4dce0 which lie above the
+     * generated span and are read verbatim by the state handlers). */
+    [0x3a8 / 4] = 0x0004a780U,
+    [0x3ac / 4] = 0x0004a990U,
+    [0x3b0 / 4] = 0x0004abc0U,
+    [0x3b4 / 4] = 0x0004ad50U,
+    [0x3b8 / 4] = 0x0004aff0U,
+    [0x3bc / 4] = 0x0004b090U,
+    [0x3c0 / 4] = 0x0004ae70U,
+    [0x3c4 / 4] = 0x0004af20U,
+    [0x3c8 / 4] = 0x0004b600U,
+    [0x3cc / 4] = 0x0004da80U,
+    [0x3d0 / 4] = 0x0004dce0U,
+    [0x3d4 / 4] = 0x0004def0U,
+    [0x3d8 / 4] = 0x0004d540U,
+    [0x3dc / 4] = 0x0004d720U,
+    [0x3e0 / 4] = 0x0004d880U,
+    [0x3e4 / 4] = 0x0004c610U,
 };
