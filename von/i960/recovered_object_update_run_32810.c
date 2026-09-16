@@ -64,6 +64,33 @@ void recovered_locomotion_action_0_run(volatile unsigned char *object);
 void recovered_locomotion_action_12_run(volatile unsigned char *object);
 void recovered_locomotion_state_31_run(volatile unsigned char *object);
 void recovered_locomotion_state_34_run(volatile unsigned char *object);
+void recovered_state_attack_2_run(volatile unsigned char *object);
+void recovered_state_attack_3_run(volatile unsigned char *object);
+void recovered_state_attack_4_run(volatile unsigned char *object);
+void recovered_state_attack_5_run(volatile unsigned char *object);
+void recovered_state_attack_6_run(volatile unsigned char *object);
+void recovered_state_attack_7_run(volatile unsigned char *object);
+void recovered_state_attack_8_run(volatile unsigned char *object);
+void recovered_state_attack_9_run(volatile unsigned char *object);
+void recovered_state_attack_11_run(volatile unsigned char *object);
+
+static void recovered_object_update_32810_state_attack(
+    volatile unsigned char *object, u16 state)
+{
+    switch (state)
+    {
+    case 2U: recovered_state_attack_2_run(object); break;
+    case 3U: recovered_state_attack_3_run(object); break;
+    case 4U: recovered_state_attack_4_run(object); break;
+    case 5U: recovered_state_attack_5_run(object); break;
+    case 6U: recovered_state_attack_6_run(object); break;
+    case 7U: recovered_state_attack_7_run(object); break;
+    case 8U: recovered_state_attack_8_run(object); break;
+    case 9U: recovered_state_attack_9_run(object); break;
+    case 11U: recovered_state_attack_11_run(object); break;
+    default: break;
+    }
+}
 
 u32 recovered_object_update_32810_state_count(void)
 {
@@ -94,6 +121,8 @@ void recovered_object_update_32810_run(volatile unsigned char *object)
             recovered_locomotion_state_31_run(object);
         else if (state == 34U)
             recovered_locomotion_state_34_run(object);
+        else if (state >= 2U && state <= 11U)
+            recovered_object_update_32810_state_attack(object, state);
         else
             recovered_object_update_32810_states[state](object);
     }

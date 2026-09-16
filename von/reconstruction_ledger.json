@@ -36889,6 +36889,66 @@
             "unresolved_behavior": "object+0x1b2 has no writer in the sibling; its writers are the 0x2e490..0x32fc0 state handlers and 0x2784c, so the command -> +0x1b2 projection is state-handler-owned and not modelled here"
           },
           "notes": "Compile-only for now; the input service does not yet populate 0x50249c/0x5024a4. Important finding: the action field +0x1b2 that the 0x32810 backbone dispatches on is set by the state handlers, so input-driven action requires those handlers."
+        },
+        {
+          "id": "maincpu.state-attack-arms",
+          "name": "state_attack_arms",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_state_attack_arms.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/state-semantics.md",
+            "von/tools/test_recovered_state_attack_arms.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0002e450",
+              "end": "0x0002e588"
+            },
+            {
+              "start": "0x0002e590",
+              "end": "0x0002e6e4"
+            },
+            {
+              "start": "0x0002e6f0",
+              "end": "0x0002e854"
+            },
+            {
+              "start": "0x0002e860",
+              "end": "0x0002e988"
+            },
+            {
+              "start": "0x0002e990",
+              "end": "0x0002ea9c"
+            },
+            {
+              "start": "0x0002eaa0",
+              "end": "0x0002ebac"
+            },
+            {
+              "start": "0x0002ebb0",
+              "end": "0x0002ecd8"
+            },
+            {
+              "start": "0x0002ece0",
+              "end": "0x0002ef80"
+            },
+            {
+              "start": "0x0002f010",
+              "end": "0x0002f258"
+            }
+          ],
+          "symbol": "recovered_state_attack_2_run",
+          "modeling": {
+            "boundary": "Runnable attack/turn states 2-9 and 11: packet-31 response handling, +0x1b2=11, +0x1c4 from cfg+0x59c/0x5a0/0x5a4, +0x19c/+0x1af/+0x1db; state 9 facing slew and clip selection to +0x172=2/3; state 11 three-phase clip machine to +0x172=0/12/13",
+            "test": "von/tools/test_recovered_state_attack_arms.py",
+            "unresolved_behavior": "The 0x884000 responses and the cfg-resident callbacks remain external; the 0x51ab08..12 publication consumers are outside the model"
+          },
+          "notes": "Dispatched from the 0x32810 backbone for states 2-9/11. Semantics captured in von/i960/state-semantics.md."
         }
       ]
     }
