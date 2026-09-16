@@ -3,6 +3,7 @@
 
 import ctypes
 import pathlib
+import struct
 import subprocess
 import tempfile
 
@@ -76,9 +77,11 @@ with tempfile.TemporaryDirectory() as directory:
 
     integrate = recovered.recovered_object_update_32810_integrate_position
     integrate.argtypes = [ctypes.POINTER(Position)]
-    position = Position(x=10, z=20, vx=5, vz=0xFFFFFFFF)
+    def fbits(value):
+        return struct.unpack("<I", struct.pack("<f", value))[0]
+    position = Position(x=fbits(10.0), z=fbits(20.0), vx=fbits(5.0), vz=fbits(-3.0))
     integrate(ctypes.byref(position))
-    assert (position.x, position.z) == (15, 19), (position.x, position.z)
+    assert (position.x, position.z) == (fbits(15.0), fbits(17.0)), (position.x, position.z)
 
     listing = LISTING.read_text(encoding="utf-8")
     dispatch = listing[listing.index("   33ae8:"):listing.index("   33b1c:")]

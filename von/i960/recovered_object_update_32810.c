@@ -77,10 +77,22 @@ u32 recovered_object_update_32810_state_in_range(u32 state_word)
     return value <= RECOVERED_OBJECT_UPDATE_STATE_MAX ? 1U : 0U;
 }
 
-/* Integrator core 0x363bc: object+0x08 += object+0x1c8; object+0x10 += object+0x1cc. */
+/* Integrator core 0x363bc: object+0x08 += object+0x1c8; object+0x10 += object+0x1cc.
+ * The i960 mnemonic `addr` is add-real (single precision), so this is a float add. */
 void recovered_object_update_32810_integrate_position(
     struct recovered_object_update_32810_position *position)
 {
-    position->x += position->vx;
-    position->z += position->vz;
+    union {
+        u32 bits;
+        float value;
+    } x, z, vx, vz;
+
+    x.bits = position->x;
+    z.bits = position->z;
+    vx.bits = position->vx;
+    vz.bits = position->vz;
+    x.value += vx.value;
+    z.value += vz.value;
+    position->x = x.bits;
+    position->z = z.bits;
 }

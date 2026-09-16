@@ -3,6 +3,7 @@
 
 import ctypes
 import pathlib
+import struct
 import subprocess
 import tempfile
 
@@ -11,6 +12,10 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "von/i960/recovered_object_update_run_32810.c"
 
 OBJECT_SIZE = 0x600
+
+
+def fbits(value):
+    return struct.unpack("<I", struct.pack("<f", value))[0]
 
 
 def u32(buf, offset):
@@ -42,33 +47,33 @@ with tempfile.TemporaryDirectory() as directory:
     assert state_count() == 43
 
     buf = (ctypes.c_ubyte * OBJECT_SIZE)()
-    set_u32(buf, 0x08, 100)
-    set_u32(buf, 0x10, 200)
-    set_u32(buf, 0x1C8, 5)
-    set_u32(buf, 0x1CC, 0xFFFFFFFF)
+    set_u32(buf, 0x08, fbits(100.0))
+    set_u32(buf, 0x10, fbits(200.0))
+    set_u32(buf, 0x1C8, fbits(5.0))
+    set_u32(buf, 0x1CC, fbits(-1.0))
     set_u16(buf, 0x1B2, 3)
     set_u16(buf, 0x172, 5)
     run(ctypes.byref(buf))
-    assert (u32(buf, 0x08), u32(buf, 0x10)) == (105, 199)
+    assert (u32(buf, 0x08), u32(buf, 0x10)) == (fbits(105.0), fbits(199.0))
 
     # Out-of-range action/state still integrate (dispatch is gated, not fatal).
-    set_u32(buf, 0x08, 0)
-    set_u32(buf, 0x10, 0)
-    set_u32(buf, 0x1C8, 1)
-    set_u32(buf, 0x1CC, 2)
+    set_u32(buf, 0x08, fbits(0.0))
+    set_u32(buf, 0x10, fbits(0.0))
+    set_u32(buf, 0x1C8, fbits(1.0))
+    set_u32(buf, 0x1CC, fbits(2.0))
     set_u16(buf, 0x1B2, 99)
     set_u16(buf, 0x172, 99)
     run(ctypes.byref(buf))
-    assert (u32(buf, 0x08), u32(buf, 0x10)) == (1, 2)
+    assert (u32(buf, 0x08), u32(buf, 0x10)) == (fbits(1.0), fbits(2.0))
 
     # Negative state high bit is rejected by the guard but integration runs.
-    set_u32(buf, 0x08, 10)
-    set_u32(buf, 0x10, 20)
-    set_u32(buf, 0x1C8, 4)
-    set_u32(buf, 0x1CC, 4)
+    set_u32(buf, 0x08, fbits(10.0))
+    set_u32(buf, 0x10, fbits(20.0))
+    set_u32(buf, 0x1C8, fbits(4.0))
+    set_u32(buf, 0x1CC, fbits(4.0))
     set_u16(buf, 0x1B2, 0)
     set_u16(buf, 0x172, 0x8000)
     run(ctypes.byref(buf))
-    assert (u32(buf, 0x08), u32(buf, 0x10)) == (14, 24)
+    assert (u32(buf, 0x08), u32(buf, 0x10)) == (fbits(14.0), fbits(24.0))
 
 print("PASS: 0x32810 runnable dispatch + integrator backbone")

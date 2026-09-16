@@ -36575,6 +36575,61 @@
             "unresolved_behavior": "The 14 action and 43 state arm bodies and the geometry projection call are stubbed no-ops; velocity producers and the object initializer are not yet wired, so integration is inert until those land"
           },
           "notes": "Linked into the reconstructed i960 image (COMMON_OBJECTS) and invoked from reconstructed_main on the service cadence for the player (0x503ad0) and CPU (0x5040d0) objects. Preserves the original dispatch structure while the arm bodies are ported."
+        },
+        {
+          "id": "maincpu.object-initializer-27550",
+          "name": "object_initializer_27550",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_object_initializer_27550.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_object_initializer_27550.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00027550",
+              "end": "0x00027c50"
+            }
+          ],
+          "symbol": "recovered_object_initializer_27550_run",
+          "modeling": {
+            "boundary": "Bounded runnable object initializer: seed the identity pointers (+0x04/+0x64/+0x68/+0x6c/+0x74), header/state (+0x00/+0x02/+0x170/+0x172), position/facing (+0x08/+0x10/+0x184), velocity accumulators (+0x1c8/+0x1cc), action bytes (+0x1ab..+0x1b2) and timer/limit halfwords (+0x1e2..+0x1fc) so the 0x32810 dispatch and integrator have a defined record",
+            "test": "von/tools/test_recovered_object_initializer_27550.py",
+            "unresolved_behavior": "The 0x275d4-0x27668 profile-route switch, the per-kind callback table, the transform producer 0x75d90, the stage selector 0x6f600, and the 0x503xxx shadow publication are outside the bounded model; the caller supplies the callback pointer verbatim"
+          },
+          "notes": "Linked into the reconstructed image (COMMON_OBJECTS). +0x1fc is 0xff and 0x1e2-0x1e8 are 0x64 with 0x1ea-0x1f0 zero, per 0x277ec-0x278b0."
+        },
+        {
+          "id": "maincpu.gameplay-velocity-de990-run",
+          "name": "gameplay_velocity_de990_run",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_gameplay_velocity_de990_run.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "mame/src/devices/cpu/i960/i960.cpp",
+            "von/tools/test_recovered_gameplay_velocity_de990_run.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000de990",
+              "end": "0x000df058"
+            }
+          ],
+          "symbol": "recovered_gameplay_velocity_de990_run",
+          "modeling": {
+            "boundary": "Freestanding runnable velocity producer for the player (0x503ad0) and CPU (0x5040d0): the 0x503c98/0x503c9c clear, the mode 9/8 doubled arms, the 10.4 signed/default arms, the state==3 arm, the service-38/39 0x884000 packet, and the r3==0 gate.",
+            "test": "von/tools/test_recovered_gameplay_velocity_de990_run.py",
+            "unresolved_behavior": "The 0x884000 device responses are external board behavior; the driver consumes whatever the FIFO returns. Doubling is integer-only notbit-31 plus exponent+1."
+          },
+          "notes": "Linked into the reconstructed image (COMMON_OBJECTS) and called before the update backbone so the integrator has velocity. The float-typed pure model maincpu.gameplay-velocity-de990 stays compile-only."
         }
       ]
     }

@@ -50,6 +50,11 @@ void recovered_host_queue_initialize(void);
 void recovered_audio_initialize_scsp(void);
 void recovered_audio_service_pending(void);
 void recovered_object_update_32810_run(volatile unsigned char *object);
+void recovered_object_initializer_27550_run(volatile unsigned char *object,
+    unsigned int config_pointer, unsigned int callback_pointer,
+    unsigned int related_pointer, unsigned int kind, unsigned int team,
+    unsigned int x, unsigned int z, unsigned int facing);
+void recovered_gameplay_velocity_de990_run(void);
 void recovered_text_video_initialize(void);
 void recovered_text_video_control_bootstrap(u32 caller_g14);
 void recovered_text_font_asset_initialize(void);
@@ -211,6 +216,15 @@ void i960_reconstructed_main(void)
     state[4] = 0x494e4954UL; /* INIT */
     state[9] = 0U; /* timed attract presentation has not yet fired */
 
+    /* Seed the two static fighters so the update backbone and the geometry
+     * seek exchange have a defined record. Positions are placed apart so the
+     * seek can produce nonzero velocity; callback/config pointers are zero
+     * until the per-kind tables are ported. */
+    recovered_object_initializer_27550_run((volatile unsigned char *)0x00503ad0U,
+        0U, 0U, 0U, 0U, 0U, 0x00000000U, 0xc2700000U, 0U);
+    recovered_object_initializer_27550_run((volatile unsigned char *)0x005040d0U,
+        0U, 0U, 0U, 0U, 1U, 0x00000000U, 0x42700000U, 0U);
+
     {
         const struct recovered_attract_platform presentation_platform = {
             (void *)state, recovered_i960_present
@@ -225,10 +239,12 @@ void i960_reconstructed_main(void)
         if ((state[5] & 0x1ffU) == 0U) {
             recovered_io_service();
             recovered_audio_service_pending();
+            /* Velocity producer drives the SHARC seek exchange and writes
+             * object+0x1c8/+0x1cc; the backbone then integrates position. */
+            recovered_gameplay_velocity_de990_run();
             /* Per-object update backbone: dispatch the action/state tables and
              * integrate position for the two static fighters. Arm bodies and
-             * the geometry projection remain stubbed; with zero velocity the
-             * integration is a no-op until velocity producers are wired. */
+             * the geometry projection remain stubbed. */
             recovered_object_update_32810_run((volatile unsigned char *)0x00503ad0U);
             recovered_object_update_32810_run((volatile unsigned char *)0x005040d0U);
         }

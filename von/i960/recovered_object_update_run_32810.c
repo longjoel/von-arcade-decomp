@@ -67,12 +67,23 @@ void recovered_object_update_32810_run(volatile unsigned char *object)
 {
     u16 action = *(volatile u16 *)(object + 0x1b2);
     u16 state = *(volatile u16 *)(object + 0x172);
+    union {
+        u32 bits;
+        float value;
+    } x, z, vx, vz;
 
     if (action <= 13U)
         recovered_object_update_32810_actions[action](object);
     if ((state & 0x8000U) == 0U && state <= 42U)
         recovered_object_update_32810_states[state](object);
 
-    *(volatile u32 *)(object + 0x08) += *(volatile u32 *)(object + 0x1c8);
-    *(volatile u32 *)(object + 0x10) += *(volatile u32 *)(object + 0x1cc);
+    /* i960 `addr` is add-real: object+0x08/+0x10 += object+0x1c8/+0x1cc. */
+    x.bits = *(volatile u32 *)(object + 0x08);
+    z.bits = *(volatile u32 *)(object + 0x10);
+    vx.bits = *(volatile u32 *)(object + 0x1c8);
+    vz.bits = *(volatile u32 *)(object + 0x1cc);
+    x.value += vx.value;
+    z.value += vz.value;
+    *(volatile u32 *)(object + 0x08) = x.bits;
+    *(volatile u32 *)(object + 0x10) = z.bits;
 }
