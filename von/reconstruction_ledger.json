@@ -36975,6 +36975,50 @@
           "notes": "The only +0x137 consumer that drives locomotion: it forces state 31 (cruise) from the latched command, which is how a committed stick command becomes transport. Integrated in the reconstructed main loop: with a held stick the committed action forces state 31 and the mech translates (verified on vonjdev, speed 3.2)."
         },
         {
+          "id": "maincpu.text-console",
+          "name": "text_console",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_text_console.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/symbols.md",
+            "von/tools/test_recovered_text_console.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0001c618",
+              "end": "0x0001c6f4"
+            },
+            {
+              "start": "0x0001cac8",
+              "end": "0x0001cb30"
+            },
+            {
+              "start": "0x0001cbb8",
+              "end": "0x0001cc3c"
+            },
+            {
+              "start": "0x0001cc40",
+              "end": "0x0001ccec"
+            },
+            {
+              "start": "0x0001ccf8",
+              "end": "0x0001cd0c"
+            }
+          ],
+          "symbol": "recovered_text_console_putc_run",
+          "modeling": {
+            "boundary": "Hardware text console: reset 0x1c618 (state cells + the 0x1000000/0x1008000/0x100c000/0x100a000 nametables), emit 0x1ccf8 (0x1800000), set-cursor 0x1cac8, control 0x1cbb8 (tab/line-feed), putc 0x1cc40 (nametable cell ch|attr|0x8000) and puts 0x1ccd0. The pure core carries the 0x504cdc/0x504ce0/0x504ce4/0x504cf4 state so the host test never touches a target address.",
+            "test": "von/tools/test_recovered_text_console.py",
+            "unresolved_behavior": "The 0x1000000 nametable is written through the _run wrappers; the visible tilemap lives in the driver, so a mode-0 UI walker is still needed to drive it."
+          },
+          "notes": "The attract/UI modes 0/1 render through this console. Recovered as a host-tested core; wiring the mode-0 UI record walker (0x2ea2918) is the next step to make attract runnable."
+        },
+        {
           "id": "maincpu.framestate-arms",
           "name": "framestate_arms",
           "classification": "code",
