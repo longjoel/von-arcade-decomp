@@ -35,6 +35,7 @@ extern "C" {
 #define VON_OBJ_STATE          0x172u
 #define VON_OBJ_MODE           0x170u
 #define VON_OBJ_DIR_SELECT     0x176u
+#define VON_OBJ_MOVE_FAMILY    0x174u
 #define VON_OBJ_COMMITTED      0x137u
 #define VON_OBJ_FACING         0x184u
 #define VON_OBJ_HALF_HEADING   0x186u
@@ -64,6 +65,10 @@ typedef struct VonMovementEnv {
     /* Facing (16-bit angle units) -> sin/cos. NULL => the caller (the i960
      * SHARC velocity unit) has already written VON_OBJ_VEL_X/VEL_Z. */
     void (*trig)(uint32_t facing, float *out_sin, float *out_cos);
+    /* Per-kind config block. NULL => read the absolute pointer at object+0x6c
+     * (the i960 target). The host kernel passes its own config buffer, which
+     * avoids needing object+0x6c to hold a valid 32-bit pointer. */
+    const uint8_t *config;
 } VonMovementEnv;
 
 /* Advance one movement frame on an i960-layout object. Returns 1 when the
