@@ -254,6 +254,130 @@ u32 recovered_framestate_state_17(
     return 0U;
 }
 
+/* 0x18438: opposite-direction test (0<->1, 2<->3). */
+static u32 recovered_framestate_opposite(u32 a, u32 b)
+{
+    return ((a == 0U && b == 1U) || (a == 1U && b == 0U)
+            || (a == 2U && b == 3U) || (a == 3U && b == 2U)) ? 1U : 0U;
+}
+
+/* Returns 1 when the arm routed to state 32 (state 31, 0x36e70). */
+u32 recovered_framestate_state_31(
+    volatile unsigned char *object,
+    const struct recovered_framestate_context *ctx)
+{
+    u32 action;
+
+    if (!((u32)(s32)(s16)(u16)recovered_framestate_ld16(object, 0x17eU) > 0U))
+        return 0U;
+    if (recovered_framestate_ld16(object, 0x174U) != 0U)
+        return 0U;
+
+    action = recovered_framestate_action(object);
+    if (action == 0xffU)
+        return 0U;
+
+    if (!recovered_framestate_opposite(
+            (u32)(s32)(s16)(u16)recovered_framestate_ld16(object, 0x176U),
+            (u32)(s32)(s16)(u16)ctx->table_18350[action]))
+        return 0U;
+
+    recovered_framestate_st16(object, 0x172U, 32U);
+    if (recovered_framestate_ld16(object, 0x1b2U) == 9U)
+        recovered_framestate_st16(object, 0x1b2U, 10U);
+    recovered_framestate_st16(object, 0x17aU, 0U);
+    return 1U;
+}
+
+/* State 33, 0x36ef0-0x36f80: +0x174 != 0 -> state 16 with the +0x102 turn. */
+u32 recovered_framestate_state_33(
+    volatile unsigned char *object,
+    const struct recovered_framestate_context *ctx)
+{
+    u32 v102;
+    u32 t;
+    u32 v34;
+
+    (void)ctx;
+    if (recovered_framestate_ld16(object, 0x174U) == 0U)
+        return 0U;
+
+    recovered_framestate_st16(object, 0x188U,
+        recovered_framestate_ld16(object, 0x176U));
+    recovered_framestate_st16(object, 0x172U, 16U);
+
+    v102 = recovered_framestate_ld16(object, 0x102U);
+    t = (v102 + 0xdfffU) & 0xffffU;
+    recovered_framestate_st16(object, 0x186U, v102);
+
+    if (0x3ffeU < t)
+        v34 = (v102 & 0xffffU) << 1;
+    else
+        v34 = (0x8000U + (v102 & 0xffffU) * 2U) & 0xffffU;
+
+    recovered_framestate_st16(object, 0x34U, v34);
+    recovered_framestate_st16(object, 0x2eU,
+        recovered_framestate_ld16(object, 0x34U)
+            + recovered_framestate_ld16(object, 0x184U));
+    recovered_framestate_st16(object, 0x178U, 0U);
+    recovered_framestate_st16(object, 0x17aU, 0U);
+    return 1U;
+}
+
+/* States 35 (0x36f90-0x37050) and 37 (0x37060-0x37120): the identical air /
+ * landing arms.  Gravity comes from cfg+0x62c; the vertical velocity is the
+ * float at object+0x150. */
+u32 recovered_framestate_air(
+    volatile unsigned char *object, const struct recovered_framestate_context *ctx)
+{
+    volatile unsigned char *cfg = (volatile unsigned char *)(unsigned long)
+        *(volatile u32 *)(object + RECOVERED_FRAMESTATE_CONFIG_OFFSET);
+
+    (void)ctx;
+    if (!((u32)(s32)(s16)(u16)recovered_framestate_ld16(object, 0x17aU) > 0U))
+        return 0U;
+
+    {
+        u32 vy = *(volatile u32 *)(object + 0x150U);
+        int negative = (vy & 0x80000000U) != 0U && (vy & 0x7fffffffU) != 0U;
+
+        if (!negative) {
+            /* 0x37004 / 0x370d4: rising or level. */
+            if (recovered_framestate_ld16(object, 0x180U) == 15U) {
+                recovered_framestate_st16(object, 0x172U, 27U);
+                recovered_framestate_st16(object, 0x178U, 0U);
+                recovered_framestate_st16(object, 0x17aU, 0U);
+                recovered_framestate_st16(object, 0x17eU, 0U);
+                recovered_framestate_st16(object, 0x1b2U, 0U);
+                return 1U;
+            }
+            recovered_framestate_st16(object, 0x172U, 24U);
+            recovered_framestate_st16(object, 0x17aU, 0U);
+            if (recovered_framestate_ld16(object, 0x170U) == 2U)
+                recovered_framestate_st16(object, 0x17cU, 1U);
+            recovered_framestate_st16(object, 0x178U, 0U);
+            recovered_framestate_st16(object, 0x1b2U, 0U);
+            return 1U;
+        }
+    }
+
+    /* 0x36fb8-0x37000: falling. */
+    if (recovered_framestate_ld8(object, 0x138U) == 0xffU
+            && recovered_framestate_ld16(object, 0x170U) != 2U) {
+        recovered_framestate_st16(object, 0x170U, 2U);
+        recovered_framestate_st16(object, 0x178U, 0U);
+        recovered_framestate_st16(object, 0x17cU, 0U);
+        recovered_framestate_st16(object, 0x174U, 0U);
+    }
+    {
+        volatile float *vy = (volatile float *)(object + 0x150U);
+        volatile float *gravity = (volatile float *)(cfg + 0x62cU);
+        *vy = *vy - *gravity;
+    }
+    recovered_framestate_st16(object, 0x1b2U, 7U);
+    return 1U;
+}
+
 /* Absolute-global entries. */
 static void recovered_framestate_context_init(
     struct recovered_framestate_context *ctx)
@@ -288,4 +412,36 @@ u32 recovered_framestate_state_17_run(volatile unsigned char *object)
 
     recovered_framestate_context_init(&ctx);
     return recovered_framestate_state_17(object, &ctx);
+}
+
+u32 recovered_framestate_state_31_run(volatile unsigned char *object)
+{
+    struct recovered_framestate_context ctx;
+
+    recovered_framestate_context_init(&ctx);
+    return recovered_framestate_state_31(object, &ctx);
+}
+
+u32 recovered_framestate_state_33_run(volatile unsigned char *object)
+{
+    struct recovered_framestate_context ctx;
+
+    recovered_framestate_context_init(&ctx);
+    return recovered_framestate_state_33(object, &ctx);
+}
+
+u32 recovered_framestate_air_35_run(volatile unsigned char *object)
+{
+    struct recovered_framestate_context ctx;
+
+    recovered_framestate_context_init(&ctx);
+    return recovered_framestate_air(object, &ctx);
+}
+
+u32 recovered_framestate_air_37_run(volatile unsigned char *object)
+{
+    struct recovered_framestate_context ctx;
+
+    recovered_framestate_context_init(&ctx);
+    return recovered_framestate_air(object, &ctx);
 }

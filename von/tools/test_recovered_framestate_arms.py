@@ -215,7 +215,62 @@ def main():
         assert u16(c.obj, 0x172) == 16, hex(u16(c.obj, 0x172))
         assert u16(c.obj, 0x188) == 0, hex(u16(c.obj, 0x188))
 
-    print("PASS: recovered i960 frame-step arms 15/16/17 (0x36690-0x36ae4)")
+        # --- arm 31: opposite current/target direction -> state 32 ----------
+        arm31 = recovered.recovered_framestate_state_31
+        arm31.argtypes = [ctypes.POINTER(ctypes.c_ubyte),
+                          ctypes.POINTER(FrameStateContext)]
+        arm31.restype = ctypes.c_uint32
+        c = Ctx()
+        set_u16(c.obj, 0x17e, 1)
+        set_u16(c.obj, 0x174, 0)
+        set_u8(c.obj, 0x137, 1)
+        set_u16(c.obj, 0x176, 0)
+        set_u16(c.obj, 0x1b2, 9)
+        c.t350[1] = 1
+        assert arm31(c.obj, ctypes.byref(c.ctx())) == 1
+        assert u16(c.obj, 0x172) == 32, hex(u16(c.obj, 0x172))
+        assert u16(c.obj, 0x1b2) == 10, hex(u16(c.obj, 0x1b2))
+        assert u16(c.obj, 0x17a) == 0, hex(u16(c.obj, 0x17a))
+
+        # --- arm 33: +0x174 set -> state 16 + +0x34/+0x2e from +0x102 -------
+        arm33 = recovered.recovered_framestate_state_33
+        arm33.argtypes = [ctypes.POINTER(ctypes.c_ubyte),
+                          ctypes.POINTER(FrameStateContext)]
+        arm33.restype = ctypes.c_uint32
+        c = Ctx()
+        set_u16(c.obj, 0x174, 1)
+        set_u16(c.obj, 0x176, 0x0055)
+        set_u16(c.obj, 0x102, 0x0100)
+        set_u16(c.obj, 0x184, 0x1000)
+        assert arm33(c.obj, ctypes.byref(c.ctx())) == 1
+        assert u16(c.obj, 0x172) == 16, hex(u16(c.obj, 0x172))
+        assert u16(c.obj, 0x188) == 0x0055, hex(u16(c.obj, 0x188))
+        assert u16(c.obj, 0x186) == 0x0100, hex(u16(c.obj, 0x186))
+        assert u16(c.obj, 0x34) == 0x0200, hex(u16(c.obj, 0x34))
+        assert u16(c.obj, 0x2e) == 0x1200, hex(u16(c.obj, 0x2e))
+
+        # --- arm 35: falling applies gravity and +0x1b2 = 7 -----------------
+        import struct as _struct
+
+        def fbits(v):
+            return _struct.unpack("<I", _struct.pack("<f", v))[0]
+
+        arm35 = recovered.recovered_framestate_air_35_run
+        arm35.argtypes = [ctypes.POINTER(ctypes.c_ubyte)]
+        arm35.restype = ctypes.c_uint32
+        c = Ctx()
+        set_u16(c.obj, 0x17a, 1)
+        set_u32(c.obj, 0x150, fbits(-1.0))
+        set_u8(c.obj, 0x138, 0xff)
+        set_u16(c.obj, 0x170, 0)
+        set_u32(c.cfg, 0x62c, fbits(0.25))
+        assert arm35(c.obj) == 1
+        assert u16(c.obj, 0x170) == 2, hex(u16(c.obj, 0x170))
+        assert u16(c.obj, 0x1b2) == 7, hex(u16(c.obj, 0x1b2))
+        assert ctypes.cast(ctypes.byref(c.obj, 0x150),
+                           ctypes.POINTER(ctypes.c_uint32))[0] == fbits(-1.25)
+
+    print("PASS: recovered i960 frame-step arms 15/16/17/31/33/35/37")
 
 
 if __name__ == "__main__":
