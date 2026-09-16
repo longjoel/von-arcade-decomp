@@ -228,10 +228,32 @@ void i960_reconstructed_main(void)
      * seek exchange have a defined record. Positions are placed apart so the
      * seek can produce nonzero velocity; callback/config pointers are zero
      * until the per-kind tables are ported. */
+    /* Scratch config block in work RAM. The ROM config table at 0x57d0 is
+     * overwritten by the generated image (code now spans 0..~0xb250), so the
+     * values extracted from the original vonj image are staged here and the
+     * objects point their +0x6c config pointer at this block. */
+    {
+        volatile unsigned int *cfg = (volatile unsigned int *)0x00590000U;
+        cfg[0x528 / 4] = 0x00000a00U;
+        cfg[0x52c / 4] = 0x00000800U;
+        cfg[0x56c / 4] = 0x40600000U; /* 3.5f */
+        cfg[0x570 / 4] = 0x404ccccdU; /* 3.2f */
+        cfg[0x574 / 4] = 0x40000000U; /* 2.0f */
+        cfg[0x578 / 4] = 0x402ccccdU; /* 2.7f */
+        cfg[0x57c / 4] = 0x402f5c29U; /* 2.74f */
+        cfg[0x580 / 4] = 0x3fe66666U; /* 1.8f */
+        cfg[0x584 / 4] = 0x40200000U; /* 2.5f */
+        cfg[0x588 / 4] = 0x402ccccdU; /* 2.7f */
+        cfg[0x58c / 4] = 0x3fe66666U; /* 1.8f */
+        cfg[0x590 / 4] = 0x40133333U; /* 2.3f */
+        cfg[0x594 / 4] = 0x40200000U; /* 2.5f */
+        cfg[0x598 / 4] = 0x3fd9999aU; /* 1.7f */
+    }
+
     recovered_object_initializer_27550_run((volatile unsigned char *)0x00503ad0U,
-        0x000057d0U, 0U, 0x005040d0U, 0U, 0U, 0x00000000U, 0xc2700000U, 0U);
+        0x00590000U, 0U, 0x005040d0U, 0U, 0U, 0x00000000U, 0xc2700000U, 0U);
     recovered_object_initializer_27550_run((volatile unsigned char *)0x005040d0U,
-        0x0000a5b0U, 0U, 0x00503ad0U, 0U, 1U, 0x00000000U, 0x42700000U, 0U);
+        0x00590000U, 0U, 0x00503ad0U, 0U, 1U, 0x00000000U, 0x42700000U, 0U);
 
     /* Provisional locomotion seed until the state-31/34 arms are ported:
      * facing angle 0 and speed scalar 3.0f feed the velocity accumulation
