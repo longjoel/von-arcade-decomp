@@ -36833,6 +36833,34 @@
             "unresolved_behavior": "The 0x884000 opcode-10 projection and the other 12 action arms remain outside the bounded model"
           },
           "notes": "Linked and dispatched from the 0x32810 backbone for actions 0/12."
+        },
+        {
+          "id": "maincpu.von-config-tables",
+          "name": "von_config_tables",
+          "classification": "data",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_von_config_tables.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.bin",
+            "von/i960/approved_data_ranges.json",
+            "von/build/i960/reconstructed-maincpu.bin"
+          ],
+          "ranges": [
+            {
+              "start": "0x00057d0",
+              "end": "0x0005fd0"
+            }
+          ],
+          "symbol": "recovered_von_config_kind0",
+          "modeling": {
+            "boundary": "Per-kind object config values (kind 0) carried in the generated image: the speed/limit/gate fields (cfg+0x528/0x52c/0x56c..0x598) consumed by the implemented locomotion routines, relocated from the original low-ROM config block at 0x57d0",
+            "test": "von/build/i960/reconstructed-maincpu.bin",
+            "unresolved_behavior": "Only the offsets read by the implemented routines are populated; the full per-kind blocks (0x19360 table) and the remaining fields are not yet carried"
+          },
+          "notes": "The original config blocks at 0x57d0 and the pointer table at 0x19360 cannot be preserved as approved_data_ranges because they lie inside the generated code span (0..0xb250); carrying the values in the generated image resolves the overlap. The object initializer points +0x6c at this table."
         }
       ]
     }
