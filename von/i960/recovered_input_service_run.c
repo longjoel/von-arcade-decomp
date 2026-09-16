@@ -50,8 +50,8 @@ typedef signed int s32;
 
 /* 315-5649 register window and the two twin-stick register offsets. */
 #define RECOVERED_INPUT_SERVICE_IO_WINDOW 0x01c00000UL
-#define RECOVERED_INPUT_SERVICE_REG_IN1   0x02U
-#define RECOVERED_INPUT_SERVICE_REG_IN2   0x03U
+#define RECOVERED_INPUT_SERVICE_REG_IN1   0x04U
+#define RECOVERED_INPUT_SERVICE_REG_IN2   0x06U
 
 /* Shared IN1/IN2 bit order (INPUT_PORTS_START(von), model2.cpp:2170-2186). */
 #define RECOVERED_INPUT_SERVICE_BIT_SHOT  0x01U
@@ -200,8 +200,12 @@ unsigned int recovered_input_service_read_ports(void)
 {
     volatile unsigned char *io =
         (volatile unsigned char *)(unsigned long)RECOVERED_INPUT_SERVICE_IO_WINDOW;
-    unsigned int in1 = (unsigned int)io[RECOVERED_INPUT_SERVICE_REG_IN1];
-    unsigned int in2 = (unsigned int)io[RECOVERED_INPUT_SERVICE_REG_IN2];
+    /* The 315-5649 port bytes appear as 16-bit reads with the value in the low
+     * lane (the io window uses umask32 0x00ff00ff), so read the halfwords. */
+    unsigned int in1 = (unsigned int)(*(volatile unsigned short *)
+        (io + RECOVERED_INPUT_SERVICE_REG_IN1)) & 0xffU;
+    unsigned int in2 = (unsigned int)(*(volatile unsigned short *)
+        (io + RECOVERED_INPUT_SERVICE_REG_IN2)) & 0xffU;
 
     return (in1 & 0xffU) | ((in2 & 0xffU) << 8);
 }
