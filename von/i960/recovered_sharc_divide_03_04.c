@@ -119,7 +119,7 @@ static u32 chop_sub(u32 a, u32 b)
     u64 big, small;
     int big_exp, gap;
     u64 diff;
-    int top, shift;
+    int top;
     u32 sig24;
     int exp;
     if (!is_norm_bits(a) || !is_norm_bits(b))
