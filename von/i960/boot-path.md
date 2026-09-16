@@ -4877,3 +4877,43 @@ selects the output mode, and expands fixed ROM strings into the tile planes.
 
 `0xe37f0` copies two fixed startup/device tables from `0x578410/0x578460` to
 `0x1d00144/0x1d00194` through `memcpy_aligned`.
+
+## Root entry chain (verified)
+
+Confirmed against MAME's i960 `device_reset` (`m_SAT = read_dword(0)`) and the
+listing:
+
+| Step | Address | Evidence |
+| --- | ---: | --- |
+| System address table (SAT) | `0x00000000` | `read_dword(0) = 0`; PRCB pointer at SAT+4 = `0xb0`, start IP at SAT+0x0c = `0x930` |
+| Reset handler | `0x930` | copies `0x8f0`→`0xe00000`, PRCB `0xb0`→`0x501800`, `0x1c20`→`0x5018b0`, then `ret` |
+| Runtime init | `0x9f0` | grows `sp`, sets `fp = 0x500400`, `pfp = fp-0x40`, calls `0x186f0` |
+| Main | `0x186f0` | clears `0x5039f4/0x503a00/...`, calls `0x186c0/0x18960/0x18a10/0x294b0` |
+| Main mode loop | `0x18724-0x18830` | `g4 = 0x5039f4 & 15`; `g0 = 0x18680[g4*4]`; `callx (g0)`; `b 0x18724` |
+
+The mode table at `0x18680` (index = `0x5039f4 & 15`, 0 -> set mode 1):
+
+| mode | handler | recovered unit |
+| ---: | ---: | --- |
+| 0 | `0x003c40` | `recovered_startup_mode_handler_0_3c40.c` |
+| 1 | `0x02b9e0` | `recovered_startup_mode_handler_1_dispatch_2b9e0.c` |
+| 2 | `0x018650` | `recovered_startup_mode_handler_2_18650.c` |
+| 3 | `0x0190d0` | `recovered_startup_mode_handler_3_190d0.c` |
+| 4 | `0x019180` | `recovered_startup_mode_handler_4_prefix_19180.c` |
+| 5 | `0x0f3f00` | `recovered_startup_mode_handler_5_...` |
+| 6 | `0x0f3fe0` | `recovered_startup_mode_handler_5_...` |
+| 7 | `0x0f3d30` | `recovered_startup_mode_handler_7_f3d30.c` |
+| 8 | `0x018620` | `recovered_startup_mode_handler_8_18620.c` |
+| 9-14, 15 | `0x000000`/`0x018620` | stub / `0x18620` |
+
+Gameplay sits under modes 3/4: their subroutines (`0x19e70`, `0x19f20`,
+`0x19ff4`, `0x1ae28`, `0x1b0c4`, `0x1b524`) `bal 0x26cb8`, the per-object
+gameplay update, which calls the frame step `0x371e0` and then the `0x32560`
+backbone `0x32810`. So the mech movement recovered in
+`recovered_framestate_arms.c` / `recovered_action_31.c` is reached as:
+
+```
+reset 0x930 -> init 0x9f0 -> main 0x186f0 -> mode loop 0x18680[0x5039f4 & 15]
+  -> mode 3/4 (0x190d0 / 0x19180) -> 0x26cb8 -> 0x371e0 (frame step, 0x37130 table)
+                                              \-> 0x32810 (0x32560 backbone)
+```
