@@ -36975,6 +36975,34 @@
           "notes": "The only +0x137 consumer that drives locomotion: it forces state 31 (cruise) from the latched command, which is how a committed stick command becomes transport. Integrated in the reconstructed main loop: with a held stick the committed action forces state 31 and the mech translates (verified on vonjdev, speed 3.2)."
         },
         {
+          "id": "maincpu.shared-movement",
+          "name": "shared_movement",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/von_movement.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/symbols.md",
+            "von/tools/test_recovered_von_movement.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0003649c",
+              "end": "0x00036550"
+            }
+          ],
+          "symbol": "von_movement_tick",
+          "modeling": {
+            "boundary": "Shared movement kernel compiled for both the i960 (with -D__IS_I960__, original direction tables, SHARC-owned velocity) and the host (no MMIO, libm trig, MAP_32BIT object/config). It composes the committed-action -> state 31 transition (0x36460), the cfg+0x56c/0x570/0x574 cruise speed selection by +0x176, and the 0x32810 position integration.",
+            "test": "von/tools/test_recovered_von_movement.py",
+            "unresolved_behavior": "The i960 reconstructed image still runs the per-arm recovered cores directly; switching it and the godot kernel onto this shared tick is the next step. The velocity direction uses an env trig callback (SHARC on target, libm on host)."
+          },
+          "notes": "Single source of truth for locomotion: one file, two builds. Target glue is selected by __IS_I960__ (env factory with the original 0x18350/60/70 table addresses and a NULL trig so the SHARC velocity unit owns VEL_X/VEL_Z)."
+        },
+        {
           "id": "maincpu.text-console",
           "name": "text_console",
           "classification": "code",
