@@ -36975,6 +36975,42 @@
           "notes": "The only +0x137 consumer that drives locomotion: it forces state 31 (cruise) from the latched command, which is how a committed stick command becomes transport. Integrated in the reconstructed main loop: with a held stick the committed action forces state 31 and the mech translates (verified on vonjdev, speed 3.2)."
         },
         {
+          "id": "maincpu.framestate-arms-15-17",
+          "name": "framestate_arms_15_17",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_framestate_arms.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/state-semantics.md",
+            "von/tools/test_recovered_framestate_arms.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00036690",
+              "end": "0x000367ec"
+            },
+            {
+              "start": "0x000367f0",
+              "end": "0x00036970"
+            },
+            {
+              "start": "0x00036980",
+              "end": "0x00036ae4"
+            }
+          ],
+          "symbol": "recovered_framestate_state_15_run",
+          "modeling": {
+            "boundary": "0x37130 frame-step arms 15/16/17. Arm 15 (0x36690) and arm 16 (0x367f0) share the addo 31,3 route to state 34 with 0x18350/0x18360 and the +0x102-keyed +0x188 classifier (arm 16 takes +0x186 from 0x18370, arm 15 zeroes it). Arm 17 (0x36980) shares the state-0 route (state 31 + 0x18350/0x18360 + the object+0x4e accumulator). The 0xff tails chain 15->0, 16->17/0 and 17->16.",
+            "test": "von/tools/test_recovered_framestate_arms.py",
+            "unresolved_behavior": "The +0x102 classifier thresholds are reproduced literally; the remaining 0x37130 arms (19/23/24/26/28/29/31/33/35/37) are still pending."
+          },
+          "notes": "The 0x37130 table is the input-facing locomotion dispatcher of the 0x371e0 frame step; these arms are the input -> locomotion bridge complementing action-commit-31 (state 0). Host-tested cores; integration onto the frame-step path is pending."
+        },
+        {
           "id": "maincpu.state-attack-arms",
           "name": "state_attack_arms",
           "classification": "code",
