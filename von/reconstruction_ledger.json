@@ -36489,6 +36489,61 @@
             "unresolved_behavior": "The geometry projection call 0x6f6f0, the four ground-height snap variants, and the 43 individual state-handler and 14 action-arm bodies remain outside this bounded dispatch/integrator model"
           },
           "notes": "Dispatch at 0x33ae8 loads object+0x172, masks it to 16 bits, rejects the negative bit and values above 42, then indexes 0x32560 with a 16-byte stride and callx into the handler. The action guard at 0x32958 bounds object+0x1b2 to 13 against the 0x32968 table (modelled by maincpu.geometry-object-state-prefix-32810). The integrators 0x36044/0x360c0/0x363bc/0x363e4 all perform x+=vx and z+=vz over object+0x08/+0x10 and +0x1c8/+0x1cc; 0x36044 and 0x363e4 also write the ground candidate 0x154 into +0x0c. Range 0x360c0-0x360e0 covers the store pair; the surrounding state-gated ground writes are a separate slice."
+        },
+        {
+          "id": "maincpu.geometry-projection-tail-6f820",
+          "name": "geometry_projection_tail_6f820",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_geometry_projection_tail_6f820.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_geometry_projection_tail_6f820.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x0006f820",
+              "end": "0x0006f900"
+            }
+          ],
+          "symbol": "recovered_geometry_projection_tail_6f820",
+          "modeling": {
+            "boundary": "Models the post-0x35 projection tail: the 640.0-biased 40-unit cell ((z/40)<<5)+(x/40) into the 0x51bb20 byte map; the 0xff and map-bit-5 callback gate with quadrant (map-0x20)>>6; the double-1000.0 result branch that publishes map<<8; and the special/general mask placement for the negative route with the reject sentinel 0x47c34f80.",
+            "test": "von/tools/test_recovered_geometry_projection_tail_6f820.py",
+            "unresolved_behavior": "The live map and mask globals, the 0x6eb70 callback targets, the 0x5770f0/0x503a7c state words, the 0x51bb20 base pointer, and the g14 fallback remain board/runtime state."
+          },
+          "notes": "Reconciled against the listing: i960 subo computes dst=src2-src1 so the field shift is 14-slot, and shri is arithmetic, so the selected 2-bit field is sign-extended before the left shift; cmprl reads the double pair r8:r9, so mov 0,r8 plus lda 0x408f4000,r9 form double 1000.0. These correct the earlier recovered_geometry_projection_output_mask/result_route, whose slot-14 shift and result<0.0f branch were inverted."
+        },
+        {
+          "id": "maincpu.gameplay-velocity-de990",
+          "name": "gameplay_velocity_de990",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_gameplay_velocity_de990.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "mame/src/devices/cpu/i960/i960.cpp",
+            "von/tools/test_recovered_gameplay_velocity_de990.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000de990",
+              "end": "0x000df058"
+            }
+          ],
+          "symbol": "recovered_gameplay_velocity_de990_select",
+          "modeling": {
+            "boundary": "Models the 0xde990-0xdf058 velocity producer: the unconditional 0x503c98/0x503c9c clear, the stage==4||state==1 gate, the 0x504134 and 0x503b34 mode 9/8 doubled arms with thresholds 0x428c0000/0x41f00000, the 10.4 default, the state<=3 doubled-self arm, the fallback signed arm, the ten-word service-38/39 packet, and the r3==0 no-op gate.",
+            "test": "von/tools/test_recovered_gameplay_velocity_de990.py",
+            "unresolved_behavior": "The 0x884000 device protocol that computes the three responses and the caller-side object/state provenance remain outside this pure model; the doubled arms are sign-toggle (notbit 31) plus 2.0x."
+          },
+          "notes": "Branch tree verified against the listing; notbit 31 semantics taken from MAME's i960 core (dst = src ^ (1<<bit)). Emits the 0x26/0x27 service exchange; positions are the shadow-copied object triples."
         }
       ]
     }
