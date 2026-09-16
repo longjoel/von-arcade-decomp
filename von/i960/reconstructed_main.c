@@ -49,6 +49,7 @@ void recovered_io_service(void);
 void recovered_host_queue_initialize(void);
 void recovered_audio_initialize_scsp(void);
 void recovered_audio_service_pending(void);
+void recovered_object_update_32810_run(volatile unsigned char *object);
 void recovered_text_video_initialize(void);
 void recovered_text_video_control_bootstrap(u32 caller_g14);
 void recovered_text_font_asset_initialize(void);
@@ -224,6 +225,12 @@ void i960_reconstructed_main(void)
         if ((state[5] & 0x1ffU) == 0U) {
             recovered_io_service();
             recovered_audio_service_pending();
+            /* Per-object update backbone: dispatch the action/state tables and
+             * integrate position for the two static fighters. Arm bodies and
+             * the geometry projection remain stubbed; with zero velocity the
+             * integration is a no-op until velocity producers are wired. */
+            recovered_object_update_32810_run((volatile unsigned char *)0x00503ad0U);
+            recovered_object_update_32810_run((volatile unsigned char *)0x005040d0U);
         }
         /* The reconstructed host has no vblank callback in this development
          * image. The captured loader loop advances at roughly 400 iterations
