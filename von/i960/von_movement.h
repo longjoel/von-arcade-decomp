@@ -35,7 +35,7 @@ extern "C" {
 #define VON_OBJ_STATE          0x172u
 #define VON_OBJ_MODE           0x170u
 #define VON_OBJ_DIR_SELECT     0x176u
-#define VON_OBJ_MOVE_FAMILY    0x174u
+#define VON_OBJ_MOVE_SELECTOR    0x174u
 #define VON_OBJ_COMMITTED      0x137u
 #define VON_OBJ_FACING         0x184u
 #define VON_OBJ_HALF_HEADING   0x186u

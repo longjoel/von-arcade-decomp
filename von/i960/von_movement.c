@@ -104,11 +104,11 @@ int von_movement_tick(uint8_t *object, const VonMovementEnv *env)
     von_mv_st16(object, VON_OBJ_CLIP_COUNTER,
         (uint16_t)(von_mv_ld16(object, VON_OBJ_CLIP_COUNTER) + 1u));
 
-    /* 0x30ad4-0x30c18: the cruise speed is a (family, select) pair, matching
-     * recovered_locomotion_state31_speed. The family is object+0x174 (the
+    /* 0x30ad4-0x30c18: the cruise speed is a (selector, select) pair, matching
+     * recovered_locomotion_state31_speed. The selector is object+0x174 (the
      * movement mode the state machine sets); select is +0x176 (dir_18350). */
     select = von_mv_ld16(object, VON_OBJ_DIR_SELECT);
-    switch (von_mv_ld16(object, VON_OBJ_MOVE_FAMILY)) {
+    switch (von_mv_ld16(object, VON_OBJ_MOVE_SELECTOR)) {
     case 1u:
         speed = von_mv_cfg_u32(config,
             select == 0u ? 0x57cu : select == 1u ? 0x580u : 0x578u);
