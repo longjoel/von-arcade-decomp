@@ -36919,6 +36919,34 @@
           "notes": "State 20 is the only handler that reads the committed action object+0x136, so it is the committed-input -> state-machine bridge; it hands off to 36 (ground) and 37-40 (air) in the 0x32560 table. Integrated in the 0x32810 backbone dispatch."
         },
         {
+          "id": "maincpu.state-turn-21",
+          "name": "state_turn_21",
+          "classification": "code",
+          "stage": "integrated",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_state_turn_21.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/state-semantics.md",
+            "von/tools/test_recovered_state_turn_21.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00032120",
+              "end": "0x00032324"
+            }
+          ],
+          "symbol": "recovered_state_21_run",
+          "modeling": {
+            "boundary": "State 21 turn/return handler 0x32120-0x32324: cfg+0x2f8/0x2fc record-lane publication keyed by (+0x176&1), the +0x17a clip counter with the chkbit 0 parity gate on the +0x106/+0x108 command change, the +0x13b + air-flag hand-off to state 11, and the +0x180 sub-phase selection that writes the object+0x170 movement mode (2/3/1) and returns to states 0/1. Every exit clears +0x1c4.",
+            "test": "von/tools/test_recovered_state_turn_21.py",
+            "unresolved_behavior": "The chkbit 0 parity that gates the second +0x17a advance is modelled as odd-frame; the cfg+0x2f8/0x2fc record lanes carry absolute pointers in the target image."
+          },
+          "notes": "State 21 is the object+0x170 movement-mode producer (2 at 0x32244, 3 at 0x32280), resolving the earlier modes 2..5 gap; its targets 0/1 are the mode-gated locomotion handlers. Integrated in the 0x32810 backbone dispatch."
+        },
+        {
           "id": "maincpu.state-attack-arms",
           "name": "state_attack_arms",
           "classification": "code",
