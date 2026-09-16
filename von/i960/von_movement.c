@@ -104,6 +104,25 @@ int von_movement_tick(uint8_t *object, const VonMovementEnv *env)
     von_mv_st16(object, VON_OBJ_CLIP_COUNTER,
         (uint16_t)(von_mv_ld16(object, VON_OBJ_CLIP_COUNTER) + 1u));
 
+    /* 0x312b0-0x31314: the weapon sentinels pick the movement selector. A
+     * weapon is active when its availability byte is 0xff and its charge flag
+     * bit 0 is set; the +0x13c sentinel selects the air selector 16. */
+    {
+        uint32_t selector = 0u;
+        if (object[VON_OBJ_WEAPON_RIGHT] == 0xffu
+                && (object[VON_OBJ_CHARGE_RIGHT] & 1u) != 0u)
+            selector = 3u;
+        else if (object[VON_OBJ_WEAPON_LEFT] == 0xffu
+                && (object[VON_OBJ_CHARGE_LEFT] & 1u) != 0u)
+            selector = 1u;
+        else if (object[VON_OBJ_WEAPON_CENTER] == 0xffu
+                && (object[VON_OBJ_CHARGE_CENTER] & 1u) != 0u)
+            selector = 2u;
+        else if (object[VON_OBJ_WEAPON_SPECIAL] == 0xffu)
+            selector = VON_SELECTOR_AIR;
+        von_mv_st16(object, VON_OBJ_MOVE_SELECTOR, (uint16_t)selector);
+    }
+
     /* 0x30ad4-0x30c18: the cruise speed is a (selector, select) pair, matching
      * recovered_locomotion_state31_speed. The selector is object+0x174 (the
      * movement mode the state machine sets); select is +0x176 (dir_18350). */

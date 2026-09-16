@@ -163,6 +163,19 @@ def main():
                               ctypes.POINTER(ctypes.c_uint32))[0])
         assert abs(vx4) < 1e-4 and vz4 < -0.5, (vx4, vz4)
 
+        # --- weapon gate: left weapon charging -> selector 1 -> family 1 -----
+        obj5 = low_buffer(0x600)
+        set_u32(obj5, 0x6c, ctypes.addressof(cfg))
+        set_u16(obj5, 0x172, 31)
+        set_u16(obj5, 0x176, 0)          # select 0
+        obj5[0x137] = 0xff               # no movement action
+        obj5[0x138] = 0xff               # left weapon available
+        obj5[0x1de] = 1                  # left weapon charge flag
+        set_u32(cfg, 0x57c, fbits(2.74))
+        assert tick(obj5, ctypes.byref(env)) == 1
+        assert abs(fof(ctypes.cast(ctypes.byref(obj5, 0x1c4),
+                                   ctypes.POINTER(ctypes.c_uint32))[0]) - 2.74) < 1e-5
+
     print("PASS: shared movement kernel (von_movement.c) host build")
 
 

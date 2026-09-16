@@ -44,6 +44,16 @@ extern "C" {
 #define VON_OBJ_VEL_X          0x1c8u
 #define VON_OBJ_VEL_Z          0x1ccu
 #define VON_OBJ_CLIP_COUNTER   0x17au
+/* Weapon selector gate (recovered 0x312b0): availability bytes and the
+ * matching charge/fire flag bits. */
+#define VON_OBJ_WEAPON_LEFT    0x138u
+#define VON_OBJ_WEAPON_CENTER  0x139u
+#define VON_OBJ_WEAPON_RIGHT   0x13au
+#define VON_OBJ_WEAPON_SPECIAL 0x13cu
+#define VON_OBJ_CHARGE_CENTER  0x1ddu
+#define VON_OBJ_CHARGE_LEFT    0x1deu
+#define VON_OBJ_CHARGE_RIGHT   0x1dfu
+#define VON_SELECTOR_AIR       16u
 
 /* Recovered speed triplet (cfg+0x56c default, 0x570 for +0x176==1, 0x574 for
  * +0x176==2) and the cruise state. */
