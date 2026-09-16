@@ -81,17 +81,27 @@ def main():
         table = (Record * 3)()
         table[2] = Record(0, 0, 0x11111111, 0x81234567, 0x33333333, 0x44444444)
         request = ctypes.c_uint32()
-        packet = (ctypes.c_uint32 * 8)()
+        packet = (ctypes.c_uint32 * 7)()
         xq = ctypes.c_uint32()
         yq = ctypes.c_uint32()
-        x, y = bits(513.75), bits(1023.9)
+        x, y = bits(0.0), bits(0.0)
         assert build(x, y, 2, table, ctypes.byref(request), packet, ctypes.byref(xq), ctypes.byref(yq)) == 1
-        assert request.value == (511 << 9) + 256
-        assert list(packet) == [53, 0x11111111, x, 0x33333333, y, 0x44444444, 0x44444444, 0x01234567]
-        assert (xq.value, yq.value) == (12, 25)
+        assert request.value == (256 << 9) + 256
+        assert list(packet) == [53, 0x11111111, x, 0x33333333, y, 0x44444444, 0x01234567]
+        assert (xq.value, yq.value) == (16, 16)
 
-        assert build(bits(-1.0), bits(1.0), 2, table, ctypes.byref(request), packet, ctypes.byref(xq), ctypes.byref(yq)) == 0
-        assert build(bits(1024.0), bits(1.0), 2, table, ctypes.byref(request), packet, ctypes.byref(xq), ctypes.byref(yq)) == 0
+        assert build(bits(-512.0), bits(511.9), 2, table, ctypes.byref(request), packet, ctypes.byref(xq), ctypes.byref(yq)) == 1
+        assert build(bits(-513.0), bits(0.0), 2, table, ctypes.byref(request), packet, ctypes.byref(xq), ctypes.byref(yq)) == 0
+        assert build(bits(512.0), bits(0.0), 2, table, ctypes.byref(request), packet, ctypes.byref(xq), ctypes.byref(yq)) == 0
+
+        listing = (ROOT / "von/build/disasm/vonj-maincpu.lst").read_text(encoding="utf-8")
+        block = listing[listing.index("   6f6f0:"):listing.index("   6f820:")]
+        for evidence in (
+                "lda\t0x40800000,g5", "lda\t0x40840000,g5",
+                "st\tr8,0x884000", "notbit\t31,g5,g5",
+                "ld\t0x4(g4),g6", "ld\t0x10(g4),g4"):
+            if evidence not in block:
+                raise AssertionError(f"projection listing evidence missing: {evidence}")
 
         result = ctypes.c_uint32()
         threshold = bits(4.0)

@@ -22,17 +22,6 @@ typedef struct recovered_geometry_projection_record {
     u32 packet_4;
 } recovered_geometry_projection_record;
 
-static int recovered_geometry_projection_truncate(u32 bits)
-{
-    union {
-        u32 bits;
-        float value;
-    } input;
-
-    input.bits = bits;
-    return (int)input.value;
-}
-
 static float recovered_geometry_projection_float(u32 bits)
 {
     union {
@@ -205,10 +194,13 @@ int recovered_geometry_projection_result_route(
 }
 
 /*
- * Build the 0x41 request and 0x35 continuation emitted by 0x6f6f0.
- * packet receives: 53, packet_1, x_bits, packet_3, y_bits, packet_4,
- * packet_4, packet_2 with bit 31 inverted.  The returned table quotients
- * are the values used by the routine's later output-selection tail.
+ * Build the deterministic 0x6f6f0 request core. The 0x41 lookup index is
+ * formed from coordinates biased by 512.0 (0x40800000 at 0x6f700) and the
+ * status cell from coordinates biased by 640.0 (0x40840000 at 0x6f760); both
+ * are added to the widened single and truncated with cvtzri. The 0x35
+ * continuation packet is 53, rec1, x_bits, rec3, y_bits, rec4, ~rec2 (bit 31
+ * inverted), matching the seven stores at 0x6f7e4..0x6f810. Valid coordinates
+ * lie in [-512, 511] so the biased 9-bit halves stay in 0..1023.
  */
 int recovered_geometry_projection_packet(
     u32 x_bits,
@@ -220,17 +212,21 @@ int recovered_geometry_projection_packet(
     u32 *x_quotient,
     u32 *y_quotient)
 {
-    int x = recovered_geometry_projection_truncate(x_bits);
-    int y = recovered_geometry_projection_truncate(y_bits);
+    int xg = (int)((double)recovered_geometry_projection_float(x_bits) + 512.0);
+    int zg = (int)((double)recovered_geometry_projection_float(y_bits) + 512.0);
+    int xs;
+    int zs;
     const recovered_geometry_projection_record *record;
 
-    if (x < 0 || x >= 1024 || y < 0 || y >= 1024)
+    if (xg < 0 || xg > 1023 || zg < 0 || zg > 1023)
         return 0;
 
-    *request_index = ((u32)y >> 1 << 9) + ((u32)x >> 1);
+    xs = (int)((double)recovered_geometry_projection_float(x_bits) + 640.0);
+    zs = (int)((double)recovered_geometry_projection_float(y_bits) + 640.0);
     record = &table[lookup_index];
-    *x_quotient = (u32)x / 40U;
-    *y_quotient = (u32)y / 40U;
+    *request_index = ((u32)zg >> 1 << 9) | ((u32)xg >> 1);
+    *x_quotient = (u32)(xs / 40);
+    *y_quotient = (u32)(zs / 40);
 
     packet[0] = 53U;
     packet[1] = record->packet_1;
@@ -238,7 +234,6 @@ int recovered_geometry_projection_packet(
     packet[3] = record->packet_3;
     packet[4] = y_bits;
     packet[5] = record->packet_4;
-    packet[6] = record->packet_4;
-    packet[7] = record->packet_2 ^ 0x80000000U;
+    packet[6] = record->packet_2 ^ 0x80000000U;
     return 1;
 }
