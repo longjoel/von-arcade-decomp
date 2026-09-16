@@ -36445,6 +36445,50 @@
             "unresolved_behavior": "Live SHARC/FIFO transport, upstream command-10/28/27 vector production, related-record multiplicands, and downstream residual action remain outside this predicate model"
           },
           "notes": "The post-gate residual tail issues two SHARC opcode-0x1f distance queries with axis-separated endpoint pairs, then rejects on CMPR(first, second) followed by BGE. Acceptance is exactly first < second; equal, greater, or NaN results reject. Decimal commands 10/28/27 dispatch to SHARC 0x0a/0x1c/0x1b before the pair; g6 is related +0x58 times the opcode-0x1c result, and g5 is related +0x58 times related +0x5c times the opcode-0x1b result. The second packet uses selected Z and affine Z. Initialization at 0x278b4 copies descriptor words 0x67c/0x680/0x684/0x688 into related-record offsets +0x54/+0x58/+0x5c/+0x60; 0x67c -> +0x54 is confirmed as the inclusive Y-window extent, while 0x680/+0x58 and 0x684/+0x5c remain unnamed per-geometry multiplicands. Sibling handlers at 0xdf6a0, 0xdf948, 0xdfbf0, and 0xe00cc repeat the +0x58 primary scaling and +0x58*+0x5c companion product. No direct +0x60 load was found in the current main-CPU listing, so that adjacent copied field is excluded from the residual model."
+        },
+        {
+          "id": "maincpu.object-update-32810-state-dispatch",
+          "name": "object_update_32810_state_dispatch",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "active": true,
+          "sources": [
+            "von/i960/recovered_object_update_32810.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_object_update_32810.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00033ae8",
+              "end": "0x00033b1c"
+            },
+            {
+              "start": "0x00036044",
+              "end": "0x00036064"
+            },
+            {
+              "start": "0x000360c0",
+              "end": "0x000360e0"
+            },
+            {
+              "start": "0x000363bc",
+              "end": "0x000363e4"
+            },
+            {
+              "start": "0x000363e4",
+              "end": "0x00036408"
+            }
+          ],
+          "symbol": "recovered_object_update_32810_plan",
+          "modeling": {
+            "boundary": "Models the object state selector and 43-entry 16-byte-stride dispatch table at 0x32560 (guarded by the signed 0..42 range), the action-field bounds (0x1b2, max 13), and the position integrator cores 0x36044/0x360c0/0x363bc/0x363e4 (object+0x08/+0x10 += object+0x1c8/+0x1cc)",
+            "test": "von/tools/test_recovered_object_update_32810.py",
+            "unresolved_behavior": "The geometry projection call 0x6f6f0, the four ground-height snap variants, and the 43 individual state-handler and 14 action-arm bodies remain outside this bounded dispatch/integrator model"
+          },
+          "notes": "Dispatch at 0x33ae8 loads object+0x172, masks it to 16 bits, rejects the negative bit and values above 42, then indexes 0x32560 with a 16-byte stride and callx into the handler. The action guard at 0x32958 bounds object+0x1b2 to 13 against the 0x32968 table (modelled by maincpu.geometry-object-state-prefix-32810). The integrators 0x36044/0x360c0/0x363bc/0x363e4 all perform x+=vx and z+=vz over object+0x08/+0x10 and +0x1c8/+0x1cc; 0x36044 and 0x363e4 also write the ground candidate 0x154 into +0x0c. Range 0x360c0-0x360e0 covers the store pair; the surrounding state-gated ground writes are a separate slice."
         }
       ]
     }
