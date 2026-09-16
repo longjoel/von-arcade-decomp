@@ -111,27 +111,24 @@ def main():
                   None, TRIG(trig))
         assert tick(obj, ctypes.byref(env)) == 1
         assert u16(obj, 0x172) == 31, hex(u16(obj, 0x172))
-        assert fof(ctypes.cast(ctypes.byref(obj, 0x1c4),
-                               ctypes.POINTER(ctypes.c_uint32))[0]) == 3.5
-        assert fof(ctypes.cast(ctypes.byref(obj, 0x1cc),
-                               ctypes.POINTER(ctypes.c_uint32))[0]) == 3.5
-        assert fof(ctypes.cast(ctypes.byref(obj, 0x10),
-                               ctypes.POINTER(ctypes.c_uint32))[0]) == 23.5
+        assert abs(fof(ctypes.cast(ctypes.byref(obj, 0x1c4),
+                                   ctypes.POINTER(ctypes.c_uint32))[0]) - 3.2) < 1e-5
+        assert abs(fof(ctypes.cast(ctypes.byref(obj, 0x1cc),
+                                   ctypes.POINTER(ctypes.c_uint32))[0]) - 3.2) < 1e-5
+        assert abs(fof(ctypes.cast(ctypes.byref(obj, 0x10),
+                                   ctypes.POINTER(ctypes.c_uint32))[0]) - 23.2) < 1e-4
 
-        # --- +0x176 == 1 selects cfg+0x570 --------------------------------
+        # --- +0x176 == 1 selects cfg+0x574 (2.0) ---------------------------
         obj2 = low_buffer(0x600)
         set_u32(obj2, 0x6c, ctypes.addressof(cfg))
         set_u16(obj2, 0x172, 31)
-        set_u16(obj2, 0x176, 1)
         t350[1] = 1
-        obj2[0x137] = 0
-        # stop the commit from overwriting +0x176: use 0xff first, then tick
         obj2[0x137] = 0xff
         set_u16(obj2, 0x176, 1)
         assert tick(obj2, ctypes.byref(env)) == 1
         assert u16(obj2, 0x172) == 31, hex(u16(obj2, 0x172))
         assert abs(fof(ctypes.cast(ctypes.byref(obj2, 0x1c4),
-                                   ctypes.POINTER(ctypes.c_uint32))[0]) - 3.2) < 1e-5
+                                   ctypes.POINTER(ctypes.c_uint32))[0]) - 2.0) < 1e-5
 
         # --- trig == NULL keeps the caller's velocity ----------------------
         obj3 = low_buffer(0x600)

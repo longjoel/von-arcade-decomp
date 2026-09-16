@@ -83,7 +83,9 @@ int von_movement_commit(uint8_t *object, const VonMovementEnv *env)
 
 int von_movement_tick(uint8_t *object, const VonMovementEnv *env)
 {
-    uint8_t *config = (uint8_t *)(uintptr_t)von_mv_ld32(object, VON_OBJ_CONFIG);
+    const uint8_t *config = env->config != NULL
+        ? env->config
+        : (const uint8_t *)(uintptr_t)von_mv_ld32(object, VON_OBJ_CONFIG);
     uint32_t select;
     uint32_t speed;
     float vx, vz;
@@ -93,11 +95,13 @@ int von_movement_tick(uint8_t *object, const VonMovementEnv *env)
     if (von_mv_ld16(object, VON_OBJ_STATE) != (uint16_t)VON_STATE_CRUISE)
         return 0;
 
-    /* 0x30ad4-0x30c18: speed from the cfg triplet by +0x176. */
+    /* 0x30ad4-0x30c18 (f174 == 0, the default profile): select 0 -> cfg+0x570,
+     * select 1 -> cfg+0x574, else cfg+0x56c. Matches
+     * recovered_locomotion_state31_speed. */
     select = von_mv_ld16(object, VON_OBJ_DIR_SELECT);
-    if (select == 1u)
+    if (select == 0u)
         speed = von_mv_cfg_u32(config, VON_CFG_SPEED_SEL1);
-    else if (select == 2u)
+    else if (select == 1u)
         speed = von_mv_cfg_u32(config, VON_CFG_SPEED_SEL2);
     else
         speed = von_mv_cfg_u32(config, VON_CFG_SPEED_DEFAULT);
@@ -130,6 +134,7 @@ static const VonMovementEnv von_movement_i960_env = {
     (const uint16_t *)(uintptr_t)0x00018350u,
     (const uint16_t *)(uintptr_t)0x00018360u,
     (const uint16_t *)(uintptr_t)0x00018370u,
+    NULL,
     NULL,
     NULL
 };
