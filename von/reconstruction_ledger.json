@@ -36947,6 +36947,34 @@
           "notes": "State 21 is the object+0x170 movement-mode producer (2 at 0x32244, 3 at 0x32280), resolving the earlier modes 2..5 gap; its targets 0/1 are the mode-gated locomotion handlers. Integrated in the 0x32810 backbone dispatch."
         },
         {
+          "id": "maincpu.action-commit-31",
+          "name": "action_commit_31",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_action_31.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/state-semantics.md",
+            "von/tools/test_recovered_action_31.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00036460",
+              "end": "0x00036550"
+            }
+          ],
+          "symbol": "recovered_action_31_run",
+          "modeling": {
+            "boundary": "Committed-action -> locomotion transition 0x36460-0x36550: the +0x18e cooldown gate, the +0x137 != 0xff test that forces +0x172 = 31 and clears +0x170, the 0x18350/0x18360/0x18370 direction tables into +0x176/+0x188/+0x3c/+0x186, the scratch clears and +0x1a8/+0x1a9 sentinels, and the object+0x4e accumulator (cfg+0x658/0x660).",
+            "test": "von/tools/test_recovered_action_31.py",
+            "unresolved_behavior": "The +0x137 == 0xff branch at 0x36554 (the state-16 reload path with the +0x10e/+0x102 gates) is out of scope. This handler is entry 0 of the 0x37130 per-kind dispatcher, not the 0x32560 mech backbone, so its integration is left open."
+          },
+          "notes": "The only +0x137 consumer that drives locomotion: it forces state 31 (cruise) from the latched command, which is how a committed stick command becomes transport. Recovered as a host-tested core; the 0x37130 vs 0x32560 dispatcher selection is unresolved."
+        },
+        {
           "id": "maincpu.state-attack-arms",
           "name": "state_attack_arms",
           "classification": "code",
