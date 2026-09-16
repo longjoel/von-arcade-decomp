@@ -50,6 +50,7 @@ class FrameStateContext(ctypes.Structure):
         ("table_18350", ctypes.POINTER(ctypes.c_uint16)),
         ("table_18360", ctypes.POINTER(ctypes.c_uint16)),
         ("table_18370", ctypes.POINTER(ctypes.c_uint16)),
+        ("project", ctypes.c_uint32),
     ]
 
 
@@ -86,7 +87,8 @@ class Ctx:
         return FrameStateContext(
             ctypes.cast(self.t350, ctypes.POINTER(ctypes.c_uint16)),
             ctypes.cast(self.t360, ctypes.POINTER(ctypes.c_uint16)),
-            ctypes.cast(self.t370, ctypes.POINTER(ctypes.c_uint16)))
+            ctypes.cast(self.t370, ctypes.POINTER(ctypes.c_uint16)),
+            0)
 
 
 def set_u32(ptr, offset, value):
@@ -270,7 +272,41 @@ def main():
         assert ctypes.cast(ctypes.byref(c.obj, 0x150),
                            ctypes.POINTER(ctypes.c_uint32))[0] == fbits(-1.25)
 
-    print("PASS: recovered i960 frame-step arms 15/16/17/31/33/35/37")
+        # --- arm 19/28: vy clamp + integrate + project (identity) -----------
+        desc = recovered.recovered_framestate_descent
+        desc.argtypes = [ctypes.POINTER(ctypes.c_ubyte),
+                         ctypes.POINTER(FrameStateContext),
+                         ctypes.c_uint32, ctypes.c_uint32]
+        desc.restype = ctypes.c_uint32
+        c = Ctx()
+        set_u32(c.cfg, 0x624, fbits(0.0))    # limit = notbit31(0.0) = -0.0
+        set_u32(c.cfg, 0x634, fbits(0.25))
+        set_u32(c.obj, 0x150, fbits(1.0))    # 1.0 > -0.0 -> decel to 0.75
+        set_u32(c.obj, 0x0c, fbits(5.0))
+        assert desc(c.obj, ctypes.byref(c.ctx()), 0x624, 0x634) == 1
+        assert ctypes.cast(ctypes.byref(c.obj, 0x150),
+                           ctypes.POINTER(ctypes.c_uint32))[0] == fbits(0.75)
+        assert ctypes.cast(ctypes.byref(c.obj, 0x0c),
+                           ctypes.POINTER(ctypes.c_uint32))[0] == fbits(5.75)
+        assert u16(c.obj, 0x17c) == 1, hex(u16(c.obj, 0x17c))
+
+        # --- arm 24/29: landing latches +0xc, kills vy, -> state 25 ---------
+        land = recovered.recovered_framestate_landing
+        land.argtypes = [ctypes.POINTER(ctypes.c_ubyte),
+                         ctypes.POINTER(FrameStateContext)]
+        land.restype = ctypes.c_uint32
+        c = Ctx()
+        set_u32(c.obj, 0x0c, fbits(5.0))
+        set_u32(c.obj, 0x150, fbits(-1.0))
+        set_u8(c.obj, 0x13b, 0)
+        assert land(c.obj, ctypes.byref(c.ctx())) == 1
+        assert ctypes.cast(ctypes.byref(c.obj, 0x0c),
+                           ctypes.POINTER(ctypes.c_uint32))[0] == fbits(5.0)
+        assert ctypes.cast(ctypes.byref(c.obj, 0x150),
+                           ctypes.POINTER(ctypes.c_uint32))[0] == 0
+        assert u16(c.obj, 0x172) == 25, hex(u16(c.obj, 0x172))
+
+    print("PASS: recovered i960 frame-step arms 15/16/17/19/23/24/26/28/29/31/33/35/37")
 
 
 if __name__ == "__main__":

@@ -31,12 +31,14 @@ typedef signed int s32;
 #define RECOVERED_FRAMESTATE_TABLE_18350 0x00018350UL
 #define RECOVERED_FRAMESTATE_TABLE_18360 0x00018360UL
 #define RECOVERED_FRAMESTATE_TABLE_18370 0x00018370UL
+#define RECOVERED_FRAMESTATE_PROJECT 0x0006f6f0UL
 #define RECOVERED_FRAMESTATE_CONFIG_OFFSET 0x6cU
 
 struct recovered_framestate_context {
     const volatile u16 *table_18350;
     const volatile u16 *table_18360;
     const volatile u16 *table_18370;
+    u32 project;   /* 0x6f6f0 address, or 0 to skip the projection */
 };
 
 static u16 recovered_framestate_ld16(const volatile unsigned char *object,
@@ -328,13 +330,16 @@ u32 recovered_framestate_state_33(
  * landing arms.  Gravity comes from cfg+0x62c; the vertical velocity is the
  * float at object+0x150. */
 u32 recovered_framestate_air(
-    volatile unsigned char *object, const struct recovered_framestate_context *ctx)
+    volatile unsigned char *object, const struct recovered_framestate_context *ctx,
+    u32 require_counter)
 {
     volatile unsigned char *cfg = (volatile unsigned char *)(unsigned long)
         *(volatile u32 *)(object + RECOVERED_FRAMESTATE_CONFIG_OFFSET);
 
     (void)ctx;
-    if (!((u32)(s32)(s16)(u16)recovered_framestate_ld16(object, 0x17aU) > 0U))
+    if (require_counter
+            && !((u32)(s32)(s16)(u16)
+                    recovered_framestate_ld16(object, 0x17aU) > 0U))
         return 0U;
 
     {
@@ -378,6 +383,139 @@ u32 recovered_framestate_air(
     return 1U;
 }
 
+/* 0x6f6f0 projection, injected: on the target it fills the 0x40(fp) record
+ * and returns the projected height in g0.  With project == 0 the current
+ * object+0xc is used unchanged (host build). */
+static u32 recovered_framestate_project(
+    volatile unsigned char *object,
+    const struct recovered_framestate_context *ctx)
+{
+    if (ctx->project == 0U)
+        return *(volatile u32 *)(object + 0xcU);
+    return ((u32 (*)(volatile unsigned char *))(unsigned long)ctx->project)(object);
+}
+
+static float recovered_framestate_f(u32 bits)
+{
+    union { u32 bits; float value; } u;
+    u.bits = bits;
+    return u.value;
+}
+
+static u32 recovered_framestate_bits(float value)
+{
+    union { u32 bits; float value; } u;
+    u.value = value;
+    return u.bits;
+}
+
+/* States 19 (0x36c40) and 28 (0x36d50): clamp vy against notbit31(cfg+A),
+ * decelerate by cfg+B, integrate object+0xc, project, then set the +0x17c
+ * contact flag. */
+u32 recovered_framestate_descent(
+    volatile unsigned char *object,
+    const struct recovered_framestate_context *ctx,
+    u32 limit_off, u32 decel_off)
+{
+    volatile unsigned char *cfg = (volatile unsigned char *)(unsigned long)
+        *(volatile u32 *)(object + RECOVERED_FRAMESTATE_CONFIG_OFFSET);
+    float vy = recovered_framestate_f(*(volatile u32 *)(object + 0x150U));
+    float limit = recovered_framestate_f(
+        *(volatile u32 *)(cfg + limit_off) ^ 0x80000000U);
+
+    if (vy > limit)
+        vy = vy - recovered_framestate_f(*(volatile u32 *)(cfg + decel_off));
+
+    *(volatile u32 *)(object + 0x150U) = recovered_framestate_bits(vy);
+    *(volatile u32 *)(object + 0x0cU) = recovered_framestate_bits(
+        recovered_framestate_f(*(volatile u32 *)(object + 0x0cU)) + vy);
+
+    {
+        u32 proj = recovered_framestate_project(object, ctx);
+
+        if (!(recovered_framestate_f(proj)
+                < recovered_framestate_f(*(volatile u32 *)(object + 0x0cU)))) {
+            *(volatile u32 *)(object + 0x0cU) = proj;
+            recovered_framestate_st16(object, 0x17cU, 1U);
+        } else {
+            recovered_framestate_st16(object, 0x17cU, 0U);
+        }
+    }
+    return 1U;
+}
+
+/* State 26 (0x36cc0): the +0x17e-gated descent with cfg+0x620/0x630; contact
+ * sets +0x17e and clears +0x178/+0x17a/+0x150. */
+u32 recovered_framestate_descent_26(
+    volatile unsigned char *object,
+    const struct recovered_framestate_context *ctx)
+{
+    volatile unsigned char *cfg = (volatile unsigned char *)(unsigned long)
+        *(volatile u32 *)(object + RECOVERED_FRAMESTATE_CONFIG_OFFSET);
+    float vy;
+    float limit;
+
+    if (recovered_framestate_ld16(object, 0x17eU) != 0U)
+        return 0U;
+
+    vy = recovered_framestate_f(*(volatile u32 *)(object + 0x150U));
+    limit = recovered_framestate_f(
+        *(volatile u32 *)(cfg + 0x620U) ^ 0x80000000U);
+    if (vy > limit)
+        vy = vy - recovered_framestate_f(*(volatile u32 *)(cfg + 0x630U));
+
+    *(volatile u32 *)(object + 0x150U) = recovered_framestate_bits(vy);
+    *(volatile u32 *)(object + 0x0cU) = recovered_framestate_bits(
+        recovered_framestate_f(*(volatile u32 *)(object + 0x0cU)) + vy);
+
+    {
+        u32 proj = recovered_framestate_project(object, ctx);
+
+        if (!(recovered_framestate_f(proj)
+                < recovered_framestate_f(*(volatile u32 *)(object + 0x0cU)))) {
+            *(volatile u32 *)(object + 0x0cU) = proj;
+            recovered_framestate_st16(object, 0x17eU, 1U);
+            recovered_framestate_st16(object, 0x178U, 0U);
+            recovered_framestate_st16(object, 0x17aU, 0U);
+            *(volatile u32 *)(object + 0x150U) = 0U;
+        }
+    }
+    return 1U;
+}
+
+/* States 24 (0x36bb0) and 29 (0x36de0): landing.  Project, latch the higher
+ * contact height, kill vy, then hand off to state 11 (airborne) or state 25. */
+u32 recovered_framestate_landing(
+    volatile unsigned char *object,
+    const struct recovered_framestate_context *ctx)
+{
+    u32 proj = recovered_framestate_project(object, ctx);
+
+    if (!(recovered_framestate_f(proj)
+            < recovered_framestate_f(*(volatile u32 *)(object + 0x0cU)))) {
+        *(volatile u32 *)(object + 0x0cU) = proj;
+        *(volatile u32 *)(object + 0x150U) = 0U;
+
+        if (recovered_framestate_ld8(object, 0x13bU) != 0U
+                && ((recovered_framestate_ld8(object, 0x1deU) & 2U)
+                        || (recovered_framestate_ld8(object, 0x1ddU) & 2U)
+                        || (recovered_framestate_ld8(object, 0x1dfU) & 2U))) {
+            recovered_framestate_st16(object, 0x172U, 11U);
+            recovered_framestate_st16(object, 0x170U, 0U);
+            recovered_framestate_st16(object, 0x176U, 0U);
+            recovered_framestate_st16(object, 0x17eU, 0U);
+            recovered_framestate_st16(object, 0x17aU, 0U);
+            recovered_framestate_st16(object, 0x17cU, 0U);
+            recovered_framestate_st16(object, 0x178U, 0U);
+            recovered_framestate_st16(object, 0x180U, 0U);
+        } else {
+            recovered_framestate_st16(object, 0x172U, 25U);
+            recovered_framestate_st16(object, 0x17aU, 0U);
+        }
+    }
+    return 1U;
+}
+
 /* Absolute-global entries. */
 static void recovered_framestate_context_init(
     struct recovered_framestate_context *ctx)
@@ -388,6 +526,7 @@ static void recovered_framestate_context_init(
         RECOVERED_FRAMESTATE_TABLE_18360;
     ctx->table_18370 = (const volatile u16 *)(unsigned long)
         RECOVERED_FRAMESTATE_TABLE_18370;
+    ctx->project = RECOVERED_FRAMESTATE_PROJECT;
 }
 
 u32 recovered_framestate_state_15_run(volatile unsigned char *object)
@@ -435,7 +574,7 @@ u32 recovered_framestate_air_35_run(volatile unsigned char *object)
     struct recovered_framestate_context ctx;
 
     recovered_framestate_context_init(&ctx);
-    return recovered_framestate_air(object, &ctx);
+    return recovered_framestate_air(object, &ctx, 1U);
 }
 
 u32 recovered_framestate_air_37_run(volatile unsigned char *object)
@@ -443,5 +582,53 @@ u32 recovered_framestate_air_37_run(volatile unsigned char *object)
     struct recovered_framestate_context ctx;
 
     recovered_framestate_context_init(&ctx);
-    return recovered_framestate_air(object, &ctx);
+    return recovered_framestate_air(object, &ctx, 1U);
+}
+
+u32 recovered_framestate_air_23_run(volatile unsigned char *object)
+{
+    struct recovered_framestate_context ctx;
+
+    recovered_framestate_context_init(&ctx);
+    return recovered_framestate_air(object, &ctx, 0U);
+}
+
+u32 recovered_framestate_state_19_run(volatile unsigned char *object)
+{
+    struct recovered_framestate_context ctx;
+
+    recovered_framestate_context_init(&ctx);
+    return recovered_framestate_descent(object, &ctx, 0x624U, 0x634U);
+}
+
+u32 recovered_framestate_state_28_run(volatile unsigned char *object)
+{
+    struct recovered_framestate_context ctx;
+
+    recovered_framestate_context_init(&ctx);
+    return recovered_framestate_descent(object, &ctx, 0x624U, 0x634U);
+}
+
+u32 recovered_framestate_state_26_run(volatile unsigned char *object)
+{
+    struct recovered_framestate_context ctx;
+
+    recovered_framestate_context_init(&ctx);
+    return recovered_framestate_descent_26(object, &ctx);
+}
+
+u32 recovered_framestate_landing_24_run(volatile unsigned char *object)
+{
+    struct recovered_framestate_context ctx;
+
+    recovered_framestate_context_init(&ctx);
+    return recovered_framestate_landing(object, &ctx);
+}
+
+u32 recovered_framestate_landing_29_run(volatile unsigned char *object)
+{
+    struct recovered_framestate_context ctx;
+
+    recovered_framestate_context_init(&ctx);
+    return recovered_framestate_landing(object, &ctx);
 }

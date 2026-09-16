@@ -37016,13 +37016,25 @@
             {
               "start": "0x00037060",
               "end": "0x00037120"
+            },
+            {
+              "start": "0x00036bb0",
+              "end": "0x00036c38"
+            },
+            {
+              "start": "0x00036cc0",
+              "end": "0x00036d44"
+            },
+            {
+              "start": "0x00036d50",
+              "end": "0x00036e60"
             }
           ],
           "symbol": "recovered_framestate_state_15_run",
           "modeling": {
             "boundary": "0x37130 frame-step arms 15/16/17. Arm 15 (0x36690) and arm 16 (0x367f0) share the addo 31,3 route to state 34 with 0x18350/0x18360 and the +0x102-keyed +0x188 classifier (arm 16 takes +0x186 from 0x18370, arm 15 zeroes it). Arm 17 (0x36980) shares the state-0 route (state 31 + 0x18350/0x18360 + the object+0x4e accumulator). The 0xff tails chain 15->0, 16->17/0 and 17->16. Arm 31 (0x36e70) is the opposite-direction turn trigger to state 32 (helper 0x18438); arm 33 (0x36ef0) turns to state 16; arms 35/37 (0x36f90/0x37060) are the air/landing arms applying cfg+0x62c gravity to the object+0x150 float.",
             "test": "von/tools/test_recovered_framestate_arms.py",
-            "unresolved_behavior": "The +0x102 classifier thresholds are reproduced literally; the remaining 0x37130 arms (19/23/24/26/28/29) are still pending."
+            "unresolved_behavior": "The +0x102 classifier thresholds are reproduced literally; arms 19/28/29 (0x36c40/0x36d50/0x36de0) and 24 (0x36bb0) model the descent/landing vy clamp, cfg+0x62c/0x624/0x620/0x634/0x630 gravity and the object+0x150 float with the 0x6f6f0 projection injected as a callback (0 on the host)."
           },
           "notes": "The 0x37130 table is the input-facing locomotion dispatcher of the 0x371e0 frame step; these arms are the input -> locomotion bridge complementing action-commit-31 (state 0). Host-tested cores; integration onto the frame-step path is pending."
         },
