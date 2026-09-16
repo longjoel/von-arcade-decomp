@@ -80,6 +80,7 @@ void recovered_state_locomotion_16_run(volatile unsigned char *object);
 void recovered_state_locomotion_17_run(volatile unsigned char *object);
 void recovered_state_locomotion_32_run(volatile unsigned char *object);
 void recovered_state_locomotion_36_run(volatile unsigned char *object);
+void recovered_state_dash_20_run(volatile unsigned char *object);
 
 static void recovered_object_update_32810_state_locomotion(
     volatile unsigned char *object, u16 state)
@@ -144,6 +145,8 @@ void recovered_object_update_32810_run(volatile unsigned char *object)
             recovered_locomotion_state_31_run(object);
         else if (state == 34U)
             recovered_locomotion_state_34_run(object);
+        else if (state == 20U)
+            recovered_state_dash_20_run(object);
         else if (state >= 2U && state <= 11U)
             recovered_object_update_32810_state_attack(object, state);
         else if (state == 0U || state == 1U || state == 15U || state == 16U ||

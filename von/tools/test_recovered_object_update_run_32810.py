@@ -15,6 +15,7 @@ LOCOMOTION = [
     ROOT / "von/i960/recovered_locomotion_actions.c",
     ROOT / "von/i960/recovered_state_attack_arms.c",
     ROOT / "von/i960/recovered_state_locomotion_arms.c",
+    ROOT / "von/i960/recovered_state_dash_20.c",
 ]
 
 OBJECT_SIZE = 0x600
@@ -58,7 +59,7 @@ with tempfile.TemporaryDirectory() as directory:
     set_u32(buf, 0x1C8, fbits(5.0))
     set_u32(buf, 0x1CC, fbits(-1.0))
     set_u16(buf, 0x1B2, 3)
-    set_u16(buf, 0x172, 20)
+    set_u16(buf, 0x172, 22)
     run(ctypes.byref(buf))
     assert (u32(buf, 0x08), u32(buf, 0x10)) == (fbits(105.0), fbits(199.0))
 

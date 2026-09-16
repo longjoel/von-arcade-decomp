@@ -36891,6 +36891,34 @@
           "notes": "Compile-only for now; the input service does not yet populate 0x50249c/0x5024a4. Important finding: the action field +0x1b2 that the 0x32810 backbone dispatches on is set by the state handlers, so input-driven action requires those handlers."
         },
         {
+          "id": "maincpu.state-dash-20",
+          "name": "state_dash_20",
+          "classification": "code",
+          "stage": "integrated",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_state_dash_20.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/i960/state-semantics.md",
+            "von/tools/test_recovered_state_dash_20.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00031d20",
+              "end": "0x00032114"
+            }
+          ],
+          "symbol": "recovered_state_dash_20_run",
+          "modeling": {
+            "boundary": "State 20 dash/boost handler 0x31d20-0x32114: cfg-lane record publication (0x288/0x28c/0x290/0x294 by (+0x176&3)*32), the cfg+0x644 frame gate (+0x1b2 5 then 7, +0x190 2), the +0x180 sub-mode dispatch to states 37/38/39/40, the object+0x143/0x142/0x136 committed-action bridge to state 36, and the object+0x13b air-flag idle fall-through to state 11/21. Every exit clears +0x1c4.",
+            "test": "von/tools/test_recovered_state_dash_20.py",
+            "unresolved_behavior": "cfg+0x3ac/0x3b4/0x3c4 callbacks of the sibling states 15/16/17 and the object+0x170 mode 2..5 producers are still external; state 20 itself needs only the +0x136 selector, which the 0x24fc0 consumer now writes."
+          },
+          "notes": "State 20 is the only handler that reads the committed action object+0x136, so it is the committed-input -> state-machine bridge; it hands off to 36 (ground) and 37-40 (air) in the 0x32560 table. Integrated in the 0x32810 backbone dispatch."
+        },
+        {
           "id": "maincpu.state-attack-arms",
           "name": "state_attack_arms",
           "classification": "code",
