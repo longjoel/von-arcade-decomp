@@ -58,6 +58,8 @@ void recovered_gameplay_velocity_de990_run(void);
 void recovered_sharc_upload_run(void);
 void recovered_input_service_run(volatile unsigned char *object);
 void recovered_input_commit_run_72ea0(volatile unsigned char *object);
+unsigned int recovered_input_consumer_24fc0_translate(
+    volatile unsigned char *object, unsigned int ma, unsigned int mb);
 void recovered_velocity_accumulate_358ac_run(volatile unsigned char *object);
 void recovered_object_update_prefix_32810_run(volatile unsigned char *object);
 extern const unsigned int recovered_von_config_kind0[];
@@ -263,6 +265,14 @@ void i960_reconstructed_main(void)
              * then commit them into the player object's held-action state. */
             recovered_input_service_run((volatile unsigned char *)0x00503ad0U);
             recovered_input_commit_run_72ea0((volatile unsigned char *)0x00503ad0U);
+            /* Per-object input consumer: decode the packed controller word into
+             * object+0x108, object+0x136 and the held/edge counters. The packed
+             * word (MA nibble bits 12-15, MB nibble bits 20-23) is produced by
+             * the service into object+0xec; object+0xf0 holds the MB lane. */
+            (void)recovered_input_consumer_24fc0_translate(
+                (volatile unsigned char *)0x00503ad0U,
+                *(volatile unsigned int *)(0x00503ad0U + 0xecU),
+                *(volatile unsigned int *)(0x00503ad0U + 0xf0U));
             /* Velocity producer drives the SHARC seek exchange and writes
              * object+0x1c8/+0x1cc; the backbone then integrates position. */
             recovered_gameplay_velocity_de990_run();

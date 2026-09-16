@@ -77,6 +77,7 @@ COMMON_OBJECTS=(
     /src/von/build/i960/recovered_velocity_accumulate_358ac.o
     /src/von/build/i960/recovered_input_service_run.o
     /src/von/build/i960/recovered_input_commit_run_72ea0.o
+    /src/von/build/i960/recovered_input_consumer_24fc0.o
     /src/von/build/i960/recovered_locomotion_states.o
     /src/von/build/i960/recovered_locomotion_actions.o
     /src/von/build/i960/recovered_state_attack_arms.o
