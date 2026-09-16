@@ -105,6 +105,28 @@ def motion_header(mmcp: bytes, md: bytes, header: int):
     return data, frames, parts
 
 
+def find_body_header(mc: bytes, md: bytes, action_header: int):
+    """Pair an action's 8-part skeleton with its 17-part body.
+
+    The state handlers index a flat pair table in the maincpu image (0x7c00)
+    holding [body, skeleton] pairs; the body sits in the word just before the
+    skeleton pointer. Scan for it and validate as a motion header.
+    """
+    import struct as _s
+    pat = _s.pack("<I", action_header)
+    start = 0
+    while True:
+        i = mc.find(pat, start)
+        if i < 0:
+            return None
+        if (i % 4) == 0 and i >= 4:
+            body = _s.unpack_from("<I", mc, i - 4)[0]
+            found = motion_header(mc, md, body)
+            if found and found[2] not in (8,):
+                return body, found
+        start = i + 1
+
+
 def extract_records(md: bytes, data: int, frames: int, parts: int) -> bytes:
     return md[data - MAIN_DATA_BASE:data - MAIN_DATA_BASE + frames * parts * 12]
 
@@ -176,14 +198,25 @@ def main() -> int:
                         continue
                     adata, aframes, aparts = found
                     araw = extract_records(md, adata, aframes, aparts)
-                    actions.append({
+                    body = find_body_header(mc, md, aheader)
+                    entry = {
                         "name": aname,
                         "header": aheader,
                         "data": adata,
                         "frames": aframes,
                         "parts": aparts,
                         "records_b64": base64.b64encode(araw).decode("ascii"),
-                    })
+                    }
+                    if body:
+                        bptr, (bdata, bframes, bparts) = body
+                        entry["body_header"] = bptr
+                        entry["body_data"] = bdata
+                        entry["body_frames"] = bframes
+                        entry["body_parts"] = bparts
+                        entry["body_records_b64"] = base64.b64encode(
+                            extract_records(md, bdata, bframes, bparts)
+                        ).decode("ascii")
+                    actions.append(entry)
                 payload["actions"] = actions
                 print(f"  action tables: {len(actions)}")
             (args.out_dir / f"{name.lower()}.json").write_text(

@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dump_motion_tables import (
     PROFILE_TABLE, NAME_TABLE, NAME_STRIDE, ACTION_HEADERS,
-    load_maincpu, load_main_data, motion_header,
+    find_body_header, load_maincpu, load_main_data, motion_header,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,6 +74,16 @@ def main():
     assert actions["jump"][1:] == (8, 8), actions["jump"]
     assert actions["shot_l"][1:] == (4, 8), actions["shot_l"]
     assert actions["shot_r"][1:] == (33, 8), actions["shot_r"]
+
+    # Each action's 8-part skeleton pairs with a 17-part body in the maincpu
+    # pair table (the body is the word before the skeleton pointer).
+    bodies = {n: find_body_header(mc, md, h) for n, h in ACTION_HEADERS.items()}
+    assert all(v is not None for v in bodies.values()), bodies
+    for name in ACTION_HEADERS:
+        bptr, (bdata, bframes, bparts) = bodies[name]
+        aframes = actions[name][1]
+        assert bparts == 17, (name, bparts)
+        assert bframes == aframes, (name, bframes, aframes)
 
     print(f"PASS: motion tables ({len(temjin)} Temjin clips, "
           f"{sum(1 for c in temjin if c[4] == 8)} skeleton)")
