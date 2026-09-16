@@ -89,11 +89,20 @@ int von_movement_tick(uint8_t *object, const VonMovementEnv *env)
     uint32_t select;
     uint32_t speed;
     float vx, vz;
+    uint16_t state_before = von_mv_ld16(object, VON_OBJ_STATE);
 
     (void)von_movement_commit(object, env);
 
     if (von_mv_ld16(object, VON_OBJ_STATE) != (uint16_t)VON_STATE_CRUISE)
         return 0;
+
+    /* 0x36500-0x36508: the clip cursor restarts when the cruise state is
+     * entered, then advances one frame per tick (the ROM's 0x51ab10 cursor
+     * rule). The host reads it to phase the clip. */
+    if (state_before != (uint16_t)VON_STATE_CRUISE)
+        von_mv_st16(object, VON_OBJ_CLIP_COUNTER, 0u);
+    von_mv_st16(object, VON_OBJ_CLIP_COUNTER,
+        (uint16_t)(von_mv_ld16(object, VON_OBJ_CLIP_COUNTER) + 1u));
 
     /* 0x30ad4-0x30c18 (f174 == 0, the default profile): select 0 -> cfg+0x570,
      * select 1 -> cfg+0x574, else cfg+0x56c. Matches
