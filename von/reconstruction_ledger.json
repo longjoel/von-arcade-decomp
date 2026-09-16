@@ -36771,6 +36771,68 @@
             "unresolved_behavior": "The opcode-31/10 SHARC responses are external; the mode==3 early-out and the action dispatch that follow are the caller/backbone's responsibility"
           },
           "notes": "Linked (COMMON_OBJECTS) and called from reconstructed_main before the velocity accumulation so the +0x7c clamp has the device response. Related pointer is object+0x74 (set to the other fighter)."
+        },
+        {
+          "id": "maincpu.locomotion-states",
+          "name": "locomotion_states",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_locomotion_states.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_locomotion_states.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00030660",
+              "end": "0x00030c20"
+            },
+            {
+              "start": "0x00030e40",
+              "end": "0x00030ff0"
+            }
+          ],
+          "symbol": "recovered_locomotion_state_31_run",
+          "modeling": {
+            "boundary": "Runnable locomotion states: state 31 (0x30660) speed selection from cfg+0x56c/0x570/0x574 and cfg+0x578..0x598, +0x17a/+0x17e advance, the +0x138/+0x139/+0x13a/+0x13c sentinel gate and +0x17e==4 transition to +0x172=0/+0x170=1; state 34 (0x30e40) cfg+0x180/0x184 speed and cfg+0x570/0x574/0x56c override, and clip end storing +0x172=31",
+            "test": "von/tools/test_recovered_locomotion_states.py",
+            "unresolved_behavior": "The cfg-resident weapon callbacks and the 0x51ab08/0x51ab0c publication consumers remain outside the bounded model"
+          },
+          "notes": "Linked and dispatched from the 0x32810 backbone for states 31/34. Config is read from object+0x6c."
+        },
+        {
+          "id": "maincpu.locomotion-actions",
+          "name": "locomotion_actions",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_locomotion_actions.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_locomotion_actions.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x000329c4",
+              "end": "0x00032a88"
+            },
+            {
+              "start": "0x00032ea4",
+              "end": "0x00032fd0"
+            }
+          ],
+          "symbol": "recovered_locomotion_action_0_run",
+          "modeling": {
+            "boundary": "Runnable arm 0 (0x329c4) auto-face: per-state 0x32564 word1 gate, +0x2e slew toward +0x184 + +0x34 clamped to +/-0x300, +0x184/+0x2e advance by +0x10a; arm 12 (0x32ea4) dash: +0x2e snap to the cached opcode-10 response within +/-cfg+0x52c, +0x1c4 rescale, +0x184=+0x2e, +0x1b2 clear",
+            "test": "von/tools/test_recovered_locomotion_actions.py",
+            "unresolved_behavior": "The 0x884000 opcode-10 projection and the other 12 action arms remain outside the bounded model"
+          },
+          "notes": "Linked and dispatched from the 0x32810 backbone for actions 0/12."
         }
       ]
     }

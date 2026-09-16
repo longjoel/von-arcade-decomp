@@ -229,9 +229,9 @@ void i960_reconstructed_main(void)
      * seek can produce nonzero velocity; callback/config pointers are zero
      * until the per-kind tables are ported. */
     recovered_object_initializer_27550_run((volatile unsigned char *)0x00503ad0U,
-        0U, 0U, 0x005040d0U, 0U, 0U, 0x00000000U, 0xc2700000U, 0U);
+        0x000057d0U, 0U, 0x005040d0U, 0U, 0U, 0x00000000U, 0xc2700000U, 0U);
     recovered_object_initializer_27550_run((volatile unsigned char *)0x005040d0U,
-        0U, 0U, 0x00503ad0U, 0U, 1U, 0x00000000U, 0x42700000U, 0U);
+        0x0000a5b0U, 0U, 0x00503ad0U, 0U, 1U, 0x00000000U, 0x42700000U, 0U);
 
     /* Provisional locomotion seed until the state-31/34 arms are ported:
      * facing angle 0 and speed scalar 3.0f feed the velocity accumulation

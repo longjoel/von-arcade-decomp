@@ -10,6 +10,10 @@ import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "von/i960/recovered_object_update_run_32810.c"
+LOCOMOTION = [
+    ROOT / "von/i960/recovered_locomotion_states.c",
+    ROOT / "von/i960/recovered_locomotion_actions.c",
+]
 
 OBJECT_SIZE = 0x600
 
@@ -33,7 +37,7 @@ def set_u16(buf, offset, value):
 with tempfile.TemporaryDirectory() as directory:
     library = pathlib.Path(directory) / "object-update-run.so"
     subprocess.run(["cc", "-std=c11", "-Wall", "-Wextra", "-Werror",
-                    "-shared", "-fPIC", "-O2", SOURCE, "-o", library], check=True)
+                    "-shared", "-fPIC", "-O2", SOURCE, *LOCOMOTION, "-o", library], check=True)
     dll = ctypes.CDLL(str(library))
 
     run = dll.recovered_object_update_32810_run
@@ -67,11 +71,13 @@ with tempfile.TemporaryDirectory() as directory:
     assert (u32(buf, 0x08), u32(buf, 0x10)) == (fbits(1.0), fbits(2.0))
 
     # Negative state high bit is rejected by the guard but integration runs.
+    # Use action 1 (stub arm) so the test does not invoke the absolute-address
+    # locomotion action 0 on the host.
     set_u32(buf, 0x08, fbits(10.0))
     set_u32(buf, 0x10, fbits(20.0))
     set_u32(buf, 0x1C8, fbits(4.0))
     set_u32(buf, 0x1CC, fbits(4.0))
-    set_u16(buf, 0x1B2, 0)
+    set_u16(buf, 0x1B2, 1)
     set_u16(buf, 0x172, 0x8000)
     run(ctypes.byref(buf))
     assert (u32(buf, 0x08), u32(buf, 0x10)) == (fbits(14.0), fbits(24.0))

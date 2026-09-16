@@ -58,6 +58,13 @@ u32 recovered_object_update_32810_action_count(void)
     return 14U;
 }
 
+/* Real locomotion arms replace the stubs for the indices that produce
+ * movement; the remaining arms are still stubs. */
+void recovered_locomotion_action_0_run(volatile unsigned char *object);
+void recovered_locomotion_action_12_run(volatile unsigned char *object);
+void recovered_locomotion_state_31_run(volatile unsigned char *object);
+void recovered_locomotion_state_34_run(volatile unsigned char *object);
+
 u32 recovered_object_update_32810_state_count(void)
 {
     return 43U;
@@ -73,9 +80,23 @@ void recovered_object_update_32810_run(volatile unsigned char *object)
     } x, z, vx, vz;
 
     if (action <= 13U)
-        recovered_object_update_32810_actions[action](object);
+    {
+        if (action == 0U)
+            recovered_locomotion_action_0_run(object);
+        else if (action == 12U)
+            recovered_locomotion_action_12_run(object);
+        else
+            recovered_object_update_32810_actions[action](object);
+    }
     if ((state & 0x8000U) == 0U && state <= 42U)
-        recovered_object_update_32810_states[state](object);
+    {
+        if (state == 31U)
+            recovered_locomotion_state_31_run(object);
+        else if (state == 34U)
+            recovered_locomotion_state_34_run(object);
+        else
+            recovered_object_update_32810_states[state](object);
+    }
 
     /* i960 `addr` is add-real: object+0x08/+0x10 += object+0x1c8/+0x1cc. */
     x.bits = *(volatile u32 *)(object + 0x08);
