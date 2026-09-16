@@ -101,9 +101,12 @@ def main():
         set_u32(obj, 0x10, fbits(20.0))
         obj[0x137] = 0  # committed action, not 0xff
 
-        def trig(facing, sinp, cosp):
-            sinp[0] = 0.0
-            cosp[0] = 1.0
+        import math
+
+        def trig(heading, sinp, cosp):
+            ang = (ctypes.c_int16(heading).value) * (2.0 * math.pi / 65536.0)
+            sinp[0] = math.sin(ang)
+            cosp[0] = math.cos(ang)
 
         env = Env(ctypes.cast(t350, ctypes.POINTER(ctypes.c_uint16)),
                   ctypes.cast(t360, ctypes.POINTER(ctypes.c_uint16)),
@@ -145,6 +148,20 @@ def main():
         assert tick(obj3, ctypes.byref(env2)) == 1
         assert fof(ctypes.cast(ctypes.byref(obj3, 0x10),
                                ctypes.POINTER(ctypes.c_uint32))[0]) == 4.0
+
+        # --- action heading offset: back (dir_18360 0x8000) -> -z -----------
+        obj4 = low_buffer(0x600)
+        set_u32(obj4, 0x6c, ctypes.addressof(cfg))
+        set_u16(obj4, 0x172, 31)
+        t360[1] = 0x8000   # 180 degrees
+        obj4[0x137] = 1    # committed action = back
+        set_u16(obj4, 0x184, 0)
+        assert tick(obj4, ctypes.byref(env)) == 1
+        vx4 = fof(ctypes.cast(ctypes.byref(obj4, 0x1c8),
+                              ctypes.POINTER(ctypes.c_uint32))[0])
+        vz4 = fof(ctypes.cast(ctypes.byref(obj4, 0x1cc),
+                              ctypes.POINTER(ctypes.c_uint32))[0])
+        assert abs(vx4) < 1e-4 and vz4 < -0.5, (vx4, vz4)
 
     print("PASS: shared movement kernel (von_movement.c) host build")
 

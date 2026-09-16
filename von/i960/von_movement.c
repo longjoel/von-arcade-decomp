@@ -118,9 +118,19 @@ int von_movement_tick(uint8_t *object, const VonMovementEnv *env)
 
     if (env->trig != NULL) {
         float sine, cosine;
+        uint32_t action = (uint32_t)object[VON_OBJ_COMMITTED] & 0xffu;
+        uint32_t heading =
+            (uint32_t)(int16_t)von_mv_ld16(object, VON_OBJ_FACING);
 
-        env->trig((uint32_t)(int16_t)von_mv_ld16(object, VON_OBJ_FACING),
-                  &sine, &cosine);
+        /* The action's heading offset (0x18360: 0 forward, 0x8000 back,
+         * 0x2000/0x4000/0x6000/0xe000/0xc000/0xa000 the turns) steers the
+         * velocity; without it every action would move along +facing and the
+         * mech would only ever drift forward. */
+        if (action <= 7u)
+            heading = (heading
+                + (uint32_t)(int16_t)env->dir_18360[action]) & 0xffffu;
+
+        env->trig(heading, &sine, &cosine);
         vx = von_mv_float(speed) * sine;
         vz = von_mv_float(speed) * cosine;
         von_mv_st32(object, VON_OBJ_VEL_X, von_mv_bits(vx));
