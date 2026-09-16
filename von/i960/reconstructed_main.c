@@ -59,6 +59,7 @@ void recovered_sharc_upload_run(void);
 void recovered_input_service_run(volatile unsigned char *object);
 void recovered_input_commit_run_72ea0(volatile unsigned char *object);
 void recovered_velocity_accumulate_358ac_run(volatile unsigned char *object);
+void recovered_object_update_prefix_32810_run(volatile unsigned char *object);
 void recovered_text_video_initialize(void);
 void recovered_text_video_control_bootstrap(u32 caller_g14);
 void recovered_text_font_asset_initialize(void);
@@ -228,9 +229,9 @@ void i960_reconstructed_main(void)
      * seek can produce nonzero velocity; callback/config pointers are zero
      * until the per-kind tables are ported. */
     recovered_object_initializer_27550_run((volatile unsigned char *)0x00503ad0U,
-        0U, 0U, 0U, 0U, 0U, 0x00000000U, 0xc2700000U, 0U);
+        0U, 0U, 0x005040d0U, 0U, 0U, 0x00000000U, 0xc2700000U, 0U);
     recovered_object_initializer_27550_run((volatile unsigned char *)0x005040d0U,
-        0U, 0U, 0U, 0U, 1U, 0x00000000U, 0x42700000U, 0U);
+        0U, 0U, 0x00503ad0U, 0U, 1U, 0x00000000U, 0x42700000U, 0U);
 
     /* Provisional locomotion seed until the state-31/34 arms are ported:
      * facing angle 0 and speed scalar 3.0f feed the velocity accumulation
@@ -260,6 +261,9 @@ void i960_reconstructed_main(void)
             /* Velocity producer drives the SHARC seek exchange and writes
              * object+0x1c8/+0x1cc; the backbone then integrates position. */
             recovered_gameplay_velocity_de990_run();
+            /* Prefix: packets 31/10 populate +0x7c/+0x84/+0x80 before the
+             * velocity accumulation clamps against +0x7c. */
+            recovered_object_update_prefix_32810_run((volatile unsigned char *)0x00503ad0U);
             /* Velocity accumulation: opcode-29/30 sin/cos * speed -> +0x1c8/+0x1cc. */
             recovered_velocity_accumulate_358ac_run((volatile unsigned char *)0x00503ad0U);
             /* Per-object update backbone: dispatch the action/state tables and

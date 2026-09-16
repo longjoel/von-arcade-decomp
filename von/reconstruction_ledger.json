@@ -36744,6 +36744,33 @@
             "unresolved_behavior": "The 0x884000 SHARC responses are consumed verbatim; the 0x6f6f0 projection, the service-31/10 continuation, the action/state handlers, and the 0x51ab14 multiplier contents remain outside the bounded model"
           },
           "notes": "Linked (COMMON_OBJECTS) and called from reconstructed_main before the update backbone. notbit 31 is src ^ (1<<bit); addr is add-real single; opcode 29 (sin) accumulates into +0x1c8 and 30 (cos) into +0x1cc."
+        },
+        {
+          "id": "maincpu.object-update-prefix-32810",
+          "name": "object_update_prefix_32810",
+          "classification": "code",
+          "stage": "modeled",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_object_update_prefix_32810.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/test_recovered_object_update_prefix_32810.py"
+          ],
+          "ranges": [
+            {
+              "start": "0x00032810",
+              "end": "0x00032924"
+            }
+          ],
+          "symbol": "recovered_object_update_prefix_32810_run",
+          "modeling": {
+            "boundary": "Runnable prefix: copy related+0x08/+0x10 to object+0xa4/+0xa8, emit the opcode-31 packet (self x/z, related x/z) storing the response at +0x7c, emit the opcode-10 delta packet storing the signed response at +0x84, publish the height delta at +0x80, the range flag at +0x86 and 0xff at +0x1fc",
+            "test": "von/tools/test_recovered_object_update_prefix_32810.py",
+            "unresolved_behavior": "The opcode-31/10 SHARC responses are external; the mode==3 early-out and the action dispatch that follow are the caller/backbone's responsibility"
+          },
+          "notes": "Linked (COMMON_OBJECTS) and called from reconstructed_main before the velocity accumulation so the +0x7c clamp has the device response. Related pointer is object+0x74 (set to the other fighter)."
         }
       ]
     }
