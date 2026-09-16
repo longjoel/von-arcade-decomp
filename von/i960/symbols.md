@@ -28,10 +28,22 @@ the role is inferred from usage.
 | `VON_START_REQUEST` | `0x005024f4` | Start/coin request register (compared against `0x50` in the loop) | candidate |
 | `VON_MODE_TABLE_LEN` | `16` | Mode index mask is `& 15` | KNOWN |
 
-Mode handlers (from `VON_MODE_TABLE`): `0x003c40` (UI record walker),
-`0x02b9e0` (mode 1/2 candidate scan), `0x018650`, `0x0190d0`, `0x019180`,
-`0x0f3f00`, `0x0f3fe0`, `0x0f3d30`, `0x018620` (shared 8/15). Modes 3 and 4
-reach gameplay.
+Mode handlers (from `VON_MODE_TABLE`):
+
+| mode | handler | role |
+| ---: | ---: | --- |
+| 0 | `0x003c40` | attract/UI: hw init `0x294b0`, SHARC opcode 8, walks the UI record list at `0x2ea2918` rendering with the `0x1c618`/`0x1cac8`/`0x1cc40` text helpers, then advances the phase |
+| 1 | `0x02b9e0` | attract sequence / select: gates on `0x503a08` and the `0x1d00034`/`0x1d00038` hardware, dispatches the phase table at `0x2b960` (phase & 31) |
+| 2 | `0x018650` | idle advance: helper `0x1ccf8`, `mode += 1`, `phase = 0` |
+| 3 | `0x0190d0` | play setup: resets the play globals, then advances to mode 4 |
+| 4 | `0x019180` | gameplay: SHARC opcodes 8/16, `VON_FN_OBJECT_UPDATE` -> frame step + backbone |
+| 5 | `0x0f3f00` | diagnostic setup: sets `VON_MAIN_HOLD=1`, clears the `0x5784f8` diagnostic record |
+| 6 | `0x0f3fe0` | diagnostic state machine: `0xf3ec0` table, counter `mod 11` |
+| 7 | `0x0f3d30` | diagnostic |
+| 8, 15 | `0x018620` | reset back to attract (`mode = 0`, `phase = 0`) |
+
+Modes 2, 3, 4 and 8/15 are modeled in `reconstructed_main_loop`; mode 0/1/5/6/7
+are not yet runnable (they need the text helpers and the diagnostic record).
 
 ## Key functions
 

@@ -196,6 +196,21 @@ static void reconstructed_mode_3(void)
         *(volatile unsigned int *)(VON_GAME_MODE) + 1U;
 }
 
+/* Mode 2, 0x18650-0x18678: idle advance (calls helper 0x1ccf8, then mode++). */
+static void reconstructed_mode_2(void)
+{
+    *(volatile unsigned int *)(VON_MODE_PHASE) = 0U;
+    *(volatile unsigned int *)(VON_GAME_MODE) =
+        *(volatile unsigned int *)(VON_GAME_MODE) + 1U;
+}
+
+/* Modes 8/15, 0x18620-0x18648: reset back to attract (mode 0, phase 0). */
+static void reconstructed_mode_8(void)
+{
+    *(volatile unsigned int *)(VON_GAME_MODE) = 0U;
+    *(volatile unsigned int *)(VON_MODE_PHASE) = 0U;
+}
+
 /* Mode 4, 0x19180-0x1922c (gameplay arm). */
 static void reconstructed_mode_4(void)
 {
@@ -207,8 +222,11 @@ static void reconstructed_main_loop(void)
     unsigned int mode = *(volatile unsigned int *)(VON_GAME_MODE);
 
     switch (mode & VON_MODE_TABLE_MASK) {
+    case 2U: reconstructed_mode_2(); break;
     case 3U: reconstructed_mode_3(); break;
     case 4U: reconstructed_mode_4(); break;
+    case 8U:
+    case 15U: reconstructed_mode_8(); break;
     default: break;
     }
 }
