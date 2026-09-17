@@ -96,9 +96,14 @@ directly, but `i960_reconstructed_main` now enters the reconstructed
 `reconstructed_main_loop`, which mirrors `VON_MAIN_LOOP`: it dispatches
 `VON_MODE_TABLE[VON_GAME_MODE & 15]`. Mode 3 (`reconstructed_mode_3`) resets the
 play globals and advances to mode 4; mode 4 (`reconstructed_mode_4`) runs the
-gameplay tick (the recovered input -> action-commit -> velocity -> backbone
-path). Other mode handlers and the in-arm helper calls (`0x2a4e0`, `0x1c618`,
-`0x1bda0`, `0x295d0`) are not yet runnable.
+gameplay tick (the recovered input -> frame-step -> velocity -> backbone path).
+The gameplay tick now enters `VON_FN_FRAME_STEP` through the recovered
+`0x37130` dispatch (`recovered_framestate_dispatch_run`, 0x37350-0x37388):
+it gates on the signed `+0x172` phase and calls the non-null arm, so state 0
+reaches the committed-action transition (0x36460) and states 15/16/17/19/
+23/24/26/28/29/31/33/35/37 run their recovered arms. Other mode handlers and
+the in-arm helper calls (`0x2a4e0`, `0x1c618`, `0x1bda0`, `0x295d0`) are not yet
+runnable.
 
 The original chain, for reference:
 

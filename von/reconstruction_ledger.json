@@ -36972,7 +36972,7 @@
             "test": "von/tools/test_recovered_action_31.py",
             "unresolved_behavior": "The +0x137 == 0xff branch at 0x36554 (the state-16 reload path with the +0x10e/+0x102 gates) is out of scope. This handler is entry 0 of the 0x37130 per-kind dispatcher, not the 0x32560 mech backbone, so it is invoked from the frame-step path (0x371e0) rather than the 0x32560 backbone."
           },
-          "notes": "The only +0x137 consumer that drives locomotion: it forces state 31 (cruise) from the latched command, which is how a committed stick command becomes transport. Integrated in the reconstructed main loop: with a held stick the committed action forces state 31 and the mech translates (verified on vonjdev, speed 3.2)."
+          "notes": "The only +0x137 consumer that drives locomotion: it forces state 31 (cruise) from the latched command, which is how a committed stick command becomes transport. Integrated in the reconstructed main loop through the recovered 0x371e0 frame-step dispatch (entry 0 of the 0x37130 table): with a held stick the committed action forces state 31 and the mech translates (verified on vonjdev, speed 3.2)."
         },
         {
           "id": "maincpu.shared-movement",
@@ -37050,16 +37050,25 @@
           "id": "maincpu.framestate-arms",
           "name": "framestate_arms",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "confidence": "KNOWN",
           "sources": [
-            "von/i960/recovered_framestate_arms.c"
+            "von/i960/recovered_framestate_arms.c",
+            "von/i960/recovered_framestate_dispatch.c",
+            "von/i960/recovered_framestate_dispatch_run.c"
           ],
           "evidence": [
             "von/build/disasm/vonj-maincpu.lst",
             "von/i960/state-semantics.md",
-            "von/tools/test_recovered_framestate_arms.py"
+            "von/tools/test_recovered_framestate_arms.py",
+            "von/tools/test_recovered_framestate_dispatch.py"
           ],
+          "integration": {
+            "image": "von/build/i960/reconstructed-clean-maincpu.bin",
+            "image_sha256": "119730bef29d3e1f42034c6dac5ad103d737d3e49d3b7deb51dd2835ad6b94e3",
+            "checkpoint": "clean-runtime-60s",
+            "test": "von/tools/test_recovered_framestate_dispatch.py"
+          },
           "ranges": [
             {
               "start": "0x00036690",
@@ -37108,7 +37117,7 @@
             "test": "von/tools/test_recovered_framestate_arms.py",
             "unresolved_behavior": "The +0x102 classifier thresholds are reproduced literally; arms 19/28/29 (0x36c40/0x36d50/0x36de0) and 24 (0x36bb0) model the descent/landing vy clamp, cfg+0x62c/0x624/0x620/0x634/0x630 gravity and the object+0x150 float with the 0x6f6f0 projection injected as a callback (0 on the host)."
           },
-          "notes": "The 0x37130 table is the input-facing locomotion dispatcher of the 0x371e0 frame step; these arms are the input -> locomotion bridge complementing action-commit-31 (state 0). Host-tested cores; integration onto the frame-step path is pending."
+          "notes": "The 0x37130 table is the input-facing locomotion dispatcher of the 0x371e0 frame step; these arms are the input -> locomotion bridge complementing action-commit-31 (state 0). Integrated on the frame-step path: recovered_framestate_dispatch_run (0x37350-0x37388) gates on the signed +0x172 phase and calls the non-null arm; reconstructed_gameplay_tick now invokes it in place of the direct action-31 call, so state 16/17 and the air/landing arms run through the recovered table."
         },
         {
           "id": "maincpu.state-attack-arms",
