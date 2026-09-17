@@ -274,6 +274,12 @@ which are written to the same `0x504dac`/`0x504db0` cells the local controller
 feeds. This closes the AI loop: perception -> class -> transition -> movement
 input.
 
+Runtime sample (extended `probe_ai_state.lua`): transitions `0/1/2/7/13`, with
+mostly `7`, and MA/MB pairs like `(7, 0x09, 0x0c)`, `(7, 0x11, 0x14)`,
+`(7, 0x21, 0x24)`. The `0x08`/`0x10`/`0x20` bits vary because the tail also
+reads the class (`0x504d94`) and counter (`0x504db4`), so the transition alone
+does not fix the movement bytes.
+
 ## Open items
 
 - The `0x504d60` SHARC response's physical meaning (distance, height, or

@@ -19,6 +19,10 @@ local G_CLASS = 0x00504d94    -- current behaviour class (0..33)
 local G_DIST = 0x00504d60     -- SHARC response / threshold
 local G_MODE = 0x00504e30
 local G_GLOBAL = 0x00504d9c
+local G_TRANS = 0x00504d98    -- state-machine transition output
+local G_COUNTER = 0x00504db4  -- action counter
+local G_MA = 0x00504dac       -- movement bytes
+local G_MB = 0x00504db0
 
 local file = assert(io.open(LOG_PATH, "w"))
 local frame = 0
@@ -52,16 +56,19 @@ emu.register_periodic(function()
         return
     end
     file:write(string.format(
-        "frame=%d sector=%d class=%d dist=%08x mode=%08x gstate=%08x " ..
-        "A64=%d A172=%d A170=%d A108=%04x A184=%04x Ax=%08x Az=%08x " ..
-        "B64=%d B172=%d B170=%d B108=%04x B184=%04x Bx=%08x Bz=%08x\n",
+        "frame=%d sector=%d class=%d trans=%d counter=%d ma=%02x mb=%02x " ..
+        "dist=%08x mode=%08x gstate=%08x " ..
+        "A64=%d A172=%d A170=%d A17a=%d A108=%04x A184=%04x Ax=%08x Az=%08x " ..
+        "B64=%d B172=%d B170=%d B17a=%d B108=%04x B184=%04x Bx=%08x Bz=%08x\n",
         frame,
-        r16(G_SECTOR), r16(G_CLASS), r32(G_DIST), r32(G_MODE), r32(G_GLOBAL),
+        r16(G_SECTOR), r16(G_CLASS), r16(G_TRANS), r16(G_COUNTER),
+        r16(G_MA) & 0xff, r16(G_MB) & 0xff,
+        r32(G_DIST), r32(G_MODE), r32(G_GLOBAL),
         r16(PLAYER + 0x64), r16(PLAYER + 0x172), r16(PLAYER + 0x170),
-        r16(PLAYER + 0x108), r16(PLAYER + 0x184),
+        r16(PLAYER + 0x17a), r16(PLAYER + 0x108), r16(PLAYER + 0x184),
         r32(PLAYER + 0x08), r32(PLAYER + 0x10),
         r16(CPU + 0x64), r16(CPU + 0x172), r16(CPU + 0x170),
-        r16(CPU + 0x108), r16(CPU + 0x184),
+        r16(CPU + 0x17a), r16(CPU + 0x108), r16(CPU + 0x184),
         r32(CPU + 0x08), r32(CPU + 0x10)))
     if frame % 60 == 0 then
         file:flush()
