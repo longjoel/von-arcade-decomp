@@ -73,6 +73,13 @@ not canonical evidence.
 No direct `+0x172` write (hand off via callback/action arm): 0, 2–8, 10, 12,
 13, 16, 23, 24, 29, 33, 35, 37, 41, 42.
 
+## See also
+
+The opponent (CPU) behaviour that selects these states is annotated in
+[opponent-ai.md](opponent-ai.md): a SHARC bearing query, a 10-sector
+classifier (`0x73508`), a sector -> class table, and a 34-way class dispatcher
+(`0x735f0`, table `0x73618`) that writes the command word at `object+0x108`.
+
 ## Input path
 
 The `0x72ea0` commit gate accepts a command only in `+0x172 ∈ {15,16,31}`

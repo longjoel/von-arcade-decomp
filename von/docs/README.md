@@ -48,6 +48,7 @@ through the lifecycle in [Reconstruction](reconstruction.md).
 
 - [i960 boot-path notebook](../i960/boot-path.md)
 - [i960 disassembly annotations](../i960/disassembly-annotations.md)
+- [Opponent (CPU) AI annotations](../i960/opponent-ai.md)
 - [Match trace findings](../i960/match-trace-findings.md)
 - [Geometry FIFO fixture notes](../i960/geometry-transform-fifo-findings.md)
 - [MAME SHARC precision investigation](../i960/mame-sharc-precision-upstream.md)
