@@ -280,6 +280,34 @@ mostly `7`, and MA/MB pairs like `(7, 0x09, 0x0c)`, `(7, 0x11, 0x14)`,
 reads the class (`0x504d94`) and counter (`0x504db4`), so the transition alone
 does not fix the movement bytes.
 
+### The transition table (`KNOWN`)
+
+Every handler ends in one of four `(g5,g6)` selections, and they follow
+`transition mod 3`:
+
+| transition mod 3 | `(g5,g6)` | tail pattern |
+| ---: | --- | --- |
+| 1 | `(2,1)` | `g4 = 1`, `g0` from MA bit0 |
+| 2 | `(1,2)` | `g4` from MA bit0, `g0 = 1` |
+| 0 | `(2,2)` | both from MA bit0 |
+| (special) | `(1,1)` | default, transitions `0`/`20`/`21`/`22`/`23` |
+
+The quotient (`transition / 3`) selects the gate:
+
+| group | transitions | gate |
+| --- | --- | --- |
+| 1-3 | 1,2,3 | own kind `+0x64`, own `+0x170`/`+0x172`, opponent kind |
+| 4-6 | 4,5,6 | `counter >= 0` (always true -> default) |
+| 7-9 | 7,8,9 | `counter < 4` |
+| 10-12 | 10,11,12 | clip cursor `+0x17a > 7` |
+| 13-15 | 13,14,15 | own `+0x172` state bands |
+| 16-18 | 16,17,18 | `counter < 1` |
+| 19 | 19 | `counter % 10 < 4` |
+| 20-21 | 20,21 | own `+0x170` in {0,2}/{0,3}, then counter |
+
+So the state machine's transition id is a compact `(gate, movement pattern)`
+pair: `id = 3*group + pattern`. That is the whole opponent decision surface.
+
 ## Open items
 
 - The `0x504d60` SHARC response's physical meaning (distance, height, or
