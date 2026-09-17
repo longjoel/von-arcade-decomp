@@ -21,8 +21,7 @@ IDENTITY = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0,
             0.0, 0.0, 0.0)
 
 
-def select_frame(trace: Path, requested_time: float | None,
-                 max_time: float | None, tolerance: float, min_objects: int):
+def load_frames(trace: Path):
     current = IDENTITY
     frames: dict[float, list[tuple[int, tuple[float, ...], dict[str, int | str]]]] = {}
     for line in trace.read_text().splitlines():
@@ -44,7 +43,11 @@ def select_frame(trace: Path, requested_time: float | None,
             "source": match[7],
         }
         frames.setdefault(time, []).append((int(match[4], 16), current, metadata))
+    return frames
 
+
+def select_frame(frames, requested_time: float | None,
+                 max_time: float | None, tolerance: float, min_objects: int):
     candidates = sorted(
         ((time, objects) for time, objects in frames.items()
          if len(objects) >= min_objects and
@@ -84,6 +87,28 @@ def filter_obas(objects, object_slots, raw_list):
     return zip(*kept)
 
 
+def gather_obas(frames, anchor_time: float, raw_list):
+    """One object per requested OBA, taken from the frame nearest the anchor.
+
+    No single frame shows a complete mech (parts cull in and out), so a model
+    exported from one frame is always missing limbs. Prefer the anchor frame
+    (a neutral idle/select pose) and fill each missing part from the closest
+    frame that shows it, so the model carries its whole part set.
+    """
+    wanted = {int(raw, 16) for raw in raw_list}
+    chosen: dict[int, tuple] = {}
+    for time in sorted(frames, key=lambda t: abs(t - anchor_time)):
+        for item in frames[time]:
+            if item[0] in wanted and item[0] not in chosen:
+                chosen[item[0]] = item
+    missing = wanted - set(chosen)
+    if missing:
+        raise SystemExit("no frame shows model obas: " +
+                         ", ".join(f"{oba:08x}" for oba in sorted(missing)))
+    objects = [chosen[oba] for oba in sorted(chosen)]
+    return objects, list(range(len(objects)))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--trace", type=Path, required=True)
@@ -111,10 +136,14 @@ def main() -> int:
     parser.add_argument("--oba", action="append", default=[],
                         help="hex polygon address to keep (repeatable); "
                              "restricts the frame to a ROM model part list")
+    parser.add_argument("--fill-missing", action="store_true",
+                        help="with --oba, take each part from the nearest frame "
+                             "that shows it (complete model) instead of failing")
     args = parser.parse_args()
 
+    frames = load_frames(args.trace)
     selected_time, objects = select_frame(
-        args.trace, args.time, args.max_time, args.tolerance, args.min_objects)
+        frames, args.time, args.max_time, args.tolerance, args.min_objects)
     if args.start_object < 0:
         raise SystemExit("--start-object must be non-negative")
     objects = objects[args.start_object:]
@@ -133,7 +162,10 @@ def main() -> int:
     if not objects:
         raise SystemExit("object slice is empty")
     if args.oba:
-        objects, object_slots = filter_obas(objects, object_slots, args.oba)
+        if args.fill_missing:
+            objects, object_slots = gather_obas(frames, selected_time, args.oba)
+        else:
+            objects, object_slots = filter_obas(objects, object_slots, args.oba)
     geometry = args.rom.read_bytes()
     texture_rom = args.texture_rom.read_bytes()
     banks = load_banks(args.bank0, args.bank1)
