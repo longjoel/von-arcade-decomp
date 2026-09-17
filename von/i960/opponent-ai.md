@@ -308,6 +308,28 @@ The quotient (`transition / 3`) selects the gate:
 So the state machine's transition id is a compact `(gate, movement pattern)`
 pair: `id = 3*group + pattern`. That is the whole opponent decision surface.
 
+## 9. Animation-cursor events (`KNOWN` shape)
+
+Three per-object handlers fire at specific animation-cursor values (`+0x17a`)
+and are selected by the `0xbf180`/`0xbf1c0`/`0xbf200` dispatchers (which pick
+the context base `0x565320` for the player, `0x5658a0` for the CPU, and pass
+`object+0x200`):
+
+| trigger (caller) | handler | context | helper |
+| --- | ---: | ---: | --- |
+| `+0x17a == 0x46` (`0x42538`) | `0xa1050` | `+0x40` | `0xbf0c0` count 4, tail `0xa0ec0` |
+| `+0x17a == 0x5f` (`0x42864`) | `0xa98f0` | `+0x180` | `0xbf120` count 8 |
+| `(+0x17a & 7) == 0` and `<= 0x26` (`0x4328c`) | `0xa55e0` | `+0xC0` | `0xbf0c0` count 8, tail `0xa5460` |
+
+`0xbf0c0`/`0xbf120` scan the object's `+0x200` records for a free slot; the
+handlers write an event record into the context block and run the tail.
+
+`0xa98f0` is the aim/step event: it emits SHARC service 29 with
+`facing + 0x4000` (or `+0x1000`) and a float (`8.0`/`16.0`), service 30 with
+the same inputs, then service 31 with the opponent's position
+(`related+0x14/0x18/0x1c`) -- a side-step vector derived from the opponent
+bearing and distance.
+
 ## Open items
 
 - The `0x504d60` SHARC response's physical meaning (distance, height, or
