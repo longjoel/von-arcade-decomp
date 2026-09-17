@@ -36571,7 +36571,7 @@
           "symbol": "recovered_object_update_32810_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
+            "image_sha256": "3cd849512f0ec7ead46502becb61599a02c493dd9a53d14091b624a5be264e8d",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_object_update_run_32810.py"
           },
@@ -36604,7 +36604,7 @@
           "symbol": "recovered_object_initializer_27550_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
+            "image_sha256": "3cd849512f0ec7ead46502becb61599a02c493dd9a53d14091b624a5be264e8d",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_object_initializer_27550.py"
           },
@@ -36638,7 +36638,7 @@
           "symbol": "recovered_gameplay_velocity_de990_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
+            "image_sha256": "3cd849512f0ec7ead46502becb61599a02c493dd9a53d14091b624a5be264e8d",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_gameplay_velocity_de990_run.py"
           },
@@ -36672,7 +36672,7 @@
           "symbol": "recovered_sharc_upload_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
+            "image_sha256": "3cd849512f0ec7ead46502becb61599a02c493dd9a53d14091b624a5be264e8d",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_sharc_upload_28300.py"
           },
@@ -36707,7 +36707,7 @@
           "symbol": "recovered_input_service_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
+            "image_sha256": "3cd849512f0ec7ead46502becb61599a02c493dd9a53d14091b624a5be264e8d",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_input_service_run.py"
           },
@@ -36770,7 +36770,7 @@
           "symbol": "recovered_velocity_accumulate_358ac_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
+            "image_sha256": "3cd849512f0ec7ead46502becb61599a02c493dd9a53d14091b624a5be264e8d",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_velocity_accumulate_358ac.py"
           },
@@ -36803,7 +36803,7 @@
           "symbol": "recovered_object_update_prefix_32810_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
+            "image_sha256": "3cd849512f0ec7ead46502becb61599a02c493dd9a53d14091b624a5be264e8d",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_object_update_prefix_32810.py"
           },
@@ -37004,7 +37004,7 @@
           ],
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
+            "image_sha256": "3cd849512f0ec7ead46502becb61599a02c493dd9a53d14091b624a5be264e8d",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_action_31.py"
           },
@@ -37113,7 +37113,7 @@
           ],
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
+            "image_sha256": "3cd849512f0ec7ead46502becb61599a02c493dd9a53d14091b624a5be264e8d",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_framestate_dispatch.py"
           },
@@ -37184,7 +37184,7 @@
           ],
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
+            "image_sha256": "3cd849512f0ec7ead46502becb61599a02c493dd9a53d14091b624a5be264e8d",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_framestep_heading.py"
           },
@@ -37200,7 +37200,7 @@
             "test": "von/tools/test_recovered_framestep_heading.py",
             "unresolved_behavior": "The config publication (0x51ab14), input consumer/reset selection (0x25040/0x24f98), the +0x1db/+0x1dc byte timers, and the post-dispatch state-1/11/19/20/22 tails (0x3738c-0x376dc) remain outside this slice."
           },
-          "notes": "Validated bit-exactly against the 25-second original attract capture: 541/541 +0x32 writes, 541/541 +0x34 writes, 19/19 +0x198 writes. Invoked for the player object immediately before the 0x37130 dispatch in the reconstructed gameplay tick. The 0x18350 direction tables are not yet approved clean-image data, so +0x186-driven facing is provisional until that data range lands."
+          "notes": "Validated bit-exactly against the 25-second original attract capture: 541/541 +0x32 writes, 541/541 +0x34 writes, 19/19 +0x198 writes. Invoked for the player object immediately before the 0x37130 dispatch in the reconstructed gameplay tick. The committed-action direction tables at 0x18350-0x18380 are now a hash-verified approved clean-image data range, so +0x186 is correct on the clean path."
         },
         {
           "id": "maincpu.state-attack-arms",

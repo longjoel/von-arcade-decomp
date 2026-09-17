@@ -32,6 +32,12 @@
       "start": "0x0016b58c",
       "end": "0x00170bc8",
       "sha256": "b79f37baa8205e9ef90c7640d596dbaae700d6fd67eb149c125a9fb4042a38da"
+    },
+    {
+      "name": "committed_action_direction_tables",
+      "start": "0x00018350",
+      "end": "0x00018380",
+      "sha256": "84e7f14f01d815d235e10edf5f05770059c003ed9406f06eb389cde24db690e9"
     }
   ]
 }
