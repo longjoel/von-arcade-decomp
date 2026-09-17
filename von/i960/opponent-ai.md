@@ -9,7 +9,8 @@ The opponent is not a separate program: it is the fighter object at
 `0x005040d0` (player `0x00503ad0`), each pointing at the other through
 `+0x74`. The AI reuses the same per-fighter state machine as the player and
 adds a small perception→class→command pipeline. It never reads raw controller
-input; it reads the opponent's *state* and *class*.
+input; it reads the opponent's *mech index* (`+0x64`) and *action state*
+(`+0x172`).
 
 ## 1. Perception — bearing to the opponent (`0x76590`, `KNOWN` shape)
 
@@ -148,6 +149,23 @@ near-ahead (0/1) and near-behind (8/9) sectors get the specialised entries.
 - `0x7a3e0` (route head) compares own `+0x64` against the opponent's `+0x64`
   and routes to mode 11 / ratio paths before the class selection.
 
+### `object+0x64` is the mech/roster index (`KNOWN`)
+
+`+0x64` is not a behaviour state; it is the fighter's roster index. The
+object initializer `0x27550` stores its `g3` argument there
+(`0x2756c st g3,0x64(g0)`), and the startup arm at `0x19d44`-`0x19dcc` passes
+`0x503a98` (player) and `0x503a9c` (CPU) and derives the config from
+`0x19360[index]`, the 10-entry roster profile table. The match reset clears it
+to 0 (`0xce75c`/`0xce764`). In the attract capture the player field stayed `0`
+and the CPU field was `5` for one match segment -- a constant per object
+lifetime, i.e. the mech identity.
+
+Consequences: `recovered_object_state_runtime`'s `state`/`related_state`
+context fields are this mech index, so the `0x79050` arms are **per-mech
+behaviour**, and the `0x7a3e0` comparison is a mech-matchup dispatch (own
+roster index vs the opponent's). The recovered "state 0..9" naming should be
+read as "kind/mech 0..9".
+
 ## 5. Summary
 
 The opponent is a **10-sector reactive classifier**:
@@ -225,7 +243,8 @@ bearing.
 
 ## Open items
 
-- `+0x64` class vs control-mode semantics (it flips 0 -> 5 for a ~4.5 s window
-  in the input-free attract capture).
 - The `0x504d60` SHARC response's physical meaning (distance, height, or
   projection) is unconfirmed.
+- Whether the `0x79050` arms are truly one-per-mech (10 arms, 10 roster
+  entries) or a shared generic table indexed by `+0x64` needs a per-mech
+  capture.
