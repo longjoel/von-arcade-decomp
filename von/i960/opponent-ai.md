@@ -163,13 +163,50 @@ No pathing, prediction, or input reading; 10-way spatial resolution with two
 dominant attack classes and a random role. This is consistent with the
 observed weak but "reactive" behaviour.
 
+## 6. Runtime validation (`observed:von-ai-state.log`)
+
+`von/tools/probe_ai_state.lua` samples the AI globals and both objects each
+frame during the input-free attract (`VON_AI_LOG`, `VON_AI_SECONDS`). In a
+40-second run (2300 frames):
+
+- sectors seen: `0` (1360), `1`, `2`, `7`, `8`, `9` — the fighters face each
+  other, so the classifier lives near the 0/9 boundary and steps through
+  adjacent sectors; adjacent-sector transitions dominate.
+- classes seen: `0` (idle, 1221), then `18`, `8`, `6`, `10`, `2`, `11`, `13`,
+  `5`, `1`, `12`, `19` — all within the decoded 0-33 range.
+- commands written to `object+0x108`: `0000` (idle), `0101`, `0202`, `0404`,
+  `0606`, `0707` (paired nibble lanes), `0004`/`0400` (single lane), `0206`,
+  and `ffff` — matching the packed command format the handlers emit.
+
+Caveat: `0x504d94`/`0x504d68` are shared and last-writer, so the per-frame
+pairing in the log is approximate; a per-object tap would tighten the
+class -> command mapping.
+
+## 7. Command-word encoding (`KNOWN` shape)
+
+The consumer head (`0x25040`-`0x2515c`) decodes `object+0x108` as two packed
+direction lanes:
+
+```
+command = (nibble[(ma >> 12) & 0xf] << 8) | nibble[(ma >> 20) & 0xf]
+```
+
+where `nibble[]` is the 16-entry table at `0x3d70`/`0x3da0`
+(`[0xff,4,0,0xff,6,5,7,0xff,2,3,1,0xff,...]`). The high byte is the
+translation lane and the low byte the twist lane, each a 0-7 direction code.
+That is why the AI's handlers write paired values (`0x0101`..`0x0707`) or
+single-lane values (`0x0004`, `0x0400`).
+
+The commit gate (`0x268c4`-`0x26968`) latches the decode into `object+0x137`
+only when the held/repeat counters pass a threshold (`in[0x56]`/`in[0x57] >
+0xEE`, gate A, or `> 0xF5`, gate B) and only in states 15/16/31 (gate B) -- so
+an AI command must persist long enough to be accepted.
+
 ## Open items
 
-- The command-word encoding at `object+0x108` (values `0x0202`, `0x0606`,
-  `0x101`..`0x707`, `0x400`, `4`) maps through the input-consumer nibble
-  tables at `0x3d70`/`0x3da0`; the exact direction/strength semantics are not
-  yet assigned.
 - `+0x64` class vs control-mode semantics (it flips 0 -> 5 for a ~4.5 s window
   in the input-free attract capture).
 - The `0x504d60` SHARC response's physical meaning (distance, height, or
   projection) is unconfirmed.
+- The exact direction-code table output (`0`-`7` -> physical stick direction)
+  is not yet bound to the twin-stick map.
