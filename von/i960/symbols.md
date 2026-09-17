@@ -101,8 +101,12 @@ The gameplay tick now enters `VON_FN_FRAME_STEP` through the recovered
 `0x37130` dispatch (`recovered_framestate_dispatch_run`, 0x37350-0x37388):
 it gates on the signed `+0x172` phase and calls the non-null arm, so state 0
 reaches the committed-action transition (0x36460) and states 15/16/17/19/
-23/24/26/28/29/31/33/35/37 run their recovered arms. Other mode handlers and
-the in-arm helper calls (`0x2a4e0`, `0x1c618`, `0x1bda0`, `0x295d0`) are not yet
+23/24/26/28/29/31/33/35/37 run their recovered arms. The frame-step heading
+prefix (`recovered_framestep_heading_run`, 0x37240-0x3734c) slews the
+`+0x32`/`+0x34` facing pair toward the `+0x186` half-heading and latches the
+`+0x198` descent timer; it was recovered bit-exactly from the original attract
+capture. Other mode handlers, the input-selection/config/timer prefix, and the
+in-arm helper calls (`0x2a4e0`, `0x1c618`, `0x1bda0`, `0x295d0`) are not yet
 runnable.
 
 The original chain, for reference:

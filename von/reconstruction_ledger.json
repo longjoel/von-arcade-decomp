@@ -36571,7 +36571,7 @@
           "symbol": "recovered_object_update_32810_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_object_update_run_32810.py"
           },
@@ -36604,7 +36604,7 @@
           "symbol": "recovered_object_initializer_27550_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_object_initializer_27550.py"
           },
@@ -36638,7 +36638,7 @@
           "symbol": "recovered_gameplay_velocity_de990_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_gameplay_velocity_de990_run.py"
           },
@@ -36672,7 +36672,7 @@
           "symbol": "recovered_sharc_upload_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_sharc_upload_28300.py"
           },
@@ -36707,7 +36707,7 @@
           "symbol": "recovered_input_service_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_input_service_run.py"
           },
@@ -36770,7 +36770,7 @@
           "symbol": "recovered_velocity_accumulate_358ac_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_velocity_accumulate_358ac.py"
           },
@@ -36803,7 +36803,7 @@
           "symbol": "recovered_object_update_prefix_32810_run",
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_object_update_prefix_32810.py"
           },
@@ -37004,7 +37004,7 @@
           ],
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_action_31.py"
           },
@@ -37113,7 +37113,7 @@
           ],
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_framestate_dispatch.py"
           },
@@ -37166,6 +37166,41 @@
             "unresolved_behavior": "The +0x102 classifier thresholds are reproduced literally; arms 19/28/29 (0x36c40/0x36d50/0x36de0) and 24 (0x36bb0) model the descent/landing vy clamp, cfg+0x62c/0x624/0x620/0x634/0x630 gravity and the object+0x150 float with the 0x6f6f0 projection injected as a callback (0 on the host)."
           },
           "notes": "The 0x37130 table is the input-facing locomotion dispatcher of the 0x371e0 frame step; these arms are the input -> locomotion bridge complementing action-commit-31 (state 0). Integrated on the frame-step path: recovered_framestate_dispatch_run (0x37350-0x37388) gates on the signed +0x172 phase and calls the non-null arm; reconstructed_gameplay_tick now invokes it in place of the direct action-31 call, so state 16/17 and the air/landing arms run through the recovered table."
+        },
+        {
+          "id": "maincpu.framestep-heading-37240",
+          "name": "framestep_heading_37240",
+          "classification": "code",
+          "stage": "integrated",
+          "confidence": "KNOWN",
+          "sources": [
+            "von/i960/recovered_framestep_heading.c"
+          ],
+          "evidence": [
+            "von/build/disasm/vonj-maincpu.lst",
+            "von/tools/probe_framestep_fields.lua",
+            "von/tests/fixtures/framestep-heading/original-heading-vectors.json",
+            "von/tools/test_recovered_framestep_heading.py"
+          ],
+          "integration": {
+            "image": "von/build/i960/reconstructed-clean-maincpu.bin",
+            "image_sha256": "77c13c3dd83e0d1b51f009add697a9c5fff80a3e8fddf29974175a089f49ef19",
+            "checkpoint": "clean-runtime-60s",
+            "test": "von/tools/test_recovered_framestep_heading.py"
+          },
+          "ranges": [
+            {
+              "start": "0x00037240",
+              "end": "0x0003734c"
+            }
+          ],
+          "symbol": "recovered_framestep_heading_run",
+          "modeling": {
+            "boundary": "Frame-step heading prefix 0x37240-0x3734c: stage 1 slews +0x32 toward 2*+0x186 with a +-0x600 clamp (in-range snaps to 2*+0x186); stage 2 computes half = 2*+0x186 (or 0x8000+2*+0x186 for the (u16)(+0x186+0xdfff) <= 0x3ffe branch), latches +0x198 to +24/-24 from the (d<<16) >= 0x02000000 and s16(+0x198) gates, and slews +0x34 toward half with the same +-0x600 clamp.",
+            "test": "von/tools/test_recovered_framestep_heading.py",
+            "unresolved_behavior": "The config publication (0x51ab14), input consumer/reset selection (0x25040/0x24f98), the +0x1db/+0x1dc byte timers, and the post-dispatch state-1/11/19/20/22 tails (0x3738c-0x376dc) remain outside this slice."
+          },
+          "notes": "Validated bit-exactly against the 25-second original attract capture: 541/541 +0x32 writes, 541/541 +0x34 writes, 19/19 +0x198 writes. Invoked for the player object immediately before the 0x37130 dispatch in the reconstructed gameplay tick. The 0x18350 direction tables are not yet approved clean-image data, so +0x186-driven facing is provisional until that data range lands."
         },
         {
           "id": "maincpu.state-attack-arms",

@@ -63,6 +63,7 @@ unsigned int recovered_input_consumer_24fc0_translate(
     volatile unsigned char *object, unsigned int ma, unsigned int mb);
 unsigned int recovered_action_31_run(volatile unsigned char *object);
 unsigned int recovered_framestate_dispatch_run(volatile unsigned char *object);
+void recovered_framestep_heading_run(volatile unsigned char *object);
 void recovered_velocity_accumulate_358ac_run(volatile unsigned char *object);
 void recovered_object_update_prefix_32810_run(volatile unsigned char *object);
 extern const unsigned int recovered_von_config_kind0[];
@@ -166,6 +167,10 @@ static void reconstructed_gameplay_tick(void)
         (volatile unsigned char *)VON_PLAYER_OBJECT,
         *(volatile unsigned int *)(VON_PLAYER_OBJECT + VON_OBJ_INPUT_BASE),
         *(volatile unsigned int *)(VON_PLAYER_OBJECT + VON_OBJ_INPUT_WORK));
+    /* VON_FN_FRAME_STEP (0x371e0) heading prefix (0x37240-0x3734c): slew the
+     * +0x32/+0x34 facing pair toward the +0x186 half-heading and latch the
+     * +0x198 descent timer. Recovered bit-exactly from the original capture. */
+    recovered_framestep_heading_run((volatile unsigned char *)VON_PLAYER_OBJECT);
     /* VON_FN_FRAME_STEP (0x371e0): dispatch the 0x37130 arm selected by the
      * object's phase/state (+0x172). State 0 is the committed-action ->
      * state-31 transition; the non-null entries are the locomotion/air arms.
