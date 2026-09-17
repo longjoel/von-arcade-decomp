@@ -89,10 +89,30 @@ synthesised input rather than bypassing the state machine.
 | 11 | `0x72b60[sector]` = `0x0606` | hold direction 6 |
 | 12 | `0x400`; if sector < 3 -> class 26 | attack/steer |
 | 13 | `4`; if sector < 3 -> class 27 | attack/steer |
-| 14/15/16 | `0x400` / `7` / `0x405` / `0x304` / `0x101` | movement levels |
-| 26 | `0x400` + class 12 when sector >= 3 | dash-like steer |
-| 27 | `4` + class 13 when sector >= 3 | dash-like steer |
-| 28-33 | `0x206`/`0x202`/`0x404`/`0x606`, or `0xffff` + reset `0x504db4` | attack variants / timeout |
+| 14 | `0x400` (setbit 8) | guard/block |
+| 15 | `7` | move |
+| 16 | `0x405` | move |
+| 17 | `0x304` | move |
+| 18 | `0x101`, or `0` when own class is 3/8 | move |
+| 19 | `0x707` | move |
+| 20 | `0x303`, or `0` when own class is 3/8 | move |
+| 21 | `0x505`, or `0` when own class is 3/8 | move |
+| 22 | `0x602` when own state `+0x172` is 11, else table `0x741d8` | state branch |
+| 23 | `0x400` (setbit 10) + class 12 when sector >= 3 | attack/steer |
+| 26 | `0x400` + class 12 when sector >= 3 | attack/steer |
+| 27 | `4` + class 13 when sector >= 3 | attack/steer |
+| 28 | `0x206` | attack variant |
+| 29 | command per `+0x170`; `0xffff` + reset `0x504db4 = 1` on 0/4/5/6 | attack/timeout |
+| 30 | `0xffff` + reset `0x504db4 = 1` when state `+0x172` not in 0/4/5 | timeout |
+| 31 | `0x404` | attack variant |
+| 32 | `0x202` | attack variant |
+| 33 | `0x606` | attack variant |
+| 0/24/25 | `0xffff` (invalid/no-op) | idle |
+
+The command word is two nibble lanes; `0x0202`/`0x0606` set both lanes to
+direction 2/6, and `0x101`..`0x707` are the paired movement levels. Classes 10
+and 11 are the only sector-table lookups (`0x72b40`/`0x72b60`, both uniform
+across sectors), so the class table above is the real decision content.
 
 The service-29 calls are the SHARC trig/velocity service (see
 `von_movement.h`), so classes 1-6 are facing-relative movement primitives.

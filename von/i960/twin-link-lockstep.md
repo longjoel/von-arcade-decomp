@@ -128,10 +128,29 @@ commit gate runs.
 - The `FG` flip-gate (`0x1a14002` bit0) selects the active record half, so the
   game consumes the half the board is not currently filling.
 
+## 6. What the record actually does (`LIKELY`)
+
+Despite carrying a full state snapshot, the only reader of the accepted record
+(`0x5024f0`) found statically is the **input** consumer at `0x72ea0`
+(`+0x514`/`+0x515`). There is no static access to `+0x518`/`+0x51a`/`+0x51c`/
+`+0x520`/`+0x524`/`+0x528`/`+0x52c` anywhere in the i960 image, and the
+received snapshot (`0x501ce0`) is only used by the checksum gate at `0x1524`.
+
+So the likely model is **deterministic lockstep**: each cabinet simulates both
+fighters from the same two inputs, and the published position/heading/health
+is a snapshot used to validate agreement (the `0x501ce2` vs `0x502236` gate),
+not to overwrite the receiver's simulation. The input bytes are the sync
+payload; the snapshot is the desync guard.
+
+The record-scan loops (`0x2BAAC`, `0x9AF30`) iterate the `0x700`-stride records
+and read `+0x04` (the `0xFE`/id/status field) to select the local record and
+write its index to `FG` (`0x1a14002`); they are the cabinet's "which record is
+me" selector, not state consumers.
+
 ## Open items
 
-- Whether the remote fighter's simulation is corrected by the received
-  position/heading (and where the accept consumer is) is not yet traced; only
-  the input consume at `0x72ea0` is located.
-- The `0x502236` expected-checksum source and the `0x515080` progress flag
-  semantics are unnamed.
+- Confirm the lockstep reading at runtime: check whether the remote object's
+  `+0x08`/`+0x0c`/`+0x10` writes track the local simulation rather than the
+  received snapshot (needs a linked trace).
+- `0x502236` (expected value) and the `0x515080` progress flag are unnamed;
+  `0x5032F2`/`0x503846` are a rolling pair updated at `0x14B4`-`0x1500`.
