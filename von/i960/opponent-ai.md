@@ -202,11 +202,30 @@ only when the held/repeat counters pass a threshold (`in[0x56]`/`in[0x57] >
 0xEE`, gate A, or `> 0xF5`, gate B) and only in states 15/16/31 (gate B) -- so
 an AI command must persist long enough to be accepted.
 
+The `0x3d70`/`0x3da0` table is an **8-direction compass map**. The nibble is
+the stick direction bits `(ma >> 4) & 0xf` (`0x10` down, `0x20` up, `0x40`
+right, `0x80` left, per the twin-stick map), and the table output is:
+
+| stick | nibble | code | direction |
+| --- | ---: | ---: | --- |
+| up | 2 | 0 | up |
+| up+left | 10 | 1 | up-left |
+| left | 8 | 2 | left |
+| down+left | 9 | 3 | down-left |
+| down | 1 | 4 | down |
+| down+right | 5 | 5 | down-right |
+| right | 4 | 6 | right |
+| up+right | 6 | 7 | up-right |
+
+So an AI command word `0xNNNN` sets the translation lane and the twist lane to
+the same compass bearing `NN`; single-lane values (`0x0004`, `0x0400`) set one
+lane to `0` and the other to a bearing. The service-29 handlers still compute
+the actual velocity via the SHARC, so the command word selects the animation
+bearing.
+
 ## Open items
 
 - `+0x64` class vs control-mode semantics (it flips 0 -> 5 for a ~4.5 s window
   in the input-free attract capture).
 - The `0x504d60` SHARC response's physical meaning (distance, height, or
   projection) is unconfirmed.
-- The exact direction-code table output (`0`-`7` -> physical stick direction)
-  is not yet bound to the twin-stick map.
