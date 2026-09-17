@@ -20,6 +20,10 @@ local probe = os.getenv("VON_TWIN_PROBE") == "1"
 local probe_until = 0
 local probe_taps = {}
 local probe_pcs = {}
+-- Write taps over the two fighter objects' position fields, to distinguish
+-- locally integrated motion from a received-record copy in linked play.
+local probe_write_taps = {}
+local probe_write_pcs = {}
 local cpu_dev
 local probe_dump = os.getenv("VON_TWIN_PROBE_DUMP") == "1"
 
@@ -116,6 +120,18 @@ local function probe_end(tag)
     end
     probe_taps = {}
     probe_pcs = {}
+    for addr, tap in pairs(probe_write_taps) do
+        pcall(function() space:uninstall_write_tap(tap) end)
+        local pcs = {}
+        for pc, count in pairs(probe_write_pcs[addr] or {}) do
+            pcs[#pcs + 1] = string.format("%s(x%d)", pc, count)
+        end
+        table.sort(pcs)
+        write(string.format("twin: probe tap %08x %s writers=%s", addr, tag,
+            table.concat(pcs, " ")))
+    end
+    probe_write_taps = {}
+    probe_write_pcs = {}
 end
 
 local function probe_begin()
@@ -140,6 +156,33 @@ local function probe_begin()
         end)
         if ok and tap then probe_taps[addr] = tap end
     end
+    -- Position-field writes for both fighter objects (x/y/z). If the remote
+    -- fighter is integrated locally, both objects are written by the same
+    -- object-update PC; if it is copied from the received record, a distinct
+    -- copy PC appears.
+    for _, base in ipairs({ 0x503ad0, 0x5040d0 }) do
+        for _, offset in ipairs({ 0x08, 0x0c, 0x10 }) do
+            local addr = base + offset
+            probe_write_pcs[addr] = {}
+            local ok, tap = pcall(function()
+                return space:install_write_tap(addr, addr + 3,
+                    string.format("twinwr%08x", addr),
+                    function(offset_in, data, mask)
+                        local pc = "?"
+                        local ok_pc, value = pcall(function()
+                            return cpu_dev.state["CURPC"].value
+                        end)
+                        if ok_pc and type(value) == "number" then
+                            pc = string.format("0x%x", value)
+                        end
+                        local seen = probe_write_pcs[addr]
+                        seen[pc] = (seen[pc] or 0) + 1
+                        return data
+                    end)
+            end)
+            if ok and tap then probe_write_taps[addr] = tap end
+        end
+    end
 end
 
 local function probe_telemetry(tag)
@@ -150,6 +193,18 @@ local function probe_telemetry(tag)
     end
     write(string.format("twin: probe tele %s f%d %s", tag, frame,
         table.concat(words, " ")))
+    -- Lockstep telemetry: local object A, remote object B, accepted peer
+    -- record, and raw receive buffer x/z.
+    local function fbits(address)
+        return string.format("%08x", space:read_u32(address))
+    end
+    write(string.format(
+        "twin: probe lockstep f%d A=%s,%s B=%s,%s rec=%s,%s rx=%s,%s",
+        frame,
+        fbits(0x503ad0 + 0x08), fbits(0x503ad0 + 0x10),
+        fbits(0x5040d0 + 0x08), fbits(0x5040d0 + 0x10),
+        fbits(0x5024f0 + 0x520), fbits(0x5024f0 + 0x528),
+        fbits(0x501ce0 + 0x520), fbits(0x501ce0 + 0x528)))
 end
 
 local function probe_snapshot(tag)
