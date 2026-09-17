@@ -88,9 +88,37 @@ communication board. The exact Virtual-On firmware is present as
 | M27C1001, 128 KiB | `EPR-18643A.7`, communication firmware | Confirmed |
 | Link connectors | CN1/CN3/CN8 and jumper area JP7-JP9 | Board documentation confirms connectors; exact signal assignment unknown |
 
-The current MAME `m2comm` device models the board as shared RAM plus CN/FG
-registers. It does not emulate the Z80, uPD72103A, PALs, or the actual HDLC
-electrical protocol yet.
+`m2comm` models only the **i960 side** of the board: 16 KiB shared RAM plus the
+CN/FG registers (`0x01A10000` and `0x01A14000`/`0x01A14002`; the i960 uses the
+`+0x10000` mirror of the base map). The board↔board wire protocol is
+implemented by the Z80 firmware `epr-18643a.7`, which is now disassembled —
+see [cpu3-disassembly.md](cpu3-disassembly.md). MAME's `m2comm` link layer
+(`0xFF`/`0xFE`/`0xFC` ids) is a simulation and does **not** match the firmware,
+which uses HDLC descriptors with message types `0x11`/`0x12`/`0x16`/`0x02`.
+The two cabinets are physically linked by the uPD72103 HDLC controller.
+
+### Communication-board Z80 firmware `epr-18643a.7`
+
+The ROM is a single 8-bit part, so the dump is already in Z80 byte order
+(reset `c3 a2 01` → `jp $01A2`); MAME's `ROM_LOAD16_WORD_SWAP` is unused
+because `m2comm` replaces the Z80. Findings from the disassembly
+([cpu3-disassembly.md](cpu3-disassembly.md)):
+
+- Boot sets `frameStart 0x2000`, `frameSize 0x0E00`, `frameOffset 0x01C0` in
+  its header and enables the HDLC via the `0x03`/`0x50`/`0x70` ports.
+- The board exposes 16 KiB bank-switched dual-port RAM. The Z80 works in a
+  bank at `0x8000` and mirrors the header into the i960 bank at `0xC000`
+  (`0x0165`), reading i960 fields back at `0xC001`/`0xC012`/`0xC014`
+  (`0x018A`). The i960 shared offset `N` corresponds to Z80 `0xC000+N`.
+- Header: `[0]` link state, `[1]` role (i960-written; `1` selects the master
+  path), `[2]` link id, `[3]` link count, `[4]`/`[5]` flags, `[8]`/`[A]` RX/TX
+  descriptor indices, `[0x10]` frameStart, `[0x12]` frameSize, `[0x14]`
+  frameOffset, `[0x18]` ring pointer `0xE1C0`.
+- Payload ring: `0x0E00` bytes at Z80 `0xE1C0` (i960 shared `0x21C0`).
+- Frames are 16-byte descriptors; `[8]` is the message type: `0x16` link
+  announce/reset, `0x11` link id/count, `0x12` link ack/id, `0x02` data/vsync
+  (templates at `0x06A2`/`0x06B2`/`0x06C2`/`0x06FA`/`0x070A`). RX descriptors
+  at `0xC100`, TX at `0xC200`; the link ISR is `0x0356` (IM2 vector `0xEF`).
 
 ## ROM Board Mapping
 
@@ -121,10 +149,14 @@ as program ROMs.
    boot path.
 2. Identify the i960 ROM-board copy/decompression routines for `main_data`,
    `polygons`, and `textures`.
-3. Trace Model 2B communication accesses at `0x01a00000`, `0x01a04000`, and
-   `0x01a04002` from the i960 program.
-4. Disassemble `epr-18643a.7` separately as Z80 communication firmware rather
-   than treating the host-side socket model as the protocol specification.
+3. ~~Trace Model 2B communication accesses at `0x01a00000`, `0x01a04000`, and
+   `0x01a04002` from the i960 program.~~ Done: the i960 uses the `+0x10000`
+   mirror (`0x01a10000` shared RAM, `0x01a14000`/`0x01a14002` CN/FG); see the
+   i960 handshake at `0xc5870` and [cpu3-disassembly.md](cpu3-disassembly.md).
+4. ~~Disassemble `epr-18643a.7` separately as Z80 communication firmware rather
+   than treating the host-side socket model as the protocol specification.~~
+   Done: see [cpu3-disassembly.md](cpu3-disassembly.md). MAME's `m2comm` link
+   ids do not match the firmware's message types.
 5. Load `copro_data` and identify SHARC boot/table references before assigning
    collision and height-map subregions.
 6. Determine the physical markings and wiring of the main-board raster,
@@ -138,6 +170,9 @@ as program ROMs.
   and how are their banks assigned?
 - What are `vo-prog0.usa` and `vo-prog1.usa`, and are they duplicate/renamed
   dumps or chips from another board?
-- Which portions of the communication-board firmware are cabinet role setup,
-  frame scheduling, and game payload transport?
 - Which EEPROM fields configure twin/relay behavior independently of the ROM?
+- What exactly do the `0x11`/`0x12` link message fields (`[4]`/`[5]` flags) and
+  the HDLC address/control bytes (`0x31`/`0x37`/`0x41`) convey, and how is the
+  link id ordered across more than two cabinets (relay)?
+- How are the uPD72103 registers (`0x03` port, 8-byte init `0x06D2`) mapped to
+  the NEC register set?

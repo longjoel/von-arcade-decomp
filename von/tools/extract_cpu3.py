@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Reconstruct the linear Z80 cpu3 image from MAME's word-swapped ROM."""
+"""Reconstruct the linear Z80 cpu3 image from the communication EPROM.
+
+`epr-18643a.7` is a single 8-bit 27C1001, so the dump is already in Z80 byte
+order (reset vector `c3 a2 01` -> `jp $01A2`, then `di`/`im 2`/`ld sp,$A000`).
+MAME declares it `ROM_LOAD16_WORD_SWAP` but never executes it (`m2comm`
+simulates the board), so that declaration must not be treated as a byte-order
+transform for analysis.
+"""
 
 from __future__ import annotations
 
@@ -16,13 +23,9 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
-    raw = args.rom.read_bytes()
-    if len(raw) != IMAGE_SIZE:
-        raise ValueError(f"expected {IMAGE_SIZE:#x} bytes, got {len(raw):#x}")
-    image = bytearray(IMAGE_SIZE)
-    for offset in range(0, IMAGE_SIZE, 2):
-        image[offset] = raw[offset + 1]
-        image[offset + 1] = raw[offset]
+    image = args.rom.read_bytes()
+    if len(image) != IMAGE_SIZE:
+        raise ValueError(f"expected {IMAGE_SIZE:#x} bytes, got {len(image):#x}")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_bytes(image)
     print(f"Wrote {len(image):#x} bytes to {args.output}")
