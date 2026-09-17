@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 
 from export_geometry_assemblies import split_assemblies
-from export_geometry_frame_textured_gltf import select_frame
+from export_geometry_frame_textured_gltf import load_frames, select_frame
 
 
 def path_error(label: str, path: Path, root: Path, *, output: bool = False) -> str | None:
@@ -42,7 +42,7 @@ def main() -> int:
             return 1
     if args.distance <= 0:
         raise SystemExit("distance must be positive")
-    selected_time, objects = select_frame(args.trace, args.time, None, args.tolerance, args.min_objects)
+    selected_time, objects = select_frame(load_frames(args.trace), args.time, None, args.tolerance, args.min_objects)
     groups = split_assemblies(objects, args.distance)
     candidates = []
     for group in groups:
