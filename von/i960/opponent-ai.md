@@ -330,6 +330,35 @@ the same inputs, then service 31 with the opponent's position
 (`related+0x14/0x18/0x1c`) -- a side-step vector derived from the opponent
 bearing and distance.
 
+## 10. Hand-move records (`object+0x200`)
+
+The `+0x200` region the event handlers and `0x77c40` touch is a 32-record
+hand-move (attack) table, 0x20 bytes each:
+
+- `0xbd6b8` resets all 32 records and, on an invalid id, prints
+  `"HAND_MOVE ID ERROR [1P:%2d]"` (string at `0xbd710`).
+- `0x77c40` scans both objects' records and aggregates flags into `0x504e50`
+  (bits 0/2/3/4/5/6/7), counting records whose id halfword has bit 13.
+- `0xbd730` is the per-record dispatcher: `record[0]` is a flags byte
+  (0..0xcc valid; `> 0xcc` takes the error path), `record[2]` is the id
+  (low 5 bits masked), and `0xbcf40[flags*8]` selects the handler:
+
+| flags | handler | flags | handler |
+| ---: | ---: | ---: | ---: |
+| `0x00` | `0xbcb90` | `0x49`-`0x4e` | `0xa5b90` |
+| `0x01`-`0x05` | `0x9f070` | `0x4f`-`0x54` | `0xaa000` |
+| `0x06`, `0x90` | `0x9f1f0` | `0x5b`-`0x5f` | `0xaa4c0` |
+| `0x07`-`0x12`, default | `0x9ece0` | `0x61`-`0x66` | `0xaa740` |
+| `0x13`-`0x18` | `0xa12e0` | `0xa9`-`0xab`, `0xae` | `0xb2f80` |
+| `0x25`-`0x2a` | `0xa38f0` | `0xac`/`0xad` | `0xb3480`/`0xb3990` |
+| `0x43`-`0x48` | `0xa3b80` | `0xb5`-`0xba` | `0xb71a0` |
+| `0x40` | `0xa5930` | `0xc8`-`0xcb` | `0xbad00`/`0xbbec0`/`0xbb820`/`0xbc570` |
+
+The per-record context lives in the 0x580-byte blocks `0x565320` (player) /
+`0x5658a0` (CPU) at `index * 0x2c`; the event handlers `0xa1050`/`0xa98f0`/
+`0xa55e0` fill them. `0xbd730` is called from 15 sites (startup arms, match
+phases, and the AI region).
+
 ## Open items
 
 - The `0x504d60` SHARC response's physical meaning (distance, height, or
