@@ -341,18 +341,19 @@ pair: `id = 3*group + pattern`. That is the whole opponent decision surface.
 ## 9. Animation-cursor events (`KNOWN` shape)
 
 Three per-object handlers fire at specific animation-cursor values (`+0x17a`)
-and are selected by the `0xbf180`/`0xbf1c0`/`0xbf200` dispatchers (which pick
-the context base `0x565320` for the player, `0x5658a0` for the CPU, and pass
-`object+0x200`):
+and are selected by the `0xbf180`/`0xbf1c0`/`0xbf200` dispatchers. Those pass
+`g0 = object`, `g1 = object+0x200`, `g2 = context` (`0x565320` player /
+`0x5658a0` CPU); the handlers claim a slot in an **object hand-move range** and
+read a context field:
 
-| trigger (caller) | handler | context | helper |
-| --- | ---: | ---: | --- |
-| `+0x17a == 0x46` (`0x42538`) | `0xa1050` | `+0x40` | `0xbf0c0` count 4, tail `0xa0ec0` |
-| `+0x17a == 0x5f` (`0x42864`) | `0xa98f0` | `+0x180` | `0xbf120` count 8 |
-| `(+0x17a & 7) == 0` and `<= 0x26` (`0x4328c`) | `0xa55e0` | `+0xC0` | `0xbf0c0` count 8, tail `0xa5460` |
+| trigger (caller) | handler | object range | scan | context field |
+| --- | ---: | --- | ---: | ---: |
+| `+0x17a == 0x46` (`0x42538`) | `0xa1050` | `object+0x240` (rec 2) | 4 | `+0x58` |
+| `+0x17a == 0x5f` (`0x42864`) | `0xa98f0` | `object+0x380` (rec 12) | 8 | `+0x210` |
+| `(+0x17a & 7) == 0` and `<= 0x26` (`0x4328c`) | `0xa55e0` | `object+0x2C0` (rec 6) | 8 | `+0x108` |
 
-`0xbf0c0`/`0xbf120` scan the object's `+0x200` records for a free slot; the
-handlers write an event record into the context block and run the tail.
+`0xbf0c0`/`0xbf120` scan the range for a free record (flags byte); the handler
+then writes the flags/id (e.g. `0xa1050` writes flags `7`, id `8`).
 
 `0xa98f0` is the aim/step event: it emits SHARC service 29 with
 `facing + 0x4000` (or `+0x1000`) and a float (`8.0`/`16.0`), service 30 with
@@ -385,9 +386,12 @@ hand-move (attack) table, 0x20 bytes each:
 | `0x40` | `0xa5930` | `0xc8`-`0xcb` | `0xbad00`/`0xbbec0`/`0xbb820`/`0xbc570` |
 
 The per-record context lives in the 0x580-byte blocks `0x565320` (player) /
-`0x5658a0` (CPU) at `index * 0x2c`; the event handlers `0xa1050`/`0xa98f0`/
-`0xa55e0` fill them. `0xbd730` is called from 15 sites (startup arms, match
-phases, and the AI region).
+`0x5658a0` (CPU) at `index * 0x2c` (32 records x 0x2c = 0x580, which is the
+gap between the two bases). `0xbd730` is called from 15 sites (startup arms,
+match phases, and the AI region). The event handlers use the object hand-move
+ranges in section 9 and read individual context fields; whether `0xbd730`'s
+`index*0x2c` records align with the object's `index*0x20` records is not yet
+confirmed.
 
 ## Open items
 
