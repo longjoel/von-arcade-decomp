@@ -26,6 +26,13 @@ are controlled from the Master side.
 
 ## Communication evidence
 
+Address-level annotations for the per-frame state exchange are in
+[../i960/twin-link-lockstep.md](../i960/twin-link-lockstep.md): the local
+fighter publishes its input/command/health/position/heading into the transmit
+record (`0x5032f0`), the interrupt handler copies it into the shared own half
+(`0x1a12000`) and accepts the peer record (`0x1a12700` -> `0x5024f0`), and the
+input-commit gate (`0x72ea0`) reads the remote MA/MB from the accepted record.
+
 The successful trace shows:
 
 - P1 shared RAM role byte `0x01` = Master.
