@@ -36549,7 +36549,7 @@
           "id": "maincpu.object-update-32810-runnable",
           "name": "object_update_32810_runnable",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "confidence": "KNOWN",
           "sources": [
             "von/i960/recovered_object_update_run_32810.c"
@@ -36569,6 +36569,12 @@
             }
           ],
           "symbol": "recovered_object_update_32810_run",
+          "integration": {
+            "image": "von/build/i960/reconstructed-clean-maincpu.bin",
+            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "checkpoint": "clean-runtime-60s",
+            "test": "von/tools/test_recovered_object_update_run_32810.py"
+          },
           "modeling": {
             "boundary": "Runnable per-object update backbone: dispatch the 14-entry action table on object+0x1b2 and the 43-entry state table on object+0x172 (masked, 0..42), then integrate object+0x08/+0x10 with object+0x1c8/+0x1cc",
             "test": "von/tools/test_recovered_object_update_run_32810.py",
@@ -36580,7 +36586,7 @@
           "id": "maincpu.object-initializer-27550",
           "name": "object_initializer_27550",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "confidence": "KNOWN",
           "sources": [
             "von/i960/recovered_object_initializer_27550.c"
@@ -36596,6 +36602,12 @@
             }
           ],
           "symbol": "recovered_object_initializer_27550_run",
+          "integration": {
+            "image": "von/build/i960/reconstructed-clean-maincpu.bin",
+            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "checkpoint": "clean-runtime-60s",
+            "test": "von/tools/test_recovered_object_initializer_27550.py"
+          },
           "modeling": {
             "boundary": "Bounded runnable object initializer: seed the identity pointers (+0x04/+0x64/+0x68/+0x6c/+0x74), header/state (+0x00/+0x02/+0x170/+0x172), position/facing (+0x08/+0x10/+0x184), velocity accumulators (+0x1c8/+0x1cc), action bytes (+0x1ab..+0x1b2) and timer/limit halfwords (+0x1e2..+0x1fc) so the 0x32810 dispatch and integrator have a defined record",
             "test": "von/tools/test_recovered_object_initializer_27550.py",
@@ -36607,7 +36619,7 @@
           "id": "maincpu.gameplay-velocity-de990-run",
           "name": "gameplay_velocity_de990_run",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "confidence": "KNOWN",
           "sources": [
             "von/i960/recovered_gameplay_velocity_de990_run.c"
@@ -36624,6 +36636,12 @@
             }
           ],
           "symbol": "recovered_gameplay_velocity_de990_run",
+          "integration": {
+            "image": "von/build/i960/reconstructed-clean-maincpu.bin",
+            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "checkpoint": "clean-runtime-60s",
+            "test": "von/tools/test_recovered_gameplay_velocity_de990_run.py"
+          },
           "modeling": {
             "boundary": "Freestanding runnable velocity producer for the player (0x503ad0) and CPU (0x5040d0): the 0x503c98/0x503c9c clear, the mode 9/8 doubled arms, the 10.4 signed/default arms, the state==3 arm, the service-38/39 0x884000 packet, and the r3==0 gate.",
             "test": "von/tools/test_recovered_gameplay_velocity_de990_run.py",
@@ -36635,7 +36653,7 @@
           "id": "maincpu.sharc-upload-28300",
           "name": "sharc_upload_28300",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "confidence": "KNOWN",
           "sources": [
             "von/i960/recovered_sharc_upload_28300.c"
@@ -36652,6 +36670,12 @@
             }
           ],
           "symbol": "recovered_sharc_upload_run",
+          "integration": {
+            "image": "von/build/i960/reconstructed-clean-maincpu.bin",
+            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "checkpoint": "clean-runtime-60s",
+            "test": "von/tools/test_recovered_sharc_upload_28300.py"
+          },
           "modeling": {
             "boundary": "Runnable SHARC upload/boot: latch the 0x2b1e word count at 0x503ac4, raise 0x980000 bit31, clear 0x980020, program the 0x8c0000 external-port IOP registers, stream the 0x2b1e 16-bit bootstrap words from 0x16b58c to 0x884000 (external-DMA 16/48 packing), clear 0x980000 to boot, and emit the 8 sync word",
             "test": "von/tools/test_recovered_sharc_upload_28300.py",
@@ -36663,7 +36687,7 @@
           "id": "maincpu.input-service-run",
           "name": "input_service_run",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "confidence": "KNOWN",
           "sources": [
             "von/i960/recovered_input_service_run.c"
@@ -36681,6 +36705,12 @@
             }
           ],
           "symbol": "recovered_input_service_run",
+          "integration": {
+            "image": "von/build/i960/reconstructed-clean-maincpu.bin",
+            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "checkpoint": "clean-runtime-60s",
+            "test": "von/tools/test_recovered_input_service_run.py"
+          },
           "modeling": {
             "boundary": "Runnable input service: fetch the 315-5649 IN1/IN2 bytes, derive the twin-stick sum/difference MA/MB words (0x504dac/0x504db0) and the object+0x108 command code via the 0x3d70/0x3da0 nibble tables; the 0x72ea0 commit call stays with the caller",
             "test": "von/tools/test_recovered_input_service_run.py",
@@ -36721,7 +36751,7 @@
           "id": "maincpu.velocity-accumulate-358ac",
           "name": "velocity_accumulate_358ac",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "confidence": "KNOWN",
           "sources": [
             "von/i960/recovered_velocity_accumulate_358ac.c"
@@ -36738,6 +36768,12 @@
             }
           ],
           "symbol": "recovered_velocity_accumulate_358ac_run",
+          "integration": {
+            "image": "von/build/i960/reconstructed-clean-maincpu.bin",
+            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "checkpoint": "clean-runtime-60s",
+            "test": "von/tools/test_recovered_velocity_accumulate_358ac.py"
+          },
           "modeling": {
             "boundary": "Freestanding runnable velocity accumulation: service word 6 and +0x2e = +0x184 + 2*+0x186; the +0x30==3 ret; the +0x19c==0 selector; the +0x1c4-to-+0x7c clamp; the opcode-29/30 facing exchanges (multipliers flip31(+0x1c4) then +0x1c4) adding response 29 to +0x1c8 and response 30 to +0x1cc; the state==19/20 and state==31/34 +0x3c arms; the +0x7c<70.0 scale; the state==18 and state==11 extensions",
             "test": "von/tools/test_recovered_velocity_accumulate_358ac.py",
@@ -36749,7 +36785,7 @@
           "id": "maincpu.object-update-prefix-32810",
           "name": "object_update_prefix_32810",
           "classification": "code",
-          "stage": "modeled",
+          "stage": "integrated",
           "confidence": "KNOWN",
           "sources": [
             "von/i960/recovered_object_update_prefix_32810.c"
@@ -36765,6 +36801,12 @@
             }
           ],
           "symbol": "recovered_object_update_prefix_32810_run",
+          "integration": {
+            "image": "von/build/i960/reconstructed-clean-maincpu.bin",
+            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "checkpoint": "clean-runtime-60s",
+            "test": "von/tools/test_recovered_object_update_prefix_32810.py"
+          },
           "modeling": {
             "boundary": "Runnable prefix: copy related+0x08/+0x10 to object+0xa4/+0xa8, emit the opcode-31 packet (self x/z, related x/z) storing the response at +0x7c, emit the opcode-10 delta packet storing the signed response at +0x84, publish the height delta at +0x80, the range flag at +0x86 and 0xff at +0x1fc",
             "test": "von/tools/test_recovered_object_update_prefix_32810.py",
