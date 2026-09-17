@@ -310,6 +310,12 @@ mostly `7`, and MA/MB pairs like `(7, 0x09, 0x0c)`, `(7, 0x11, 0x14)`,
 reads the class (`0x504d94`) and counter (`0x504db4`), so the transition alone
 does not fix the movement bytes.
 
+**Validated (observed):** transition 7 selects `(g5,g6) = (2,1)`, and the tail
+model predicts `MA = 1 | dirbit`, `MB = 4 | dirbit` with `dirbit` in
+`8/0x10/0x20`. The observed `(7, 0x09, 0x0c)`, `(7, 0x11, 0x14)`,
+`(7, 0x21, 0x24)` match exactly, so the transition -> movement tail is
+confirmed, not just read.
+
 ### The transition table (`KNOWN`)
 
 Every handler ends in one of four `(g5,g6)` selections, and they follow
