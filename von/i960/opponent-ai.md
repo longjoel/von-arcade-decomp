@@ -359,13 +359,18 @@ read a context field:
 | `(+0x17a & 7) == 0` and `<= 0x26` (`0x4328c`) | `0xa55e0` | `object+0x2C0` (rec 6) | 8 | `+0x108` |
 
 `0xbf0c0`/`0xbf120` scan the range for a free record (flags byte); the handler
-then writes the flags/id (e.g. `0xa1050` writes flags `7`, id `8`).
+then writes the flags/id (e.g. `0xa1050` writes flags `7`, id `8`). The context
+pointers the handlers read (`+0x58`, `+0x108`, `+0x210`) are record `2`, `6`,
+`12` at `0x2c` stride, matching their object ranges -- the context and object
+tables are the same index, parallel arrays.
 
-`0xa98f0` is the aim/step event: it emits SHARC service 29 with
-`facing + 0x4000` (or `+0x1000`) and a float (`8.0`/`16.0`), service 30 with
-the same inputs, then service 31 with the opponent's position
-(`related+0x14/0x18/0x1c`) -- a side-step vector derived from the opponent
-bearing and distance.
+All three events emit SHARC trig and produce a facing-relative vector:
+
+- `0xa1050` (tail `0xa0ec0`): service 29 at `facing - 0x1400` with `7.0`.
+- `0xa98f0`: service 29 at `facing + 0x4000` (or `+0x1000`) with `8.0`/`16.0`,
+  then service 30, then service 31 with the opponent position
+  (`related+0x14/0x18/0x1c`). It is a facing-relative step/dodge; "side-step"
+  is an inferred label, not proven.
 
 ## 10. Hand-move records (`object+0x200`)
 
