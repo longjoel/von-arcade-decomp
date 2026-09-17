@@ -372,6 +372,14 @@ bearing and distance.
 The `+0x200` region the event handlers and `0x77c40` touch is a 32-record
 hand-move (attack) table, 0x20 bytes each:
 
+| offset | field |
+| ---: | --- |
+| `0x00` | owner/hand index byte; indexes the 0x30-byte table at `0x562ccc` (`ldob (g1),g5; ld 0x562ccc[g5*0x30]`) |
+| `0x02` | flags/id halfword: bit 15 = active/occupied, bit 13 = counted by `0x77c40`, low bits = move id (`& 0xffe0` in `0xbd730`) |
+| `0x04` | counter/timer halfword: bit 15 flag, incremented by the handler (`0xa3b98`-`0xa3bb0`) |
+| `0x10`/`0x14`/`0x18` | target world position (x/y/z), compared against the opponent's `+0x14`/`+0x18`/`+0x1c` |
+| other | handler-specific state |
+
 - `0xbd6b8` resets all 32 records and, on an invalid id, prints
   `"HAND_MOVE ID ERROR [1P:%2d]"` (string at `0xbd710`).
 - `0x77c40` scans both objects' records and aggregates flags into `0x504e50`
@@ -392,12 +400,11 @@ hand-move (attack) table, 0x20 bytes each:
 | `0x40` | `0xa5930` | `0xc8`-`0xcb` | `0xbad00`/`0xbbec0`/`0xbb820`/`0xbc570` |
 
 The per-record context lives in the 0x580-byte blocks `0x565320` (player) /
-`0x5658a0` (CPU) at `index * 0x2c` (32 records x 0x2c = 0x580, which is the
-gap between the two bases). `0xbd730` is called from 15 sites (startup arms,
-match phases, and the AI region). The event handlers use the object hand-move
-ranges in section 9 and read individual context fields; whether `0xbd730`'s
-`index*0x2c` records align with the object's `index*0x20` records is not yet
-confirmed.
+`0x5658a0` (CPU) at `index * 0x2c` (32 records x 0x2c = 0x580, the gap between
+the two bases). The object record and the context record are **parallel
+arrays** for the same index: `0xbd730` passes `g1 = object+0x200+index*0x20`
+and `g2 = context+index*0x2c` to each handler, so they are not expected to
+overlap.
 
 **Validated (observed):** `von/tools/probe_hand_moves.lua` over the attract
 saw record flags `01/02/07/08/09/0b/6a/6b/73/75/7f/81` -- all within the
