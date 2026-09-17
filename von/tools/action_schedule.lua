@@ -24,6 +24,12 @@ local START_FRAME = tonumber(os.getenv("VON_ACTION_START_FRAME") or "2120")
 local CYCLES = tonumber(os.getenv("VON_ACTION_CYCLES") or "2")
 local COIN_FRAME = tonumber(os.getenv("VON_PROGRESS_COIN_FRAME") or "900")
 local MATCH_START = tonumber(os.getenv("VON_PROGRESS_START_FRAME") or "1500")
+-- Optional machine-select navigation: press "right" SELECT_STEPS times after
+-- the coin before confirming, so P1 is that roster entry (0 = default Temjin,
+-- unchanged). Mirrors capture_single_player.lua's machine_select phase.
+local SELECT_STEPS = tonumber(os.getenv("VON_ACTION_SELECT_STEPS") or "0")
+local SELECT_SETTLE = 180
+local SELECT_STEP_FRAMES = 45
 
 local log_file = assert(io.open(LOG_PATH, "w"))
 log_file:write("action: session start\n")
@@ -175,7 +181,20 @@ end
 local function boot_step()
     if frame < START_FRAME then
         set_key("coin", frame == COIN_FRAME)
-        set_key("start", frame == MATCH_START)
+        if SELECT_STEPS <= 0 then
+            set_key("start", frame == MATCH_START)
+        else
+            -- Walk the select cursor, finishing the last step before the
+            -- confirm at MATCH_START; 8-frame presses match the harness.
+            local base = MATCH_START - (SELECT_STEPS + 1) * SELECT_STEP_FRAMES
+            local right = false
+            for step = 1, SELECT_STEPS do
+                local at = base + step * SELECT_STEP_FRAMES
+                if frame >= at and frame < at + 8 then right = true end
+            end
+            set_key("right", right)
+            set_key("start", frame == MATCH_START)
+        end
         return false
     end
     if frame == START_FRAME then
