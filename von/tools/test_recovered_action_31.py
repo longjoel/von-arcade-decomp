@@ -9,10 +9,12 @@ the config only needs to live in a 32-bit mapping.
 
 Covered listing spans:
     0x36470-0x36484   +0x18e cooldown gate
-    0x36488-0x36498   +0x137 == 0xff leaves the object untouched
+    0x36488-0x36498   +0x137 == 0xff takes the reload path
     0x3649c-0x364fc   action -> state 31, +0x176/+0x188/+0x3c/+0x186
     0x36500-0x36518   scratch clears + +0x1a8/+0x1a9
     0x3651c-0x36550   object+0x4e accumulator
+    0x36554-0x3668b   reload: +0x10e/+0x102 sentinel, +0x170 -> state 16/15,
+                      +0x186 = +0x102, +0x188 = classifier
 """
 
 import ctypes
@@ -149,12 +151,71 @@ def main():
         assert u16(c.obj, 0x18e) == 4, hex(u16(c.obj, 0x18e))
         assert u16(c.obj, 0x172) == 9, hex(u16(c.obj, 0x172))
 
-        # --- +0x137 == 0xff leaves the object untouched --------------------
+        # --- +0x137 == 0xff, +0x10e set -> sentinel leaves state -----------
         c = Ctx()
         set_u8(c.obj, 0x137, 0xff)
         set_u16(c.obj, 0x172, 9)
+        set_u16(c.obj, 0x10e, 1)
+        set_u8(c.obj, 0x1a8, 1)
         assert call(c) == 0
         assert u16(c.obj, 0x172) == 9, hex(u16(c.obj, 0x172))
+        assert u8(c.obj, 0x1a8) == 2, hex(u8(c.obj, 0x1a8))
+
+        # --- +0x137 == 0xff, +0x102 bit15 -> sentinel ----------------------
+        c = Ctx()
+        set_u8(c.obj, 0x137, 0xff)
+        set_u16(c.obj, 0x172, 9)
+        set_u16(c.obj, 0x102, 0x8000)
+        assert call(c) == 0
+        assert u16(c.obj, 0x172) == 9, hex(u16(c.obj, 0x172))
+        assert u8(c.obj, 0x1a8) == 0, hex(u8(c.obj, 0x1a8))
+
+        # --- reload, +0x170 == 2 -> state 16 + class 1 ---------------------
+        c = Ctx()
+        set_u8(c.obj, 0x137, 0xff)
+        set_u16(c.obj, 0x170, 2)
+        set_u16(c.obj, 0x102, 0x2001)
+        set_u16(c.obj, 0x178, 0x1234)
+        set_u16(c.obj, 0x17a, 0x5678)
+        assert call(c) == 0
+        assert u16(c.obj, 0x172) == 16, hex(u16(c.obj, 0x172))
+        assert u16(c.obj, 0x186) == 0x2001, hex(u16(c.obj, 0x186))
+        assert u16(c.obj, 0x188) == 1, hex(u16(c.obj, 0x188))
+        assert u16(c.obj, 0x178) == 0x1234, hex(u16(c.obj, 0x178))
+        assert u16(c.obj, 0x17a) == 0, hex(u16(c.obj, 0x17a))
+
+        # --- reload, +0x170 == 3 -> state 16 + class 3 ---------------------
+        c = Ctx()
+        set_u8(c.obj, 0x137, 0xff)
+        set_u16(c.obj, 0x170, 3)
+        set_u16(c.obj, 0x102, 0x6001)
+        assert call(c) == 0
+        assert u16(c.obj, 0x172) == 16, hex(u16(c.obj, 0x172))
+        assert u16(c.obj, 0x188) == 3, hex(u16(c.obj, 0x188))
+
+        # --- reload, +0x170 not 2/3 -> state 15 + class 2, clears +0x178 ---
+        c = Ctx()
+        set_u8(c.obj, 0x137, 0xff)
+        set_u16(c.obj, 0x170, 0)
+        set_u16(c.obj, 0x102, 0x1001)
+        set_u16(c.obj, 0x178, 0x1234)
+        set_u16(c.obj, 0x17a, 0x5678)
+        assert call(c) == 0
+        assert u16(c.obj, 0x172) == 15, hex(u16(c.obj, 0x172))
+        assert u16(c.obj, 0x186) == 0x1001, hex(u16(c.obj, 0x186))
+        assert u16(c.obj, 0x188) == 2, hex(u16(c.obj, 0x188))
+        assert u16(c.obj, 0x178) == 0, hex(u16(c.obj, 0x178))
+        assert u16(c.obj, 0x17a) == 0, hex(u16(c.obj, 0x17a))
+
+        # --- reload classifier: +0x102 high band -> class 0 ----------------
+        c = Ctx()
+        set_u8(c.obj, 0x137, 0xff)
+        set_u16(c.obj, 0x170, 2)
+        set_u16(c.obj, 0x102, 0x0000)
+        assert call(c) == 0
+        assert u16(c.obj, 0x172) == 16, hex(u16(c.obj, 0x172))
+        assert u16(c.obj, 0x186) == 0, hex(u16(c.obj, 0x186))
+        assert u16(c.obj, 0x188) == 0, hex(u16(c.obj, 0x188))
 
         # --- accumulator clamp: step + current >= limit stops --------------
         c = Ctx()

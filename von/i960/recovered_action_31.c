@@ -1,5 +1,5 @@
 /* Bounded freestanding recovery of the i960 committed-action -> locomotion
- * transition at 0x36460-0x36550 (the state-0 entry of the per-kind dispatcher
+ * transition at 0x36460-0x3668c (the state-0 entry of the per-kind dispatcher
  * table at 0x37130, also inlined at 0x373ac-0x37464).
  *
  * Provenance
@@ -15,7 +15,7 @@
  * Listing map (g0 = object, g2 = return):
  *
  *   0x36470  ldos 0x18e ; != 0 -> +0x18e-- and return (cooldown)
- *   0x36488  ldob 0x137 ; == 0xff -> the separate state-16 reload path
+ *   0x36488  ldob 0x137 ; == 0xff -> the reload path at 0x36554
  *   0x3649c  stos 31,0x172 ; stos 0,0x170
  *   0x364a8  0x18350[+0x137] -> +0x176 and +0x188
  *   0x364c0  0x18360[+0x137] (s16) added to +0x184 -> +0x3c
@@ -23,11 +23,13 @@
  *   0x36500  +0x174/+0x17e/+0x17a/+0x1a0 = 0
  *   0x36510  +0x1a8/+0x1a9 = 1
  *   0x3651c  object+0x4e accumulator advanced by cfg+0x658, clamped by cfg+0x660
+ *   0x36554  reload: +0x10e != 0 or +0x102 bit15 -> +0x1a8 sentinel and return
+ *   0x36574  +0x170 in {2,3} -> state 16, +0x186 = +0x102, +0x188 class, +0x17a = 0
+ *   0x365f4  otherwise -> state 15, +0x178 = 0 and +0x17a = 0
+ *   0x365e8  the +0x102-keyed 0/1/2/3 classifier shared by both reload arms
  *
  * The 0x18350/0x18360/0x18370 tables live above the generated span and are
  * read verbatim by the _run wrapper; the pure core takes them as pointers.
- * The +0x137 == 0xff branch (0x36554+) is a separate state-16 reload path and
- * is deliberately out of scope here.
  */
 
 typedef unsigned char u8;
@@ -100,6 +102,57 @@ static void recovered_action_31_accumulate(volatile unsigned char *object)
     }
 }
 
+/* 0x365e8 / 0x36668: the +0x102-keyed +0x188 classifier shared by both reload
+ * arms.  Returns 0..3. */
+static u32 recovered_action_31_classify(u32 v102)
+{
+    u32 t = (v102 + 0xefffU) & 0xffffU;
+
+    if (!(0xfffU < t))
+        return 2U;
+    t = (v102 + 0xdfffU) & 0xffffU;
+    if (!(t > 0x3ffeU))
+        return 1U;
+    t = (v102 + 0xa000U) & 0xffffU;
+    if (0xfffU < t)
+        return 0U;
+    return 3U;
+}
+
+/* 0x36554-0x3668b: the +0x137 == 0xff reload path.  It selects the locomotion
+ * reload state from +0x170 and publishes the +0x102 class, or latches the
+ * +0x1a8 sentinel and leaves the object untouched.  Always returns 0: this arm
+ * never applies the state-31 transition. */
+static u32 recovered_action_31_reload(volatile unsigned char *object)
+{
+    u32 mode;
+    u32 v102;
+
+    if (recovered_action_31_ld16(object, 0x10eU) != 0U ||
+        (recovered_action_31_ld16(object, 0x102U) & 0x8000U) != 0U) {
+        if (recovered_action_31_ld8(object, 0x1a8U) != 0U)
+            recovered_action_31_st8(object, 0x1a8U, 2U);
+        return 0U;
+    }
+
+    mode = recovered_action_31_ld16(object, 0x170U);
+    v102 = (u32)recovered_action_31_ld16(object, 0x102U);
+
+    if (mode == 2U || mode == 3U) {
+        /* 0x36574-0x365f0: state 16, no +0x178 clear. */
+        recovered_action_31_st16(object, 0x172U, 16U);
+    } else {
+        /* 0x365f4-0x36674: state 15, +0x178 cleared. */
+        recovered_action_31_st16(object, 0x172U, 15U);
+        recovered_action_31_st16(object, 0x178U, 0U);
+    }
+    recovered_action_31_st16(object, 0x186U, v102);
+    recovered_action_31_st16(object, 0x188U,
+        recovered_action_31_classify(v102));
+    recovered_action_31_st16(object, 0x17aU, 0U);
+    return 0U;
+}
+
 /* Returns 1 when the action->state-31 transition was applied. */
 u32 recovered_action_31_core(
     volatile unsigned char *object,
@@ -116,10 +169,10 @@ u32 recovered_action_31_core(
         return 0U;
     }
 
-    /* 0x36488-0x36498: a 0xff latch takes the separate reload path. */
+    /* 0x36488-0x36498: a 0xff latch takes the reload path at 0x36554. */
     action = (u32)recovered_action_31_ld8(object, 0x137U) & 0xffU;
     if (action == 0xffU)
-        return 0U;
+        return recovered_action_31_reload(object);
 
     /* 0x3649c-0x364fc: force state 31 and build the direction. */
     recovered_action_31_st16(object, 0x172U, 31U);

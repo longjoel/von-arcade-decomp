@@ -36960,19 +36960,25 @@
             "von/i960/state-semantics.md",
             "von/tools/test_recovered_action_31.py"
           ],
+          "integration": {
+            "image": "von/build/i960/reconstructed-clean-maincpu.bin",
+            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
+            "checkpoint": "clean-runtime-60s",
+            "test": "von/tools/test_recovered_action_31.py"
+          },
           "ranges": [
             {
               "start": "0x00036460",
-              "end": "0x00036550"
+              "end": "0x00036690"
             }
           ],
           "symbol": "recovered_action_31_run",
           "modeling": {
-            "boundary": "Committed-action -> locomotion transition 0x36460-0x36550: the +0x18e cooldown gate, the +0x137 != 0xff test that forces +0x172 = 31 and clears +0x170, the 0x18350/0x18360/0x18370 direction tables into +0x176/+0x188/+0x3c/+0x186, the scratch clears and +0x1a8/+0x1a9 sentinels, and the object+0x4e accumulator (cfg+0x658/0x660).",
+            "boundary": "Committed-action -> locomotion transition 0x36460-0x3668c: the +0x18e cooldown gate, the +0x137 != 0xff test that forces +0x172 = 31 and clears +0x170, the 0x18350/0x18360/0x18370 direction tables into +0x176/+0x188/+0x3c/+0x186, the scratch clears and +0x1a8/+0x1a9 sentinels, the object+0x4e accumulator (cfg+0x658/0x660), and the +0x137 == 0xff reload path (0x36554): the +0x10e/+0x102-bit15 sentinel, the +0x170 in {2,3} -> state 16 versus state 15 selection, +0x186 = +0x102, and the +0x102-keyed 0/1/2/3 classifier into +0x188.",
             "test": "von/tools/test_recovered_action_31.py",
-            "unresolved_behavior": "The +0x137 == 0xff branch at 0x36554 (the state-16 reload path with the +0x10e/+0x102 gates) is out of scope. This handler is entry 0 of the 0x37130 per-kind dispatcher, not the 0x32560 mech backbone, so it is invoked from the frame-step path (0x371e0) rather than the 0x32560 backbone."
+            "unresolved_behavior": "None in this range. This handler is entry 0 of the 0x37130 per-kind dispatcher, not the 0x32560 mech backbone, so it is invoked from the frame-step path (0x371e0) rather than the 0x32560 backbone."
           },
-          "notes": "The only +0x137 consumer that drives locomotion: it forces state 31 (cruise) from the latched command, which is how a committed stick command becomes transport. Integrated in the reconstructed main loop through the recovered 0x371e0 frame-step dispatch (entry 0 of the 0x37130 table): with a held stick the committed action forces state 31 and the mech translates (verified on vonjdev, speed 3.2)."
+          "notes": "The only +0x137 consumer that drives locomotion: a latched command forces state 31 (cruise), and the 0xff case reloads the locomotion clip state (16/15) instead. Integrated in the reconstructed main loop through the recovered 0x371e0 frame-step dispatch (entry 0 of the 0x37130 table): with a held stick the committed action forces state 31 and the mech translates (verified on vonjdev, speed 3.2); with no command the reload path selects state 16/15 by +0x170."
         },
         {
           "id": "maincpu.shared-movement",
@@ -37065,7 +37071,7 @@
           ],
           "integration": {
             "image": "von/build/i960/reconstructed-clean-maincpu.bin",
-            "image_sha256": "119730bef29d3e1f42034c6dac5ad103d737d3e49d3b7deb51dd2835ad6b94e3",
+            "image_sha256": "9e43a57f03d5517c453854e255652aaee66c21192e5095d005bac5354e1992a8",
             "checkpoint": "clean-runtime-60s",
             "test": "von/tools/test_recovered_framestate_dispatch.py"
           },
