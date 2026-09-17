@@ -29,6 +29,7 @@
 --              VON_PROGRESS_SHOT_HOLD_FRAMES (default 20)
 --              VON_PROGRESS_COMBAT_END (default 7000)
 --              VON_PROGRESS_ACTIVE_LEVELS (1 to use raw electrical polarity)
+--              VON_PROGRESS_TRANSFORM_LOG (ordered i960/SHARC NDJSON events)
 
 local SECONDS = tonumber(os.getenv("VON_PROGRESS_SECONDS") or "150")
 local TARGET_FRAMES = SECONDS * 60
@@ -51,6 +52,7 @@ local SHARC_TAP_MIN = tonumber(
 local SHARC_TAP_MAX = tonumber(
     os.getenv("VON_PROGRESS_SHARC_TAP_MAX") or "0x01410000")
 local SHARC_MAX = tonumber(os.getenv("VON_PROGRESS_SHARC_MAX") or "40000")
+local TRANSFORM_LOG_PATH = os.getenv("VON_PROGRESS_TRANSFORM_LOG")
 local ACTIVE_LEVELS = os.getenv("VON_PROGRESS_ACTIVE_LEVELS") == "1"
 local RAM_SNAP_FRAME = tonumber(os.getenv("VON_PROGRESS_RAM_SNAP_FRAME") or "0")
 local RAM_SNAP_PATH = os.getenv("VON_PROGRESS_RAM_SNAP_PATH")
@@ -89,19 +91,40 @@ local motion_selector_reading = false
 local frame = 0
 local space
 
+-- One monotonically ordered stream shared by the i960 FIFO, selector, and
+-- SHARC stack/commit taps. Callback order, rather than emulated timestamps,
+-- is the join key used by normalize/analyze tooling.
+local transform_file
+local transform_event_id = 0
+local function transform_event(kind, body)
+    if not transform_file then
+        return
+    end
+    transform_event_id = transform_event_id + 1
+    transform_file:write(string.format(
+        '{"event_id":%d,"kind":"%s","frame":%d%s}\n',
+        transform_event_id, kind, frame, body or ""))
+    transform_file:flush()
+end
+
 local function install_motion_selector_tap()
-    if not MOTION_SELECTOR_LOG_PATH or motion_selector_tap or not space then
+    if (not MOTION_SELECTOR_LOG_PATH and not transform_file) or
+            motion_selector_tap or not space then
         return
     end
     motion_selector_cpu = manager.machine.devices[":maincpu"]
     if not motion_selector_cpu then
         return
     end
-    motion_selector_file = assert(io.open(MOTION_SELECTOR_LOG_PATH, "w"))
-    motion_selector_file:write(string.format(
-        "motion-selector: pc=%08x source=lua-program-read-tap\n",
-        MOTION_SELECTOR_PC))
-    motion_selector_file:flush()
+    if MOTION_SELECTOR_LOG_PATH then
+        motion_selector_file = assert(io.open(MOTION_SELECTOR_LOG_PATH, "w"))
+    end
+    if motion_selector_file then
+        motion_selector_file:write(string.format(
+            "motion-selector: pc=%08x source=lua-program-read-tap\n",
+            MOTION_SELECTOR_PC))
+        motion_selector_file:flush()
+    end
     -- The selector consumer is in this small published-header block.  A
     -- 16-byte tap is required for MAME's mapped 32-bit bus handler while
     -- avoiding an otherwise expensive callback on every work-RAM read.
@@ -144,10 +167,18 @@ local function install_motion_selector_tap()
                 return
             end
             motion_selector_events = motion_selector_events + 1
-            motion_selector_file:write(string.format(
-                "motion-selector: frame=%d object=%08x g0=%08x header=%08x body_header=%08x sel=%04x state=%04x frame_cursor=%04x\n",
-                frame, object, selector_object, data, body_header, selector, state, cursor))
-            motion_selector_file:flush()
+            transform_event("motion_selector", string.format(
+                ',"pc":%d,"object":%d,"selector_object":%d,' ..
+                '"skeleton_header":%d,"body_header":%d,' ..
+                '"selector":%d,"state":%d,"cursor":%d',
+                pc, object, selector_object, data, body_header,
+                selector, state, cursor))
+            if motion_selector_file then
+                motion_selector_file:write(string.format(
+                    "motion-selector: frame=%d object=%08x g0=%08x header=%08x body_header=%08x sel=%04x state=%04x frame_cursor=%04x\n",
+                    frame, object, selector_object, data, body_header, selector, state, cursor))
+                motion_selector_file:flush()
+            end
         end)
 end
 
@@ -163,6 +194,94 @@ local sharc_device
 local sharc_space
 local sharc_writes = 0
 local sharc_reading = false
+local sharc_stack_tap
+local i960_fifo_tap
+local marker_slot_tap
+local sharc_last_depth = 0
+local sharc_pending_stack_kind
+local commit_run = { start = nil, next = nil, words = {} }
+
+local function state_value(device, name)
+    local entry = device and device.state and device.state[name]
+    return entry and tonumber(entry.value) or 0
+end
+
+local function matrix_at(address)
+    local words = {}
+    for i = 0, 11 do
+        local ok, word = pcall(function()
+            return sharc_space:read_u32(address + i)
+        end)
+        words[#words + 1] = ok and word or 0xffffffff
+    end
+    return words
+end
+
+local function json_words(words)
+    local out = {}
+    for _, word in ipairs(words) do
+        out[#out + 1] = tostring(word)
+    end
+    return "[" .. table.concat(out, ",") .. "]"
+end
+
+local function flush_commit_run()
+    -- Services 0x39/0x3a/0x3b write a 13-word geometry record: a fixed
+    -- 0x05800b0b seed followed by the committed row-major 3x4 matrix.
+    if #commit_run.words == 13 and commit_run.words[1] == 0x05800b0b then
+        local matrix = {}
+        for i = 2, 13 do
+            matrix[#matrix + 1] = commit_run.words[i]
+        end
+        transform_event("commit", string.format(
+            ',"pc":%d,"depth":%d,"destination":"0x%08x",' ..
+            '"matrix_words":%s', state_value(sharc_device, "CURPC"),
+            sharc_last_depth, commit_run.start, json_words(matrix)))
+    elseif #commit_run.words > 0 then
+        transform_event("commit_fragment", string.format(
+            ',"destination":"0x%08x","word_count":%d',
+            commit_run.start, #commit_run.words))
+    end
+    commit_run = { start = nil, next = nil, words = {} }
+end
+
+local function install_i960_fifo_tap()
+    if not transform_file or i960_fifo_tap or not space or not motion_selector_cpu then
+        return
+    end
+    i960_fifo_tap = space:install_write_tap(
+        0x00884000, 0x00884003, "von-transform-fifo",
+        function(offset, data, mask)
+            transform_event("i960_fifo", string.format(
+                ',"pc":%d,"data":%d,"mask":%d,"r6":%d,' ..
+                '"g0":%d,"g2":%d,"g4":%d',
+                state_value(motion_selector_cpu, "CURPC"), data, mask,
+                state_value(motion_selector_cpu, "r6"),
+                state_value(motion_selector_cpu, "g0"),
+                state_value(motion_selector_cpu, "g2"),
+                state_value(motion_selector_cpu, "g4")))
+            return data
+        end)
+end
+
+local function install_marker_slot_tap()
+    if not transform_file or marker_slot_tap or not space or
+            not motion_selector_cpu then
+        return
+    end
+    marker_slot_tap = space:install_write_tap(
+        0x00562430, 0x00562477, "von-transform-marker-slots",
+        function(offset, data, mask)
+            local relative = offset - 0x00562430
+            transform_event("marker_slot_write", string.format(
+                ',"pc":%d,"address":%d,"slot":%d,"field":%d,' ..
+                '"data":%d,"mask":%d',
+                state_value(motion_selector_cpu, "CURPC"), offset,
+                math.floor(relative / 12), math.floor((relative % 12) / 4),
+                data, mask))
+            return data
+        end)
+end
 
 local function find_sharc()
     for _, dev in pairs(manager.machine.devices) do
@@ -174,7 +293,7 @@ local function find_sharc()
 end
 
 local function install_sharc_tap()
-    if not SHARC_LOG_PATH or sharc_tap then
+    if (not SHARC_LOG_PATH and not transform_file) or sharc_tap then
         return
     end
     sharc_device = find_sharc()
@@ -186,16 +305,21 @@ local function install_sharc_tap()
     if not sharc_space then
         return
     end
-    sharc_file = assert(io.open(SHARC_LOG_PATH, "w"))
-    sharc_file:write(string.format(
-        "sharc-state: tap=[%08x,%08x] device=%s\n",
-        SHARC_TAP_MIN, SHARC_TAP_MAX, tostring(sharc_device.shortname)))
-    sharc_file:flush()
+    if SHARC_LOG_PATH then
+        sharc_file = assert(io.open(SHARC_LOG_PATH, "w"))
+        sharc_file:write(string.format(
+            "sharc-state: tap=[%08x,%08x] device=%s\n",
+            SHARC_TAP_MIN, SHARC_TAP_MAX, tostring(sharc_device.shortname)))
+        sharc_file:flush()
+    end
     local ok, err = pcall(function()
         sharc_tap = sharc_space:install_write_tap(
             SHARC_TAP_MIN, SHARC_TAP_MAX, "von-sharc-state",
             function(offset, data, mask)
-                if sharc_reading or sharc_writes >= SHARC_MAX then
+                -- SHARC_MAX is the historical human-readable log cap. The
+                -- ordered evidence stream must not silently stop mid-run.
+                if sharc_reading or
+                        (not transform_file and sharc_writes >= SHARC_MAX) then
                     return data
                 end
                 sharc_reading = true
@@ -204,17 +328,96 @@ local function install_sharc_tap()
                 pcall(function()
                     ptr = sharc_space:read_u32(0x0030101)
                 end)
-                sharc_file:write(string.format(
-                    "sharc-write: frame=%d offset=%08x data=%08x mask=%08x ptr=%08x\n",
-                    frame, offset, data, mask, ptr))
-                sharc_file:flush()
+                if sharc_file then
+                    sharc_file:write(string.format(
+                        "sharc-write: frame=%d offset=%08x data=%08x mask=%08x ptr=%08x\n",
+                        frame, offset, data, mask, ptr))
+                    sharc_file:flush()
+                end
+                if transform_file then
+                    if commit_run.start == nil then
+                        commit_run.start = offset
+                        commit_run.next = offset
+                    elseif offset ~= commit_run.next then
+                        flush_commit_run()
+                        commit_run.start = offset
+                        commit_run.next = offset
+                    end
+                    commit_run.words[#commit_run.words + 1] = data
+                    commit_run.next = offset + 1
+                    if #commit_run.words == 13 then
+                        flush_commit_run()
+                    end
+                end
                 sharc_reading = false
                 return data
             end)
     end)
     if not ok then
-        sharc_file:write("sharc-state: install failed: " .. tostring(err) .. "\n")
-        sharc_file:flush()
+        if sharc_file then
+            sharc_file:write("sharc-state: install failed: " .. tostring(err) .. "\n")
+            sharc_file:flush()
+        end
+        transform_event("tap_error", ',"tap":"sharc_commit"')
+    end
+
+    if transform_file then
+        -- Stack bookkeeping and the copied 12-word windows are disjoint from
+        -- the commit destination range, so use a second Lua tap. A pointer
+        -- write is the ordered point at which the pushed/restored base can be
+        -- read exactly from the copied window.
+        local stack_ok, stack_err = pcall(function()
+            sharc_stack_tap = sharc_space:install_write_tap(
+                0x0030100, 0x0030260, "von-transform-stack",
+                function(offset, data, mask)
+                    if sharc_reading then
+                        return data
+                    end
+                    sharc_reading = true
+                    local pc = state_value(sharc_device, "CURPC")
+                    if offset == 0x0030100 then
+                        if data > sharc_last_depth then
+                            sharc_pending_stack_kind = "push"
+                        elseif data < sharc_last_depth then
+                            sharc_pending_stack_kind = "pop"
+                        else
+                            sharc_pending_stack_kind = "reset"
+                        end
+                        sharc_last_depth = data
+                    elseif offset == 0x0030101 then
+                        local words = matrix_at(data)
+                        local kind = sharc_pending_stack_kind or "stack_pointer"
+                        local depth = sharc_last_depth
+                        local matrix_field = "matrix_words"
+                        local suffix = ""
+                        if kind == "push" then
+                            matrix_field = "base_words"
+                        elseif kind == "pop" then
+                            -- The handler stores the decremented depth before
+                            -- its restored pointer. Preserve both sides of the
+                            -- operation; lineage consumes the pre-pop depth.
+                            depth = sharc_last_depth + 1
+                            matrix_field = "restored_words"
+                            suffix = string.format(',"depth_after":%d',
+                                sharc_last_depth)
+                        end
+                        transform_event(kind,
+                            string.format(',"pc":%d,"depth":%d%s,' ..
+                                '"pointer":%d,"%s":%s', pc, depth, suffix,
+                                data, matrix_field, json_words(words)))
+                        sharc_pending_stack_kind = nil
+                    end
+                    sharc_reading = false
+                    return data
+                end)
+        end)
+        if not stack_ok then
+            transform_event("tap_error", ',"tap":"sharc_stack"')
+            if sharc_file then
+                sharc_file:write("sharc-state: stack tap failed: " ..
+                    tostring(stack_err) .. "\n")
+            end
+        end
     end
 end
 
@@ -384,6 +587,11 @@ local function setup()
         log("progress: no program space")
         return false
     end
+    motion_selector_cpu = cpu
+    if TRANSFORM_LOG_PATH then
+        transform_file = assert(io.open(TRANSFORM_LOG_PATH, "w"))
+        transform_event("session", ',"schema_version":1')
+    end
     for key, spec in pairs(FIELD_NAMES) do
         local port = manager.machine.ioport.ports[spec[1]]
         fields[key] = port and port.fields[spec[2]] or nil
@@ -451,6 +659,8 @@ local function setup()
         log("progress: motion-selector log " .. MOTION_SELECTOR_LOG_PATH)
     end
     install_motion_selector_tap()
+    install_i960_fifo_tap()
+    install_marker_slot_tap()
     if SHARC_LOG_PATH then
         log("progress: sharc-state log " .. SHARC_LOG_PATH)
     end

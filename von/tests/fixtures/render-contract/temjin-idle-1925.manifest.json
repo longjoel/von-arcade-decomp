@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "temjin-idle-1925",
+  "status": "evidence-fixture-not-yet-lineage-promoted",
+  "runtime": {
+    "set": "vonj",
+    "execution_engine": "interpreter",
+    "mame_option": "-nodrc",
+    "instrumentation": "von/tools/gameplay_progress.lua",
+    "instrumentation_sha256": "cf2579db048d4a710dfb9a684dc56513fbb8b57836f3e602927a98efdfdc0a74"
+  },
+  "capture": {
+    "command": "VON_PROGRESS_SECONDS=38 VON_PROGRESS_TRANSFORM_LOG=<local>/von-transform-temjin-complete.ndjson ./bin/vonctl run -nodrc -video none -sound none -skip_gameinfo -seconds_to_run 38 -autoboot_script von/tools/gameplay_progress.lua",
+    "raw_path_policy": "local-ignored",
+    "raw_size": 245729049,
+    "raw_sha256": "76195e538c4f747ca00acbe4014d79d853ef3f9d312a63200f575deed6e7943e"
+  },
+  "normalization": {
+    "tool": "von/tools/normalize_transform_trace.py",
+    "tool_sha256": "17e65872d3825bf8c7dcd22d905dd4d4b7e8967b74968c3d3268daf3cedcfe72",
+    "arguments": [
+      "--frame-start", "1925",
+      "--frame-end", "1925",
+      "--event-start", "994226",
+      "--event-end", "994637",
+      "--oba-prefix", "0x009e"
+    ]
+  },
+  "fixture": {
+    "path": "temjin-idle-1925.json",
+    "sha256": "c5189a5819c36440981f0284f8423c4bef1ae2e0c78d954329ae51c889070a8e",
+    "selector_events": 1,
+    "marker_slot_writes": 12,
+    "active_marker_slots": [0, 1, 2, 3],
+    "body_packets": 11,
+    "skeleton_packets": 7,
+    "part_programs": 18,
+    "unresolved_obas": 0,
+    "unmatched_joins": 0
+  },
+  "independent_run": {
+    "raw_sha256": "e23846fca2c166cb93277c373039b2b70c6ffdea3d2a42201812af81fda11978",
+    "instrumentation_sha256": "a95f337154df2bae6e747a7f6260646910809c647090feaa590ff3ba914dc8ad",
+    "frame": 1925,
+    "event_range": [989931, 990308],
+    "selector_header_cursor_exact": true,
+    "packet_words_exact": true,
+    "oba_order_exact": true,
+    "pushed_base_words_exact": true,
+    "committed_matrix_words_exact": true
+  },
+  "promotion_limits": [
+    "The fixture proves packet, selector, stack, commit, and OBA ordering for one traversal.",
+    "Marker/root naming and unique parent lineage remain required before this action can enter a fighter render contract."
+  ]
+}

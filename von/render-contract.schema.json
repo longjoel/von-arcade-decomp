@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://von-reconstruction.invalid/render-contract-v1.schema.json",
+  "title": "Virtual-On fighter render contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "fighter", "parts", "motions", "evidence"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "fighter": {"type": "string", "minLength": 1},
+    "parts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/part"}
+    },
+    "motions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/motion"}
+    },
+    "overlays": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/overlay"},
+      "default": []
+    },
+    "evidence": {"$ref": "#/$defs/evidence"}
+  },
+  "$defs": {
+    "hex32": {"type": "string", "pattern": "^0x[0-9a-fA-F]{8}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "parent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {"kind": {"const": "object_root"}}
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "oba"],
+          "properties": {
+            "kind": {"const": "part"},
+            "oba": {"$ref": "#/$defs/hex32"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "slot"],
+          "properties": {
+            "kind": {"const": "marker"},
+            "slot": {"type": "integer", "minimum": 0, "maximum": 5}
+          }
+        }
+      ]
+    },
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "selectors": {"type": "array", "items": {"type": "integer", "minimum": 0}},
+        "states": {"type": "array", "items": {"type": "integer", "minimum": 0}},
+        "required_flags": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oba", "stream", "record_slot", "submission_order", "parent", "active_when", "fixture_sha256"],
+      "properties": {
+        "oba": {"$ref": "#/$defs/hex32"},
+        "stream": {"enum": ["skeleton", "body", "option", "procedural"]},
+        "record_slot": {"type": "integer", "minimum": 0},
+        "submission_order": {"type": "integer", "minimum": 0},
+        "parent": {"$ref": "#/$defs/parent"},
+        "active_when": {"$ref": "#/$defs/condition"},
+        "fixture_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "motion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selector", "state", "skeleton_header", "body_header", "cursor"],
+      "properties": {
+        "selector": {"type": "integer", "minimum": 0},
+        "state": {"type": "integer", "minimum": 0},
+        "skeleton_header": {"$ref": "#/$defs/hex32"},
+        "body_header": {"$ref": "#/$defs/hex32"},
+        "cursor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reset", "wrap"],
+          "properties": {
+            "reset": {"type": "integer", "minimum": 0},
+            "wrap": {"type": "integer", "minimum": 1}
+          }
+        }
+      }
+    },
+    "overlay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "order", "targets"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "order": {"type": "integer", "minimum": 0},
+        "targets": {"type": "array", "items": {"$ref": "#/$defs/hex32"}}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fixtures", "capture_manifests"],
+      "properties": {
+        "fixtures": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/sha256"}},
+        "capture_manifests": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/sha256"}}
+      }
+    }
+  }
+}

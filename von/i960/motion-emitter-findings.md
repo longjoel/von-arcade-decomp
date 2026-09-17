@@ -179,19 +179,21 @@ VON_TRACE_T0=0 VON_TRACE_T1=180 VON_EMITTER_T0=0 VON_EMITTER_T1=180 \
   bash scripts/record-human.sh
 ```
 
-## 5. Open convention (`SPECULATIVE`)
+## 5. Superseded 27-degree result (`RETRACTED`)
 
 Records are **absolute local rotations** — an integration test (treating the
 angles as deltas and accumulating) scored worse than the absolute hypothesis
 (60° vs 33° mean edge residual), so they are not integrator inputs.
 
-Composing the exact emitted `M` against the geometry-board world matrices does
-not close: for no `(parent, child)` pair is `inv(W_parent)*W_child ≈ M` below a
-~27° floor, with the best axis/transpose conventions. This means the matrix the
-geometry parser logs is not related to the SHARC local matrix the way we
-assumed (it may carry its own object-level transform or use a different basis).
+The first composition attempt reported a ~27° floor. That number is not a
+property of the arcade transform pipeline and must not be used as a tolerance:
+the experiment mixed instruction and service opcode numbers, decoded the
+translation words as ordinary values instead of the SHARC packed format, and
+did not follow opcode-0x05/0x06 stack lineage. Section 5d records the corrected
+packet math and the remaining exact-parent requirement.
 
-**Next step (decisive):** calibrate against the SHARC directly. `probe_sharc_transform.lua`
+The next calibration step at the time was to query the SHARC directly.
+`probe_sharc_transform.lua`
 finds the SHARC (`adsp21062(:copro_adsp)`), injects the packet, and reads the
 12-word result at `DM(0x30101)`. Feeding one captured packet and reading the
 hardware matrix pins the true relationship without any inference. Then the
@@ -291,9 +293,10 @@ The angle word is signed-16 scaled by the constant `0x38C9116D = pi/32768`
 
 Because the pushed matrix is cumulative and the rotations are applied
 **pre-multiplied** (`M' = R * M`) while the translate accumulates `M * v`, the
-remaining question for the rig is the exact relation between this SHARC
-cumulative matrix and the geometry parser's world matrix `W` (the ~27 deg
-composition floor).
+rig must preserve the SHARC program and stack state directly. The old ~27°
+number was produced before the packet, angle, packed-translation, and stack
+semantics were corrected; it is not an unexplained residual or an acceptable
+runtime tolerance.
 
 **Translation words are fixed-point, not floats.** Service `0x2f` does not use
 the three words as float translations. It builds a float from each 16-bit word
@@ -332,18 +335,43 @@ against the logged `vonj_geometry_matrix` (paired by OBA via
 - **Rotation composes to ~2 deg** for the best parent/child pairs
   (`W[504754]*L[504748]` -> 1.97 deg). This confirms the transform math
   (fixed-point translation + `pi/32768` angles + Z/Y/X pre-multiply).
-- Translation still differs by ~19 units on those pairs because the **parent
-  base is not yet identified** (the emitted parts are emitted in a
-  depth-first order with push/pop, so a child's base is its parent's committed
-  matrix, not the previous packet). The best-rotation pairs are near-coincident
-  joints, so the pairing must come from the model part tree (`rigs/*.json`),
-  not from geometry distance.
+- Translation still differs by ~19 units on those guessed pairs because the
+  **parent base was not identified** (parts are emitted in depth-first order
+  with push/pop, so a child's base is the exact pushed state, not the previous
+  packet). A fitted model tree and geometry distance may diagnose captures,
+  but neither can promote lineage; that requires the ordered stack events.
 
-The transform is therefore **pinned**: the remaining exact placement needs the
-per-part parent tree, which is exactly what `bake_fighter_animation.py` infers
-and `rig_to_header_multi.py` bakes. The earlier ~27 deg "composition floor" is
-resolved — it was the wrong record decode (instruction vs service opcodes, the
-wrong angle unit, and the fixed-point translation).
+The transform math is therefore **pinned**. Parent promotion is now a separate
+lineage problem: `von/tools/analyze_transform_lineage.py` consumes ordered raw
+matrix words and recovered push/commit/pop events, accepts only exact stack
+state, and rejects ambiguous bases. Capture-fitted parents and nearest-matrix
+or nearest-part choices remain provisional inputs and cannot populate the
+versioned `von/render-contract.schema.json` contract. The earlier ~27 degree
+"composition floor" is resolved — it came from the wrong record decode
+(instruction vs service opcodes, the wrong angle unit, packed translation,
+and missing stack lineage), not from SHARC numeric error.
+
+## 5e. Ordered runtime fixture (2026-09-17)
+
+`gameplay_progress.lua` now emits a single monotonically ordered NDJSON stream
+from Lua taps: i960 FIFO words and writer registers, selector/header/cursor
+state, six-slot marker-record writes, exact SHARC push bases and pop restores,
+and seeded 13-word geometry writes normalized to their 12 matrix words. This
+requires MAME's `-nodrc` interpreter because SHARC DRC writes bypass Lua data-
+space taps; no MAME C++ instrumentation is involved.
+
+`von/tests/fixtures/render-contract/temjin-idle-1925.json` is the first compact
+slice. It contains one Temjin traversal: selector 0/state 0/cursor 2, 11 body
+packets, seven skeleton packets, 18 destination-joined commits, 18 exact
+push/commit/pop programs, and the 12 writes that populated marker slots 0–3.
+Every OBA and packet/commit join resolves. Its adjacent manifest pins the raw
+245 MB capture by hash and records the exact normalization range; the raw file
+remains local and ignored. Slots 4–5 were not written in this traversal and
+remain unclassified. The fixture is evidence-complete for ordering but is not
+yet lineage-promoted: root/marker matrix naming is still required. A preceding
+independent run reproduced the selector/header/cursor tuple, packet words, OBA
+order, pushed bases, and committed matrix words bit-for-bit; both raw hashes
+and extraction ranges are recorded in the fixture manifest.
 
 ## 6. What this unlocks
 

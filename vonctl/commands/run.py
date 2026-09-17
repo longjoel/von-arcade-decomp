@@ -23,6 +23,14 @@ def _ctrlr_args() -> list[str]:
     return []
 
 
+def _runner_ctrlr_args() -> list[str]:
+    """Controller arguments understood by tools/mame_runner.py."""
+    name, path = config.ctrlr_name(), config.ctrlr_path()
+    if name and path.is_dir():
+        return ["--ctrlr", name, "--ctrlr-path", str(path)]
+    return []
+
+
 def run(argv: list[str], env: dict[str, str] | None = None) -> int:
     """Run the original ROM set (port of scripts/run.sh)."""
     config.require_command("python3")
@@ -37,7 +45,7 @@ def run(argv: list[str], env: dict[str, str] | None = None) -> int:
             "--capture-dir", str(config.capture_dir()),
             "--root", str(config.ROOT),
         ]
-        command += _ctrlr_args()
+        command += _runner_ctrlr_args()
         command += ["--", *_mame_args(argv)]
         return process.run(command, env=env, cwd=config.ROOT, check=False)
     finally:
