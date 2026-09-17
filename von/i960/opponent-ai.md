@@ -379,7 +379,7 @@ hand-move (attack) table, 0x20 bytes each:
 
 | offset | field |
 | ---: | --- |
-| `0x00` | owner/hand index byte; indexes the 0x30-byte table at `0x562ccc` (`ldob (g1),g5; ld 0x562ccc[g5*0x30]`) |
+| `0x00` | owner/hand index byte; indexes the 0x30-byte work-RAM table at `0x562ccc` (`ldob (g1),g5; ld 0x562ccc[g5*0x30]`), which is populated at runtime |
 | `0x02` | flags/id halfword: bit 15 = active/occupied, bit 13 = counted by `0x77c40`, low bits = move id (`& 0xffe0` in `0xbd730`) |
 | `0x04` | counter/timer halfword: bit 15 flag, incremented by the handler (`0xa3b98`-`0xa3bb0`) |
 | `0x10`/`0x14`/`0x18` | target world position (x/y/z), compared against the opponent's `+0x14`/`+0x18`/`+0x1c` |
