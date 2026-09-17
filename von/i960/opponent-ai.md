@@ -12,6 +12,28 @@ adds a small perception→class→command pipeline. It never reads raw controlle
 input; it reads the opponent's *mech index* (`+0x64`) and *action state*
 (`+0x172`).
 
+## Evidence status
+
+Structural facts (table indices, control flow, store sites) are
+instruction-derived and are not guesses. Semantic names are hypotheses, and
+they are not equal:
+
+- **Runtime-validated**: the bearing-sector classifier (§1: recomputed from
+  object positions/facing, matches the logged sector in 93.9% of 2300 frames);
+  the packed command word and commit gate (§7, matches the consumer decode);
+  the transition table `3*group+pattern` (§8, read directly from every
+  handler); the hand-move dispatch (§10, corroborated by the
+  `"HAND_MOVE ID ERROR"` string at `0xbd710`).
+- **Instruction-grounded, not runtime-validated**: the 8-direction code table
+  (§7), `+0x64` as the roster index (§4), the event triggers (§9).
+- **Inferred labels (not proven)**: "side-step" for `0xa98f0`; "mech matchup"
+  for `0x7a3e0`; the per-mech reading of the `0x79050` arms. These are the
+  weakest claims in this note and should be tested before being relied on.
+
+A label that has not survived a falsification attempt is marked `LIKELY` or
+`SPECULATIVE` in place; the `KNOWN` tags on sections above refer to the
+structural chain, not to the semantic name.
+
 ## 1. Perception — bearing to the opponent (`0x76590`, `KNOWN` shape)
 
 `0x76590` (geometry object band pair) is the "where is he" step:
@@ -42,6 +64,14 @@ in `g0 = (s16)bearing`:
 The sector is stored at `0x504d68` (`0x76638`). Note `0x504d60` is a SHARC
 geometry response, not a wall-clock timer, even though the state machine uses
 it as a threshold.
+
+**Validated (observed):** recomputing the sector from the two objects'
+positions and facing over the 2300-frame attract capture matches the logged
+`0x504d68` in **93.9%** of frames using object A and the convention
+`bearing = atan2(-(x_other - x_self), z_other - z_self) - facing`. The
+remaining frames are consistent with the global being last-writer for whichever
+object ran the classifier most recently. This confirms the "relative bearing ->
+sector" semantics rather than only the address chain.
 
 ## 2. Class dispatch (`0x735f0`, `KNOWN`)
 
