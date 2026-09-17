@@ -393,6 +393,13 @@ ranges in section 9 and read individual context fields; whether `0xbd730`'s
 `index*0x2c` records align with the object's `index*0x20` records is not yet
 confirmed.
 
+**Validated (observed):** `von/tools/probe_hand_moves.lua` over the attract
+saw record flags `01/02/07/08/09/0b/6a/6b/73/75/7f/81` -- all within the
+0..0xcc valid range -- ids `0000/2000/4000/c000/c800/2008/2103/...` (bit 13 is
+the flag `0x77c40` counts), and aggregate `0x504e50` values
+`00/08/10/14/18/1c`. So the table and its flag vocabulary are real, not just a
+static reading.
+
 ## Open items
 
 - The `0x504d60` SHARC response's physical meaning (distance, height, or
