@@ -171,8 +171,10 @@ as program ROMs.
 - What are `vo-prog0.usa` and `vo-prog1.usa`, and are they duplicate/renamed
   dumps or chips from another board?
 - Which EEPROM fields configure twin/relay behavior independently of the ROM?
-- What exactly do the `0x11`/`0x12` link message fields (`[4]`/`[5]` flags) and
-  the HDLC address/control bytes (`0x31`/`0x37`/`0x41`) convey, and how is the
-  link id ordered across more than two cabinets (relay)?
+- What exactly do the descriptor's `[0]`/`[1]`/`[2]` controller header bytes
+  (`0x31`/`0x35`/`0x37`/`0x3A`/`0x41`, `0xFF`, and `0x00`/`0x01`/`0x02`/`0x05`/
+  `0x62`) and the type-`0x02` `[4]`/`[6]` geometry fields convey? The message
+  payload `[8..0xC]` is decoded (type, count, id, flags) as is the role/hop
+  arithmetic; see [cpu3-disassembly.md](cpu3-disassembly.md).
 - How are the uPD72103 registers (`0x03` port, 8-byte init `0x06D2`) mapped to
   the NEC register set?

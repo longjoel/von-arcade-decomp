@@ -69,24 +69,62 @@ Shared header layout, Z80 `0x8000` (i960 offset `0`):
 The payload ring buffer is `0x0E00` bytes at Z80 `0xE1C0` (i960 shared offset
 `0x21C0`); the i960 game re-derives `frameOffset` as `frameSize/2 = 0x0700`.
 
-## Message grammar
+## Link descriptors
 
-I/O frames are 16-byte descriptors. `[0]` is an HDLC address/flag byte
-(`0x31`/`0x37`/`0x41`), `[1]` is `0xFF`, and `[8]` is the message type. The
-firmware dispatches on `(IX+8)` in `0x047A`/`0x04CA`/`0x0500`:
+Both rings hold 16-byte descriptors (`0x10` stride, indices `0x8008`/`0x800A`
+wrap within `0x100`). `0xC100` (`0x010C`) is the controller-facing ring: the
+ISR `0x0356` fills a slot (`[9]`/`[0xA]`/`[0xB]`), clears `[1]`, and kicks
+`out ($00),1`. `0xC200` (`0x0119`) is the staging ring that `0x064F` acquires a
+free slot from (`[0] == 0x31`) and `0x0500` copies into a `0xC100` slot.
 
-| Type | Meaning (LIKELY) |
-| --- | --- |
-| `0x16` | link announce/reset (checked by `0x0392`/`0x03DB`) |
-| `0x11` | link id/count exchange (`[9]`=count, `[0xB]`/`[0xC]`=flags) |
-| `0x12` | link ack/id (`[0xA]`=id) |
-| `0x02` | data/vsync frame (template `0x06C2` carries frame geometry) |
+Descriptor field map (offsets are within the 16-byte record):
 
-Descriptor templates live at `0x06A2` (`0x16`), `0x06B2` (`0x11`), `0x06C2`
-(`0x02`), `0x06FA`/`0x070A` (`0x41`/`0x37`). The RX descriptor ring is based at
-`0xC100` and TX at `0xC200` (0x10-byte stride, advanced by the `0x8008`/`0x800A`
-indices; `0x0664` clears `0xE0` bytes and seeds the frame geometry). `0x072A`'s
-16-byte ring-pointer table is copied to `0xC300`.
+| Offset | Meaning | Evidence |
+| ---: | --- | --- |
+| `0` | controller/ownership command `0x31`/`0x35`/`0x37`/`0x3A`/`0x41`; set `0xFF` when consumed | templates; `0x03C8`/`0x04FC`/`0x0547` |
+| `1` | constant `0xFF` (HDLC broadcast address candidate) | all templates |
+| `2` | header aux `0x00`/`0x01`/`0x02`/`0x05`/`0x62` | templates |
+| `3..4` | frame size, little-endian (`0x06C2` = `00 0e`; `0x0677` writes `$8012`) | LIKELY |
+| `6` | extra geometry in the type-`0x02` template (`0xE0`) | KNOWN value, role open |
+| `8` | message type | `0x047A`/`0x04CA`/`0x0500` |
+| `9` | link count | `0x04DF`, `0x0516`, `0x0364` |
+| `0xA` | link id | `0x04F6`, `0x053B`, `0x036E` |
+| `0xB` | link flags, OR'd with `shared[0x0E]` when building | `0x04E8`, `0x0529` |
+| `0xC` | link flags, minus `shared[0x26]` hop offset | `0x04E2`, `0x051F` |
+| `0xD..0xF` | zero | templates |
+
+Message types (`[8]`), with the template that seeds each:
+
+| Type | Template | Fields | Meaning |
+| --- | --- | --- | --- |
+| `0x16` | `0x06A2` | `[9]`/`[0xA]` = count or `-id`, `[0xB]` = active flag | link announce/reset |
+| `0x11` | `0x06B2` | `[9]`=count, `[0xA]`=id, `[0xB]`/`[0xC]`=flags | link id/count |
+| `0x12` | (built by `0x0500`) | `[0xA]`=id | link ack/id |
+| `0x02` | `0x06C2` | `[3..4]`=frame size, `[4]`/`[6]`=geometry | data / vsync |
+| `0x10` | `0x06DA` | — | controller seed |
+
+Controller seeds `0x06DA` (`35 FF 62 10 40 05 …`), `0x06EA`/`0x06FA`
+(`41 FF …`), `0x070A` (`37 FF …`), `0x071A` (`3A FF …`) are posted at init
+(`0x05C8`) and refreshed by `0x02D8`; `0x072A`'s four `00 C0 E1 00` entries
+are the ring pointers copied to `0xC300` (`0x055C`).
+
+## Role and hop arithmetic
+
+The role byte `shared[1]` (i960-written) selects the boot path and the id/count
+offsets. `sbc a,a`/`cpl` at `0x021B`/`0x0273` derive them:
+
+| `shared[1]` | meaning | `0x800E` active | `0x8024` | `0x8025` id add | `0x8026` count sub |
+| ---: | --- | ---: | ---: | ---: | ---: |
+| `0` | relay | `0x80` | `0` | `0x00` | `0xFF` |
+| `1` | master | `0x01` | `0xFF` | `0` | `0` |
+| `2` | slave | `0x80` | `0` | `0xFF` | `0x00` |
+| `3` | standalone | `0x80` | `0` | `0xFF` | `0x00` |
+
+`0x0500` applies them: `shared[2] = desc[0xA] + 0x8025` (the slave's id is one
+below the master's) and `shared[4] = desc[0xC] - 0x8026` (a relay subtracts one
+hop). `0x0356` emits an announce with `[9] = [0xA] = (count == 0 ? -id : count)`
+and `[0xB] = shared[0x0E]`. `0x802A`/`0x802C` are the `0x20`-port keepalive
+counter and its `0x00AB` threshold.
 
 ## I/O ports
 
@@ -110,7 +148,8 @@ TX/RX descriptor work (`0x0308`/`0x04B5`) and reports the local link id/count.
 
 ## Status
 
-The mailbox contract and the message grammar are now recovered well enough to
-drive a replacement link. Open items are noted in
-[chip-map.md](chip-map.md#communication-board-837-11615): the exact HDLC
-address/control fields and the meaning of the `[4]`/`[5]` link flags.
+The mailbox contract, descriptor payload fields (`[8..0xC]`), message types,
+and the role/hop arithmetic are recovered. Open items: the `[0]`/`[1]`/`[2]`
+controller header semantics and the `[4]`/`[6]` type-`0x02` geometry fields —
+both need the uPD72103 register/datasheet context. See
+[chip-map.md](chip-map.md#communication-board-837-11615).
