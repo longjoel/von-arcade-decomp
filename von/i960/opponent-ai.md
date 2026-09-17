@@ -241,6 +241,39 @@ lane to `0` and the other to a bearing. The service-29 handlers still compute
 the actual velocity via the SHARC, so the command word selects the animation
 bearing.
 
+## 8. Transition -> movement command (`KNOWN` shape)
+
+The state machine's transition (`0x504d98`) is consumed at `0x74964`-`0x74978`,
+which indexes a 24-entry table at `0x7497c` (transition -> handler). The
+handlers are small and set `g5`/`g6` before the common tail:
+
+- default (`0`, `22`, `23`) -> `g5 = g6 = 1` (`0x74D20`).
+- `7`/`8`/`9` (`0x74B20`/`0x74B30`/`0x74B44`): taken only while the action
+  counter `0x504db4 < 4`; otherwise default. `7` -> `g5=2,g6=1`;
+  `8` -> `g5=1,g6=2`; `9` -> `g5=2,g6=2`.
+- `10`/`11`/`12` (`0x74C24`/`0x74C38`/`0x74C50`): taken only while the clip
+  cursor `+0x17a > 7`; otherwise default. `10` -> `g5=2,g6=1`;
+  `11` -> `g5=1,g6=2`; `12` -> `g5=2,g6=2`.
+- `1`-`6` and `13`-`21` have their own `+0x172`/`+0x170`/counter gates.
+
+The common tail `0x74D28`-`0x74E50` computes the **movement bytes**:
+
+```
+74da4: cmpi g6,2 ; g6 = current MA (0x504dac)
+74db0: g4 = 0
+74db4..74dd0: g4 = 4/2/1 from g6/MA bit0
+74dd4..74dec: g0 = 1, or 2/4 from g5 and bit0 of current MA
+74df0..74e34: setbit 3/4/5 of g4/g0 per r8/r9 (16 or 8)
+74e10: st g4,0x504dac     ; MA
+74e48: st g0,0x504db0     ; MB
+```
+
+So the transition id selects the CPU's stick command: `g5`/`g6` pick the
+forward/back/strafe pattern and `r8`/`r9` (16 or 8) pick the direction bits,
+which are written to the same `0x504dac`/`0x504db0` cells the local controller
+feeds. This closes the AI loop: perception -> class -> transition -> movement
+input.
+
 ## Open items
 
 - The `0x504d60` SHARC response's physical meaning (distance, height, or
