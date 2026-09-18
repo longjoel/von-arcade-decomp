@@ -570,7 +570,7 @@ def _newest(directory: Path, pattern: str) -> Path | None:
 
 
 def von_progress(argv: list[str]) -> int:
-    mame = config.MAME_DIR / "von"
+    mame = config.env_path("VON_MAME_BIN", config.ROOT / "bin" / "von")
     config.require_file(mame, "MAME binary")
     toolbox = config.env("VON_TOOLBOX", "von-mame")
     seconds = config.env_int("VON_PROGRESS_SECONDS", 150)
@@ -580,10 +580,14 @@ def von_progress(argv: list[str]) -> int:
     out_dir = _disasm()
     trace = out_dir / f"vonj-progress-{seconds}s.trace"
     lua_log = out_dir / f"vonj-progress-{seconds}s.lua.log"
+    transform_log = out_dir / f"vonj-progress-{seconds}s.transform.ndjson"
     snap_dir = out_dir / "vonj-progress-snaps"
     snap_dir.mkdir(parents=True, exist_ok=True)
     command = process.toolbox_prefix(toolbox) + [
         "env", f"VON_PROGRESS_SECONDS={seconds}", f"VON_PROGRESS_LOG={lua_log}",
+        f"VON_PROGRESS_TRANSFORM_LOG={transform_log}",
+        "VON_PROGRESS_SHARC_FIFO_READS=1", "VON_PROGRESS_SHARC_FIFO_REGS=1",
+        f"SDL_VIDEODRIVER={config.env('SDL_VIDEODRIVER', 'dummy')}",
         str(mame), "vonj", "-rompath", str(rom_path),
         "-video", "none", "-sound", "none", "-oslog",
         "-snapshot_directory", str(snap_dir),
@@ -594,6 +598,7 @@ def von_progress(argv: list[str]) -> int:
     _summarize(trace)
     print(f"Wrote {trace}")
     print(f"Wrote {lua_log}")
+    print(f"Wrote {transform_log}")
     return 0
 
 
