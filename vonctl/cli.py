@@ -37,7 +37,7 @@ Capture and trace
   sandbox                    movement sandbox run
   fuzz versus|twin           input fuzzing
   hack bout                  instrumented hacking run
-  sweep sticks               twin-stick mapping sweep
+  sweep sticks|locomotion    twin-stick mapping or Godot-calibration sweep
   audit clean-runtime        clean i960 runtime audit
 
 Build

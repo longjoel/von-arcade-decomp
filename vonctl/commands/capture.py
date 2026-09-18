@@ -45,27 +45,44 @@ def audio(argv: list[str]) -> int:
     return 0
 
 
-def bout(argv: list[str]) -> int:
+def bout(argv: list[str], env: dict[str, str] | None = None) -> int:
     """Deterministic versus-bout telemetry (port of scripts/capture-bout.sh)."""
     from . import ops
 
+    override = env or {}
+
+    def setting(name: str, default: str) -> str:
+        return override[name] if name in override else (config.env(name, default) or default)
+
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    out_dir = config.env_path("VON_BOUT_OUT", config.capture_dir() / f"bout-{stamp}")
+    out_dir = Path(setting("VON_BOUT_OUT", str(config.capture_dir() / f"bout-{stamp}")))
     out_dir.mkdir(parents=True, exist_ok=True)
+    telemetry_path = out_dir / "bout.csv"
     ops.sandbox([], env={
         "VON_SANDBOX_OUT": str(out_dir),
-        "VON_SANDBOX_SECONDS": str(config.env_int("VON_BOUT_SECONDS", 220)),
-        "VON_SANDBOX_ACTIVE_LEVELS": config.env("VON_BOUT_ACTIVE_LEVELS", "0") or "0",
-        "VON_SANDBOX_FREEZE": config.env("VON_BOUT_FREEZE", "1") or "1",
-        "VON_SANDBOX_PROGRAM": config.env("VON_BOUT_PROGRAM", "default") or "default",
-        "VON_SANDBOX_PROBE": config.env("VON_BOUT_PROBE", "") or "",
-        "VON_SANDBOX_PROBE_FRAMES": config.env("VON_BOUT_PROBE_FRAMES", "180") or "180",
-        "VON_SANDBOX_WEAPON_CASE": config.env("VON_BOUT_WEAPON_CASE", "both") or "both",
-        "VON_SANDBOX_TELEMETRY": str(out_dir / "bout.csv"),
-        "VON_SANDBOX_SET": config.env("VON_BOUT_SET", "vonj") or "vonj",
-        "VON_SANDBOX_ROMPATH": config.env("VON_BOUT_ROMPATH", "") or "",
+        "VON_SANDBOX_SECONDS": setting("VON_BOUT_SECONDS", "220"),
+        "VON_SANDBOX_ACTIVE_LEVELS": setting("VON_BOUT_ACTIVE_LEVELS", "0"),
+        "VON_SANDBOX_FREEZE": setting("VON_BOUT_FREEZE", "1"),
+        "VON_SANDBOX_PROGRAM": setting("VON_BOUT_PROGRAM", "default"),
+        "VON_SANDBOX_PROBE": setting("VON_BOUT_PROBE", ""),
+        "VON_SANDBOX_PROBE_FRAMES": setting("VON_BOUT_PROBE_FRAMES", "180"),
+        "VON_SANDBOX_WEAPON_CASE": setting("VON_BOUT_WEAPON_CASE", "both"),
+        "VON_SANDBOX_TELEMETRY": str(telemetry_path),
+        "VON_SANDBOX_SET": setting("VON_BOUT_SET", "vonj"),
+        "VON_SANDBOX_ROMPATH": setting("VON_BOUT_ROMPATH", ""),
     })
-    print(f"bout telemetry: {out_dir / 'bout.csv'}")
+    row_count = 0
+    if telemetry_path.is_file():
+        with telemetry_path.open(encoding="utf-8", errors="replace") as telemetry:
+            row_count = sum(1 for _ in telemetry)
+    # The Lua script opens the CSV at boot, so a header-only file still means
+    # MAME never reached the sandbox battle/telemetry phase.
+    if row_count < 2:
+        raise config.CommandError(
+            f"bout capture produced no telemetry: {telemetry_path} "
+            f"(inspect {out_dir / 'mame.log'})"
+        )
+    print(f"bout telemetry: {telemetry_path}")
     return 0
 
 

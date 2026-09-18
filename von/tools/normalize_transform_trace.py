@@ -59,6 +59,7 @@ def normalize(lines: Iterable[bytes], source_sha256: str, *,
               event_end: int = 2**63 - 1) -> dict[str, Any]:
     selectors: list[dict[str, Any]] = []
     marker_writes: list[dict[str, Any]] = []
+    marker_consumes: list[dict[str, Any]] = []
     packets: list[dict[str, Any]] = []
     output_packet_ids: set[int] = set()
     matched_packet_ids: set[int] = set()
@@ -66,8 +67,10 @@ def normalize(lines: Iterable[bytes], source_sha256: str, *,
     part_programs: list[dict[str, Any]] = []
     pending: dict[str, deque[dict[str, Any]]] = defaultdict(deque)
     latest_push: dict[int, dict[str, Any]] = {}
+    latest_service_source: dict[str, Any] | None = None
     open_programs: dict[int, dict[str, Any]] = {}
     packet_words: list[dict[str, Any]] | None = None
+    queued_packet: dict[str, Any] | None = None
     raw_events = 0
     first_id: int | None = None
     last_id: int | None = None
@@ -103,6 +106,14 @@ def normalize(lines: Iterable[bytes], source_sha256: str, *,
                     "data", "mask")})
             continue
 
+        if kind == "marker_slot_consume":
+            if selected:
+                marker_consumes.append({key: event[key] for key in (
+                    "event_id", "frame", "pc", "address", "slot", "field",
+                    "data", "mask", "slot_words", "r6", "g0", "g1", "g2",
+                    "g3", "g4", "g5")})
+            continue
+
         if kind == "i960_fifo":
             if packet_words is None:
                 if event.get("data") == 5 and event.get("pc") in EMITTERS:
@@ -114,8 +125,14 @@ def normalize(lines: Iterable[bytes], source_sha256: str, *,
             if expected is not None and event.get("data") != expected:
                 packet_words = ([event] if event.get("data") == 5 and
                                  event.get("pc") in EMITTERS else None)
+                queued_packet = None
                 continue
-            if len(packet_words) == len(PACKET_OPS):
+            # The SHARC commit is generated after the 0x3a copy-target word
+            # (index 12), before the emitter's trailing 0x06.  Queue the
+            # packet at that boundary so destination joins cannot drift to a
+            # later frame; retain the object and append the terminator when
+            # it arrives for fixture completeness.
+            if index == 12:
                 start = packet_words[0]
                 stream = EMITTERS[start["pc"]]
                 oba, record_address = resolve_identity(start, stream, g2_map, r6_map)
@@ -132,6 +149,7 @@ def normalize(lines: Iterable[bytes], source_sha256: str, *,
                     "destination": dest,
                     "words": words,
                 }
+                queued_packet = packet
                 pending[dest].append(packet)
                 if (frame_start <= start["frame"] <= frame_end and
                         event_start <= start["event_id"] <= event_end and
@@ -139,10 +157,18 @@ def normalize(lines: Iterable[bytes], source_sha256: str, *,
                          (oba is not None and oba.startswith(oba_prefix)))):
                     packets.append(packet)
                     output_packet_ids.add(packet["event_id"])
+                continue
+            if index == 13:
+                if queued_packet is not None:
+                    queued_packet["words"].append(event["data"])
+                    queued_packet["end_event_id"] = event["event_id"]
                 packet_words = None
+                queued_packet = None
             continue
 
-        if kind == "push":
+        if kind == "sharc_service_source":
+            latest_service_source = event
+        elif kind == "push":
             push = {
                 "event_id": event_id, "frame": frame, "kind": "push",
                 "depth": event["depth"], "pointer": event["pointer"],
@@ -166,6 +192,15 @@ def normalize(lines: Iterable[bytes], source_sha256: str, *,
                     "source_stream": packet and packet["source_stream"],
                     "record_address": packet and packet["record_address"],
                 }
+                if "stack_words" in event:
+                    commit["stack_words"] = event["stack_words"]
+                if (latest_service_source is not None and
+                        latest_service_source.get("frame") == frame and
+                        latest_service_source.get("event_id", 0) < event_id):
+                    commit["service_source_words"] = latest_service_source.get(
+                        "matrix_words", [])
+                    commit["service_source_event_id"] = latest_service_source.get(
+                        "event_id")
                 push = latest_push.get(event["depth"])
                 if push is None:
                     unmatched_commits += 1
@@ -199,6 +234,7 @@ def normalize(lines: Iterable[bytes], source_sha256: str, *,
         },
         "motion_selectors": selectors,
         "marker_slot_writes": marker_writes,
+        "marker_slot_consumes": marker_consumes,
         "packets": packets,
         "stack_transitions": transitions,
         "part_programs": part_programs,

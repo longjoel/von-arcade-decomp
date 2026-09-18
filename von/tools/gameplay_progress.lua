@@ -47,6 +47,8 @@ local MOTION_SELECTOR_MAX = tonumber(
 -- bound the tapped window (default the 0x1400000 commit region); the tap also
 -- logs the working-matrix pointer DM(0x30101) so the push/pop base is visible.
 local SHARC_LOG_PATH = os.getenv("VON_PROGRESS_SHARC_LOG")
+local SHARC_FIFO_READS = os.getenv("VON_PROGRESS_SHARC_FIFO_READS") == "1"
+local SHARC_FIFO_REGS = os.getenv("VON_PROGRESS_SHARC_FIFO_REGS") == "1"
 local SHARC_TAP_MIN = tonumber(
     os.getenv("VON_PROGRESS_SHARC_TAP_MIN") or "0x01400000")
 local SHARC_TAP_MAX = tonumber(
@@ -195,8 +197,14 @@ local sharc_space
 local sharc_writes = 0
 local sharc_reading = false
 local sharc_stack_tap
+local sharc_fifo_read_tap
+local sharc_live_words
+local sharc_reg_pending_command
 local i960_fifo_tap
 local marker_slot_tap
+local marker_slot_read_tap
+local marker_slot_reading = false
+local marker_slot_words = {}
 local sharc_last_depth = 0
 local sharc_pending_stack_kind
 local commit_run = { start = nil, next = nil, words = {} }
@@ -235,8 +243,10 @@ local function flush_commit_run()
         end
         transform_event("commit", string.format(
             ',"pc":%d,"depth":%d,"destination":"0x%08x",' ..
-            '"matrix_words":%s', state_value(sharc_device, "CURPC"),
-            sharc_last_depth, commit_run.start, json_words(matrix)))
+            '"matrix_words":%s,"stack_words":%s',
+            state_value(sharc_device, "CURPC"), sharc_last_depth,
+            commit_run.start, json_words(matrix),
+            json_words(commit_run.stack_words or {})))
     elseif #commit_run.words > 0 then
         transform_event("commit_fragment", string.format(
             ',"destination":"0x%08x","word_count":%d',
@@ -273,12 +283,48 @@ local function install_marker_slot_tap()
         0x00562430, 0x00562477, "von-transform-marker-slots",
         function(offset, data, mask)
             local relative = offset - 0x00562430
+            local slot = math.floor(relative / 12)
+            local field = math.floor((relative % 12) / 4)
+            if marker_slot_words[slot] == nil then
+                marker_slot_words[slot] = { 0, 0, 0 }
+            end
+            marker_slot_words[slot][field + 1] = data
             transform_event("marker_slot_write", string.format(
                 ',"pc":%d,"address":%d,"slot":%d,"field":%d,' ..
                 '"data":%d,"mask":%d',
                 state_value(motion_selector_cpu, "CURPC"), offset,
-                math.floor(relative / 12), math.floor((relative % 12) / 4),
+                slot, field,
                 data, mask))
+            return data
+        end)
+    marker_slot_read_tap = space:install_read_tap(
+        0x00562430, 0x00562477, "von-transform-marker-slot-consume",
+        function(offset, data, mask)
+            if marker_slot_reading then
+                return data
+            end
+            marker_slot_reading = true
+            local relative = offset - 0x00562430
+            local slot = math.floor(relative / 12)
+            local field = math.floor((relative % 12) / 4)
+            local words = marker_slot_words[slot] or { 0, 0, 0 }
+            -- Log the complete producer state at the read, not just one field:
+            -- a marker source is an ordered slot consumption, and a later
+            -- sibling rewrite must not be retroactively attributed to it.
+            transform_event("marker_slot_consume", string.format(
+                ',"pc":%d,"address":%d,"slot":%d,"field":%d,' ..
+                '"data":%d,"mask":%d,"slot_words":%s,' ..
+                '"r6":%d,"g0":%d,"g1":%d,"g2":%d,"g3":%d,"g4":%d,"g5":%d',
+                state_value(motion_selector_cpu, "CURPC"), offset, slot, field,
+                data, mask, json_words(words),
+                state_value(motion_selector_cpu, "r6"),
+                state_value(motion_selector_cpu, "g0"),
+                state_value(motion_selector_cpu, "g1"),
+                state_value(motion_selector_cpu, "g2"),
+                state_value(motion_selector_cpu, "g3"),
+                state_value(motion_selector_cpu, "g4"),
+                state_value(motion_selector_cpu, "g5")))
+            marker_slot_reading = false
             return data
         end)
 end
@@ -293,7 +339,7 @@ local function find_sharc()
 end
 
 local function install_sharc_tap()
-    if (not SHARC_LOG_PATH and not transform_file) or sharc_tap then
+    if (not SHARC_LOG_PATH and not transform_file and not SHARC_FIFO_READS) or sharc_tap then
         return
     end
     sharc_device = find_sharc()
@@ -338,6 +384,16 @@ local function install_sharc_tap()
                     if commit_run.start == nil then
                         commit_run.start = offset
                         commit_run.next = offset
+                        -- The geometry commit is produced from the live
+                        -- stack matrix. Capture that source before any
+                        -- destination writes so offline replay can separate
+                        -- fighter-local services from object/world factoring.
+                        local ptr_ok, ptr = pcall(function()
+                            return sharc_space:read_u32(0x0030101)
+                        end)
+                        if ptr_ok then
+                            commit_run.stack_words = matrix_at(ptr)
+                        end
                     elseif offset ~= commit_run.next then
                         flush_commit_run()
                         commit_run.start = offset
@@ -406,6 +462,37 @@ local function install_sharc_tap()
                                 '"pointer":%d,"%s":%s', pc, depth, suffix,
                                 data, matrix_field, json_words(words)))
                         sharc_pending_stack_kind = nil
+                    elseif offset >= 0x003010c and offset < 0x0030260 then
+                        -- The stack tap already records pointer changes, but
+                        -- SHARC services can mutate the live matrix in place
+                        -- while a frame remains pushed. Preserve those writes
+                        -- so lineage can identify the service between sibling
+                        -- pushes instead of treating the changed base as a
+                        -- fitted parent.
+                        local reg_suffix = ""
+                        if SHARC_FIFO_REGS and (pc == 131876 or pc == 131904 or
+                                pc == 131848 or pc == 132877) then
+                            reg_suffix = string.format(
+                                ',"r0":%d,"r1":%d,"r2":%d,"r3":%d,"r4":%d,"r5":%d,"r6":%d,"r7":%d,"r8":%d,"r9":%d,"r10":%d,"r11":%d,"r12":%d,"r13":%d,"r14":%d,"r15":%d',
+                                state_value(sharc_device, "R0"), state_value(sharc_device, "R1"),
+                                state_value(sharc_device, "R2"), state_value(sharc_device, "R3"),
+                                state_value(sharc_device, "R4"), state_value(sharc_device, "R5"),
+                                state_value(sharc_device, "R6"), state_value(sharc_device, "R7"),
+                                state_value(sharc_device, "R8"), state_value(sharc_device, "R9"),
+                                state_value(sharc_device, "R10"), state_value(sharc_device, "R11"),
+                                state_value(sharc_device, "R12"), state_value(sharc_device, "R13"),
+                                state_value(sharc_device, "R14"), state_value(sharc_device, "R15"))
+                        end
+                        local ptr_ok, ptr = pcall(function()
+                            return sharc_space:read_u32(0x0030101)
+                        end)
+                        transform_event("sharc_service_write",
+                            string.format(',"pc":%d,"depth":%d,"offset":%d,"data":%d,"mask":%d,"pointer":%d%s',
+                                pc, sharc_last_depth, offset, data, mask,
+                                ptr_ok and ptr or 0, reg_suffix))
+                        if ptr_ok then
+                            sharc_live_words = matrix_at(ptr)
+                        end
                     end
                     sharc_reading = false
                     return data
@@ -418,6 +505,58 @@ local function install_sharc_tap()
                     tostring(stack_err) .. "\n")
             end
         end
+    end
+
+    if SHARC_FIFO_READS and transform_file then
+        pcall(function()
+            -- model2b::copro_sharc_map maps the i960 input FIFO to the
+            -- SHARC data-space window 0x0400000..0x0bfffff.  The firmware
+            -- consumes the stream through the first word of that window.
+            sharc_fifo_read_tap = sharc_space:install_read_tap(
+                0x00400000, 0x00400003, "von-transform-sharc-fifo-read",
+                function(offset, data, mask)
+                    local pc = state_value(sharc_device, "PC")
+                    local suffix = ""
+                    if SHARC_FIFO_REGS and (data == 20 or data == 21 or
+                            data == 22 or data == 58 or
+                            sharc_reg_pending_command ~= nil) then
+                        suffix = string.format(
+                            ',"registers_for":%d,"r0":%d,"r1":%d,"r2":%d,"r3":%d,"r4":%d,"r5":%d,"r6":%d,"r7":%d,"r8":%d,"r9":%d,"r10":%d,"r11":%d,"r12":%d,"r13":%d,"r14":%d,"r15":%d',
+                            sharc_reg_pending_command or data,
+                            state_value(sharc_device, "R0"), state_value(sharc_device, "R1"),
+                            state_value(sharc_device, "R2"), state_value(sharc_device, "R3"),
+                            state_value(sharc_device, "R4"), state_value(sharc_device, "R5"),
+                            state_value(sharc_device, "R6"), state_value(sharc_device, "R7"),
+                            state_value(sharc_device, "R8"), state_value(sharc_device, "R9"),
+                            state_value(sharc_device, "R10"), state_value(sharc_device, "R11"),
+                            state_value(sharc_device, "R12"), state_value(sharc_device, "R13"),
+                            state_value(sharc_device, "R14"), state_value(sharc_device, "R15"))
+                    end
+                    if data == 20 or data == 21 or data == 22 then
+                        sharc_reg_pending_command = data
+                    else
+                        sharc_reg_pending_command = nil
+                    end
+                    transform_event("sharc_fifo_read", string.format(
+                        ',"pc":%d,"offset":%d,"data":%d,"mask":%d%s',
+                        pc, offset, data, mask, suffix))
+                    -- Opcode 0x3a (word 58) terminates a transform service.
+                    -- At this read the service's source pointer still names
+                    -- the live fighter-local matrix; capture it before the
+                    -- commit handler advances or factors the object matrix.
+                    if data == 58 then
+                        local ok, ptr = pcall(function()
+                            return sharc_space:read_u32(0x0030101)
+                        end)
+                        if ok then
+                            transform_event("sharc_service_source",
+                                string.format(',"pc":%d,"pointer":%d,"matrix_words":%s',
+                                    pc, ptr, json_words(sharc_live_words or matrix_at(ptr))))
+                        end
+                    end
+                    return data
+                end)
+        end)
     end
 end
 

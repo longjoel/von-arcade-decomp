@@ -525,6 +525,10 @@ emu.register_periodic(function()
                 log(string.format("input: probe hold=[%s] f%d-%d",
                     PROBE_HOLD, PROBE_BASE, PROBE_BASE + PROBE_DUR))
                 watch("phase-edge")
+            elseif frame == PROBE_BASE + PROBE_DUR then
+                hold_only({})
+                log(string.format("input: probe release f%d", frame))
+                watch("phase-release")
             end
         elseif PROGRAM == "parity" then
             step_parity_program()

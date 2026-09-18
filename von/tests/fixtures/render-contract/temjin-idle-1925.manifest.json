@@ -7,7 +7,7 @@
     "execution_engine": "interpreter",
     "mame_option": "-nodrc",
     "instrumentation": "von/tools/gameplay_progress.lua",
-    "instrumentation_sha256": "cf2579db048d4a710dfb9a684dc56513fbb8b57836f3e602927a98efdfdc0a74"
+    "instrumentation_sha256": "128a69a257824b4f9738445523a33af8e484d9e07b822caa9227b7608c876fe6"
   },
   "capture": {
     "command": "VON_PROGRESS_SECONDS=38 VON_PROGRESS_TRANSFORM_LOG=<local>/von-transform-temjin-complete.ndjson ./bin/vonctl run -nodrc -video none -sound none -skip_gameinfo -seconds_to_run 38 -autoboot_script von/tools/gameplay_progress.lua",
@@ -17,7 +17,7 @@
   },
   "normalization": {
     "tool": "von/tools/normalize_transform_trace.py",
-    "tool_sha256": "17e65872d3825bf8c7dcd22d905dd4d4b7e8967b74968c3d3268daf3cedcfe72",
+    "tool_sha256": "9a27a3df1e80987d35c1a04bea4f48d27aae9dda846f010464a4592d480be4b0",
     "arguments": [
       "--frame-start", "1925",
       "--frame-end", "1925",

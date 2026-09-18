@@ -20,15 +20,26 @@ def main():
                        "frame": frame, **fields})
 
     packet = [5, 0x2F, 1, 2, 3, 0x16, 4, 0x15, 5, 0x14, 6, 0x3A, 0x100, 6]
-    for index, word in enumerate(packet):
+    # The emitter's trailing 0x06 is written after the SHARC commit.  Keep it
+    # after the synthetic stack transaction so the destination join is tested
+    # at the 0x3a boundary rather than accidentally relying on packet end.
+    for index, word in enumerate(packet[:-1]):
         add("i960_fifo", pc=0x8E164 if index == 0 else 0x8E170 + index * 4,
             data=word, mask=0xFFFFFFFF, r6=0x1234, g0=0,
             g2=0x00504730, g4=word)
     add("push", depth=1, pointer=0x3020C, base_words=I)
     add("commit", depth=1, destination="0x01400040", matrix_words=M)
     add("pop", depth=1, depth_after=0, pointer=0x30200, restored_words=I)
+    add("i960_fifo", pc=0x8E1A0, data=packet[-1], mask=0xFFFFFFFF,
+        r6=0x1234, g0=0, g2=0x00504730, g4=packet[-1])
     add("motion_selector", object=1, selector_object=2,
         skeleton_header=3, body_header=4, selector=5, state=6, cursor=7)
+    # A marker consume preserves the complete slot snapshot and CPU context;
+    # marker-source analysis must not have to revisit the raw trace.
+    add("marker_slot_consume", pc=0x8e2d4, address=0x562454,
+        slot=3, field=0, data=0x11111111, mask=0xffffffff,
+        slot_words=[0x11111111, 0x22222222, 0x33333333],
+        r6=6, g0=0, g1=1, g2=2, g3=3, g4=4, g5=5)
 
     lines = [(json.dumps(event) + "\n").encode() for event in events]
     result = normalize(lines, "0" * 64,
@@ -42,6 +53,13 @@ def main():
     assert result["validation"] == {
         "unresolved_packet_obas": 0, "unmatched_packet_commits": 0,
         "unmatched_commits": 0}
+    assert result["marker_slot_consumes"] == [{
+        "event_id": len(events), "frame": 10, "pc": 0x8e2d4,
+        "address": 0x562454, "slot": 3, "field": 0,
+        "data": 0x11111111, "mask": 0xffffffff,
+        "slot_words": [0x11111111, 0x22222222, 0x33333333],
+        "r6": 6, "g0": 0, "g1": 1, "g2": 2, "g3": 3,
+        "g4": 4, "g5": 5}]
 
     bad = [dict(event) for event in events]
     bad[1]["event_id"] = 1

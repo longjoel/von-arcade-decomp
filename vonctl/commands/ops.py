@@ -44,6 +44,10 @@ def sandbox(argv: list[str], env: dict[str, str] | None = None) -> int:
     print(f"out: {out_dir}  budget: {seconds}s  set: {set_name}")
 
     run_env = {
+        # The sandbox is always a headless capture.  Do not require a desktop
+        # SDL video device merely to reach its Lua telemetry program.
+        "SDL_VIDEODRIVER": override.get(
+            "SDL_VIDEODRIVER", config.env("SDL_VIDEODRIVER", "dummy") or "dummy"),
         "VON_SANDBOX_LOG": str(out_dir / "sandbox.log"),
         "VON_SANDBOX_FREEZE": config.env("VON_SANDBOX_FREEZE", "1") or "1",
         "VON_SANDBOX_RECON": config.env("VON_SANDBOX_RECON", "8") or "8",
@@ -220,7 +224,7 @@ def hack(argv: list[str]) -> int:
     return 0
 
 
-PROBES = [
+STICK_PROBES = [
     "up", "down", "left", "right", "up2", "down2", "left2", "right2",
     "up,up2", "down,down2", "left,left2", "right,right2",
     "up,down2", "down,up2", "right,left2", "left,right2",
@@ -228,13 +232,31 @@ PROBES = [
     "up,up2,dash", "up,up2,shot", "right,right2,dash",
 ]
 
+# Short, isolated full-deflection gestures used to calibrate the playable
+# Godot Airport duel.  Each probe runs in its own original-ROM session, which
+# avoids the known long sandbox fault and leaves normal MAME play untouched.
+LOCOMOTION_PROBES = [
+    "up,up2",       # both forward
+    "down,down2",   # both back
+    "right,right2", # strafe right
+    "left,left2",   # strafe left
+    "up",           # single-stick twist
+    "up,down2",     # opposed-stick twist
+    "up,up2,dash",  # forward boost
+]
+
 
 def sweep(argv: list[str]) -> int:
     if not argv or argv[0] in ("-h", "--help"):
-        print("usage: vonctl sweep sticks")
+        print("usage: vonctl sweep sticks|locomotion")
         return 0
-    if argv[0] != "sticks":
-        raise config.CommandError("usage: vonctl sweep sticks")
+    kind = argv[0]
+    if kind == "sticks":
+        probes = STICK_PROBES
+    elif kind == "locomotion":
+        probes = LOCOMOTION_PROBES
+    else:
+        raise config.CommandError("usage: vonctl sweep sticks|locomotion")
     from . import capture as capture_cmd
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -242,7 +264,7 @@ def sweep(argv: list[str]) -> int:
     jobs = config.env_int("VON_SWEEP_JOBS", 6)
     frames = config.env_int("VON_SWEEP_FRAMES", 180)
     out_root.mkdir(parents=True, exist_ok=True)
-    print(f"sweep: {len(PROBES)} probes -> {out_root} (jobs={jobs})")
+    print(f"sweep {kind}: {len(probes)} probes -> {out_root} (jobs={jobs})")
 
     def run_one(probe: str) -> None:
         tag = probe.replace(",", "+")
@@ -256,12 +278,16 @@ def sweep(argv: list[str]) -> int:
         })
 
     with ThreadPoolExecutor(max_workers=jobs) as pool:
-        futures = [pool.submit(run_one, probe) for probe in PROBES]
-        for future, probe in zip(futures, PROBES, strict=True):
+        futures = [pool.submit(run_one, probe) for probe in probes]
+        failures: list[str] = []
+        for future, probe in zip(futures, probes, strict=True):
             try:
                 future.result()
             except config.CommandError as exc:
                 print(f"probe {probe} failed: {exc}", file=__import__("sys").stderr)
+                failures.append(probe)
+    if failures:
+        raise config.CommandError("sweep failed probes: " + ", ".join(failures))
 
     _sweep_summary(out_root, frames)
     return 0

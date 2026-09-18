@@ -21,6 +21,14 @@ from pathlib import Path
 STAGE_NAMES = ["FLOODED CITY", "AIRPORT", "WATERFRONT", "GREEN HILLS", "RUINS",
                "SECRET BASE", "SPACE DOCK", "MOON BASE", "DEATH TRAP", "NIRVANA"]
 HALF = 320.0
+# Airport's two central raised slabs are movement-confirmed pads, not blocking
+# solids (recovered_stage_obstacle_boxes.c).  Geometry extraction supplies the
+# bounds but not the gameplay kind, so retain that recovered semantic here.
+PAD_OBAS = {1: {0x00800126, 0x0080009D}}
+
+
+def obstacle_kind(stage: int, box: dict) -> int:
+    return 1 if int(box["oba"], 0) in PAD_OBAS.get(stage, set()) else 0
 
 
 def fmt(value: float) -> str:
@@ -80,7 +88,8 @@ def main() -> int:
             header.append(f"static const rv_box RV_BOXES_S{stage}[] = {{")
             for b in boxes:
                 header.append(f"    {{{b['min'][0]}, {b['min'][1]}, {b['min'][2]}, "
-                              f"{b['max'][0]}, {b['max'][1]}, {b['max'][2]}, 0}},")
+                              f"{b['max'][0]}, {b['max'][1]}, {b['max'][2]}, "
+                              f"{obstacle_kind(stage, b)}}},")
             header.append("};")
             box_ref, box_count = f"RV_BOXES_S{stage}", f"RV_BOXES_S{stage}_COUNT"
             header.append(f"#define {box_count} "
@@ -102,9 +111,10 @@ def main() -> int:
                      f"{{{box_ref}, {box_count}, {HALF}f, 0.0f, {terrain_ref}, {terrain_n}}},")
 
         entries = ", ".join(
-            "{\"oba\": %d, \"kind\": 0, \"min\": Vector3(%d, %d, %d), "
+            "{\"oba\": %d, \"kind\": %d, \"min\": Vector3(%d, %d, %d), "
             "\"max\": Vector3(%d, %d, %d)}"
-            % (int(b["oba"], 0), *b["min"], *b["max"]) for b in boxes)
+            % (int(b["oba"], 0), obstacle_kind(stage, b), *b["min"], *b["max"])
+            for b in boxes)
         gd.append(f"\t{stage}: [{entries}],")
 
     table.append("};")

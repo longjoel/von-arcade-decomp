@@ -52,7 +52,9 @@ local function word(v) space:write_u32(0x00884000, v & 0xffffffff) end
 local function dump(tag, base)
     local vals = {}
     for i = 0, 11 do
-        vals[i + 1] = string.format("%08x", dspace:read_u32(base + i * 4))
+        -- SHARC data-space addresses are word-addressed (the gameplay tap
+        -- and matrix_at helper use the same convention).
+        vals[i + 1] = string.format("%08x", dspace:read_u32(base + i))
     end
     log(string.format("%s base=0x%08x %s", tag, base, table.concat(vals, " ")))
 end
@@ -90,7 +92,7 @@ emu.register_periodic(function()
         if RESET then
             local id = { 0x3f800000, 0, 0, 0, 0x3f800000, 0, 0, 0, 0x3f800000, 0, 0, 0 }
             for i = 0, 11 do
-                dspace:write_u32(MATRIX_BASE + i * 4, id[i + 1])
+                dspace:write_u32(MATRIX_BASE + i, id[i + 1])
             end
             dspace:write_u32(MATRIX_PTR, MATRIX_BASE)
             log(string.format("probe: reset matrix->identity at 0x%08x", MATRIX_BASE))
