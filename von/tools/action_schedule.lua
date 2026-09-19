@@ -19,6 +19,7 @@
 
 local LOG_PATH = assert(os.getenv("VON_ACTION_LOG"), "VON_ACTION_LOG required")
 local LOCK_PATH = os.getenv("VON_LOCK_LOG")
+local CAMERA_PATH = os.getenv("VON_CAMERA_LOG")
 local SECONDS = tonumber(os.getenv("VON_ACTION_SECONDS") or "40")
 local START_FRAME = tonumber(os.getenv("VON_ACTION_START_FRAME") or "2120")
 local CYCLES = tonumber(os.getenv("VON_ACTION_CYCLES") or "2")
@@ -36,6 +37,8 @@ log_file:write("action: session start\n")
 log_file:flush()
 local lock_file = LOCK_PATH and assert(io.open(LOCK_PATH, "w")) or nil
 if lock_file then lock_file:write("lock: session start\n") lock_file:flush() end
+local camera_file = CAMERA_PATH and assert(io.open(CAMERA_PATH, "w")) or nil
+if camera_file then camera_file:write("camera: session start\n") camera_file:flush() end
 
 local FIELD_NAMES = {
     coin       = { ":IN0", "Coin 1" },
@@ -141,6 +144,10 @@ local function read_u32(addr)
     return 0
 end
 
+local function read_f32(addr)
+    return (string.unpack("<f", string.pack("<I", read_u32(addr))))
+end
+
 local function log_lock()
     if not lock_file then return end
     -- Player/enemy positions and heading (recovered-camera.md), the turret
@@ -161,6 +168,24 @@ local function log_lock()
         now(), frame, current, mode, px or 0, pz or 0, ex or 0, ez or 0,
         head or 0, pa0 or 0, body or 0, paired or 0, cursor or 0))
     lock_file:flush()
+end
+
+-- Per-frame camera extrinsics (recovered-camera.md): eye and target in world
+-- space. The traced geometry matrices are camera-relative, so this is what lets
+-- a capture be converted back to model space.
+local function log_camera()
+    if not camera_file then return end
+    local ex = read_f32(0x00504b98)  -- eye
+    local ey = read_f32(0x00504b9c)
+    local ez = read_f32(0x00504ba0)
+    local tx = read_f32(0x00504bb4)  -- target
+    local ty = read_f32(0x00504bb8)
+    local tz = read_f32(0x00504bbc)
+    local dist = read_f32(0x00504bc8)
+    camera_file:write(string.format(
+        "camera: t=%.6f frame=%d action=%s eye=%.6f,%.6f,%.6f target=%.6f,%.6f,%.6f dist=%.6f\n",
+        now(), frame, current, ex, ey, ez, tx, ty, tz, dist))
+    camera_file:flush()
 end
 
 local function open_window()
@@ -232,4 +257,5 @@ emu.register_periodic(function()
     if not fields.coin then return end
     schedule_step()
     if lock_file and schedule_active then log_lock() end
+    if camera_file and schedule_active then log_camera() end
 end)
