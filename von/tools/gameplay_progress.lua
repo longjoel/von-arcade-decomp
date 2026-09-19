@@ -55,6 +55,7 @@ local SHARC_TAP_MAX = tonumber(
     os.getenv("VON_PROGRESS_SHARC_TAP_MAX") or "0x01410000")
 local SHARC_MAX = tonumber(os.getenv("VON_PROGRESS_SHARC_MAX") or "40000")
 local TRANSFORM_LOG_PATH = os.getenv("VON_PROGRESS_TRANSFORM_LOG")
+local CAMERA_LOG_PATH = os.getenv("VON_PROGRESS_CAMERA_LOG")
 local ACTIVE_LEVELS = os.getenv("VON_PROGRESS_ACTIVE_LEVELS") == "1"
 local RAM_SNAP_FRAME = tonumber(os.getenv("VON_PROGRESS_RAM_SNAP_FRAME") or "0")
 local RAM_SNAP_PATH = os.getenv("VON_PROGRESS_RAM_SNAP_PATH")
@@ -68,6 +69,15 @@ local COLS = 64
 local log_file = assert(io.open(LOG_PATH, "w"))
 log_file:write("progress: session start\n")
 log_file:flush()
+
+-- Per-frame camera extrinsics, so a transform capture can be converted from
+-- camera-relative space back to model space (recovered-camera.md cells).
+local camera_file
+if CAMERA_LOG_PATH then
+    camera_file = assert(io.open(CAMERA_LOG_PATH, "w"))
+    camera_file:write("camera: session start\n")
+    camera_file:flush()
+end
 
 local geometry_state_file
 if GEOMETRY_STATE_LOG_PATH then
@@ -915,6 +925,33 @@ local SHOT_PATTERN = os.getenv("VON_PROGRESS_SHOT_PATTERN") or "alternate"
 local SHOT_INTERVAL = tonumber(os.getenv("VON_PROGRESS_SHOT_INTERVAL") or "45")
 local SHOT_HOLD_FRAMES = tonumber(os.getenv("VON_PROGRESS_SHOT_HOLD_FRAMES") or "20")
 
+local function camera_now()
+    local ok, t = pcall(function() return manager.machine.time:as_double() end)
+    if ok and type(t) == "number" then return t end
+    return frame / 60.0
+end
+
+local function read_f32(addr)
+    local ok, v = pcall(function() return space:read_u32(addr) end)
+    if not ok then return 0.0 end
+    return (string.unpack("<f", string.pack("<I", v)))
+end
+
+local function log_camera()
+    if not camera_file or not space then return end
+    local ex = read_f32(0x00504b98)
+    local ey = read_f32(0x00504b9c)
+    local ez = read_f32(0x00504ba0)
+    local tx = read_f32(0x00504bb4)
+    local ty = read_f32(0x00504bb8)
+    local tz = read_f32(0x00504bbc)
+    local dist = read_f32(0x00504bc8)
+    camera_file:write(string.format(
+        "camera: t=%.6f frame=%d eye=%.6f,%.6f,%.6f target=%.6f,%.6f,%.6f dist=%.6f\n",
+        camera_now(), frame, ex, ey, ez, tx, ty, tz, dist))
+    camera_file:flush()
+end
+
 emu.register_periodic(function()
     frame = frame + 1
     if not space and frame % 60 == 1 then
@@ -927,6 +964,7 @@ emu.register_periodic(function()
     end
 
     release_expired()
+    log_camera()
 
     -- Comma-separated explicit snapshot frames
     -- (VON_PROGRESS_RAM_SNAP_FRAMES="1300,1400,1500"); falls back to the
