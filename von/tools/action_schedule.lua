@@ -82,6 +82,10 @@ local CYCLE = {
     { "idle", 30, {} },
     { "jump", 45, { "left", "right2" } },
     { "landing", 30, {} },
+    { "air_forward_dash", 45, { "left", "right2", "up", "up2", "left_dash" } },
+    { "air_dash_slash", 45, { "left", "right2", "up", "up2", "left_dash", "left_shot" } },
+    { "dash_fire", 45, { "up", "up2", "left_dash", "left_shot" } },
+    { "idle", 30, {} },
     { "forward", 150, { "up", "up2" } },
     -- At near-lock range Temjin's single sword trigger is the stab; the
     -- two-trigger chord is the cross slash. Keep these as separate windows so
