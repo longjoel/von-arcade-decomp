@@ -31,6 +31,10 @@ local MATCH_START = tonumber(os.getenv("VON_PROGRESS_START_FRAME") or "1500")
 local SELECT_STEPS = tonumber(os.getenv("VON_ACTION_SELECT_STEPS") or "0")
 local SELECT_SETTLE = 180
 local SELECT_STEP_FRAMES = 45
+-- Lab-only placement for close-range recovery.  The normal movement schedule
+-- is intentionally preserved for locomotion clips, but melee clips must be
+-- captured inside the game's near-lock radius or they silently become idle.
+local CLOSE_RANGE_DISTANCE = tonumber(os.getenv("VON_ACTION_CLOSE_RANGE") or "8")
 
 local log_file = assert(io.open(LOG_PATH, "w"))
 log_file:write("action: session start\n")
@@ -79,7 +83,10 @@ local CYCLE = {
     { "jump", 45, { "left", "right2" } },
     { "landing", 30, {} },
     { "forward", 150, { "up", "up2" } },
-    { "melee_stab", 45, { "left_shot", "right_shot" } },
+    -- At near-lock range Temjin's single sword trigger is the stab; the
+    -- two-trigger chord is the cross slash. Keep these as separate windows so
+    -- the labels remain meaningful for every fighter capture.
+    { "melee_stab", 45, { "left_shot" } },
     { "idle", 30, {} },
     { "melee_cross_slash", 45, { "left_shot", "right_shot" } },
     { "idle", 30, {} },
@@ -155,6 +162,33 @@ local function read_f32(addr)
     return (string.unpack("<f", string.pack("<I", read_u32(addr))))
 end
 
+local function float_bits(value)
+    return string.unpack("<I", string.pack("<f", value))
+end
+
+local function write_f32(addr, value)
+    local ok = pcall(function() space:write_u32(addr, float_bits(value)) end)
+    return ok
+end
+
+local function setup_close_range(action)
+    if action ~= "melee_stab" and action ~= "melee_cross_slash" then return end
+    -- Keep the player's current side of the opponent, close enough for melee
+    -- but not overlapping.  Preserve the opponent's coordinates and place the
+    -- player on +X; this is a capture-lab setup, never runtime game logic.
+    local ex = read_f32(0x005040d8)
+    local ez = read_f32(0x005040e0)
+    local px = ex + CLOSE_RANGE_DISTANCE
+    local pz = ez
+    local heading = math.deg(math.atan(ez - pz, ex - px))
+    write_f32(0x00503ad8, px)
+    write_f32(0x00503ae0, pz)
+    write_f32(0x00503c28, heading)
+    log(string.format(
+        "action: close_range action=%s px=%.4f pz=%.4f ex=%.4f ez=%.4f distance=%.4f",
+        action, px, pz, ex, ez, math.sqrt((px - ex) * (px - ex) + (pz - ez) * (pz - ez))))
+end
+
 local function log_lock()
     if not lock_file then return end
     -- Player/enemy positions and heading (recovered-camera.md), the turret
@@ -169,11 +203,14 @@ local function log_lock()
     local mode = read_u32(0x00503a98)
     local body = read_u32(0x0051ab08)
     local paired = read_u32(0x0051ab0c)
-    local cursor = read_u16(0x0051ab10)
+    local selector = read_u16(0x00503ad0 + 0x174)
+    local state = read_u16(0x00503ad0 + 0x176)
+    local cursor = read_u16(0x00503ad0 + 0x17a)
     lock_file:write(string.format(
-        "lock: t=%.6f frame=%d action=%s mode=%08x px=%08x pz=%08x ex=%08x ez=%08x head=%08x pa0=%04x body=%08x paired=%08x cur=%04x\n",
+        "lock: t=%.6f frame=%d action=%s mode=%08x px=%08x pz=%08x ex=%08x ez=%08x head=%08x pa0=%04x body=%08x paired=%08x sel=%04x state=%04x cur=%04x\n",
         now(), frame, current, mode, px or 0, pz or 0, ex or 0, ez or 0,
-        head or 0, pa0 or 0, body or 0, paired or 0, cursor or 0))
+        head or 0, pa0 or 0, body or 0, paired or 0,
+        selector or 0, state or 0, cursor or 0))
     lock_file:flush()
 end
 
@@ -203,6 +240,7 @@ local function open_window()
     current = name
     window_end = frame + frames
     log(string.format("action: t=%.6f frame=%d action=%s begin", now(), frame, name))
+    setup_close_range(name)
     schedule_pos = schedule_pos + 1
     if schedule_pos > #CYCLE then
         schedule_pos = 1
