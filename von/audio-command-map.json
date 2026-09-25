@@ -1,0 +1,2751 @@
+{
+  "schema": "von-audio-command-map/1",
+  "pointer_offset": 32796,
+  "command_table": 6324252,
+  "pointer": 6343194,
+  "first_level": [
+    {
+      "hh": 16,
+      "max_ll": 34,
+      "table": 6343204
+    },
+    {
+      "hh": 17,
+      "max_ll": 91,
+      "table": 6343276
+    },
+    {
+      "hh": 18,
+      "max_ll": 79,
+      "table": 6343462
+    },
+    {
+      "hh": 19,
+      "max_ll": 102,
+      "table": 6343624
+    }
+  ],
+  "command_count": 310,
+  "commands": {
+    "0x1000": {
+      "entry": 6343832,
+      "control": 0,
+      "name": "SDB_continue",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 01 00 61 00 00 00 61 00 00 ff ff ff f1 00 60 cc ac"
+    },
+    "0x1001": {
+      "entry": 6343864,
+      "control": 0,
+      "name": "SDB_bgm_01",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 02 00 61 02 52 00 61 18 38 ff ff ff f1 00 60 cc cc"
+    },
+    "0x1002": {
+      "entry": 6343896,
+      "control": 0,
+      "name": "SDB_bgm_02",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 03 00 61 4c c4 00 61 4c c4 ff ff ff f1 00 60 cc ec"
+    },
+    "0x1003": {
+      "entry": 6343928,
+      "control": 0,
+      "name": "SDB_bgm_03",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 04 00 61 92 e0 00 61 92 e0 ff ff ff f1 00 60 cd 0c"
+    },
+    "0x1004": {
+      "entry": 6343960,
+      "control": 0,
+      "name": "SDB_bgm_04",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 05 00 61 a5 ca 00 61 a5 ca ff ff ff f1 00 60 cd 2c"
+    },
+    "0x1005": {
+      "entry": 6343992,
+      "control": 0,
+      "name": "SDB_bgm_05",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 06 00 61 e8 9c 00 61 e8 9c ff ff ff f1 00 60 cd 4c"
+    },
+    "0x1006": {
+      "entry": 6344024,
+      "control": 0,
+      "name": "SDB_bgm_06",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 07 00 62 18 98 00 62 18 98 ff ff ff f1 00 60 cd 6c"
+    },
+    "0x1007": {
+      "entry": 6344056,
+      "control": 0,
+      "name": "SDB_bgm_07",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 08 00 62 53 1a 00 62 53 1a ff ff ff f1 00 60 cd 8c"
+    },
+    "0x1008": {
+      "entry": 6344088,
+      "control": 0,
+      "name": "SDB_bgm_08",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 09 00 62 a9 1e 00 62 b5 44 ff ff ff f1 00 60 cd ac"
+    },
+    "0x1009": {
+      "entry": 6344120,
+      "control": 0,
+      "name": "SDB_bgm_09",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 0a 00 62 e7 e6 00 62 f5 3c ff ff ff f1 00 60 cd cc"
+    },
+    "0x100a": {
+      "entry": 6344152,
+      "control": 0,
+      "name": "SDB_bgm_10",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 0b 00 63 20 04 00 63 20 04 ff ff ff f1 00 60 cd ec"
+    },
+    "0x100b": {
+      "entry": 6344184,
+      "control": 0,
+      "name": "SDB_select1",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 0c 00 63 58 18 00 63 58 18 ff ff ff f1 00 60 ce 0c"
+    },
+    "0x100c": {
+      "entry": 6344216,
+      "control": 0,
+      "name": "SDB_select3",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 0d 00 63 5f b0 00 63 5f b0 ff ff ff f1 00 60 ce 2c"
+    },
+    "0x100d": {
+      "entry": 6344248,
+      "control": 0,
+      "name": "SDB_start1",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 0e 00 63 76 dc ff ff ff ff 00 00 00 00 80 a0 00 02"
+    },
+    "0x100e": {
+      "entry": 6344272,
+      "control": 0,
+      "name": "SDB_start3",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 0f 00 63 7a 5c ff ff ff ff 00 00 00 00 80 a0 00 02"
+    },
+    "0x100f": {
+      "entry": 6344296,
+      "control": 0,
+      "name": "SDB_start4",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 10 00 63 7c 74 ff ff ff ff 00 00 00 00 80 a0 00 02"
+    },
+    "0x1010": {
+      "entry": 6344320,
+      "control": 0,
+      "name": "SDB_start5",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 11 00 63 7f ba ff ff ff ff 00 00 00 00 80 a0 00 02"
+    },
+    "0x1011": {
+      "entry": 6344344,
+      "control": 0,
+      "name": "SDB_lose1",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 12 00 63 83 ec ff ff ff ff 00 00 00 00 80 a0 00 02"
+    },
+    "0x1012": {
+      "entry": 6344368,
+      "control": 0,
+      "name": "SDB_lose2",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 13 00 63 84 e8 ff ff ff ff 00 00 00 00 80 a0 00 02"
+    },
+    "0x1013": {
+      "entry": 6344392,
+      "control": 0,
+      "name": "SDB_lose3",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 14 00 63 85 f4 ff ff ff ff 00 00 00 00 80 a0 00 02"
+    },
+    "0x1014": {
+      "entry": 6344416,
+      "control": 0,
+      "name": "SDB_win1",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 15 00 63 86 c6 ff ff ff ff 00 00 00 00 80 a0 00 02"
+    },
+    "0x1015": {
+      "entry": 6344440,
+      "control": 0,
+      "name": "SDB_win2",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 16 00 63 88 12 ff ff ff ff 00 00 00 00 80 a0 00 02"
+    },
+    "0x1016": {
+      "entry": 6344464,
+      "control": 0,
+      "name": "SDB_bgm_11",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 17 00 63 89 76 00 63 8c aa ff ff ff f1 00 60 cf 24"
+    },
+    "0x1017": {
+      "entry": 6344496,
+      "control": 0,
+      "name": "SDB_bgm_12",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 18 00 63 dc 80 00 63 dc 80 ff ff ff f1 00 60 cf 44"
+    },
+    "0x1018": {
+      "entry": 6344528,
+      "control": 0,
+      "name": "SDB_bgm_13",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 19 00 64 14 74 00 64 1a b4 ff ff ff f1 00 60 cf 64"
+    },
+    "0x1019": {
+      "entry": 6344560,
+      "control": 0,
+      "name": "SDB_bgm_14",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 1a 00 64 d4 8a 00 64 4b 84 ff ff ff f1 00 60 cf 84"
+    },
+    "0x101a": {
+      "entry": 6344592,
+      "control": 0,
+      "name": "SDB_title",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 1b 00 64 7b 62 ff ff ff ff 00 00 00 00 80 a0 00 02"
+    },
+    "0x101b": {
+      "entry": 6344616,
+      "control": 0,
+      "name": "SDB_demo",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 1c 00 64 7d a2 00 64 7d a2 ff ff ff f1 00 60 cf bc"
+    },
+    "0x101c": {
+      "entry": 6344648,
+      "control": 0,
+      "name": "SDB_continue2",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 1d 00 64 93 72 00 64 93 72 ff ff ff f1 00 60 cf dc"
+    },
+    "0x101d": {
+      "entry": 6344680,
+      "control": 0,
+      "name": "SDB_demo01",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 1e 00 64 98 b0 00 64 98 b0 ff ff ff f1 00 60 cf fc"
+    },
+    "0x101e": {
+      "entry": 6344712,
+      "control": 0,
+      "name": "SDB_end01",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 1f 00 64 a0 2a ff ff ff ff 00 00 00 00 80 a0 00 02"
+    },
+    "0x101f": {
+      "entry": 6344736,
+      "control": 0,
+      "name": "SDB_end02",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 20 00 64 da 6c ff ff ff ff 00 00 00 00 80 a0 00 02"
+    },
+    "0x1020": {
+      "entry": 6344760,
+      "control": 0,
+      "name": "SDB_comp01",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 21 00 64 fd f8 00 64 fd f8 ff ff ff f1 00 60 d0 4c"
+    },
+    "0x1021": {
+      "entry": 6344792,
+      "control": 0,
+      "name": "SDB_comp02",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 22 00 65 03 ac 00 65 03 ac ff ff ff f1 00 60 d0 6c"
+    },
+    "0x1022": {
+      "entry": 6344824,
+      "control": 0,
+      "name": "SDB_end03",
+      "sequence_pointer": 8429568,
+      "record": "00 00 00 00 80 a0 00 02 00 60 d0 90 80 a0 07 23 00 65 09 b0 ff ff ff ff e0 00 40 00 e1 00 40 00"
+    },
+    "0x1100": {
+      "entry": 6344891,
+      "control": 128,
+      "name": "SDE_type03",
+      "opcode": 154,
+      "sample": 0,
+      "param": 122,
+      "stream": "9a 00 7a 00 ff 2f 00 80 9a 01 7a 00 ff 2f 00 80"
+    },
+    "0x1101": {
+      "entry": 6344899,
+      "control": 128,
+      "name": "SDE_bom_01",
+      "opcode": 154,
+      "sample": 1,
+      "param": 122,
+      "stream": "9a 01 7a 00 ff 2f 00 80 9a 02 7a 00 ff 2f 00 80"
+    },
+    "0x1102": {
+      "entry": 6344907,
+      "control": 128,
+      "name": "SDE_bom_02",
+      "opcode": 154,
+      "sample": 2,
+      "param": 122,
+      "stream": "9a 02 7a 00 ff 2f 00 80 9a 03 7c 00 ff 2f 00 80"
+    },
+    "0x1103": {
+      "entry": 6344915,
+      "control": 128,
+      "name": "SDE_bom_05",
+      "opcode": 154,
+      "sample": 3,
+      "param": 124,
+      "stream": "9a 03 7c 00 ff 2f 00 80 9a 04 7c 00 ff 2f 00 80"
+    },
+    "0x1104": {
+      "entry": 6344923,
+      "control": 128,
+      "name": "SDE_bom_06",
+      "opcode": 154,
+      "sample": 4,
+      "param": 124,
+      "stream": "9a 04 7c 00 ff 2f 00 80 9a 05 7a 00 ff 2f 00 80"
+    },
+    "0x1105": {
+      "entry": 6344931,
+      "control": 128,
+      "name": "SDE_bom_11",
+      "opcode": 154,
+      "sample": 5,
+      "param": 122,
+      "stream": "9a 05 7a 00 ff 2f 00 80 9a 06 7a 00 ff 2f 00 80"
+    },
+    "0x1106": {
+      "entry": 6344939,
+      "control": 128,
+      "name": "SDE_bom_12",
+      "opcode": 154,
+      "sample": 6,
+      "param": 122,
+      "stream": "9a 06 7a 00 ff 2f 00 80 9a 07 66 00 ff 2f 00 80"
+    },
+    "0x1107": {
+      "entry": 6344947,
+      "control": 128,
+      "name": "SDE_dash_05_loop",
+      "opcode": 154,
+      "sample": 7,
+      "param": 102,
+      "stream": "9a 07 66 00 ff 2f 00 80 9a 08 66 00 ff 2f 00 80"
+    },
+    "0x1108": {
+      "entry": 6344955,
+      "control": 128,
+      "name": "SDE_dash_01_loop",
+      "opcode": 154,
+      "sample": 8,
+      "param": 102,
+      "stream": "9a 08 66 00 ff 2f 00 80 9a 09 7a 00 ff 2f 00 80"
+    },
+    "0x1109": {
+      "entry": 6344963,
+      "control": 128,
+      "name": "SDE_dash_03",
+      "opcode": 154,
+      "sample": 9,
+      "param": 122,
+      "stream": "9a 09 7a 00 ff 2f 00 80 9a 0a 7a 00 ff 2f 00 80"
+    },
+    "0x110a": {
+      "entry": 6344971,
+      "control": 128,
+      "name": "SDE_beam_01",
+      "opcode": 154,
+      "sample": 10,
+      "param": 122,
+      "stream": "9a 0a 7a 00 ff 2f 00 80 9a 0b 7a 00 ff 2f 00 80"
+    },
+    "0x110b": {
+      "entry": 6344979,
+      "control": 128,
+      "name": "SDE_beam_03",
+      "opcode": 154,
+      "sample": 11,
+      "param": 122,
+      "stream": "9a 0b 7a 00 ff 2f 00 80 9a 0c 7a 00 ff 2f 00 80"
+    },
+    "0x110c": {
+      "entry": 6344987,
+      "control": 128,
+      "name": "SDE_beam_05",
+      "opcode": 154,
+      "sample": 12,
+      "param": 122,
+      "stream": "9a 0c 7a 00 ff 2f 00 80 9a 0d 7a 00 ff 2f 00 80"
+    },
+    "0x110d": {
+      "entry": 6344995,
+      "control": 128,
+      "name": "SDE_beam_06",
+      "opcode": 154,
+      "sample": 13,
+      "param": 122,
+      "stream": "9a 0d 7a 00 ff 2f 00 80 9a 0e 7a 00 ff 2f 00 80"
+    },
+    "0x110e": {
+      "entry": 6345003,
+      "control": 128,
+      "name": "SDE_beam_07",
+      "opcode": 154,
+      "sample": 14,
+      "param": 122,
+      "stream": "9a 0e 7a 00 ff 2f 00 80 9a 0f 57 00 ff 2f 00 80"
+    },
+    "0x110f": {
+      "entry": 6345011,
+      "control": 128,
+      "name": "SDE_count_down",
+      "opcode": 154,
+      "sample": 15,
+      "param": 87,
+      "stream": "9a 0f 57 00 ff 2f 00 80 9a 10 5a 00 ff 2f 00 80"
+    },
+    "0x1110": {
+      "entry": 6345019,
+      "control": 128,
+      "name": "SDE_siren",
+      "opcode": 154,
+      "sample": 16,
+      "param": 90,
+      "stream": "9a 10 5a 00 ff 2f 00 80 9a 11 7a 00 ff 2f 00 80"
+    },
+    "0x1111": {
+      "entry": 6345027,
+      "control": 128,
+      "name": "SDE_type_05",
+      "opcode": 154,
+      "sample": 17,
+      "param": 122,
+      "stream": "9a 11 7a 00 ff 2f 00 80 9a 12 7a 00 ff 2f 00 80"
+    },
+    "0x1112": {
+      "entry": 6345035,
+      "control": 128,
+      "name": "SDE_hit_01",
+      "opcode": 154,
+      "sample": 18,
+      "param": 122,
+      "stream": "9a 12 7a 00 ff 2f 00 80 9a 13 7a 00 ff 2f 00 80"
+    },
+    "0x1113": {
+      "entry": 6345043,
+      "control": 128,
+      "name": "SDE_hit_03",
+      "opcode": 154,
+      "sample": 19,
+      "param": 122,
+      "stream": "9a 13 7a 00 ff 2f 00 80 9a 14 7a 00 ff 2f 00 80"
+    },
+    "0x1114": {
+      "entry": 6345051,
+      "control": 128,
+      "name": "SDE_hit_09",
+      "opcode": 154,
+      "sample": 20,
+      "param": 122,
+      "stream": "9a 14 7a 00 ff 2f 00 80 9a 15 7a 00 ff 2f 00 80"
+    },
+    "0x1115": {
+      "entry": 6345059,
+      "control": 128,
+      "name": "SDE_hit_13",
+      "opcode": 154,
+      "sample": 21,
+      "param": 122,
+      "stream": "9a 15 7a 00 ff 2f 00 80 9a 16 7a 00 ff 2f 00 80"
+    },
+    "0x1116": {
+      "entry": 6345067,
+      "control": 128,
+      "name": "SDE_hit_14",
+      "opcode": 154,
+      "sample": 22,
+      "param": 122,
+      "stream": "9a 16 7a 00 ff 2f 00 80 9a 17 7a 00 ff 2f 00 80"
+    },
+    "0x1117": {
+      "entry": 6345075,
+      "control": 128,
+      "name": "SDE_jump_01",
+      "opcode": 154,
+      "sample": 23,
+      "param": 122,
+      "stream": "9a 17 7a 00 ff 2f 00 80 9a 18 7a 00 ff 2f 00 80"
+    },
+    "0x1118": {
+      "entry": 6345083,
+      "control": 128,
+      "name": "SDE_jump_02",
+      "opcode": 154,
+      "sample": 24,
+      "param": 122,
+      "stream": "9a 18 7a 00 ff 2f 00 80 9a 19 7a 00 ff 2f 00 80"
+    },
+    "0x1119": {
+      "entry": 6345091,
+      "control": 128,
+      "name": "SDE_jump_03",
+      "opcode": 154,
+      "sample": 25,
+      "param": 122,
+      "stream": "9a 19 7a 00 ff 2f 00 80 9a 1a 7a 00 ff 2f 00 80"
+    },
+    "0x111a": {
+      "entry": 6345099,
+      "control": 128,
+      "name": "SDE_jump_04",
+      "opcode": 154,
+      "sample": 26,
+      "param": 122,
+      "stream": "9a 1a 7a 00 ff 2f 00 80 9a 1b 7a 00 ff 2f 00 80"
+    },
+    "0x111b": {
+      "entry": 6345107,
+      "control": 128,
+      "name": "SDE_fse_05",
+      "opcode": 154,
+      "sample": 27,
+      "param": 122,
+      "stream": "9a 1b 7a 00 ff 2f 00 80 9a 1c 7a 00 ff 2f 00 80"
+    },
+    "0x111c": {
+      "entry": 6345115,
+      "control": 128,
+      "name": "SDE_fse_43",
+      "opcode": 154,
+      "sample": 28,
+      "param": 122,
+      "stream": "9a 1c 7a 00 ff 2f 00 80 9a 1d 7a 00 ff 2f 00 80"
+    },
+    "0x111d": {
+      "entry": 6345123,
+      "control": 128,
+      "name": "SDE_hibana_s3",
+      "opcode": 154,
+      "sample": 29,
+      "param": 122,
+      "stream": "9a 1d 7a 00 ff 2f 00 80 9a 1e 7a 00 ff 2f 00 80"
+    },
+    "0x111e": {
+      "entry": 6345131,
+      "control": 128,
+      "name": "SDE_hit_4_rev",
+      "opcode": 154,
+      "sample": 30,
+      "param": 122,
+      "stream": "9a 1e 7a 00 ff 2f 00 80 9a 1f 7a 00 ff 2f 00 80"
+    },
+    "0x111f": {
+      "entry": 6345139,
+      "control": 128,
+      "name": "SDE_sait_01",
+      "opcode": 154,
+      "sample": 31,
+      "param": 122,
+      "stream": "9a 1f 7a 00 ff 2f 00 80 9a 20 7a 00 ff 2f 00 80"
+    },
+    "0x1120": {
+      "entry": 6345147,
+      "control": 128,
+      "name": "SDE_bom_new1",
+      "opcode": 154,
+      "sample": 32,
+      "param": 122,
+      "stream": "9a 20 7a 00 ff 2f 00 80 9a 21 7a 00 ff 2f 00 80"
+    },
+    "0x1121": {
+      "entry": 6345155,
+      "control": 128,
+      "name": "SDE_bom_new3",
+      "opcode": 154,
+      "sample": 33,
+      "param": 122,
+      "stream": "9a 21 7a 00 ff 2f 00 80 8a 07 00 ff 2f 00 80 8a"
+    },
+    "0x1122": {
+      "entry": 6345163,
+      "control": 128,
+      "name": null,
+      "opcode": 138,
+      "sample": 7,
+      "param": 0,
+      "stream": "8a 07 00 ff 2f 00 80 8a 08 00 ff 2f 00 80 9a 27"
+    },
+    "0x1123": {
+      "entry": 6345170,
+      "control": 128,
+      "name": null,
+      "opcode": 138,
+      "sample": 8,
+      "param": 0,
+      "stream": "8a 08 00 ff 2f 00 80 9a 27 70 00 ff 2f 00 80 9a"
+    },
+    "0x1124": {
+      "entry": 6345177,
+      "control": 128,
+      "name": null,
+      "opcode": 154,
+      "sample": 39,
+      "param": 112,
+      "stream": "9a 27 70 00 ff 2f 00 80 9a 28 6e 00 ff 2f 00 80"
+    },
+    "0x1125": {
+      "entry": 6345185,
+      "control": 128,
+      "name": "SDE_2_bom_01",
+      "opcode": 154,
+      "sample": 40,
+      "param": 110,
+      "stream": "9a 28 6e 00 ff 2f 00 80 9a 29 6e 00 ff 2f 00 80"
+    },
+    "0x1126": {
+      "entry": 6345193,
+      "control": 128,
+      "name": "SDE_2_bom_02",
+      "opcode": 154,
+      "sample": 41,
+      "param": 110,
+      "stream": "9a 29 6e 00 ff 2f 00 80 9a 2a 71 00 ff 2f 00 80"
+    },
+    "0x1127": {
+      "entry": 6345201,
+      "control": 128,
+      "name": "SDE_2_bom_05",
+      "opcode": 154,
+      "sample": 42,
+      "param": 113,
+      "stream": "9a 2a 71 00 ff 2f 00 80 9a 2b 71 00 ff 2f 00 80"
+    },
+    "0x1128": {
+      "entry": 6345209,
+      "control": 128,
+      "name": "SDE_2_bom_06",
+      "opcode": 154,
+      "sample": 43,
+      "param": 113,
+      "stream": "9a 2b 71 00 ff 2f 00 80 9a 2c 6e 00 ff 2f 00 80"
+    },
+    "0x1129": {
+      "entry": 6345217,
+      "control": 128,
+      "name": "SDE_2_bom_11",
+      "opcode": 154,
+      "sample": 44,
+      "param": 110,
+      "stream": "9a 2c 6e 00 ff 2f 00 80 9a 2d 6e 00 ff 2f 00 80"
+    },
+    "0x112a": {
+      "entry": 6345225,
+      "control": 128,
+      "name": "SDE_2_bom_12",
+      "opcode": 154,
+      "sample": 45,
+      "param": 110,
+      "stream": "9a 2d 6e 00 ff 2f 00 80 9a 2e 5c 00 ff 2f 00 80"
+    },
+    "0x112b": {
+      "entry": 6345233,
+      "control": 128,
+      "name": "SDE_2_dash_05_loop",
+      "opcode": 154,
+      "sample": 46,
+      "param": 92,
+      "stream": "9a 2e 5c 00 ff 2f 00 80 9a 2f 5c 00 ff 2f 00 80"
+    },
+    "0x112c": {
+      "entry": 6345241,
+      "control": 128,
+      "name": "SDE_2_dash_01_loop",
+      "opcode": 154,
+      "sample": 47,
+      "param": 92,
+      "stream": "9a 2f 5c 00 ff 2f 00 80 9a 30 70 00 ff 2f 00 80"
+    },
+    "0x112d": {
+      "entry": 6345249,
+      "control": 128,
+      "name": "SDE_2_dash_03",
+      "opcode": 154,
+      "sample": 48,
+      "param": 112,
+      "stream": "9a 30 70 00 ff 2f 00 80 9a 31 70 00 ff 2f 00 80"
+    },
+    "0x112e": {
+      "entry": 6345257,
+      "control": 128,
+      "name": "SDE_2_beam_01",
+      "opcode": 154,
+      "sample": 49,
+      "param": 112,
+      "stream": "9a 31 70 00 ff 2f 00 80 9a 32 70 00 ff 2f 00 80"
+    },
+    "0x112f": {
+      "entry": 6345265,
+      "control": 128,
+      "name": "SDE_2_beam_03",
+      "opcode": 154,
+      "sample": 50,
+      "param": 112,
+      "stream": "9a 32 70 00 ff 2f 00 80 9a 33 70 00 ff 2f 00 80"
+    },
+    "0x1130": {
+      "entry": 6345273,
+      "control": 128,
+      "name": "SDE_2_beam_05",
+      "opcode": 154,
+      "sample": 51,
+      "param": 112,
+      "stream": "9a 33 70 00 ff 2f 00 80 9a 34 70 00 ff 2f 00 80"
+    },
+    "0x1131": {
+      "entry": 6345281,
+      "control": 128,
+      "name": "SDE_2_beam_06",
+      "opcode": 154,
+      "sample": 52,
+      "param": 112,
+      "stream": "9a 34 70 00 ff 2f 00 80 9a 35 70 00 ff 2f 00 80"
+    },
+    "0x1132": {
+      "entry": 6345289,
+      "control": 128,
+      "name": "SDE_2_beam_07",
+      "opcode": 154,
+      "sample": 53,
+      "param": 112,
+      "stream": "9a 35 70 00 ff 2f 00 80 9a 36 70 00 ff 2f 00 80"
+    },
+    "0x1133": {
+      "entry": 6345297,
+      "control": 128,
+      "name": "SDE_2_count_doun",
+      "opcode": 154,
+      "sample": 54,
+      "param": 112,
+      "stream": "9a 36 70 00 ff 2f 00 80 9a 37 70 00 ff 2f 00 80"
+    },
+    "0x1134": {
+      "entry": 6345305,
+      "control": 128,
+      "name": "SDE_2_sailen",
+      "opcode": 154,
+      "sample": 55,
+      "param": 112,
+      "stream": "9a 37 70 00 ff 2f 00 80 9a 38 70 00 ff 2f 00 80"
+    },
+    "0x1135": {
+      "entry": 6345313,
+      "control": 128,
+      "name": null,
+      "opcode": 154,
+      "sample": 56,
+      "param": 112,
+      "stream": "9a 38 70 00 ff 2f 00 80 9a 39 70 00 ff 2f 00 80"
+    },
+    "0x1136": {
+      "entry": 6345321,
+      "control": 128,
+      "name": "SDE_2_hit_01",
+      "opcode": 154,
+      "sample": 57,
+      "param": 112,
+      "stream": "9a 39 70 00 ff 2f 00 80 9a 3a 70 00 ff 2f 00 80"
+    },
+    "0x1137": {
+      "entry": 6345329,
+      "control": 128,
+      "name": "SDE_2_hit_03",
+      "opcode": 154,
+      "sample": 58,
+      "param": 112,
+      "stream": "9a 3a 70 00 ff 2f 00 80 9a 3b 70 00 ff 2f 00 80"
+    },
+    "0x1138": {
+      "entry": 6345337,
+      "control": 128,
+      "name": "SDE_2_hit_09",
+      "opcode": 154,
+      "sample": 59,
+      "param": 112,
+      "stream": "9a 3b 70 00 ff 2f 00 80 9a 3c 70 00 ff 2f 00 80"
+    },
+    "0x1139": {
+      "entry": 6345345,
+      "control": 128,
+      "name": "SDE_2_hit_13",
+      "opcode": 154,
+      "sample": 60,
+      "param": 112,
+      "stream": "9a 3c 70 00 ff 2f 00 80 9a 3d 70 00 ff 2f 00 80"
+    },
+    "0x113a": {
+      "entry": 6345353,
+      "control": 128,
+      "name": "SDE_2_hit_14",
+      "opcode": 154,
+      "sample": 61,
+      "param": 112,
+      "stream": "9a 3d 70 00 ff 2f 00 80 9a 3e 70 00 ff 2f 00 80"
+    },
+    "0x113b": {
+      "entry": 6345361,
+      "control": 128,
+      "name": "SDE_2_jump_01",
+      "opcode": 154,
+      "sample": 62,
+      "param": 112,
+      "stream": "9a 3e 70 00 ff 2f 00 80 9a 3f 70 00 ff 2f 00 80"
+    },
+    "0x113c": {
+      "entry": 6345369,
+      "control": 128,
+      "name": "SDE_2_jump_02",
+      "opcode": 154,
+      "sample": 63,
+      "param": 112,
+      "stream": "9a 3f 70 00 ff 2f 00 80 9a 40 70 00 ff 2f 00 80"
+    },
+    "0x113d": {
+      "entry": 6345377,
+      "control": 128,
+      "name": "SDE_2_jump_03",
+      "opcode": 154,
+      "sample": 64,
+      "param": 112,
+      "stream": "9a 40 70 00 ff 2f 00 80 9a 41 70 00 ff 2f 00 80"
+    },
+    "0x113e": {
+      "entry": 6345385,
+      "control": 128,
+      "name": "SDE_2_jump_04",
+      "opcode": 154,
+      "sample": 65,
+      "param": 112,
+      "stream": "9a 41 70 00 ff 2f 00 80 9a 42 70 00 ff 2f 00 80"
+    },
+    "0x113f": {
+      "entry": 6345393,
+      "control": 128,
+      "name": null,
+      "opcode": 154,
+      "sample": 66,
+      "param": 112,
+      "stream": "9a 42 70 00 ff 2f 00 80 9a 43 70 00 ff 2f 00 80"
+    },
+    "0x1140": {
+      "entry": 6345401,
+      "control": 128,
+      "name": null,
+      "opcode": 154,
+      "sample": 67,
+      "param": 112,
+      "stream": "9a 43 70 00 ff 2f 00 80 9a 44 70 00 ff 2f 00 80"
+    },
+    "0x1141": {
+      "entry": 6345409,
+      "control": 128,
+      "name": "SDE_2_hibana_s3",
+      "opcode": 154,
+      "sample": 68,
+      "param": 112,
+      "stream": "9a 44 70 00 ff 2f 00 80 9a 45 70 00 ff 2f 00 80"
+    },
+    "0x1142": {
+      "entry": 6345417,
+      "control": 128,
+      "name": "SDE_2_hit_4_rev",
+      "opcode": 154,
+      "sample": 69,
+      "param": 112,
+      "stream": "9a 45 70 00 ff 2f 00 80 9a 46 70 00 ff 2f 00 80"
+    },
+    "0x1143": {
+      "entry": 6345425,
+      "control": 128,
+      "name": "SDE_2_sait_01",
+      "opcode": 154,
+      "sample": 70,
+      "param": 112,
+      "stream": "9a 46 70 00 ff 2f 00 80 9a 47 70 00 ff 2f 00 80"
+    },
+    "0x1144": {
+      "entry": 6345433,
+      "control": 128,
+      "name": "SDE_2_bom_new1",
+      "opcode": 154,
+      "sample": 71,
+      "param": 112,
+      "stream": "9a 47 70 00 ff 2f 00 80 9a 48 70 00 ff 2f 00 80"
+    },
+    "0x1145": {
+      "entry": 6345441,
+      "control": 128,
+      "name": "SDE_2_bom_new3",
+      "opcode": 154,
+      "sample": 72,
+      "param": 112,
+      "stream": "9a 48 70 00 ff 2f 00 80 8a 2e 00 ff 2f 00 80 8a"
+    },
+    "0x1146": {
+      "entry": 6345449,
+      "control": 128,
+      "name": null,
+      "opcode": 138,
+      "sample": 46,
+      "param": 0,
+      "stream": "8a 2e 00 ff 2f 00 80 8a 2f 00 ff 2f 00 80 9a 22"
+    },
+    "0x1147": {
+      "entry": 6345456,
+      "control": 128,
+      "name": null,
+      "opcode": 138,
+      "sample": 47,
+      "param": 0,
+      "stream": "8a 2f 00 ff 2f 00 80 9a 22 49 00 ff 2f 00 80 9a"
+    },
+    "0x1148": {
+      "entry": 6345463,
+      "control": 128,
+      "name": "SDE_count2",
+      "opcode": 154,
+      "sample": 34,
+      "param": 73,
+      "stream": "9a 22 49 00 ff 2f 00 80 9a 23 74 00 ff 2f 00 80"
+    },
+    "0x1149": {
+      "entry": 6345471,
+      "control": 128,
+      "name": "SDE_heart_beam_s1",
+      "opcode": 154,
+      "sample": 35,
+      "param": 116,
+      "stream": "9a 23 74 00 ff 2f 00 80 9a 24 7a 00 ff 2f 00 80"
+    },
+    "0x114a": {
+      "entry": 6345479,
+      "control": 128,
+      "name": "SDE_heart_beam_s2",
+      "opcode": 154,
+      "sample": 36,
+      "param": 122,
+      "stream": "9a 24 7a 00 ff 2f 00 80 9a 25 74 00 ff 2f 00 80"
+    },
+    "0x114b": {
+      "entry": 6345487,
+      "control": 128,
+      "name": "SDE_heart_beam3",
+      "opcode": 154,
+      "sample": 37,
+      "param": 116,
+      "stream": "9a 25 74 00 ff 2f 00 80 9a 55 5f 00 ff 2f 00 80"
+    },
+    "0x114c": {
+      "entry": 6345495,
+      "control": 128,
+      "name": "SDE_charging_weapon1",
+      "opcode": 154,
+      "sample": 85,
+      "param": 95,
+      "stream": "9a 55 5f 00 ff 2f 00 80 9a 49 49 00 ff 2f 00 80"
+    },
+    "0x114d": {
+      "entry": 6345503,
+      "control": 128,
+      "name": "SDE_2_count2",
+      "opcode": 154,
+      "sample": 73,
+      "param": 73,
+      "stream": "9a 49 49 00 ff 2f 00 80 9a 4a 67 00 ff 2f 00 80"
+    },
+    "0x114e": {
+      "entry": 6345511,
+      "control": 128,
+      "name": "SDE_2_heart_beam_s1",
+      "opcode": 154,
+      "sample": 74,
+      "param": 103,
+      "stream": "9a 4a 67 00 ff 2f 00 80 9a 4b 6c 00 ff 2f 00 80"
+    },
+    "0x114f": {
+      "entry": 6345519,
+      "control": 128,
+      "name": "SDE_2_heart_beam_s2",
+      "opcode": 154,
+      "sample": 75,
+      "param": 108,
+      "stream": "9a 4b 6c 00 ff 2f 00 80 9a 4c 67 00 ff 2f 00 80"
+    },
+    "0x1150": {
+      "entry": 6345527,
+      "control": 128,
+      "name": "SDE_2_heart_beam3",
+      "opcode": 154,
+      "sample": 76,
+      "param": 103,
+      "stream": "9a 4c 67 00 ff 2f 00 80 9a 56 5a 00 ff 2f 00 80"
+    },
+    "0x1151": {
+      "entry": 6345535,
+      "control": 128,
+      "name": "SDE_charging_weapon2",
+      "opcode": 154,
+      "sample": 86,
+      "param": 90,
+      "stream": "9a 56 5a 00 ff 2f 00 80 9a 4e 78 00 ff 2f 00 80"
+    },
+    "0x1152": {
+      "entry": 6345543,
+      "control": 128,
+      "name": "SDE_zig_foot_low",
+      "opcode": 154,
+      "sample": 78,
+      "param": 120,
+      "stream": "9a 4e 78 00 ff 2f 00 80 9a 4f 78 00 ff 2f 00 80"
+    },
+    "0x1153": {
+      "entry": 6345551,
+      "control": 128,
+      "name": "SDE_zig_foot_hi",
+      "opcode": 154,
+      "sample": 79,
+      "param": 120,
+      "stream": "9a 4f 78 00 ff 2f 00 80 9a 50 78 00 ff 2f 00 80"
+    },
+    "0x1154": {
+      "entry": 6345559,
+      "control": 128,
+      "name": "SDE_zig_dash_loop",
+      "opcode": 154,
+      "sample": 80,
+      "param": 120,
+      "stream": "9a 50 78 00 ff 2f 00 80 8a 50 00 ff 2f 00 80 9a"
+    },
+    "0x1155": {
+      "entry": 6345567,
+      "control": 128,
+      "name": null,
+      "opcode": 138,
+      "sample": 80,
+      "param": 0,
+      "stream": "8a 50 00 ff 2f 00 80 9a 51 6e 00 ff 2f 00 80 8a"
+    },
+    "0x1156": {
+      "entry": 6345574,
+      "control": 128,
+      "name": "SDE_zig_rotate",
+      "opcode": 154,
+      "sample": 81,
+      "param": 110,
+      "stream": "9a 51 6e 00 ff 2f 00 80 8a 51 00 ff 2f 00 80 9a"
+    },
+    "0x1157": {
+      "entry": 6345582,
+      "control": 128,
+      "name": null,
+      "opcode": 138,
+      "sample": 81,
+      "param": 0,
+      "stream": "8a 51 00 ff 2f 00 80 9a 52 73 00 ff 2f 00 80 9a"
+    },
+    "0x1158": {
+      "entry": 6345589,
+      "control": 128,
+      "name": "SDE_zig_rotate_stop",
+      "opcode": 154,
+      "sample": 82,
+      "param": 115,
+      "stream": "9a 52 73 00 ff 2f 00 80 9a 53 6e 00 ff 2f 00 80"
+    },
+    "0x1159": {
+      "entry": 6345597,
+      "control": 128,
+      "name": "SDE_zig_elect",
+      "opcode": 154,
+      "sample": 83,
+      "param": 110,
+      "stream": "9a 53 6e 00 ff 2f 00 80 8a 53 00 ff 2f 00 80 9a"
+    },
+    "0x115a": {
+      "entry": 6345605,
+      "control": 128,
+      "name": null,
+      "opcode": 138,
+      "sample": 83,
+      "param": 0,
+      "stream": "8a 53 00 ff 2f 00 80 9a 54 73 00 ff 2f 00 80 9b"
+    },
+    "0x115b": {
+      "entry": 6345612,
+      "control": 128,
+      "name": null,
+      "opcode": 154,
+      "sample": 84,
+      "param": 115,
+      "stream": "9a 54 73 00 ff 2f 00 80 9b 27 7a 00 ff 2f 00 80"
+    },
+    "0x1200": {
+      "entry": 6345620,
+      "control": 128,
+      "name": "SDE_tem_rifle",
+      "opcode": 155,
+      "sample": 39,
+      "param": 122,
+      "stream": "9b 27 7a 00 ff 2f 00 80 9b 28 7a 00 ff 2f 00 80"
+    },
+    "0x1201": {
+      "entry": 6345628,
+      "control": 128,
+      "name": "SDE_tem_sword_on",
+      "opcode": 155,
+      "sample": 40,
+      "param": 122,
+      "stream": "9b 28 7a 00 ff 2f 00 80 9b 29 7a 00 ff 2f 00 80"
+    },
+    "0x1202": {
+      "entry": 6345636,
+      "control": 128,
+      "name": "SDE_tem_sword_hit",
+      "opcode": 155,
+      "sample": 41,
+      "param": 122,
+      "stream": "9b 29 7a 00 ff 2f 00 80 9b 2a 7a 00 ff 2f 00 80"
+    },
+    "0x1203": {
+      "entry": 6345644,
+      "control": 128,
+      "name": "SDE_tem_sword_cut",
+      "opcode": 155,
+      "sample": 42,
+      "param": 122,
+      "stream": "9b 2a 7a 00 ff 2f 00 80 9b 2b 7a 00 ff 2f 00 80"
+    },
+    "0x1204": {
+      "entry": 6345652,
+      "control": 128,
+      "name": "SDE_tem_sword_off",
+      "opcode": 155,
+      "sample": 43,
+      "param": 122,
+      "stream": "9b 2b 7a 00 ff 2f 00 80 9b 2c 7a 00 ff 2f 00 80"
+    },
+    "0x1205": {
+      "entry": 6345660,
+      "control": 128,
+      "name": "SDE_rai_grand",
+      "opcode": 155,
+      "sample": 44,
+      "param": 122,
+      "stream": "9b 2c 7a 00 ff 2f 00 80 9b 2d 7a 00 ff 2f 00 80"
+    },
+    "0x1206": {
+      "entry": 6345668,
+      "control": 128,
+      "name": "SDE_rai_baz",
+      "opcode": 155,
+      "sample": 45,
+      "param": 122,
+      "stream": "9b 2d 7a 00 ff 2f 00 80 9b 2e 7a 00 ff 2f 00 80"
+    },
+    "0x1207": {
+      "entry": 6345676,
+      "control": 128,
+      "name": "SDE_rai_laser",
+      "opcode": 155,
+      "sample": 46,
+      "param": 122,
+      "stream": "9b 2e 7a 00 ff 2f 00 80 9b 2f 7a 00 ff 2f 00 80"
+    },
+    "0x1208": {
+      "entry": 6345684,
+      "control": 128,
+      "name": "SDE_vip_sevenway",
+      "opcode": 155,
+      "sample": 47,
+      "param": 122,
+      "stream": "9b 2f 7a 00 ff 2f 00 80 9b 30 7a 00 ff 2f 00 80"
+    },
+    "0x1209": {
+      "entry": 6345692,
+      "control": 128,
+      "name": "SDE_vip_homing",
+      "opcode": 155,
+      "sample": 48,
+      "param": 122,
+      "stream": "9b 30 7a 00 ff 2f 00 80 9b 31 7a 00 ff 2f 00 80"
+    },
+    "0x120a": {
+      "entry": 6345700,
+      "control": 128,
+      "name": "SDE_vip_gun",
+      "opcode": 155,
+      "sample": 49,
+      "param": 122,
+      "stream": "9b 31 7a 00 ff 2f 00 80 9b 32 7a 00 ff 2f 00 80"
+    },
+    "0x120b": {
+      "entry": 6345708,
+      "control": 128,
+      "name": "SDE_bel_napalm",
+      "opcode": 155,
+      "sample": 50,
+      "param": 122,
+      "stream": "9b 32 7a 00 ff 2f 00 80 9b 33 7a 00 ff 2f 00 80"
+    },
+    "0x120c": {
+      "entry": 6345716,
+      "control": 128,
+      "name": "SDE_bel_missile",
+      "opcode": 155,
+      "sample": 51,
+      "param": 122,
+      "stream": "9b 33 7a 00 ff 2f 00 80 9b 34 7a 00 ff 2f 00 80"
+    },
+    "0x120d": {
+      "entry": 6345724,
+      "control": 128,
+      "name": "SDE_bel_gun",
+      "opcode": 155,
+      "sample": 52,
+      "param": 122,
+      "stream": "9b 34 7a 00 ff 2f 00 80 9b 35 7a 00 ff 2f 00 80"
+    },
+    "0x120e": {
+      "entry": 6345732,
+      "control": 128,
+      "name": "SDE_aph_ton_on",
+      "opcode": 155,
+      "sample": 53,
+      "param": 122,
+      "stream": "9b 35 7a 00 ff 2f 00 80 9b 36 7a 00 ff 2f 00 80"
+    },
+    "0x120f": {
+      "entry": 6345740,
+      "control": 128,
+      "name": "SDE_aph_ton_shake",
+      "opcode": 155,
+      "sample": 54,
+      "param": 122,
+      "stream": "9b 36 7a 00 ff 2f 00 80 9b 37 7a 00 ff 2f 00 80"
+    },
+    "0x1210": {
+      "entry": 6345748,
+      "control": 128,
+      "name": "SDE_aph_ton_hit",
+      "opcode": 155,
+      "sample": 55,
+      "param": 122,
+      "stream": "9b 37 7a 00 ff 2f 00 80 9b 38 7a 00 ff 2f 00 80"
+    },
+    "0x1211": {
+      "entry": 6345756,
+      "control": 128,
+      "name": "SDE_aph_shotgun",
+      "opcode": 155,
+      "sample": 56,
+      "param": 122,
+      "stream": "9b 38 7a 00 ff 2f 00 80 9b 39 7a 00 ff 2f 00 80"
+    },
+    "0x1212": {
+      "entry": 6345764,
+      "control": 128,
+      "name": "SDE_dor_grenade",
+      "opcode": 155,
+      "sample": 57,
+      "param": 122,
+      "stream": "9b 39 7a 00 ff 2f 00 80 9b 3a 7a 00 ff 2f 00 80"
+    },
+    "0x1213": {
+      "entry": 6345772,
+      "control": 128,
+      "name": "SDE_dor_hammer_on",
+      "opcode": 155,
+      "sample": 58,
+      "param": 122,
+      "stream": "9b 3a 7a 00 ff 2f 00 80 9b 3b 7a 00 ff 2f 00 80"
+    },
+    "0x1214": {
+      "entry": 6345780,
+      "control": 128,
+      "name": "SDE_dor_hammer_shoot",
+      "opcode": 155,
+      "sample": 59,
+      "param": 122,
+      "stream": "9b 3b 7a 00 ff 2f 00 80 9b 3c 7a 00 ff 2f 00 80"
+    },
+    "0x1215": {
+      "entry": 6345788,
+      "control": 128,
+      "name": "SDE_dor_hammer_hit",
+      "opcode": 155,
+      "sample": 60,
+      "param": 122,
+      "stream": "9b 3c 7a 00 ff 2f 00 80 9b 3d 7a 00 ff 2f 00 80"
+    },
+    "0x1216": {
+      "entry": 6345796,
+      "control": 128,
+      "name": "SDE_dor_phalanx_shoot",
+      "opcode": 155,
+      "sample": 61,
+      "param": 122,
+      "stream": "9b 3d 7a 00 ff 2f 00 80 9b 3e 7a 00 ff 2f 00 80"
+    },
+    "0x1217": {
+      "entry": 6345804,
+      "control": 128,
+      "name": "SDE_dor_phalanx_on",
+      "opcode": 155,
+      "sample": 62,
+      "param": 122,
+      "stream": "9b 3e 7a 00 ff 2f 00 80 9b 3f 7a 00 ff 2f 00 80"
+    },
+    "0x1218": {
+      "entry": 6345812,
+      "control": 128,
+      "name": "SDE_bbb_r_laser",
+      "opcode": 155,
+      "sample": 63,
+      "param": 122,
+      "stream": "9b 3f 7a 00 ff 2f 00 80 9b 40 7a 00 ff 2f 00 80"
+    },
+    "0x1219": {
+      "entry": 6345820,
+      "control": 128,
+      "name": "SDE_bbb_h_bit_on",
+      "opcode": 155,
+      "sample": 64,
+      "param": 122,
+      "stream": "9b 40 7a 00 ff 2f 00 80 9b 41 7a 00 ff 2f 00 80"
+    },
+    "0x121a": {
+      "entry": 6345828,
+      "control": 128,
+      "name": "SDE_bbb_h_bit_shoot",
+      "opcode": 155,
+      "sample": 65,
+      "param": 122,
+      "stream": "9b 41 7a 00 ff 2f 00 80 9b 42 7a 00 ff 2f 00 80"
+    },
+    "0x121b": {
+      "entry": 6345836,
+      "control": 128,
+      "name": "SDE_bbb_h_bit_laser",
+      "opcode": 155,
+      "sample": 66,
+      "param": 122,
+      "stream": "9b 42 7a 00 ff 2f 00 80 9b 43 7a 00 ff 2f 00 80"
+    },
+    "0x121c": {
+      "entry": 6345844,
+      "control": 128,
+      "name": "SDE_bbb_fireball",
+      "opcode": 155,
+      "sample": 67,
+      "param": 122,
+      "stream": "9b 43 7a 00 ff 2f 00 80 9b 44 7a 00 ff 2f 00 80"
+    },
+    "0x121d": {
+      "entry": 6345852,
+      "control": 128,
+      "name": "SDE_fei_handbeam",
+      "opcode": 155,
+      "sample": 68,
+      "param": 122,
+      "stream": "9b 44 7a 00 ff 2f 00 80 9b 45 7a 00 ff 2f 00 80"
+    },
+    "0x121e": {
+      "entry": 6345860,
+      "control": 128,
+      "name": "SDE_fei_bowgun",
+      "opcode": 155,
+      "sample": 69,
+      "param": 122,
+      "stream": "9b 45 7a 00 ff 2f 00 80 9b 46 7a 00 ff 2f 00 80"
+    },
+    "0x121f": {
+      "entry": 6345868,
+      "control": 128,
+      "name": "SDE_fei_lovebeam",
+      "opcode": 155,
+      "sample": 70,
+      "param": 122,
+      "stream": "9b 46 7a 00 ff 2f 00 80 9b 47 7a 00 ff 2f 00 80"
+    },
+    "0x1220": {
+      "entry": 6345876,
+      "control": 128,
+      "name": "SDE_jag_bazooka",
+      "opcode": 155,
+      "sample": 71,
+      "param": 122,
+      "stream": "9b 47 7a 00 ff 2f 00 80 9b 48 7a 00 ff 2f 00 80"
+    },
+    "0x1221": {
+      "entry": 6345884,
+      "control": 128,
+      "name": "SDE_jag_lazer",
+      "opcode": 155,
+      "sample": 72,
+      "param": 122,
+      "stream": "9b 48 7a 00 ff 2f 00 80 9b 49 7a 00 ff 2f 00 80"
+    },
+    "0x1222": {
+      "entry": 6345892,
+      "control": 128,
+      "name": "SDE_jag_grandbom",
+      "opcode": 155,
+      "sample": 73,
+      "param": 122,
+      "stream": "9b 49 7a 00 ff 2f 00 80 9b 4a 7a 00 ff 2f 00 80"
+    },
+    "0x1223": {
+      "entry": 6345900,
+      "control": 128,
+      "name": "SDE_new_bom",
+      "opcode": 155,
+      "sample": 74,
+      "param": 122,
+      "stream": "9b 4a 7a 00 ff 2f 00 80 9b 4b 7a 00 ff 2f 00 80"
+    },
+    "0x1224": {
+      "entry": 6345908,
+      "control": 128,
+      "name": "SDE_new_hit1",
+      "opcode": 155,
+      "sample": 75,
+      "param": 122,
+      "stream": "9b 4b 7a 00 ff 2f 00 80 9b 4c 7a 00 ff 2f 00 80"
+    },
+    "0x1225": {
+      "entry": 6345916,
+      "control": 128,
+      "name": "SDE_new_hit2",
+      "opcode": 155,
+      "sample": 76,
+      "param": 122,
+      "stream": "9b 4c 7a 00 ff 2f 00 80 9b 4d 7a 00 ff 2f 00 80"
+    },
+    "0x1226": {
+      "entry": 6345924,
+      "control": 128,
+      "name": "SDE_new_hit3",
+      "opcode": 155,
+      "sample": 77,
+      "param": 122,
+      "stream": "9b 4d 7a 00 ff 2f 00 80 9b 4e 7a 00 ff 2f 00 80"
+    },
+    "0x1227": {
+      "entry": 6345932,
+      "control": 128,
+      "name": "SDE_new_hit4",
+      "opcode": 155,
+      "sample": 78,
+      "param": 122,
+      "stream": "9b 4e 7a 00 ff 2f 00 80 9b 4f 70 00 ff 2f 00 80"
+    },
+    "0x1228": {
+      "entry": 6345940,
+      "control": 128,
+      "name": "SDE_2_tem_rifle",
+      "opcode": 155,
+      "sample": 79,
+      "param": 112,
+      "stream": "9b 4f 70 00 ff 2f 00 80 9b 50 70 00 ff 2f 00 80"
+    },
+    "0x1229": {
+      "entry": 6345948,
+      "control": 128,
+      "name": "SDE_2_tem_sword_on",
+      "opcode": 155,
+      "sample": 80,
+      "param": 112,
+      "stream": "9b 50 70 00 ff 2f 00 80 9b 51 70 00 ff 2f 00 80"
+    },
+    "0x122a": {
+      "entry": 6345956,
+      "control": 128,
+      "name": "SDE_2_tem_sword_hit",
+      "opcode": 155,
+      "sample": 81,
+      "param": 112,
+      "stream": "9b 51 70 00 ff 2f 00 80 9b 52 70 00 ff 2f 00 80"
+    },
+    "0x122b": {
+      "entry": 6345964,
+      "control": 128,
+      "name": "SDE_2_tem_sword_cut",
+      "opcode": 155,
+      "sample": 82,
+      "param": 112,
+      "stream": "9b 52 70 00 ff 2f 00 80 9b 53 70 00 ff 2f 00 80"
+    },
+    "0x122c": {
+      "entry": 6345972,
+      "control": 128,
+      "name": "SDE_2_tem_sword_off",
+      "opcode": 155,
+      "sample": 83,
+      "param": 112,
+      "stream": "9b 53 70 00 ff 2f 00 80 9b 54 70 00 ff 2f 00 80"
+    },
+    "0x122d": {
+      "entry": 6345980,
+      "control": 128,
+      "name": "SDE_2_rai_grand",
+      "opcode": 155,
+      "sample": 84,
+      "param": 112,
+      "stream": "9b 54 70 00 ff 2f 00 80 9b 55 70 00 ff 2f 00 80"
+    },
+    "0x122e": {
+      "entry": 6345988,
+      "control": 128,
+      "name": "SDE_2_rai_baz",
+      "opcode": 155,
+      "sample": 85,
+      "param": 112,
+      "stream": "9b 55 70 00 ff 2f 00 80 9b 56 70 00 ff 2f 00 80"
+    },
+    "0x122f": {
+      "entry": 6345996,
+      "control": 128,
+      "name": "SDE_2_rai_leaser",
+      "opcode": 155,
+      "sample": 86,
+      "param": 112,
+      "stream": "9b 56 70 00 ff 2f 00 80 9b 57 70 00 ff 2f 00 80"
+    },
+    "0x1230": {
+      "entry": 6346004,
+      "control": 128,
+      "name": "SDE_2_vip_sevenway",
+      "opcode": 155,
+      "sample": 87,
+      "param": 112,
+      "stream": "9b 57 70 00 ff 2f 00 80 9b 58 70 00 ff 2f 00 80"
+    },
+    "0x1231": {
+      "entry": 6346012,
+      "control": 128,
+      "name": "SDE_2_vip_homing",
+      "opcode": 155,
+      "sample": 88,
+      "param": 112,
+      "stream": "9b 58 70 00 ff 2f 00 80 9b 59 70 00 ff 2f 00 80"
+    },
+    "0x1232": {
+      "entry": 6346020,
+      "control": 128,
+      "name": "SDE_2_vip_gun",
+      "opcode": 155,
+      "sample": 89,
+      "param": 112,
+      "stream": "9b 59 70 00 ff 2f 00 80 9b 5a 70 00 ff 2f 00 80"
+    },
+    "0x1233": {
+      "entry": 6346028,
+      "control": 128,
+      "name": "SDE_2_bel_napalm",
+      "opcode": 155,
+      "sample": 90,
+      "param": 112,
+      "stream": "9b 5a 70 00 ff 2f 00 80 9b 5b 70 00 ff 2f 00 80"
+    },
+    "0x1234": {
+      "entry": 6346036,
+      "control": 128,
+      "name": "SDE_2_bel_missile",
+      "opcode": 155,
+      "sample": 91,
+      "param": 112,
+      "stream": "9b 5b 70 00 ff 2f 00 80 9b 5c 70 00 ff 2f 00 80"
+    },
+    "0x1235": {
+      "entry": 6346044,
+      "control": 128,
+      "name": "SDE_2_bel_gun",
+      "opcode": 155,
+      "sample": 92,
+      "param": 112,
+      "stream": "9b 5c 70 00 ff 2f 00 80 9b 5d 70 00 ff 2f 00 80"
+    },
+    "0x1236": {
+      "entry": 6346052,
+      "control": 128,
+      "name": "SDE_2_aph_ton_on",
+      "opcode": 155,
+      "sample": 93,
+      "param": 112,
+      "stream": "9b 5d 70 00 ff 2f 00 80 9b 5e 70 00 ff 2f 00 80"
+    },
+    "0x1237": {
+      "entry": 6346060,
+      "control": 128,
+      "name": "SDE_2_aph_ton_shake",
+      "opcode": 155,
+      "sample": 94,
+      "param": 112,
+      "stream": "9b 5e 70 00 ff 2f 00 80 9b 5f 70 00 ff 2f 00 80"
+    },
+    "0x1238": {
+      "entry": 6346068,
+      "control": 128,
+      "name": "SDE_2_aph_ton_hit",
+      "opcode": 155,
+      "sample": 95,
+      "param": 112,
+      "stream": "9b 5f 70 00 ff 2f 00 80 9b 60 70 00 ff 2f 00 80"
+    },
+    "0x1239": {
+      "entry": 6346076,
+      "control": 128,
+      "name": "SDE_2_aph_shotgun",
+      "opcode": 155,
+      "sample": 96,
+      "param": 112,
+      "stream": "9b 60 70 00 ff 2f 00 80 9b 61 70 00 ff 2f 00 80"
+    },
+    "0x123a": {
+      "entry": 6346084,
+      "control": 128,
+      "name": "SDE_2_dor_grenade",
+      "opcode": 155,
+      "sample": 97,
+      "param": 112,
+      "stream": "9b 61 70 00 ff 2f 00 80 9b 62 70 00 ff 2f 00 80"
+    },
+    "0x123b": {
+      "entry": 6346092,
+      "control": 128,
+      "name": "SDE_2_dor_hammer_on",
+      "opcode": 155,
+      "sample": 98,
+      "param": 112,
+      "stream": "9b 62 70 00 ff 2f 00 80 9b 63 70 00 ff 2f 00 80"
+    },
+    "0x123c": {
+      "entry": 6346100,
+      "control": 128,
+      "name": "SDE_2_dor_hammer_shoot",
+      "opcode": 155,
+      "sample": 99,
+      "param": 112,
+      "stream": "9b 63 70 00 ff 2f 00 80 9b 64 70 00 ff 2f 00 80"
+    },
+    "0x123d": {
+      "entry": 6346108,
+      "control": 128,
+      "name": "SDE_2_dor_hammer_hit",
+      "opcode": 155,
+      "sample": 100,
+      "param": 112,
+      "stream": "9b 64 70 00 ff 2f 00 80 9b 65 70 00 ff 2f 00 80"
+    },
+    "0x123e": {
+      "entry": 6346116,
+      "control": 128,
+      "name": "SDE_2_dor_phalanx_shoot",
+      "opcode": 155,
+      "sample": 101,
+      "param": 112,
+      "stream": "9b 65 70 00 ff 2f 00 80 9b 66 70 00 ff 2f 00 80"
+    },
+    "0x123f": {
+      "entry": 6346124,
+      "control": 128,
+      "name": "SDE_2_dor_phalanx_on",
+      "opcode": 155,
+      "sample": 102,
+      "param": 112,
+      "stream": "9b 66 70 00 ff 2f 00 80 9b 67 70 00 ff 2f 00 80"
+    },
+    "0x1240": {
+      "entry": 6346132,
+      "control": 128,
+      "name": "SDE_2_bbb_r_laser",
+      "opcode": 155,
+      "sample": 103,
+      "param": 112,
+      "stream": "9b 67 70 00 ff 2f 00 80 9b 68 70 00 ff 2f 00 80"
+    },
+    "0x1241": {
+      "entry": 6346140,
+      "control": 128,
+      "name": "SDE_2_bbb_h_bit_on",
+      "opcode": 155,
+      "sample": 104,
+      "param": 112,
+      "stream": "9b 68 70 00 ff 2f 00 80 9b 69 70 00 ff 2f 00 80"
+    },
+    "0x1242": {
+      "entry": 6346148,
+      "control": 128,
+      "name": "SDE_2_bbb_h_bit_shoot",
+      "opcode": 155,
+      "sample": 105,
+      "param": 112,
+      "stream": "9b 69 70 00 ff 2f 00 80 9b 6a 70 00 ff 2f 00 80"
+    },
+    "0x1243": {
+      "entry": 6346156,
+      "control": 128,
+      "name": "SDE_2_bbb_h_bit_laser",
+      "opcode": 155,
+      "sample": 106,
+      "param": 112,
+      "stream": "9b 6a 70 00 ff 2f 00 80 9b 6b 70 00 ff 2f 00 80"
+    },
+    "0x1244": {
+      "entry": 6346164,
+      "control": 128,
+      "name": "SDE_2_bbb_fireball",
+      "opcode": 155,
+      "sample": 107,
+      "param": 112,
+      "stream": "9b 6b 70 00 ff 2f 00 80 9b 6c 70 00 ff 2f 00 80"
+    },
+    "0x1245": {
+      "entry": 6346172,
+      "control": 128,
+      "name": "SDE_2_fei_handbeam",
+      "opcode": 155,
+      "sample": 108,
+      "param": 112,
+      "stream": "9b 6c 70 00 ff 2f 00 80 9b 6d 70 00 ff 2f 00 80"
+    },
+    "0x1246": {
+      "entry": 6346180,
+      "control": 128,
+      "name": "SDE_2_fei_bowgun",
+      "opcode": 155,
+      "sample": 109,
+      "param": 112,
+      "stream": "9b 6d 70 00 ff 2f 00 80 9b 6e 70 00 ff 2f 00 80"
+    },
+    "0x1247": {
+      "entry": 6346188,
+      "control": 128,
+      "name": "SDE_2_fei_lovebeam",
+      "opcode": 155,
+      "sample": 110,
+      "param": 112,
+      "stream": "9b 6e 70 00 ff 2f 00 80 9b 6f 70 00 ff 2f 00 80"
+    },
+    "0x1248": {
+      "entry": 6346196,
+      "control": 128,
+      "name": "SDE_2_jag_bazooka",
+      "opcode": 155,
+      "sample": 111,
+      "param": 112,
+      "stream": "9b 6f 70 00 ff 2f 00 80 9b 70 70 00 ff 2f 00 80"
+    },
+    "0x1249": {
+      "entry": 6346204,
+      "control": 128,
+      "name": "SDE_2_jag_lazer",
+      "opcode": 155,
+      "sample": 112,
+      "param": 112,
+      "stream": "9b 70 70 00 ff 2f 00 80 9b 71 70 00 ff 2f 00 80"
+    },
+    "0x124a": {
+      "entry": 6346212,
+      "control": 128,
+      "name": "SDE_2_jag_grandbom",
+      "opcode": 155,
+      "sample": 113,
+      "param": 112,
+      "stream": "9b 71 70 00 ff 2f 00 80 9b 72 70 00 ff 2f 00 80"
+    },
+    "0x124b": {
+      "entry": 6346220,
+      "control": 128,
+      "name": "SDE_2_new_bom",
+      "opcode": 155,
+      "sample": 114,
+      "param": 112,
+      "stream": "9b 72 70 00 ff 2f 00 80 9b 73 70 00 ff 2f 00 80"
+    },
+    "0x124c": {
+      "entry": 6346228,
+      "control": 128,
+      "name": "SDE_2_new_hit1",
+      "opcode": 155,
+      "sample": 115,
+      "param": 112,
+      "stream": "9b 73 70 00 ff 2f 00 80 9b 74 70 00 ff 2f 00 80"
+    },
+    "0x124d": {
+      "entry": 6346236,
+      "control": 128,
+      "name": "SDE_2_new_hit2",
+      "opcode": 155,
+      "sample": 116,
+      "param": 112,
+      "stream": "9b 74 70 00 ff 2f 00 80 9b 75 70 00 ff 2f 00 80"
+    },
+    "0x124e": {
+      "entry": 6346244,
+      "control": 128,
+      "name": "SDE_2_new_hit3",
+      "opcode": 155,
+      "sample": 117,
+      "param": 112,
+      "stream": "9b 75 70 00 ff 2f 00 80 9b 76 70 00 ff 2f 00 80"
+    },
+    "0x124f": {
+      "entry": 6346252,
+      "control": 128,
+      "name": "SDE_2_new_hit4",
+      "opcode": 155,
+      "sample": 118,
+      "param": 112,
+      "stream": "9b 76 70 00 ff 2f 00 80 9c 00 7a 00 ff 2f 00 80"
+    },
+    "0x1300": {
+      "entry": 6346260,
+      "control": 128,
+      "name": "SDE_round_01",
+      "opcode": 156,
+      "sample": 0,
+      "param": 122,
+      "stream": "9c 00 7a 00 ff 2f 00 80 9c 01 7a 00 ff 2f 00 80"
+    },
+    "0x1301": {
+      "entry": 6346268,
+      "control": 128,
+      "name": "SDE_round_02",
+      "opcode": 156,
+      "sample": 1,
+      "param": 122,
+      "stream": "9c 01 7a 00 ff 2f 00 80 9c 02 7a 00 ff 2f 00 80"
+    },
+    "0x1302": {
+      "entry": 6346276,
+      "control": 128,
+      "name": "SDE_round_03",
+      "opcode": 156,
+      "sample": 2,
+      "param": 122,
+      "stream": "9c 02 7a 00 ff 2f 00 80 9c 03 7a 00 ff 2f 00 80"
+    },
+    "0x1303": {
+      "entry": 6346284,
+      "control": 128,
+      "name": "SDE_round_04",
+      "opcode": 156,
+      "sample": 3,
+      "param": 122,
+      "stream": "9c 03 7a 00 ff 2f 00 80 9c 04 7a 00 ff 2f 00 80"
+    },
+    "0x1304": {
+      "entry": 6346292,
+      "control": 128,
+      "name": "SDE_round_05",
+      "opcode": 156,
+      "sample": 4,
+      "param": 122,
+      "stream": "9c 04 7a 00 ff 2f 00 80 9c 05 7a 00 ff 2f 00 80"
+    },
+    "0x1305": {
+      "entry": 6346300,
+      "control": 128,
+      "name": "SDE_round_06",
+      "opcode": 156,
+      "sample": 5,
+      "param": 122,
+      "stream": "9c 05 7a 00 ff 2f 00 80 9c 06 7a 00 ff 2f 00 80"
+    },
+    "0x1306": {
+      "entry": 6346308,
+      "control": 128,
+      "name": null,
+      "opcode": 156,
+      "sample": 6,
+      "param": 122,
+      "stream": "9c 06 7a 00 ff 2f 00 80 9c 07 7a 00 ff 2f 00 80"
+    },
+    "0x1307": {
+      "entry": 6346316,
+      "control": 128,
+      "name": null,
+      "opcode": 156,
+      "sample": 7,
+      "param": 122,
+      "stream": "9c 07 7a 00 ff 2f 00 80 9c 08 7a 00 ff 2f 00 80"
+    },
+    "0x1308": {
+      "entry": 6346324,
+      "control": 128,
+      "name": null,
+      "opcode": 156,
+      "sample": 8,
+      "param": 122,
+      "stream": "9c 08 7a 00 ff 2f 00 80 9c 09 7a 00 ff 2f 00 80"
+    },
+    "0x1309": {
+      "entry": 6346332,
+      "control": 128,
+      "name": null,
+      "opcode": 156,
+      "sample": 9,
+      "param": 122,
+      "stream": "9c 09 7a 00 ff 2f 00 80 9c 0a 7a 00 ff 2f 00 80"
+    },
+    "0x130a": {
+      "entry": 6346340,
+      "control": 128,
+      "name": "SDE_voice_09",
+      "opcode": 156,
+      "sample": 10,
+      "param": 122,
+      "stream": "9c 0a 7a 00 ff 2f 00 80 9c 0b 7a 00 ff 2f 00 80"
+    },
+    "0x130b": {
+      "entry": 6346348,
+      "control": 128,
+      "name": null,
+      "opcode": 156,
+      "sample": 11,
+      "param": 122,
+      "stream": "9c 0b 7a 00 ff 2f 00 80 9c 0c 7a 00 ff 2f 00 80"
+    },
+    "0x130c": {
+      "entry": 6346356,
+      "control": 128,
+      "name": null,
+      "opcode": 156,
+      "sample": 12,
+      "param": 122,
+      "stream": "9c 0c 7a 00 ff 2f 00 80 9c 0d 7a 00 ff 2f 00 80"
+    },
+    "0x130d": {
+      "entry": 6346364,
+      "control": 128,
+      "name": "SDE_voice_31",
+      "opcode": 156,
+      "sample": 13,
+      "param": 122,
+      "stream": "9c 0d 7a 00 ff 2f 00 80 9c 0e 7a 00 ff 2f 00 80"
+    },
+    "0x130e": {
+      "entry": 6346372,
+      "control": 128,
+      "name": "SDE_voice_32",
+      "opcode": 156,
+      "sample": 14,
+      "param": 122,
+      "stream": "9c 0e 7a 00 ff 2f 00 80 9c 0f 7a 00 ff 2f 00 80"
+    },
+    "0x130f": {
+      "entry": 6346380,
+      "control": 128,
+      "name": "SDE_voice_34",
+      "opcode": 156,
+      "sample": 15,
+      "param": 122,
+      "stream": "9c 0f 7a 00 ff 2f 00 80 9c 10 7a 00 ff 2f 00 80"
+    },
+    "0x1310": {
+      "entry": 6346388,
+      "control": 128,
+      "name": "SDE_voice_35",
+      "opcode": 156,
+      "sample": 16,
+      "param": 122,
+      "stream": "9c 10 7a 00 ff 2f 00 80 9c 11 7a 00 ff 2f 00 80"
+    },
+    "0x1311": {
+      "entry": 6346396,
+      "control": 128,
+      "name": "SDE_voice_36",
+      "opcode": 156,
+      "sample": 17,
+      "param": 122,
+      "stream": "9c 11 7a 00 ff 2f 00 80 9c 12 7f 00 ff 2f 00 80"
+    },
+    "0x1312": {
+      "entry": 6346404,
+      "control": 128,
+      "name": "SDE_voice_37",
+      "opcode": 156,
+      "sample": 18,
+      "param": 127,
+      "stream": "9c 12 7f 00 ff 2f 00 80 9c 13 7f 00 ff 2f 00 80"
+    },
+    "0x1313": {
+      "entry": 6346412,
+      "control": 128,
+      "name": "SDE_voice_38",
+      "opcode": 156,
+      "sample": 19,
+      "param": 127,
+      "stream": "9c 13 7f 00 ff 2f 00 80 9c 14 7f 00 ff 2f 00 80"
+    },
+    "0x1314": {
+      "entry": 6346420,
+      "control": 128,
+      "name": "SDE_voice_39",
+      "opcode": 156,
+      "sample": 20,
+      "param": 127,
+      "stream": "9c 14 7f 00 ff 2f 00 80 9c 15 7f 00 ff 2f 00 80"
+    },
+    "0x1315": {
+      "entry": 6346428,
+      "control": 128,
+      "name": "SDE_voice_40",
+      "opcode": 156,
+      "sample": 21,
+      "param": 127,
+      "stream": "9c 15 7f 00 ff 2f 00 80 9c 16 7a 00 ff 2f 00 80"
+    },
+    "0x1316": {
+      "entry": 6346436,
+      "control": 128,
+      "name": "SDE_voice_41",
+      "opcode": 156,
+      "sample": 22,
+      "param": 122,
+      "stream": "9c 16 7a 00 ff 2f 00 80 9c 17 7a 00 ff 2f 00 80"
+    },
+    "0x1317": {
+      "entry": 6346444,
+      "control": 128,
+      "name": "SDE_voice_42",
+      "opcode": 156,
+      "sample": 23,
+      "param": 122,
+      "stream": "9c 17 7a 00 ff 2f 00 80 9c 18 7a 00 ff 2f 00 80"
+    },
+    "0x1318": {
+      "entry": 6346452,
+      "control": 128,
+      "name": null,
+      "opcode": 156,
+      "sample": 24,
+      "param": 122,
+      "stream": "9c 18 7a 00 ff 2f 00 80 9c 19 7a 00 ff 2f 00 80"
+    },
+    "0x1319": {
+      "entry": 6346460,
+      "control": 128,
+      "name": null,
+      "opcode": 156,
+      "sample": 25,
+      "param": 122,
+      "stream": "9c 19 7a 00 ff 2f 00 80 9c 1a 7a 00 ff 2f 00 80"
+    },
+    "0x131a": {
+      "entry": 6346468,
+      "control": 128,
+      "name": null,
+      "opcode": 156,
+      "sample": 26,
+      "param": 122,
+      "stream": "9c 1a 7a 00 ff 2f 00 80 9c 1b 7a 00 ff 2f 00 80"
+    },
+    "0x131b": {
+      "entry": 6346476,
+      "control": 128,
+      "name": "SDE_voice_52",
+      "opcode": 156,
+      "sample": 27,
+      "param": 122,
+      "stream": "9c 1b 7a 00 ff 2f 00 80 9c 1c 7a 00 ff 2f 00 80"
+    },
+    "0x131c": {
+      "entry": 6346484,
+      "control": 128,
+      "name": "SDE_voice_55",
+      "opcode": 156,
+      "sample": 28,
+      "param": 122,
+      "stream": "9c 1c 7a 00 ff 2f 00 80 9c 1d 7a 00 ff 2f 00 80"
+    },
+    "0x131d": {
+      "entry": 6346492,
+      "control": 128,
+      "name": "SDE_next_enemy",
+      "opcode": 156,
+      "sample": 29,
+      "param": 122,
+      "stream": "9c 1d 7a 00 ff 2f 00 80 9c 1e 7a 00 ff 2f 00 80"
+    },
+    "0x131e": {
+      "entry": 6346500,
+      "control": 128,
+      "name": "SDE_attack",
+      "opcode": 156,
+      "sample": 30,
+      "param": 122,
+      "stream": "9c 1e 7a 00 ff 2f 00 80 9c 1f 7a 00 ff 2f 00 80"
+    },
+    "0x131f": {
+      "entry": 6346508,
+      "control": 128,
+      "name": "SDE_defence",
+      "opcode": 156,
+      "sample": 31,
+      "param": 122,
+      "stream": "9c 1f 7a 00 ff 2f 00 80 9c 20 7a 00 ff 2f 00 80"
+    },
+    "0x1320": {
+      "entry": 6346516,
+      "control": 128,
+      "name": "SDE_speed",
+      "opcode": 156,
+      "sample": 32,
+      "param": 122,
+      "stream": "9c 20 7a 00 ff 2f 00 80 9c 21 7a 00 ff 2f 00 80"
+    },
+    "0x1321": {
+      "entry": 6346524,
+      "control": 128,
+      "name": "SDE_mission",
+      "opcode": 156,
+      "sample": 33,
+      "param": 122,
+      "stream": "9c 21 7a 00 ff 2f 00 80 9c 22 7a 00 ff 2f 00 80"
+    },
+    "0x1322": {
+      "entry": 6346532,
+      "control": 128,
+      "name": "SDE_encounter",
+      "opcode": 156,
+      "sample": 34,
+      "param": 122,
+      "stream": "9c 22 7a 00 ff 2f 00 80 9c 23 7a 00 ff 2f 00 80"
+    },
+    "0x1323": {
+      "entry": 6346540,
+      "control": 128,
+      "name": "SDE_warning",
+      "opcode": 156,
+      "sample": 35,
+      "param": 122,
+      "stream": "9c 23 7a 00 ff 2f 00 80 9c 24 7a 00 ff 2f 00 80"
+    },
+    "0x1324": {
+      "entry": 6346548,
+      "control": 128,
+      "name": "SDE_unknown",
+      "opcode": 156,
+      "sample": 36,
+      "param": 122,
+      "stream": "9c 24 7a 00 ff 2f 00 80 9c 25 7a 00 ff 2f 00 80"
+    },
+    "0x1325": {
+      "entry": 6346556,
+      "control": 128,
+      "name": "SDE_enemy_is",
+      "opcode": 156,
+      "sample": 37,
+      "param": 122,
+      "stream": "9c 25 7a 00 ff 2f 00 80 9c 26 7a 00 ff 2f 00 80"
+    },
+    "0x1326": {
+      "entry": 6346564,
+      "control": 128,
+      "name": "SDE_gameover",
+      "opcode": 156,
+      "sample": 38,
+      "param": 122,
+      "stream": "9c 26 7a 00 ff 2f 00 80 9c 27 7a 00 ff 2f 00 80"
+    },
+    "0x1327": {
+      "entry": 6346572,
+      "control": 128,
+      "name": "SDE_back",
+      "opcode": 156,
+      "sample": 39,
+      "param": 122,
+      "stream": "9c 27 7a 00 ff 2f 00 80 9c 28 7a 00 ff 2f 00 80"
+    },
+    "0x1328": {
+      "entry": 6346580,
+      "control": 128,
+      "name": "SDE_left",
+      "opcode": 156,
+      "sample": 40,
+      "param": 122,
+      "stream": "9c 28 7a 00 ff 2f 00 80 9c 29 7a 00 ff 2f 00 80"
+    },
+    "0x1329": {
+      "entry": 6346588,
+      "control": 128,
+      "name": "SDE_right",
+      "opcode": 156,
+      "sample": 41,
+      "param": 122,
+      "stream": "9c 29 7a 00 ff 2f 00 80 9c 2a 7a 00 ff 2f 00 80"
+    },
+    "0x132a": {
+      "entry": 6346596,
+      "control": 128,
+      "name": "SDE_apharmd",
+      "opcode": 156,
+      "sample": 42,
+      "param": 122,
+      "stream": "9c 2a 7a 00 ff 2f 00 80 9c 2b 7a 00 ff 2f 00 80"
+    },
+    "0x132b": {
+      "entry": 6346604,
+      "control": 128,
+      "name": "SDE_balbasbow",
+      "opcode": 156,
+      "sample": 43,
+      "param": 122,
+      "stream": "9c 2b 7a 00 ff 2f 00 80 9c 2c 7a 00 ff 2f 00 80"
+    },
+    "0x132c": {
+      "entry": 6346612,
+      "control": 128,
+      "name": "SDE_belgdor",
+      "opcode": 156,
+      "sample": 44,
+      "param": 122,
+      "stream": "9c 2c 7a 00 ff 2f 00 80 9c 2d 7a 00 ff 2f 00 80"
+    },
+    "0x132d": {
+      "entry": 6346620,
+      "control": 128,
+      "name": "SDE_dorkas",
+      "opcode": 156,
+      "sample": 45,
+      "param": 122,
+      "stream": "9c 2d 7a 00 ff 2f 00 80 9c 2e 7a 00 ff 2f 00 80"
+    },
+    "0x132e": {
+      "entry": 6346628,
+      "control": 128,
+      "name": "SDE_feiyen",
+      "opcode": 156,
+      "sample": 46,
+      "param": 122,
+      "stream": "9c 2e 7a 00 ff 2f 00 80 9c 2f 7a 00 ff 2f 00 80"
+    },
+    "0x132f": {
+      "entry": 6346636,
+      "control": 128,
+      "name": "SDE_jagrandi",
+      "opcode": 156,
+      "sample": 47,
+      "param": 122,
+      "stream": "9c 2f 7a 00 ff 2f 00 80 9c 30 7a 00 ff 2f 00 80"
+    },
+    "0x1330": {
+      "entry": 6346644,
+      "control": 128,
+      "name": "SDE_raiden",
+      "opcode": 156,
+      "sample": 48,
+      "param": 122,
+      "stream": "9c 30 7a 00 ff 2f 00 80 9c 31 7a 00 ff 2f 00 80"
+    },
+    "0x1331": {
+      "entry": 6346652,
+      "control": 128,
+      "name": "SDE_temjin",
+      "opcode": 156,
+      "sample": 49,
+      "param": 122,
+      "stream": "9c 31 7a 00 ff 2f 00 80 9c 32 7a 00 ff 2f 00 80"
+    },
+    "0x1332": {
+      "entry": 6346660,
+      "control": 128,
+      "name": "SDE_viper",
+      "opcode": 156,
+      "sample": 50,
+      "param": 122,
+      "stream": "9c 32 7a 00 ff 2f 00 80 9c 33 7a 00 ff 2f 00 80"
+    },
+    "0x1333": {
+      "entry": 6346668,
+      "control": 128,
+      "name": "SDE_zigrad",
+      "opcode": 156,
+      "sample": 51,
+      "param": 122,
+      "stream": "9c 33 7a 00 ff 2f 00 80 9c 34 7a 00 ff 2f 00 80"
+    },
+    "0x1334": {
+      "entry": 6346676,
+      "control": 128,
+      "name": "SDE_round_07",
+      "opcode": 156,
+      "sample": 52,
+      "param": 122,
+      "stream": "9c 34 7a 00 ff 2f 00 80 9c 35 7a 00 ff 2f 00 80"
+    },
+    "0x1335": {
+      "entry": 6346684,
+      "control": 128,
+      "name": "SDE_round_08",
+      "opcode": 156,
+      "sample": 53,
+      "param": 122,
+      "stream": "9c 35 7a 00 ff 2f 00 80 9c 36 7a 00 ff 2f 00 80"
+    },
+    "0x1336": {
+      "entry": 6346692,
+      "control": 128,
+      "name": "SDE_round_09",
+      "opcode": 156,
+      "sample": 54,
+      "param": 122,
+      "stream": "9c 36 7a 00 ff 2f 00 80 9c 37 7a 00 ff 2f 00 80"
+    },
+    "0x1337": {
+      "entry": 6346700,
+      "control": 128,
+      "name": "SDE_round_10",
+      "opcode": 156,
+      "sample": 55,
+      "param": 122,
+      "stream": "9c 37 7a 00 ff 2f 00 80 9c 38 7a 00 ff 2f 00 80"
+    },
+    "0x1338": {
+      "entry": 6346708,
+      "control": 128,
+      "name": "SDE_penalty_stage",
+      "opcode": 156,
+      "sample": 56,
+      "param": 122,
+      "stream": "9c 38 7a 00 ff 2f 00 80 9c 39 7a 00 ff 2f 00 80"
+    },
+    "0x1339": {
+      "entry": 6346716,
+      "control": 128,
+      "name": "SDE_final_round",
+      "opcode": 156,
+      "sample": 57,
+      "param": 122,
+      "stream": "9c 39 7a 00 ff 2f 00 80 9c 3a 7d 84 00 9c 3a 2f"
+    },
+    "0x133a": {
+      "entry": 6346724,
+      "control": 128,
+      "name": "SDE_voice_80",
+      "opcode": 156,
+      "sample": 58,
+      "param": 125,
+      "stream": "9c 3a 7d 84 00 9c 3a 2f 84 00 9c 3a 14 84 00 9c"
+    },
+    "0x133b": {
+      "entry": 6346747,
+      "control": 128,
+      "name": "SDE_voice_81",
+      "opcode": 156,
+      "sample": 59,
+      "param": 125,
+      "stream": "9c 3b 7d 83 00 9c 3b 1c 83 00 9c 3b 0c 00 ff 2f"
+    },
+    "0x133c": {
+      "entry": 6346765,
+      "control": 128,
+      "name": "SDE_voice_82",
+      "opcode": 156,
+      "sample": 60,
+      "param": 122,
+      "stream": "9c 3c 7a 00 ff 2f 00 80 9c 3d 7a 00 ff 2f 00 80"
+    },
+    "0x133d": {
+      "entry": 6346773,
+      "control": 128,
+      "name": "SDE_presented_by_SEGA",
+      "opcode": 156,
+      "sample": 61,
+      "param": 122,
+      "stream": "9c 3d 7a 00 ff 2f 00 80 9b 77 7f 00 ff 2f 00 80"
+    },
+    "0x133e": {
+      "entry": 6346781,
+      "control": 128,
+      "name": "SDE_new_noise1",
+      "opcode": 155,
+      "sample": 119,
+      "param": 127,
+      "stream": "9b 77 7f 00 ff 2f 00 80 9b 78 7f 00 ff 2f 00 80"
+    },
+    "0x133f": {
+      "entry": 6346789,
+      "control": 128,
+      "name": "SDE_new_noise2",
+      "opcode": 155,
+      "sample": 120,
+      "param": 127,
+      "stream": "9b 78 7f 00 ff 2f 00 80 9b 79 7f 00 ff 2f 00 80"
+    },
+    "0x1340": {
+      "entry": 6346797,
+      "control": 128,
+      "name": "SDE_new_siren",
+      "opcode": 155,
+      "sample": 121,
+      "param": 127,
+      "stream": "9b 79 7f 00 ff 2f 00 80 9b 7a 7f 00 ff 2f 00 80"
+    },
+    "0x1341": {
+      "entry": 6346805,
+      "control": 128,
+      "name": "SDE_frame_01",
+      "opcode": 155,
+      "sample": 122,
+      "param": 127,
+      "stream": "9b 7a 7f 00 ff 2f 00 80 9b 7f 7f 00 ff 2f 00 80"
+    },
+    "0x1342": {
+      "entry": 6346813,
+      "control": 128,
+      "name": "SDE_new_siren2",
+      "opcode": 155,
+      "sample": 127,
+      "param": 127,
+      "stream": "9b 7f 7f 00 ff 2f 00 80 9b 7b 7a 00 ff 2f 00 80"
+    },
+    "0x1343": {
+      "entry": 6346821,
+      "control": 128,
+      "name": "SDE_bbb_needle1",
+      "opcode": 155,
+      "sample": 123,
+      "param": 122,
+      "stream": "9b 7b 7a 00 ff 2f 00 80 9b 7c 7a 00 ff 2f 00 80"
+    },
+    "0x1344": {
+      "entry": 6346829,
+      "control": 128,
+      "name": null,
+      "opcode": 155,
+      "sample": 124,
+      "param": 122,
+      "stream": "9b 7c 7a 00 ff 2f 00 80 9b 7d 70 00 ff 2f 00 80"
+    },
+    "0x1345": {
+      "entry": 6346837,
+      "control": 128,
+      "name": "SDE_2_bbb_needle1",
+      "opcode": 155,
+      "sample": 125,
+      "param": 112,
+      "stream": "9b 7d 70 00 ff 2f 00 80 9b 7e 70 00 ff 2f 00 80"
+    },
+    "0x1346": {
+      "entry": 6346845,
+      "control": 128,
+      "name": null,
+      "opcode": 155,
+      "sample": 126,
+      "param": 112,
+      "stream": "9b 7e 70 00 ff 2f 00 80 9c 3e 7f 00 ff 2f 00 80"
+    },
+    "0x1347": {
+      "entry": 6346853,
+      "control": 128,
+      "name": "SDE_new_voice1",
+      "opcode": 156,
+      "sample": 62,
+      "param": 127,
+      "stream": "9c 3e 7f 00 ff 2f 00 80 9c 3f 7f 00 ff 2f 00 80"
+    },
+    "0x1348": {
+      "entry": 6346861,
+      "control": 128,
+      "name": "SDE_new_voice2",
+      "opcode": 156,
+      "sample": 63,
+      "param": 127,
+      "stream": "9c 3f 7f 00 ff 2f 00 80 9c 40 7f 00 ff 2f 00 80"
+    },
+    "0x1349": {
+      "entry": 6346869,
+      "control": 128,
+      "name": "SDE_new_voice3",
+      "opcode": 156,
+      "sample": 64,
+      "param": 127,
+      "stream": "9c 40 7f 00 ff 2f 00 80 9c 41 7f 00 ff 2f 00 80"
+    },
+    "0x134a": {
+      "entry": 6346877,
+      "control": 128,
+      "name": "SDE_new_voice4",
+      "opcode": 156,
+      "sample": 65,
+      "param": 127,
+      "stream": "9c 41 7f 00 ff 2f 00 80 9c 42 7f 00 ff 2f 00 80"
+    },
+    "0x134b": {
+      "entry": 6346885,
+      "control": 128,
+      "name": "SDE_new_voice5",
+      "opcode": 156,
+      "sample": 66,
+      "param": 127,
+      "stream": "9c 42 7f 00 ff 2f 00 80 9c 43 7f 00 ff 2f 00 80"
+    },
+    "0x134c": {
+      "entry": 6346893,
+      "control": 128,
+      "name": "SDE_new_voice6",
+      "opcode": 156,
+      "sample": 67,
+      "param": 127,
+      "stream": "9c 43 7f 00 ff 2f 00 80 9c 44 7f 00 ff 2f 00 80"
+    },
+    "0x134d": {
+      "entry": 6346901,
+      "control": 128,
+      "name": "SDE_new_voice7",
+      "opcode": 156,
+      "sample": 68,
+      "param": 127,
+      "stream": "9c 44 7f 00 ff 2f 00 80 9c 45 7f 00 ff 2f 00 80"
+    },
+    "0x134e": {
+      "entry": 6346909,
+      "control": 128,
+      "name": "SDE_new_voice8",
+      "opcode": 156,
+      "sample": 69,
+      "param": 127,
+      "stream": "9c 45 7f 00 ff 2f 00 80 9c 46 7f 00 ff 2f 00 80"
+    },
+    "0x134f": {
+      "entry": 6346917,
+      "control": 128,
+      "name": "SDE_new_voice9",
+      "opcode": 156,
+      "sample": 70,
+      "param": 127,
+      "stream": "9c 46 7f 00 ff 2f 00 80 9c 47 7f 00 ff 2f 00 80"
+    },
+    "0x1350": {
+      "entry": 6346925,
+      "control": 128,
+      "name": "SDE_new_voice10",
+      "opcode": 156,
+      "sample": 71,
+      "param": 127,
+      "stream": "9c 47 7f 00 ff 2f 00 80 9c 48 7f 00 ff 2f 00 80"
+    },
+    "0x1351": {
+      "entry": 6346933,
+      "control": 128,
+      "name": "SDE_new_voice11",
+      "opcode": 156,
+      "sample": 72,
+      "param": 127,
+      "stream": "9c 48 7f 00 ff 2f 00 80 9c 49 7f 00 ff 2f 00 80"
+    },
+    "0x1352": {
+      "entry": 6346941,
+      "control": 128,
+      "name": "SDE_new_voice12",
+      "opcode": 156,
+      "sample": 73,
+      "param": 127,
+      "stream": "9c 49 7f 00 ff 2f 00 80 9c 4a 7f 00 ff 2f 00 80"
+    },
+    "0x1353": {
+      "entry": 6346949,
+      "control": 128,
+      "name": "SDE_new_voice13",
+      "opcode": 156,
+      "sample": 74,
+      "param": 127,
+      "stream": "9c 4a 7f 00 ff 2f 00 80 9c 4b 7f 00 ff 2f 00 80"
+    },
+    "0x1354": {
+      "entry": 6346957,
+      "control": 128,
+      "name": "SDE_new_voice14",
+      "opcode": 156,
+      "sample": 75,
+      "param": 127,
+      "stream": "9c 4b 7f 00 ff 2f 00 80 9c 4c 7f 00 ff 2f 00 80"
+    },
+    "0x1355": {
+      "entry": 6346965,
+      "control": 128,
+      "name": "SDE_new_voice15",
+      "opcode": 156,
+      "sample": 76,
+      "param": 127,
+      "stream": "9c 4c 7f 00 ff 2f 00 80 9c 4d 7f 00 ff 2f 00 80"
+    },
+    "0x1356": {
+      "entry": 6346973,
+      "control": 128,
+      "name": "SDE_new_voice16",
+      "opcode": 156,
+      "sample": 77,
+      "param": 127,
+      "stream": "9c 4d 7f 00 ff 2f 00 80 9c 4e 7f 00 ff 2f 00 80"
+    },
+    "0x1357": {
+      "entry": 6346981,
+      "control": 128,
+      "name": "SDE_new_voice17",
+      "opcode": 156,
+      "sample": 78,
+      "param": 127,
+      "stream": "9c 4e 7f 00 ff 2f 00 80 9c 4f 7f 00 ff 2f 00 80"
+    },
+    "0x1358": {
+      "entry": 6346989,
+      "control": 128,
+      "name": "SDE_new_voice18",
+      "opcode": 156,
+      "sample": 79,
+      "param": 127,
+      "stream": "9c 4f 7f 00 ff 2f 00 80 9c 50 7f 00 ff 2f 00 80"
+    },
+    "0x1359": {
+      "entry": 6346997,
+      "control": 128,
+      "name": "SDE_new_voice19",
+      "opcode": 156,
+      "sample": 80,
+      "param": 127,
+      "stream": "9c 50 7f 00 ff 2f 00 80 9c 51 7f 00 ff 2f 00 80"
+    },
+    "0x135a": {
+      "entry": 6347005,
+      "control": 128,
+      "name": "SDE_new_voice20",
+      "opcode": 156,
+      "sample": 81,
+      "param": 127,
+      "stream": "9c 51 7f 00 ff 2f 00 80 9c 52 7f 00 ff 2f 00 80"
+    },
+    "0x135b": {
+      "entry": 6347013,
+      "control": 128,
+      "name": "SDE_new_voice21",
+      "opcode": 156,
+      "sample": 82,
+      "param": 127,
+      "stream": "9c 52 7f 00 ff 2f 00 80 9c 53 7f 00 ff 2f 00 80"
+    },
+    "0x135c": {
+      "entry": 6347021,
+      "control": 128,
+      "name": "SDE_new_voice22",
+      "opcode": 156,
+      "sample": 83,
+      "param": 127,
+      "stream": "9c 53 7f 00 ff 2f 00 80 9c 54 7f 00 ff 2f 00 80"
+    },
+    "0x135d": {
+      "entry": 6347029,
+      "control": 128,
+      "name": "SDE_new_voice23",
+      "opcode": 156,
+      "sample": 84,
+      "param": 127,
+      "stream": "9c 54 7f 00 ff 2f 00 80 9c 55 7f 00 ff 2f 00 80"
+    },
+    "0x135e": {
+      "entry": 6347037,
+      "control": 128,
+      "name": "SDE_new_voice24",
+      "opcode": 156,
+      "sample": 85,
+      "param": 127,
+      "stream": "9c 55 7f 00 ff 2f 00 80 9a 57 73 00 ff 2f 00 80"
+    },
+    "0x135f": {
+      "entry": 6347045,
+      "control": 128,
+      "name": "SDE_hyper_feyn",
+      "opcode": 154,
+      "sample": 87,
+      "param": 115,
+      "stream": "9a 57 73 00 ff 2f 00 80 9a 58 5a 00 ff 2f 00 80"
+    },
+    "0x1360": {
+      "entry": 6347053,
+      "control": 128,
+      "name": "SDE_2_hyper_feyn",
+      "opcode": 154,
+      "sample": 88,
+      "param": 90,
+      "stream": "9a 58 5a 00 ff 2f 00 80 9a 59 6e 00 ff 2f 00 80"
+    },
+    "0x1361": {
+      "entry": 6347061,
+      "control": 128,
+      "name": "SDE_super_bang_1",
+      "opcode": 154,
+      "sample": 89,
+      "param": 110,
+      "stream": "9a 59 6e 00 ff 2f 00 80 9a 5a 6e 00 ff 2f 00 80"
+    },
+    "0x1362": {
+      "entry": 6347069,
+      "control": 128,
+      "name": "SDE_super_bang_2",
+      "opcode": 154,
+      "sample": 90,
+      "param": 110,
+      "stream": "9a 5a 6e 00 ff 2f 00 80 9a 5b 73 00 ff 2f 00 80"
+    },
+    "0x1363": {
+      "entry": 6347077,
+      "control": 128,
+      "name": "SDE_click_0",
+      "opcode": 154,
+      "sample": 91,
+      "param": 115,
+      "stream": "9a 5b 73 00 ff 2f 00 80 9a 5c 73 00 ff 2f 00 80"
+    },
+    "0x1364": {
+      "entry": 6347085,
+      "control": 128,
+      "name": "SDE_click_1",
+      "opcode": 154,
+      "sample": 92,
+      "param": 115,
+      "stream": "9a 5c 73 00 ff 2f 00 80 9a 5d 73 00 ff 2f 00 80"
+    },
+    "0x1365": {
+      "entry": 6347093,
+      "control": 128,
+      "name": "SDE_click_2",
+      "opcode": 154,
+      "sample": 93,
+      "param": 115,
+      "stream": "9a 5d 73 00 ff 2f 00 80 9a 5e 73 00 ff 2f 00 00"
+    },
+    "0x1366": {
+      "entry": 6347101,
+      "control": 128,
+      "name": "SDE_click_3",
+      "opcode": 154,
+      "sample": 94,
+      "param": 115,
+      "stream": "9a 5e 73 00 ff 2f 00 00 00 01 00 06 00 86 00 09"
+    }
+  }
+}

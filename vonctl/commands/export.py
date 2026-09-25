@@ -84,9 +84,19 @@ def stage_arenas(argv: list[str]) -> int:
     return 0
 
 
+def audio(argv: list[str]) -> int:
+    """Stage the decoded SFX/voice clips and manifest into the Godot tree."""
+    godot = config.env_path("VON_GODOT", config.ROOT.parent / "von-godot")
+    out_dir = godot / "assets" / "generated" / "audio"
+    process.run(process.python_tool("export_audio_manifest.py") + [
+        "--output", str(out_dir), *argv], cwd=config.ROOT)
+    return 0
+
+
 EXPORTS = {
     "select-models": select_models,
     "stage-arenas": stage_arenas,
+    "audio": audio,
 }
 
 

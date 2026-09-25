@@ -52,22 +52,53 @@ then run that script. The confirmed code entry points include:
 - `0x602938`: `audio_voice_pitch_from_command`;
 - `0x602bb8`: `audio_voice_pan_command`;
 - `0x602c94`: `audio_voice_level_command`;
-- `0x608004`: `audio_voice_descriptor_table_ptr`, a pointer cell resolving to
-  the descriptor table at `0x60b5e0` (maximum descriptor ID `0x41`);
-- `0x608008`: `audio_sequence_table_ptr`, a pointer cell resolving to the
-  sequence table at `0x609da8` (maximum observed event ID `1`);
+- `0x602146`: `audio_sample_upload`, the lazy component that copies a
+  descriptor's ROM range into SCSP sound RAM and keys the slot;
+- `0x601af8`: `audio_sample_trigger_command`, the nibble-9 sample handler;
+- `0x6034b8`: `audio_host_command_resolve`, the `ae HH LL` resolver;
 - `0x605e24`: `audio_pitch_table_index`;
 - `0x602d9e`: `audio_tempo_lookup`.
 
-The sequence table entries at `0x609dae` and `0x609de2` are 16-bit relative
-offsets from `0x609da8`; `0x608008` is only the pointer cell and must not be
-treated as the table base. `von/tools/analyze_sound_rom.py` emits the resolved
-pointer/table information as JSON for the offline music-renderer work.
+### Sound ROM table map (corrected 2026-09-18)
+
+The pointer block at `0x608000` resolves the driver's tables. Earlier notes
+swapped the roles of `0x60b5e0` and `0x609da8`; the current reading is:
+
+| pointer cell | target | role |
+| --- | --- | --- |
+| `0x608000` | `0x60a010` | sample descriptor table: `u16` size then 16-byte records at `0x60a012` (`{src, len-1, end, loop}`, 347 records); copied to RAM `0x5000` |
+| `0x608004` | `0x60b5e0` | sequence/track table: `u16` count (65) then relative offsets to `[lo,hi]` + 12-byte-entry range tables; copied to RAM `0x9000` |
+| `0x608008` | `0x609da8` | 16-entry voice/sample assignment table, selected by the header at base-`0x10`; built into RAM `0x1600` |
+| `0x60800c` | `0x6080e2` | init/mode script emitting `a0 NN` ring setup commands |
+| `0x608010` | `0x608080` | effect-channel records (six 16-byte records; `+1` = command low nibble, `+2` = track) |
+| `0x608018` | `0x609884` | SCSP DSP microprogram copied to `0x100700` |
+| `0x60801c` | `0x60ca1a` | two-level host command table indexed by `ae HH LL` |
+| `0x608020` | `0x60b5c2` | eager sample-upload index list (terminated on this ROM) |
+| `0x608028` | `0x60d966` | byte-indexed effect parameter table |
+
+`von/tools/analyze_sound_rom.py` resolves the sequence table from `0x8004`
+(not `0x8008`) and emits it as JSON; `von/tools/extract_audio_command_map.py`
+resolves the `ae HH LL` command table; `von/tools/extract_audio_sample_table.py`
+resolves the descriptor table.
+
+### Command -> clip chain (resolved)
+
+- `0x6034b8` indexes `[0x60801c]` by `HH` then `LL`; `control == 0x00` gives a
+  sequence pointer, `control & 0x80` queues the inline stream at `A2+1`.
+- The inline packet is `OP SAMPLE PARAM` (`0x9a`/`0x9b`/`0x9c`). The low nibble
+  of `OP` selects an effect-channel record (`0x608080`); `+2` is the track.
+- `0x601af8` searches that track's `[lo,hi]` range table for `SAMPLE`; the
+  entry's first word is the descriptor index.
+- `0x602146` uploads the descriptor's PCM range from the sample region.
+
+The join is extracted as `von/audio-clip-map.json`
+(`extract_audio_clip_map.py`, `test_audio_clip_map.py`): 275 commands with
+0 unresolved, e.g. `0x1115 SDE_hit_13 -> descriptor 0xb5 -> 0x468b84, 37381
+bytes`. `--extract DIR` writes a PCM8 WAV per command.
 
 The normal command handlers consume three-byte packets (command plus two
 payload bytes); `von/tools/decode_sound_sequences.py` exports those packets
-for renderer development. The packet field meanings are still being mapped
-to voice/sample selection and timing.
+for renderer development.
 
 Existing MAME logs can preserve part of that evidence without another run:
 `von/tools/extract_scsp_midi_trace.py` extracts timestamped three-byte MIDI

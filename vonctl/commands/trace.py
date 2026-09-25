@@ -621,6 +621,18 @@ def von_toolbox(argv: list[str]) -> int:
     return 0
 
 
+def jev_triage(argv: list[str]) -> int:
+    """Run the opt-in, advisory JEV trace triage tool."""
+    return process.run(process.python_tool("jev_trace_triage.py") + argv, cwd=config.ROOT,
+                       check=False)
+
+
+def jev_benchmark(argv: list[str]) -> int:
+    """Score saved JEV triage reports without making network requests."""
+    return process.run(process.python_tool("jev_trace_benchmark.py") + argv, cwd=config.ROOT,
+                       check=False)
+
+
 TRACES = {
     "camera": camera,
     "geometry-buffer": geometry_buffer,
@@ -634,6 +646,8 @@ TRACES = {
     "i960-boot": i960_boot,
     "i960-exploratory": i960_exploratory,
     "i960-reconstructed": i960_reconstructed,
+    "jev-benchmark": jev_benchmark,
+    "jev-triage": jev_triage,
     "texture-buffers": texture_buffers,
     "von-progress": von_progress,
     "von-toolbox": von_toolbox,

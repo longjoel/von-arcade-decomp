@@ -13,6 +13,7 @@ notebooks remain at their established paths.
 | [Operations](operations.md) | Build, run, trace, test, and deployment commands. |
 | [Geometry](geometry.md) | Current geometry/export boundary and validation status. |
 | [Audio](audio.md) | SCSP captures, sample extraction, reconstruction status, and validation tiers. |
+| [68000 sound program](audio-68000.md) | Disassembly recipe, load map, sequence parser, and host command packet boundary. |
 | [SHARC](sharc.md) | Stable recovered contracts, freeze rule, and MAME precision boundary. |
 
 ## Generated truth

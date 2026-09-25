@@ -247,6 +247,19 @@ label(0x0051aa74, "audio_fifo_write_index")
 label(0x0051aa80, "audio_fifo_bytes_64")
 label(0x009c0000, "scsp_command_port")
 label(0x009c0004, "scsp_status_control_port")
+label(0x0051ab14, "audio_active_fighter_profile")
+label(0x00019360, "fighter_profile_table",
+      "Ten per-roster profile pointers; each profile carries eight 16-bit action sound words at +0x488..+0x4a4 (weapon, jump, dash, stop pairs).")
+label(0x000195e0, "stage_audio_record_table",
+      "Ten 8-byte arena records {u16 bgm, u16 pad, u16 announce, u16 pad}; slot 7 copies the selected record to 0x504cc0 and publishes the index at 0x5770f0.")
+label(0x000195e4, "stage_announce_table",
+      "High halfword of each 0x195e0 record: the per-arena SDE_new_voice announce command, sent at 0x1a190/0x1a1cc.")
+label(0x00019480, "round_announce_table",
+      "Ten SDE_round_01..10 announcement words indexed by the round counter and sent at 0x1a178/0x1a1b4.")
+label(0x00021180, "stage_intro_voice_pair_table",
+      "Ten 4-byte {u16 intro_voice, u16 fight_announce} pairs used by the status screen; 0x21d78 loads the low halfword (or 0x1322 when 0x503a7c is zero). The high halfword matches the 0x195e0 fight announce for every selector.")
+label(0x000edd22, "sound_name_table",
+      "Packed {u16 command, NUL-terminated ascii} records naming 287 host commands (SDE_* effects/voices, SDB_* shell music). Extracted by von/tools/extract_sound_id_names.py.")
 label(0x000292d8, "geometry_command_stream_upload")
 label(0x000294b0, "geometry_profile_upload_setup",
       "Fixed profile-3 setup prefix: programs 0x800160/0x800070/0x800080/0x800030, calls 0x292d8 with headers 0/32 from 0x293b0, then emits the 0x800090/0x804000/0x8000a0 handshake and finishes through 0x28d30.")

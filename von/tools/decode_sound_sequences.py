@@ -58,7 +58,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("rom", type=Path)
     parser.add_argument("-o", "--output", type=Path, required=True)
-    parser.add_argument("--table-offset", type=lambda value: int(value, 0), default=0x8008,
+    parser.add_argument("--table-offset", type=lambda value: int(value, 0), default=0x8004,
                         help="ROM offset containing the sequence-table pointer")
     parser.add_argument("--maximum-packets", type=int, default=4096)
     args = parser.parse_args()

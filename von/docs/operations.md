@@ -43,6 +43,9 @@ tracked example. The pinned i960 Docker image supplies GCC/binutils.
 ```sh
 ./bin/vonctl disasm i960
 ./bin/vonctl disasm remote-i960
+./bin/vonctl disasm audio
+./bin/vonctl disasm cpu3
+./bin/vonctl disasm sharc
 ./bin/vonctl trace i960-boot
 ./bin/vonctl trace i960-reconstructed
 ./bin/vonctl i960 prototype
@@ -94,6 +97,13 @@ python3 von/tools/extract_geometry_rom.py
 Every promoted export must follow the evidence-pack rules in
 [Evidence and assets plan](evidence-and-assets-plan.md). A plausible glTF is
 not automatically a validated asset.
+
+## Advisory JEV trace triage
+
+Use `./bin/vonctl trace jev-triage` to prepare, submit, or replay a bounded
+first-divergence dossier. Use `./bin/vonctl trace jev-benchmark` to score saved
+reports against confirmed cases. Both workflows and their evidence limitations
+are documented in [Advisory JEV trace triage](jev-trace-triage.md).
 
 ## Audio capture
 

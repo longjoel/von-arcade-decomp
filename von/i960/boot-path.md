@@ -1428,6 +1428,37 @@ command/video transition and returns at `0x2b76c`; `0x2b770` decrements the
 status subcounter and returns through `0x2b7a4`; and `0x2b940` is a small
 continuation trampoline ending at `0x2b954`.
 
+### Mode-1 phase-handler effects (runtime probe 2026-09-18)
+
+`von/tools/probe_mode1_handlers.py` breaks once at every reachable handler
+entry on the original input-free attract and dumps the g-register file plus
+work-RAM windows; consecutive dumps give each arm's net writes. The observed
+order is phase `0,3,4,5,6,7,8,9,10,11,12,13,14,15,null->1` (see
+`von/build/disasm/mode-transitions.log`). Highlights:
+
+- `0x2b500`: phase +1; helper fills `0x51c864..0x51c95c` (1..0x3f) and resets
+  `0x504cdc/e0/e4`; direct stores `0x51aac4`/`0x503aac` (g14 = 0) and
+  `0x51c850` (g0).
+- `0x2b7b0`/`0x2b7e0`: phase +2 / +1 (modeled).
+- `0x2b810`: phase +1; `0x503a04` = 0; `0x100a004` = `0x504d28` = `0x200`;
+  `0x504d30` = `0x4000` (modeled as `recovered_startup_mode1_phase3_run_2b810`).
+- `0x2b870`: phase +1; `0x503a04` = `0x81`; `0x504d28` = 0; enqueues audio.
+- `0x2dc50`: phase +1; `0x503a80` = 4; `0x503a9c` = 5; `0x503ab0` = `0xff`;
+  `0x5770f0` = 3; seeds `0x51aaf4..0x51ab00`.
+- `0x2dd30`/`0x2ded0`: phase +1; large status/geometry seed
+  (`0x503abc..0x504f48`, team/score workspaces).
+- `0x2b550`/`0x2b660`: phase +1; publish `0x51c854` (profile bases
+  `0x2aae0`/`0x2ab40`) and walk the `0x51c5b4`/`0x51c890` status rows.
+- `0xd24b0`: phase +1; `0x503ab4` = `0x73`; `0x503ab8` = `0x258`;
+  `0x5770f0` = 13; stores continuation pointers in `0x5772xx`.
+- `0xd2560`/`0xd25b0`: phase +1; dispatch the `0x577280` status selector.
+- `0xe3ab0`: device-gated; `0x1d00026 == 0` -> phase +2, else dispatch
+  `0x5783b4` (`0xe3dc0`/`0xe3f30`/`0xe3b70`) and increment it.
+
+`0x51aa70`/`0x51aa74` are the host-to-audio ring head/tail; several mode-1 arms
+enqueue `ae HH LL` payload bytes there (`0x2b870`, `0x2dc50`, `0xd24b0`), which
+ties the attract sequence to the recovered audio command stream.
+
 The adjacent geometry/status dispatch at `0x2bdd0` selects one of the three
 arms in the table at `0x2bdc0` using the low two bits of `0x503a00`. Its
 fallback advances `0x5039f4`; the dispatcher returns at `0x2be24`, immediately
@@ -1607,11 +1638,16 @@ dispatcher at `0x2b430`.
 
 The device-state arm at `0xe3ab0` is a three-state cycle. If device byte
 `0x1d00026` is zero it advances `0x503a00` by `2`; otherwise it wraps the
-state at `0x5783b4` into `0..2`, dispatches to `0xe3dc0`, `0xe3f30`, or
-`0xe3b70`, then increments the stored state. The state-0 path clears the
-status tile region, seeds the text asset at `0x578410`, and emits the fixed
-status strings visible in the listing. These are concrete service effects;
-the user-facing state names remain unresolved.
+state at `0x5783b4` into `0..2`, dispatches by the clamped state, then stores
+state+1. Sub-state `1` dispatches `0xe3dc0`, `2` dispatches `0xe3f30`, and
+`0` (plus values above `2` wrapped to `0`) dispatches `0xe3b70`. Runtime probe
+of the original attract pass (`von/tools/probe_mode1_handlers.py` and the
+`0xe3ab0` sub-probe) shows entry sub-state `0` with `0x1d00026 = 1`
+dispatching `0xe3b70`; the earlier reading of state `0` as `0xe3dc0` was
+inverted. The `0xe3b70` path clears the status tile region, seeds the text
+asset at `0x578410`, and emits the fixed status strings visible in the
+listing; modeled as `recovered_startup_mode1_phase13_run_e3ab0`. These are
+concrete service effects; the user-facing state names remain unresolved.
 
 The next two compact arms are timing wrappers. `0x2b7b0` adds `2` to
 `0x503a00`, then branches through its local return stub at `0x2b7d8`.
@@ -1621,7 +1657,11 @@ The next two compact arms are timing wrappers. `0x2b7b0` adds `2` to
 
 The adjacent `0x2b810` arm increments the service counter, clears the video
 context, emits command `0x7fff`, sets the text-plane attribute bits, copies a
-fixed asset through `0x1f060`, clears `0x503a04`, and returns. `0x2b870`
+fixed asset through `0x1f060`, clears `0x503a04`, and returns. Runtime probe
+(original input-free attract, `probe_2b810` breakpoint at `0x2b858`): phase
+`0x503a00` 3 -> 4, `0x503a04` `0xffffffff` -> 0, and attributes
+`0x100a004`/`0x504d28`/`0x504d30` = `0x200`/`0x200`/`0x4000`; modeled as
+`recovered_startup_mode1_phase3_run_2b810`. `0x2b870`
 converts the progress counter at `0x503a04` into a text-plane coordinate at
 `0x504d28`, selects status messages through `0x2a5f0`, and advances the main
 service counter when the progress reaches the terminal boundary. This gives

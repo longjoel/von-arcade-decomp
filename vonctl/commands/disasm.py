@@ -59,6 +59,24 @@ def cpu3(argv: list[str]) -> int:
     return 0
 
 
+def audio(argv: list[str]) -> int:
+    """Disassemble the 68000 sound CPU (epr-18670.31)."""
+    out_dir = _disasm()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    unidasm = config.unidasm()
+    config.require_file(unidasm, "unidasm")
+    image = out_dir / "vonj-audio.bin"
+    listing = out_dir / "vonj-audio.lst"
+    process.run(process.python_tool("extract_audio.py") + ["--output", str(image)],
+                cwd=config.ROOT)
+    with listing.open("w", encoding="utf-8") as stream:
+        subprocess.run([str(unidasm), str(image), "-arch", "m68000",
+                        "-basepc", "0x600000"],
+                       stdout=stream, check=True, env=process.merged_env())
+    print(f"Wrote {listing}")
+    return 0
+
+
 def sharc(argv: list[str]) -> int:
     """Disassemble the SHARC bootstrap (port of scripts/disasm-sharc.sh)."""
     out_dir = _disasm()
@@ -189,6 +207,7 @@ def _ghidra_install(argv: list[str]) -> int:
 
 DISASM = {
     "i960": i960,
+    "audio": audio,
     "cpu3": cpu3,
     "sharc": sharc,
     "remote-i960": remote_i960,

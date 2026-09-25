@@ -2742,6 +2742,58 @@ read-index advances trail in the same frame from PC `0x00001720`, next to the
 vocabulary and bout correlation (FIGHT calls, stage-intro/BGM family) are
 recorded in [audio.md](../docs/audio.md) rather than repeated here.
 
+### Gameplay Action Sound Bindings
+
+The gameplay handlers reach the `0x2a4e0` producer both with fixed command
+words and with per-fighter profile fields. The profile pointer is the global
+`0x0051ab14` (set from `object+0x6c`), and `0x0019360` holds the ten roster
+profile pointers (`0x57d0`, `0xa5b0`, `0xcdc0`, `0x7be0`, `0xeb90`,
+`0x119e0`, `0x138d0`, `0x15820`, `0x16a10`, `0x17b20`). Each profile stores
+eight 16-bit command words at `+0x488..+0x4a4`.
+
+The confirmed `ld 0x51ab14 -> ld field -> mov g4,g0 -> call 0x2a4e0` sites,
+all selecting the second field of the pair when `object+0x68` is nonzero:
+
+| pair | action | call sites |
+| --- | --- | --- |
+| `+0x488`/`+0x48c` | primary weapon fire (guarded by `object+0x1ab`) | `0x34d9c`, `0x34dac` |
+| `+0x490`/`+0x494` | jump/air | `0x2fe6c`, `0x2fe74`, `0x31060`, `0x31068`, `0x3147c`, `0x31484` |
+| `+0x498`/`+0x4a0` | dash loop | `0x34300`, `0x34310` |
+| `+0x49c`/`+0x4a4` | move-end/stop | `0x34354`, `0x34364`, reused at `0x4dc20`–`0x67c50` |
+
+The dash pair is an `object+0x196` toggle over `object+0x172` values `31`
+and `34` (`0x342d4`–`0x34374`): the entering edge sends `+0x498`/`+0x4a0`
+and sets the flag, the leaving edge sends `+0x49c`/`+0x4a4` and clears it.
+The `_b` field of every pair is the `SDE_2_*` duplicate of the same action,
+so `object+0x68` selects the sound bank.
+
+The extracted profile words are reproduced by
+`recovered_audio_profile_sound()`/`recovered_audio_*_command()` in
+`von/i960/recovered_audio_actions.c` and re-derived from the assembled image
+by `von/tools/test_recovered_audio_actions.py`. `object+0x1fc` is the
+object's last/pending command word: the initializer at `0x27350`–`0x273a0`
+copies profile `+0xe8` into it and replays it through `0x2a4e0`, and the
+move-script families store their fixed `0x12xx` choice there before sending
+it.
+
+### Sound-ID Name Table: `0x000edd22`..`0x000f03e6`
+
+The image carries packed records of a 16-bit command word followed by a
+NUL-terminated ASCII asset name (`0x22`-byte stride in the largest tables):
+the effect/voice tables at `0xedd22`–`0xef158`, the misc/round/voice tables
+at `0xef1a2`–`0xefbea`, the `SDE_new_*` table at `0xefc0c`–`0xeff1a`, and
+the 68000 shell table at `0xeff62`–`0xf03e6`. They name 287 distinct
+commands. Extractor: `von/tools/extract_sound_id_names.py`; committed map:
+`von/sound-id-names.json`; test: `von/tools/test_sound_id_names.py`.
+
+The stage selection at `0x19830` copies the 8-byte arena record at
+`0x195e0[selector*8]` to `0x504cc0` (`{u16 bgm, u16 pad, u16 announce, u16
+pad}`) and publishes the selector to `0x5770f0`. Mode 4 sends the BGM word
+from `0x504cc0` at `0x1a45c`–`0x1a474`, the announce word from
+`0x195e4[selector*8]` at `0x1a190`/`0x1a1cc`, and the round announcement
+from `0x19480[round]` at `0x1a178`/`0x1a1b4`. Table values and the
+corrected BGM/announce reading are in [audio.md](../docs/audio.md).
+
 ### Reused Geometry Service Boundary: `0x0002a990`
 
 The attract worklist's next high-frequency host target is a fixed SHARC

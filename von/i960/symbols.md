@@ -74,6 +74,32 @@ System 24 tile device) and advances to mode 1. Mode 1 and the diagnostics
 | `VON_DIR_TABLE_18360` | `0x00018360` | Committed-action -> turn delta (`+0x3c`) | KNOWN |
 | `VON_DIR_TABLE_18370` | `0x00018370` | Committed-action -> half heading (`+0x186`) | KNOWN |
 
+## Audio (host -> SCSP)
+
+| Symbol | Address | Meaning | Confidence |
+| --- | ---: | --- | --- |
+| `VON_FN_AUDIO_SEND_U16` | `0x0002a4e0` | Frame a 16-bit command as `ae,high,low` (or lone `ff`) and enqueue it on the 64-byte ring | KNOWN |
+| `VON_FN_AUDIO_SEND_U16_IDLE` | `0x0002a5f0` | Sibling sender that also suppresses normal commands when mode is 1 and board status is 0 | KNOWN |
+| `VON_FN_AUDIO_SEND_ALT` | `0x0002a580` | Sender entered from the input/retry paths (`0x111b`/`0x111c`) | KNOWN |
+| `VON_FN_AUDIO_SEND_LEVEL` | `0x0002a690` | Clamp a signed level to `1..127` and send `a0,1,level` | KNOWN |
+| `VON_FN_AUDIO_SEND_VALUE0` | `0x0002a870` | Send `a0,0,low_byte(value)` without clamping | KNOWN |
+| `VON_FN_AUDIO_INIT` | `0x0002a8a0` | Clear/`0x99`-fill the ring, emit the six-value control sequence, queue `0xff` | KNOWN |
+| `VON_AUDIO_READ_INDEX` | `0x0051aa70` | Ring read index (mod 64) | KNOWN |
+| `VON_AUDIO_WRITE_INDEX` | `0x0051aa74` | Ring write index (mod 64) | KNOWN |
+| `VON_AUDIO_QUEUE` | `0x0051aa80` | 64 command bytes | KNOWN |
+| `VON_FN_AUDIO_CONSUME` | `0x000016dc` | Interrupt branch that drains one byte to `0x009c0000` when SCSP status bit 0 permits | KNOWN |
+| `VON_FIGHTER_PROFILE_TABLE` | `0x00019360` | Ten per-roster profile pointers (config + motion) | KNOWN |
+| `VON_SOUND_NAME_TABLE` | `0x000edd22` | Packed `{u16 command, ascii name}` records naming 287 commands (`SDE_*`/`SDB_*`) | KNOWN |
+| `VON_STAGE_AUDIO_TABLE` | `0x000195e0` | Ten 8-byte arena records `{bgm, pad, fight announce, pad}` | KNOWN |
+| `VON_STAGE_INTRO_VOICE_TABLE` | `0x00021180` | Ten 4-byte `{intro voice, fight announce}` pairs for the status screen | KNOWN |
+| `VON_ROUND_ANNOUNCE_TABLE` | `0x00019480` | Ten `SDE_round_NN` announcement words | KNOWN |
+| `VON_OBJ_SOUND_FIELD` | `object+0x1fc` | Last/current command word published by the action paths | candidate |
+
+The profile sound fields are read through the existing `VON_CONFIG_PTR`
+(`0x0051ab14`). The per-roster profile sound fields (`+0x488..+0x4a4`) and the confirmed
+action bindings are recovered in `recovered_audio_actions.c`; the queue
+producer/consumer is recovered in `recovered_audio_queue.c`.
+
 ## Objects and globals
 
 Base player object `0x00503ad0`, CPU object `0x005040d0`.

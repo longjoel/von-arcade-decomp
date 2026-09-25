@@ -93,20 +93,61 @@ def gather_obas(frames, anchor_time: float, raw_list):
     No single frame shows a complete mech (parts cull in and out), so a model
     exported from one frame is always missing limbs. Prefer the anchor frame
     (a neutral idle/select pose) and fill each missing part from the closest
-    frame that shows it, so the model carries its whole part set.
+    frame that shows it, so the model carries its whole part set. The source
+    time of every part is returned so a common root can re-base borrowed parts.
     """
     wanted = {int(raw, 16) for raw in raw_list}
     chosen: dict[int, tuple] = {}
+    frame_of: dict[int, float] = {}
     for time in sorted(frames, key=lambda t: abs(t - anchor_time)):
         for item in frames[time]:
             if item[0] in wanted and item[0] not in chosen:
                 chosen[item[0]] = item
+                frame_of[item[0]] = time
     missing = wanted - set(chosen)
     if missing:
         raise SystemExit("no frame shows model obas: " +
                          ", ".join(f"{oba:08x}" for oba in sorted(missing)))
     objects = [chosen[oba] for oba in sorted(chosen)]
-    return objects, list(range(len(objects)))
+    return objects, list(range(len(objects))), frame_of
+
+
+# The geometry matrix stores the rotation columns (x_axis, y_axis, z_axis) in
+# m[0:3]/m[3:6]/m[6:9] with the translation in m[9:12]. Convert to a standard
+# row-major rotation so composition is ordinary `parent * local`.
+def _rot(m):
+    return [m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]]
+
+
+def _store(rot, tx):
+    return [rot[0], rot[3], rot[6], rot[1], rot[4], rot[7],
+            rot[2], rot[5], rot[8]] + list(tx)
+
+
+def _mat3_inverse(a):
+    x, y, z, u, v, w, p, q, r = a
+    det = x * (v * r - w * q) - y * (u * r - w * p) + z * (u * q - v * p)
+    if det == 0.0:
+        raise ValueError("singular rigid transform")
+    return [(v * r - w * q) / det, (z * q - y * r) / det, (y * w - z * v) / det,
+            (w * p - u * r) / det, (x * r - z * p) / det, (z * u - x * w) / det,
+            (u * q - v * p) / det, (y * p - x * q) / det, (x * v - y * u) / det]
+
+
+def rigid_inverse(m):
+    rot = _rot(m)
+    inv_rot = _mat3_inverse(rot)
+    trans = [-sum(inv_rot[r * 3 + c] * m[9 + c] for c in range(3)) for r in range(3)]
+    return _store(inv_rot, trans)
+
+
+def rigid_compose(a, b):
+    a_rot, b_rot = _rot(a), _rot(b)
+    rot = [sum(a_rot[r * 3 + k] * b_rot[k * 3 + c] for k in range(3))
+           for r in range(3) for c in range(3)]
+    tx = [sum(a_rot[r * 3 + k] * b[9 + k] for k in range(3)) + a[9 + r]
+          for r in range(3)]
+    return _store(rot, tx)
 
 
 def main() -> int:
@@ -139,6 +180,10 @@ def main() -> int:
     parser.add_argument("--fill-missing", action="store_true",
                         help="with --oba, take each part from the nearest frame "
                              "that shows it (complete model) instead of failing")
+    parser.add_argument("--retarget-root", type=lambda s: int(s, 16), default=None,
+                        help="OBA used as the common frame; parts borrowed from "
+                             "other frames are re-based into the anchor pose of "
+                             "this root so the assembled model is coherent")
     args = parser.parse_args()
 
     frames = load_frames(args.trace)
@@ -163,9 +208,31 @@ def main() -> int:
         raise SystemExit("object slice is empty")
     if args.oba:
         if args.fill_missing:
-            objects, object_slots = gather_obas(frames, selected_time, args.oba)
+            objects, object_slots, frame_of = gather_obas(
+                frames, selected_time, args.oba)
         else:
             objects, object_slots = filter_obas(objects, object_slots, args.oba)
+            frame_of = {}
+    else:
+        frame_of = {}
+    if args.retarget_root is not None and frame_of:
+        root_at: dict[float, tuple] = {}
+        for time, items in frames.items():
+            for item in items:
+                if item[0] == args.retarget_root:
+                    root_at[time] = item[1]
+        if root_at:
+            anchor = (root_at[selected_time] if selected_time in root_at else
+                      root_at[min(root_at, key=lambda t: abs(t - selected_time))])
+            rebased = []
+            for oba, matrix, metadata in objects:
+                source = root_at.get(frame_of.get(oba, selected_time))
+                if source is None:
+                    rebased.append((oba, matrix, metadata))
+                else:
+                    local = rigid_compose(rigid_inverse(source), matrix)
+                    rebased.append((oba, rigid_compose(anchor, local), metadata))
+            objects = rebased
     geometry = args.rom.read_bytes()
     texture_rom = args.texture_rom.read_bytes()
     banks = load_banks(args.bank0, args.bank1)

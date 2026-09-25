@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
-"""Report the 68000 sound-program sequence dispatch table."""
+"""Report the 68000 sound-program sequence dispatch table.
+
+The sound driver loads its sequence table from the pointer word at CPU
+address `0x608004` (the game image's `0x8004`), copies it to sound RAM at
+`0x9000`, and indexes it with relative 16-bit offsets. The sibling pointer
+at `0x608008` names the 16-entry voice/sample assignment table.
+
+The default `--table-offset 0x8004` therefore resolves the real 65-entry
+sequence table; earlier revisions used `0x8008` (the voice pointer), which
+resolves to a one-entry table.
+"""
 
 from __future__ import annotations
 
@@ -41,8 +51,8 @@ def main() -> int:
     parser.add_argument("rom", type=Path, help="epr-18670.31 sound CPU ROM")
     parser.add_argument("-o", "--output", type=Path)
     parser.add_argument("--no-word-swap", action="store_true")
-    parser.add_argument("--table-offset", type=lambda value: int(value, 0), default=0x8008,
-                        help="ROM offset containing the table pointer")
+    parser.add_argument("--table-offset", type=lambda value: int(value, 0), default=0x8004,
+                        help="ROM offset containing the sequence-table pointer")
     args = parser.parse_args()
     physical = args.rom.read_bytes()
     data = physical if args.no_word_swap else word_swap(physical)
@@ -64,10 +74,9 @@ def main() -> int:
             entry.update(target=target, cpu_address=target + 0x600000,
                          preview=data[target:target + 16].hex(" "))
         streams.append(entry)
-    # The first sound-command table contains a pointer to a second, larger
-    # sequence/voice table.  Resolve it from the low word exactly as the
-    # 68000 code does at $6027f0.
-    voice_pointer = int.from_bytes(data[0x8004:0x8008], "big")
+    # The adjacent pointer resolved by the 68000 init at $601696 names the
+    # 16-entry voice/sample assignment table.
+    voice_pointer = int.from_bytes(data[0x8008:0x800c], "big")
     if not 0x600000 <= voice_pointer < 0x700000:
         raise ValueError(f"invalid voice-table pointer: {voice_pointer:#x}")
     voice_base = voice_pointer - 0x600000
@@ -81,7 +90,7 @@ def main() -> int:
                             "entry_stride": 2},
         "streams": streams,
         "voice_sequence_table": {
-            "pointer_word_offset": 0x8004,
+            "pointer_word_offset": 0x8008,
             "rom_offset": voice_base,
             "cpu_address": voice_base + 0x600000,
             "maximum_id": voice_maximum,
