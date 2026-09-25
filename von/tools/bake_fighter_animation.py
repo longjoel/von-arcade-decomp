@@ -346,6 +346,7 @@ def main() -> int:
     print("parts present:", sum(1 for m in measured if m > 0), "/", n)
 
     out = {
+        "schema": "von-animation-bake/1",
         "fighter": args.fighter,
         "clip": args.clip,
         "fps": 60.0,
