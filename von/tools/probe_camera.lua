@@ -33,6 +33,27 @@ do
 	end
 end
 local hold
+-- Field-name schedule (preferred over masks for motion probes):
+--   VON_CAMERA_FIELD_SEQ="from,to,PORT:FIELD[,PORT:FIELD];from,to,..."
+-- Each window presses the named ioport fields (e.g. jump = left stick left +
+-- right stick right, melee = both shots). One run can sweep idle/dash/jump/...
+local FIELD_SEQ = {}
+do
+	local raw = os.getenv("VON_CAMERA_FIELD_SEQ") or ""
+	for tok in string.gmatch(raw, "([^;]+)") do
+		local from, to, spec = string.match(tok, "([^,]+),([^,]+),(.+)")
+		if from then
+			local fields = {}
+			for item in string.gmatch(spec, "([^,]+)") do
+				local port, name = string.match(item, "([^:]+):(.+)")
+				if port then
+					fields[#fields + 1] = { port = ":" .. port:gsub("^:", ""), name = name }
+				end
+			end
+			FIELD_SEQ[#FIELD_SEQ + 1] = { from = tonumber(from), to = tonumber(to), fields = fields }
+		end
+	end
+end
 local STATE = os.getenv("VON_CAMERA_STATE")
 local state_base, state_len, state_every
 if STATE then
@@ -119,8 +140,14 @@ emu.register_periodic(function()
 	for _, s in ipairs(SEQUENCE) do
 		setmask(s.port, s.mask, frame >= s.from and frame < s.to)
 	end
+	for _, w in ipairs(FIELD_SEQ) do
+		local active = frame >= w.from and frame < w.to
+		for _, f in ipairs(w.fields) do
+			setp(f.name, f.port, active)
+		end
+	end
 	local next_phase = -1
-	if not hold and #SEQUENCE == 0 and frame >= FROM then
+	if not hold and #SEQUENCE == 0 and #FIELD_SEQ == 0 and frame >= FROM then
 		next_phase = math.floor((frame - FROM) / STEP) % #PHASES
 	end
 	if not hold and #SEQUENCE == 0 and next_phase ~= phase then

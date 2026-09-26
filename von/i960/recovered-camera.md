@@ -71,17 +71,49 @@ An earlier run looked like a *world-axis-aligned* follow (offset `(0, -77.2)`);
 that run simply had the opponent along +Z, so the enemy axis coincided with
 world -Z. Corrected here.
 
+## Motion- and state-dependent changes (live-match probe)
+
+A controlled sweep (`VON_CAMERA_FIELD_SEQ`, see below) and the clean
+`action-roster` captures (idle opponent) answer the earlier open questions:
+
+- **Grounded base is stable.** Idle, forward/back, strafe, turn, **dash**,
+  guard, and ranged fire all hold eye `29.445`, target y `18.0`, horizontal
+  `|eye - target|` `77.2`, pitch `8.44 deg`, even at point-blank player->opponent
+  range. So the camera distance does **not** scale with the fighter range in
+  normal play.
+- **Jump/air: the target rides the mech.** The look target follows the player's
+  height (`target.y ~ 18 + player.y`): jump 45-frame median `target.y 44`
+  (player y ~26) and the post-jump landing window `70.3` (player y ~52, close to
+  the recovered ~51 jump apex). The eye rises too but lags through the smoothing,
+  so the eye-target vertical offset temporarily grows from `11.4` to ~`18-27`
+  during fast vertical motion.
+- **Close/lock pulls the camera in.** Melee (stab/cross-slash) and the center
+  chord reduce the horizontal distance to ~`53-66` (min ~`41`) and lower the
+  target to y ~`12`; single left/right shots (unlocked) stay `77.2 / 18`.
+- **Cell correction.** `0x504bc8` duplicates the target z (the `dist` field of
+  the old camera log), not a distance cell. Use `|eye - target|` horizontal.
+
+A 10-stage idle sweep with `probe_camera.lua` shows several stages/windows with
+alternate poses (e.g. distance `40` with eye y `8-23`, or `49`), while others
+match the standard `77.2 / 29.445 / 18`. The fixed stage-force probe is
+confounded by round-intro/attract phases (a stage can show two poses at
+different times), so whether this is stage geometry or match state is **not yet
+separated**; it needs a probe that holds the round in COMBAT.
+
+Probe tooling added for this: `probe_camera.lua` accepts
+`VON_CAMERA_FIELD_SEQ="from,to,PORT:FIELD[,PORT:FIELD];..."` (named inputs, e.g.
+jump = left-stick-left + right-stick-right), and `analyze_camera_probe.py`
+summarizes a `state` dump's player/eye/target cells and base pose.
+
 ## Open questions
 
-- Distance and height were constant in normal play, but the probe's
-  jump/dash/shot segments did not move the mech (the match had not started),
-  so any motion-dependent distance/height change is **not yet measured**.
-  Re-probe with the schedule inside the live match and a stationary opponent.
-- The yaw smoothing time constant is not fitted; only the tracking statistic.
-- Whether the target follows player y during a jump is unmeasured (target y
-  was a constant 18).
-- Late frames with `|eye-target|` far from 77.2 (player parked in a corner) are
-  unclassified: possible wall avoidance, death cam, or a stale cell.
+- Separate stage- from match-state-dependence of the alternate camera poses
+  (phase-controlled probe that stays in COMBAT).
+- Fit the vertical target/eye smoothing time constants during a jump.
+- The lock/close pull-in curve: is it keyed on the lock latch, the melee action,
+  or the player->opponent range?
+- The late frames with `|eye-target|` far from `77.2` when parked in a corner are
+  yaw lag (the eye is off the player->opponent axis), not a distance change.
 
 ## Application
 
