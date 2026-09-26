@@ -101,6 +101,21 @@ local CYCLE = {
     { "shot_right", 60, { "right_shot" } },
 }
 
+-- Focused close-attack sweep (VON_ACTION_FOCUS): park the player at melee range
+-- and press one weapon button at a time, so a capture can tell which slots are
+-- close attacks (they engage the recovered close-combat camera).
+if os.getenv("VON_ACTION_FOCUS") then
+    CYCLE = {
+        { "focus_idle", 30, {} },
+        { "focus_left", 60, { "left_shot" } },
+        { "focus_idle", 30, {} },
+        { "focus_center", 60, { "left_shot", "right_shot" } },
+        { "focus_idle", 30, {} },
+        { "focus_right", 60, { "right_shot" } },
+        { "focus_idle", 30, {} },
+    }
+end
+
 local frame = 0
 local space
 local fields = {}
@@ -176,7 +191,8 @@ local function write_f32(addr, value)
 end
 
 local function setup_close_range(action)
-    if action ~= "melee_stab" and action ~= "melee_cross_slash" then return end
+    if action ~= "melee_stab" and action ~= "melee_cross_slash"
+            and not action:match("^focus") then return end
     -- Keep the player's current side of the opponent, close enough for melee
     -- but not overlapping.  Preserve the opponent's coordinates and place the
     -- player on +X; this is a capture-lab setup, never runtime game logic.

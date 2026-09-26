@@ -131,14 +131,27 @@ falling back to its own chase only when the fields are absent. The smoothing gai
 `RV_CAM_YAW_SMOOTH = 0.18` is still provisional (see the open question above).
 
 The **close-combat (lock) camera** is implemented as `cam_close`, a 0..1 blend
-eased (gain `0.06`) while the player is in a melee/contact attack (`weapon == 1`
-for Temjin, `0` for Dorkas, `1` for Apharmd). At full blend the eye height goes
-`29.445 -> 28.26`, the target y `18.0 -> 12.0`, and the horizontal distance
-`77.2 -> 53.6`, then eases back when the attack ends. `cam_close` joins the state
-hash and save/load.
+eased (gain `0.06`) while the player is in a melee/contact attack. At full blend
+the eye height goes `29.445 -> 28.26`, the target y drops by 6 (`base -> base-6`,
+e.g. `18 -> 12`), and the horizontal distance `77.2 -> 53.6`, then eases back when
+the attack ends. `cam_close` joins the state hash and save/load.
 
 The trigger is the **close attack**, not proximity or the lock. The capture
 shows a locked mech (turret flag `pa0=0x0100`) walking to point-blank range with
 the base camera; the close pose engages exactly when the melee action starts
-(target y drops `18.0 -> 12.0` on the first melee frame) and persists ~20 frames
-after it ends. Ranged shots (even with the turret flag set) keep the base pose.
+(target y drops on the first melee frame) and persists ~20 frames after it ends.
+Ranged shots (even with the turret flag set) keep the base pose.
+
+A focused close-range sweep (`VON_ACTION_FOCUS`, `action_schedule.lua`: park the
+player at melee range and press one button at a time) recovers which slots are
+close attacks. **Innate close attacks** (engage with no prior lock):
+Temjin centre (beam sword), Dorkas left (hammer), Fei-Yen left, Apharmd centre
+(Tongfer); their other slots stay ranged. The other fighters (Viper II,
+Belgador, Raiden, Bal-Bas-Bow) have no innate close attack on any button, though
+the roster captures show their **left** shot pulling the camera in when locked at
+close range (a lock-dependent close melee our kernel does not model yet).
+
+The **base camera height is per-fighter** in these captures: the base target y is
+16 (Dorkas), 18 (Temjin/Viper II), 19 (Apharmd), 21 (Fei-Yen/Raiden), 22
+(Belgador), 23 (Bal-Bas-Bow), with the horizontal distance always 77.2. The
+close pose keeps the same `-6` drop and `53.6` distance for every fighter.
