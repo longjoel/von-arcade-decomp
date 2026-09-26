@@ -16,8 +16,11 @@ from bake_effect_animation import (dominant_stream, family_of,  # noqa: E402
                                    sequence_kind, tick_and_step)
 
 
+IDENTITY = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+
+
 def row(time: float, oba: int, world=(0.0, 0.0, 0.0)):
-    return (time, oba, oba, oba, world)
+    return (time, oba, oba, oba, world, IDENTITY)
 
 
 def main() -> int:

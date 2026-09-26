@@ -38,6 +38,7 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from export_geometry_animation_gltf import transform_trs  # noqa: E402
 from export_geometry_frame_gltf import MATRIX, OBJECT  # noqa: E402
 from export_geometry_textured_gltf import parse_faces  # noqa: E402
 from model2_texture import (DEFAULT_BANK0, DEFAULT_BANK1, load_banks,  # noqa: E402
@@ -60,14 +61,21 @@ def family_of(oba: int) -> int:
 
 
 def load_objects(trace: Path, family: int):
-    """Return [(time, oba, tpa, tha, world_t)] for one OBA family, time-sorted."""
+    """Return object rows for one OBA family, time-sorted.
+
+    Each row is (time, oba, tpa, tha, world_translation, matrix). The matrix is
+    the object's world transform; its rotation and scale are part of the effect
+    (a bolt is oriented along its flight and stretched as it grows).
+    """
     current = (0.0, 0.0, 0.0)
+    rotation = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
     rows = []
     with trace.open(errors="ignore") as handle:
         for line in handle:
             matrix = MATRIX.search(line)
             if matrix:
-                current = tuple(float(v) for v in matrix[3].split(","))
+                rotation = tuple(float(value) for value in matrix[2].split(","))
+                current = tuple(float(value) for value in matrix[3].split(","))
                 continue
             match = OBJECT.search(line)
             if not match:
@@ -76,7 +84,7 @@ def load_objects(trace: Path, family: int):
             if family_of(oba) != family:
                 continue
             rows.append((float(match[1]), oba, int(match[2], 16),
-                         int(match[3], 16), current))
+                         int(match[3], 16), current, rotation))
     rows.sort(key=lambda row: row[0])
     return rows
 
@@ -89,7 +97,8 @@ def tick_and_step(rows):
     tick = gaps[len(gaps) // 10] if len(gaps) > 4 else (gaps[0] if gaps else 1 / 60)
     deltas = []
     previous = None
-    for time, oba, _, _, _ in rows:
+    for row in rows:
+        time, oba = row[0], row[1]
         if previous is not None:
             dt = time - previous[0]
             if 0.0 < dt <= tick * 1.6:
@@ -265,6 +274,18 @@ def bake_frame(geometry: bytes, texture_rom: bytes, banks, palette_state,
     return baked
 
 
+def _travel_dir(worlds):
+    """Unit direction of an instance's world motion (its authored forward)."""
+    if len(worlds) < 2:
+        return (0.0, 0.0, 1.0)
+    start, end = worlds[0], worlds[-1]
+    direction = [end[index] - start[index] for index in range(3)]
+    length = sum(value * value for value in direction) ** 0.5
+    if length < 1e-6:
+        return (0.0, 0.0, 1.0)
+    return tuple(value / length for value in direction)
+
+
 def sequence_kind(worlds, span):
     """Classify a stream by how far its world translation travels."""
     if not worlds:
@@ -316,14 +337,19 @@ def main() -> int:
         chain = chain[:args.max_frames]
     frames = []
     worlds = []
-    for time, oba, tpa, tha, world in chain:
+    for time, oba, tpa, tha, world, matrix in chain:
         groups = bake_frame(geometry, texture_rom, banks,
                             palettes.at(time), oba, tpa, tha)
+        rotation, scale = transform_trs(matrix)
         worlds.append(world)
         frames.append({
             "oba": f"{oba:08x}", "tpa": f"{tpa:08x}", "tha": f"{tha:08x}",
             "time": round(time, 6),
             "world": [round(value, 3) for value in world],
+            # The object's world orientation and per-frame stretch, so the host
+            # can point the effect along the projectile's velocity and scale it.
+            "rotation": [round(value, 6) for value in rotation],
+            "scale": [round(value, 5) for value in scale],
             "groups": groups,
         })
     gaps = sorted(chain[i + 1][0] - chain[i][0] for i in range(len(chain) - 1))
@@ -335,6 +361,7 @@ def main() -> int:
         "kind": kind,
         "displacement": distance,
         "frame_seconds": round(step, 6),
+        "travel": [round(value, 6) for value in _travel_dir(worlds)],
         "frames": frames,
     }]
     total_bytes = sum(group["bytes"] for frame in frames
