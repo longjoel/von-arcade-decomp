@@ -85,6 +85,15 @@ world -Z. Corrected here.
 
 ## Application
 
-`von-godot/scripts/match_view.gd` uses this model: `CAMERA_DISTANCE = 77.2`,
-`CAMERA_HEIGHT = 29.445`, `CAMERA_LOOK_HEIGHT = 18.0`,
-`CAMERA_FOV = 35.48`, and a smoothed player->opponent yaw.
+The kernel now owns the camera: `von_recovered_kernel.c` keeps a `cam_yaw`
+smoothed first-order follow of the horizontal player->opponent bearing (snapping
+while the lock latch is active), and each tick derives the eye behind the player
+along that bearing and the player as the look target, using `RV_CAM_DISTANCE =
+77.2`, `RV_CAM_HEIGHT = 29.445`, `RV_CAM_LOOK_HEIGHT = 18.0`, `RV_CAM_FOV =
+35.48`. `cam_yaw` is hashed and saved/loaded with the rest of the state, so the
+camera is deterministic and rollback-safe.
+
+The snapshot exposes `camera_eye`, `camera_target`, and `camera_fov` (optional,
+`bytes`-guarded appends) and `von-godot/scripts/match_view.gd` renders from them,
+falling back to its own chase only when the fields are absent. The smoothing gain
+`RV_CAM_YAW_SMOOTH = 0.18` is still provisional (see the open question above).
