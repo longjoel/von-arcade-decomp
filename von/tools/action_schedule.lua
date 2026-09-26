@@ -23,6 +23,8 @@ local CAMERA_PATH = os.getenv("VON_CAMERA_LOG")
 local SECONDS = tonumber(os.getenv("VON_ACTION_SECONDS") or "40")
 local START_FRAME = tonumber(os.getenv("VON_ACTION_START_FRAME") or "2120")
 local CYCLES = tonumber(os.getenv("VON_ACTION_CYCLES") or "2")
+-- Optional forced stage ordinal (0..9); nil keeps the match's own choice.
+local STAGE = tonumber(os.getenv("VON_ACTION_STAGE") or "")
 local COIN_FRAME = tonumber(os.getenv("VON_PROGRESS_COIN_FRAME") or "900")
 local MATCH_START = tonumber(os.getenv("VON_PROGRESS_START_FRAME") or "1500")
 -- Optional machine-select navigation: press "right" SELECT_STEPS times after
@@ -320,6 +322,14 @@ emu.register_periodic(function()
         return
     end
     if not fields.coin then return end
+    -- Optional forced stage (VON_ACTION_STAGE): the same arena for every fighter
+    -- so a per-fighter camera height can be separated from a per-stage one.
+    if STAGE and frame >= 1600 and frame < 2600 then
+        pcall(function()
+            space:write_u32(0x503a80, STAGE)
+            space:write_u32(0x509b80, STAGE)
+        end)
+    end
     schedule_step()
     if lock_file and schedule_active then log_lock() end
     if camera_file and schedule_active then log_camera() end

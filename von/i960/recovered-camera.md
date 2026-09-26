@@ -56,10 +56,11 @@ The focal is a constant **600.0 / 600.0**. On the Model 2 viewport
 
 ## Recovered model
 
-- **Target**: the player's x/z at height 18.0 — `0x504bb4` tracks `0x503ad8`.
+- **Target**: the player's x/z at a per-fighter height (Temjin 18.0) —
+  `0x504bb4` tracks `0x503ad8`.
 - **Distance**: constant **77.2** horizontal eye-to-target in normal play.
-- **Heights**: eye 29.445, target 18.0, pitch `atan2(29.445-18.0, 77.2) =
-  -8.44 deg`.
+- **Heights**: eye 29.445, target 18.0 for Temjin; both are per-fighter (see the
+  live-match probe section). Pitch `atan2(eye-target, 77.2) = -8.44 deg`.
 - **Yaw**: the eye is placed behind the player along the horizontal
   player->opponent axis, so the camera faces the enemy. Over 1046 in-play
   samples the camera-forward angle tracks the player->opponent bearing with
@@ -155,7 +156,11 @@ base pose). The kernel models this as `close_lock` — acquired with the aim loc
 at jump/dash completion, held while the opponent stays in the camera cone, and
 gating the close pose for any attack within ~60 units.
 
-The **base camera height is per-fighter** in these captures: the base target y is
+The **base camera height is per-fighter**, not per-stage. The base target y is
 16 (Dorkas), 18 (Temjin/Viper II), 19 (Apharmd), 21 (Fei-Yen/Raiden), 22
-(Belgador), 23 (Bal-Bas-Bow), with the horizontal distance always 77.2. The
-close pose keeps the same `-6` drop and `53.6` distance for every fighter.
+(Belgador), 23 (Bal-Bas-Bow), with the horizontal distance always 77.2 and the
+eye a fixed `+11.445` above the target. Forcing one common stage (0) for every
+fighter reproduces the same per-fighter values, so it is the fighter, not the
+arena. The close pose drops the target y by 6 and the eye by ~1.19 and pulls to
+53.6 for every fighter. The kernel holds the table as `RV_CAM_LOOK_HEIGHT[8]`
+(kernel roster order) plus `RV_CAM_EYE_OFFSET = 11.445`.
