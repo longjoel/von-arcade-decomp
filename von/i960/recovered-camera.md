@@ -147,9 +147,13 @@ player at melee range and press one button at a time) recovers which slots are
 close attacks. **Innate close attacks** (engage with no prior lock):
 Temjin centre (beam sword), Dorkas left (hammer), Fei-Yen left, Apharmd centre
 (Tongfer); their other slots stay ranged. The other fighters (Viper II,
-Belgador, Raiden, Bal-Bas-Bow) have no innate close attack on any button, though
-the roster captures show their **left** shot pulling the camera in when locked at
-close range (a lock-dependent close melee our kernel does not model yet).
+Belgador, Raiden, Bal-Bas-Bow) have no innate close attack on any button, but a
+**persistent close lock** turns their weapon buttons into close melees: the
+roster captures show their left shot pulling the camera in only when the jump/
+dash lock is held at close range (the focus probe, which never jumps, keeps the
+base pose). The kernel models this as `close_lock` — acquired with the aim lock
+at jump/dash completion, held while the opponent stays in the camera cone, and
+gating the close pose for any attack within ~60 units.
 
 The **base camera height is per-fighter** in these captures: the base target y is
 16 (Dorkas), 18 (Temjin/Viper II), 19 (Apharmd), 21 (Fei-Yen/Raiden), 22
