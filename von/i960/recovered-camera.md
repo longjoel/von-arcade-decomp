@@ -110,8 +110,8 @@ summarizes a `state` dump's player/eye/target cells and base pose.
 - Separate stage- from match-state-dependence of the alternate camera poses
   (phase-controlled probe that stays in COMBAT).
 - Fit the vertical target/eye smoothing time constants during a jump.
-- The lock/close pull-in curve: is it keyed on the lock latch, the melee action,
-  or the player->opponent range?
+- The close-combat pull-in is **resolved** as the close attack (above); whether
+  non-melee fighters share it (a locked ranged fighter) is still open.
 - The late frames with `|eye-target|` far from `77.2` when parked in a corner are
   yaw lag (the eye is off the player->opponent axis), not a distance change.
 
@@ -129,3 +129,11 @@ The snapshot exposes `camera_eye`, `camera_target`, and `camera_fov` (optional,
 `bytes`-guarded appends) and `von-godot/scripts/match_view.gd` renders from them,
 falling back to its own chase only when the fields are absent. The smoothing gain
 `RV_CAM_YAW_SMOOTH = 0.18` is still provisional (see the open question above).
+
+The **close-combat (lock) camera** is implemented as `cam_close`, a 0..1 blend
+eased (gain `0.06`) while the player is in a melee/contact attack (`weapon == 1`
+for Temjin, `0` for Dorkas, `1` for Apharmd) or while the lock latch is active.
+At full blend the eye height goes `29.445 -> 28.26`, the target y `18.0 -> 12.0`,
+and the horizontal distance `77.2 -> 53.6`, then eases back when the attack ends.
+`cam_close` joins the state hash and save/load. The trigger is the close attack,
+not proximity: a mech walking to point-blank range keeps the base pose.
