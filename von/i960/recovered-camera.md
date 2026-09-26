@@ -132,8 +132,13 @@ falling back to its own chase only when the fields are absent. The smoothing gai
 
 The **close-combat (lock) camera** is implemented as `cam_close`, a 0..1 blend
 eased (gain `0.06`) while the player is in a melee/contact attack (`weapon == 1`
-for Temjin, `0` for Dorkas, `1` for Apharmd) or while the lock latch is active.
-At full blend the eye height goes `29.445 -> 28.26`, the target y `18.0 -> 12.0`,
-and the horizontal distance `77.2 -> 53.6`, then eases back when the attack ends.
-`cam_close` joins the state hash and save/load. The trigger is the close attack,
-not proximity: a mech walking to point-blank range keeps the base pose.
+for Temjin, `0` for Dorkas, `1` for Apharmd). At full blend the eye height goes
+`29.445 -> 28.26`, the target y `18.0 -> 12.0`, and the horizontal distance
+`77.2 -> 53.6`, then eases back when the attack ends. `cam_close` joins the state
+hash and save/load.
+
+The trigger is the **close attack**, not proximity or the lock. The capture
+shows a locked mech (turret flag `pa0=0x0100`) walking to point-blank range with
+the base camera; the close pose engages exactly when the melee action starts
+(target y drops `18.0 -> 12.0` on the first melee frame) and persists ~20 frames
+after it ends. Ranged shots (even with the turret flag set) keep the base pose.
