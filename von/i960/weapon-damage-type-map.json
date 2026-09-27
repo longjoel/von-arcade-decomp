@@ -32,8 +32,9 @@
  },
  "damage_scaling": {
   "applier": "i960 0x33334/0x33364 -> 0x33420 -> 0x33838",
-  "model": "applied = object+0x4a (raw table damage) * global(0x503ab4) * distance_factor / 10000, then optionally scaled by the profile percent (+0x63c when object+0x172==11, +0x640 when 0x172==14) / 100, then by a factor selected on 0x503ac0.",
-  "status": "path recovered but not yet reduced to a closed form; not wired into the kernel"
+  "model": "applied = object+0x4a (raw table damage) * global(0x503ab4) / 100 (global is 100 by default, so applied == raw; there is no distance term), then, only when the hit object's state (+0x172) is 11 or 14, scaled by the profile percent (+0x63c for 11, +0x640 for 14) / 100, then by a factor selected on 0x503ac0 (boss/Jaguarandi branch).",
+  "profile_percent": {"+0x63c (state 11)": "5-15 per fighter", "+0x640 (state 14)": "80 for every fighter"},
+  "status": "raw damage wired per fighter (weapon_damage.h); the state-11/14 profile modifier is not wired (needs the defender's +0x172 state in the hit path)"
  },
  "fighter_types": {
   "method": "probe_ordnance_id.lua with VON_OID_SELECT_STEPS selects each roster fighter; byte 0 of the player's ordnance record at spawn (0x503ad0+0x200+i*0x20) is the damage-table index. Windows: left, right, center (held chord).",
