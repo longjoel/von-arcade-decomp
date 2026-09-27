@@ -14,6 +14,14 @@ local START = tonumber(os.getenv("VON_OID_START") or "7400")
 local BATTLE = tonumber(os.getenv("VON_OID_BATTLE") or "9500")
 local WINDOW = tonumber(os.getenv("VON_OID_WINDOW") or "1500")
 local PLAYER = 0x00503ad0
+-- Optional fighter selection: walk the select cursor right N times before the
+-- confirm, so the same probe recovers another fighter's ordnance type bytes.
+local SELECT_STEPS = tonumber(os.getenv("VON_OID_SELECT_STEPS") or "0")
+local SELECT_STEP_FRAMES = 45
+if SELECT_STEPS > 0 then
+    START = COIN + (SELECT_STEPS + 2) * SELECT_STEP_FRAMES
+    BATTLE = START + 2100
+end
 
 local WINDOWS = {
     { "left",   BATTLE + 100, BATTLE + 100 + WINDOW },
@@ -23,7 +31,9 @@ local WINDOWS = {
 
 local FIELDS = {
     coin = { ":IN0", "Coin 1" },
-    start = { ":IN0", "2 Players Start" },
+    start = { ":IN0", (SELECT_STEPS > 0 or os.getenv("VON_OID_1P") == "1")
+        and "1 Player Start" or "2 Players Start" },
+    right = { ":IN1", "P1 Left Stick/Right" },
     left_shot = { ":IN1", "P1 Left Shot" },
     right_shot = { ":IN2", "P1 Right Shot" },
 }
@@ -86,6 +96,15 @@ emu.register_periodic(function()
     if not fields.coin then return end
     if frame == COIN then set_key("coin", true) end
     if frame == COIN + 8 then set_key("coin", false) end
+    if SELECT_STEPS > 0 then
+        local base = START - (SELECT_STEPS + 1) * SELECT_STEP_FRAMES
+        local right = false
+        for step = 1, SELECT_STEPS do
+            local at = base + step * SELECT_STEP_FRAMES
+            if frame >= at and frame < at + 8 then right = true end
+        end
+        set_key("right", right)
+    end
     if frame == START then set_key("start", true) end
     if frame == START + 8 then set_key("start", false) end
 
